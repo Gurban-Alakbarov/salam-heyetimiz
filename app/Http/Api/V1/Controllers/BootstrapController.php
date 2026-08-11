@@ -3,6 +3,7 @@
 namespace App\Http\Api\V1\Controllers;
 
 use App\Domain\Admin\Services\SettingsService;
+use App\Domain\Notifications\Queries\NotificationQuery;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
 use App\Domain\Users\Models\User;
 use App\Http\Api\V1\Support\RespondsWithEnvelope;
@@ -27,6 +28,7 @@ class BootstrapController
     public function __construct(
         private readonly SettingsService $settings,
         private readonly SubscriptionQuery $subscriptions,
+        private readonly NotificationQuery $notifications,
     ) {}
 
     /** GET /v1/bootstrap — guest app configuration (public). */
@@ -73,7 +75,7 @@ class BootstrapController
             'app' => $this->appBlock(),
             'feature_flags' => $this->featureFlags(),
             'permissions' => [],                    // mobile users have no RBAC (reserved/extensible)
-            'unread_notifications_count' => 0,      // reserved (notifications not implemented yet)
+            'unread_notifications_count' => $this->notifications->unreadCount((int) $user->getKey()),
             'user_devices' => $this->userDevices($user),
             'active_subscriptions' => $this->activeSubscriptions((int) $user->getKey()),
             // Future sections (apartments, vehicles, devices, complexes, notifications, invitations,

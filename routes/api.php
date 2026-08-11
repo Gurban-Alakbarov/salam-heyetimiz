@@ -9,6 +9,7 @@ use App\Http\Api\V1\Controllers\Devices\TechDeviceController;
 use App\Http\Api\V1\Controllers\Auth\RegistrationController;
 use App\Http\Api\V1\Controllers\BootstrapController;
 use App\Http\Api\V1\Controllers\Health\HealthController;
+use App\Http\Api\V1\Controllers\Notifications\NotificationController;
 use App\Http\Api\V1\Controllers\Notifications\PushTokenController;
 use App\Http\Api\V1\Controllers\Orders\OrderController;
 use App\Http\Api\V1\Controllers\Payments\PaymentReturnController;
@@ -68,6 +69,11 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
     // Push token registration/de-registration for the current install (batch 11 — Notifications).
     Route::put('notifications/push-token', [PushTokenController::class, 'upsert'])->name('upsertPushToken');
     Route::delete('notifications/push-token', [PushTokenController::class, 'destroy'])->name('deletePushToken');
+
+    // In-app notification inbox (batch 11 — Notifications). read-all before {notificationId}/read.
+    Route::get('notifications', [NotificationController::class, 'index'])->name('listNotifications');
+    Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('markAllNotificationsRead');
+    Route::post('notifications/{notificationId}/read', [NotificationController::class, 'read'])->whereNumber('notificationId')->name('markNotificationRead');
 
     // Orders & Payments (batch 05)
     Route::prefix('orders')->group(function (): void {

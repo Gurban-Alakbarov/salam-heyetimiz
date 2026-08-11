@@ -6,7 +6,15 @@ use App\Domain\DeviceComm\Events\OpenCommandCompleted;
 use App\Domain\Notifications\Adapters\FakePushClient;
 use App\Domain\Notifications\Adapters\FcmPushClient;
 use App\Domain\Notifications\Contracts\PushClient;
+use App\Domain\Notifications\Listeners\SendSubscriptionActivatedNotification;
+use App\Domain\Notifications\Listeners\SendSubscriptionExpiredNotification;
+use App\Domain\Notifications\Listeners\SendSubscriptionExpiringNotification;
+use App\Domain\Notifications\Listeners\SendSubscriptionRenewedNotification;
 use App\Domain\Notifications\Listeners\SendVisitorOpenedNotification;
+use App\Domain\Subscriptions\Events\SubscriptionActivated;
+use App\Domain\Subscriptions\Events\SubscriptionExpired;
+use App\Domain\Subscriptions\Events\SubscriptionExpiringSoon;
+use App\Domain\Subscriptions\Events\SubscriptionRenewed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -45,6 +53,15 @@ class ModuleServiceProvider extends ServiceProvider
         // the link's owning resident. Additive consumer of the existing event — DeviceComm/Visitor
         // logic is untouched, and IncrementVisitorUsageOnOpenCompleted keeps its own subscription.
         Event::listen(OpenCommandCompleted::class, SendVisitorOpenedNotification::class);
+
+        // Subscription lifecycle notifications (INVENTORY §2; Phase 4A): additive consumers of the
+        // existing Subscriptions events — no dispatch site or Subscriptions logic is changed (R-ARCH-06).
+        // Each maps to a DB template + LOCKED dedupe; SubscriptionActivated notifies only a real paid
+        // activation (the comp-grant path has no billing period and is a no-op).
+        Event::listen(SubscriptionExpiringSoon::class, SendSubscriptionExpiringNotification::class);
+        Event::listen(SubscriptionExpired::class, SendSubscriptionExpiredNotification::class);
+        Event::listen(SubscriptionActivated::class, SendSubscriptionActivatedNotification::class);
+        Event::listen(SubscriptionRenewed::class, SendSubscriptionRenewedNotification::class);
     }
 
     /** Absolute path to the service-account JSON, or null when unset/missing (→ FakePushClient). */

@@ -11,6 +11,7 @@ return [
     'validation_failed' => 'Daxil edilən məlumat yanlışdır.',
     'conflict' => 'Əməliyyat ziddiyyət yaratdı.',
     'idempotency_mismatch' => 'Eyni açar fərqli sorğu ilə istifadə olunub.',
+    'confirmation_required' => 'Göndərişi təsdiqləmək tələb olunur (confirmed=true).',
     'rate_limited' => 'Çox sayda sorğu. :retry_after_seconds saniyə sonra yenidən cəhd edin.',
     'cooldown' => 'Yenidən cəhd üçün :retry_after_seconds saniyə gözləyin.',
     'subscription_required' => 'Aboneliyiniz başa çatıb.',

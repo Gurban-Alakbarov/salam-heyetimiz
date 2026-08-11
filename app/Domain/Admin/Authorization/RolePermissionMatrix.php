@@ -52,6 +52,8 @@ final class RolePermissionMatrix
                 Permission::COMMANDS_VIEW,
                 Permission::VISITOR_LINKS_VIEW,
                 Permission::VISITOR_LINKS_MANAGE,
+                Permission::NOTIFICATIONS_VIEW,
+                Permission::NOTIFICATIONS_SEND,
             ],
 
             AdminRole::Finance->value => [
@@ -75,6 +77,7 @@ final class RolePermissionMatrix
                 Permission::COMMANDS_VIEW,
                 Permission::SUPPORT_OTP_RESEND,
                 Permission::VISITOR_LINKS_VIEW,
+                Permission::NOTIFICATIONS_VIEW,
             ],
 
             AdminRole::ComplexManager->value => [
@@ -93,6 +96,8 @@ final class RolePermissionMatrix
                 Permission::REPORTS_VIEW,
                 Permission::VISITOR_LINKS_VIEW,
                 Permission::VISITOR_LINKS_MANAGE,
+                Permission::NOTIFICATIONS_VIEW,
+                Permission::NOTIFICATIONS_SEND,
             ],
         ];
     }

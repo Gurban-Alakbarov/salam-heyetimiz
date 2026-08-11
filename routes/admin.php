@@ -4,11 +4,12 @@ use App\Http\Admin\V1\Controllers\Access\AccessControlController;
 use App\Http\Admin\V1\Controllers\Admins\AdminManagementController;
 use App\Http\Admin\V1\Controllers\Admins\ImpersonationController;
 use App\Http\Admin\V1\Controllers\Audit\AuditController;
-use App\Http\Admin\V1\Controllers\Complexes\ComplexManagementController;
 use App\Http\Admin\V1\Controllers\Auth\AdminAuthController;
+use App\Http\Admin\V1\Controllers\Complexes\ComplexManagementController;
 use App\Http\Admin\V1\Controllers\Devices\AdminDeviceCommController;
 use App\Http\Admin\V1\Controllers\Devices\AdminDeviceController;
 use App\Http\Admin\V1\Controllers\Devices\AdminDeviceRosterController;
+use App\Http\Admin\V1\Controllers\Notifications\AdminNotificationCampaignController;
 use App\Http\Admin\V1\Controllers\Orders\AdminOrderController;
 use App\Http\Admin\V1\Controllers\Payments\AdminPaymentLogController;
 use App\Http\Admin\V1\Controllers\Refunds\AdminRefundController;
@@ -105,6 +106,13 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     // Residents directory (residents.view; complex_manager scoped) + account removal (residents.delete)
     Route::get('residents', [AdminResidentController::class, 'index'])->name('adminListResidents');
     Route::delete('residents/{userId}', [AdminResidentController::class, 'destroy'])->whereNumber('userId')->name('adminDeleteResident');
+
+    // Notification campaigns (batch 11 — notifications.view / notifications.send; complex_manager scoped).
+    // audience/preview before {campaignId} so the static path is not captured by the numeric param.
+    Route::get('notifications', [AdminNotificationCampaignController::class, 'index'])->name('adminListNotificationCampaigns');
+    Route::post('notifications', [AdminNotificationCampaignController::class, 'send'])->name('adminSendNotification');
+    Route::post('notifications/audience/preview', [AdminNotificationCampaignController::class, 'previewAudience'])->name('adminPreviewNotificationAudience');
+    Route::get('notifications/{campaignId}', [AdminNotificationCampaignController::class, 'show'])->whereNumber('campaignId')->name('adminGetNotificationCampaign');
 
     // Devices (batch 08)
     Route::get('devices', [AdminDeviceController::class, 'index'])->name('adminListDevices');

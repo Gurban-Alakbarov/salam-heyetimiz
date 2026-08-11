@@ -70,4 +70,50 @@ final class ResidentQuery
             ],
         ];
     }
+
+    /**
+     * Distinct resident user_ids matching an admin-campaign audience filter (ADMIN_SPEC). Reuses the same
+     * active-roster join as the directory listing; the complex_manager scope is an ANDed WHERE so a scoped
+     * caller can never resolve outside its complex. Recipients dedupe to distinct user_id (a user on two
+     * devices = one recipient). `$userIds` constrains to an explicit id list (an empty list → no recipients).
+     *
+     * @param  array<int, int>|null  $userIds
+     * @return array<int, int>
+     */
+    public function resolveAudienceUserIds(?int $complexId, ?string $q, ?string $role, ?string $status, ?array $userIds, ?int $scopeComplexId): array
+    {
+        $query = DB::table('device_users as du')
+            ->join('users as u', 'u.id', '=', 'du.user_id')
+            ->join('devices as d', 'd.id', '=', 'du.device_id')
+            ->leftJoin('subscriptions as s', 's.device_user_id', '=', 'du.id')
+            ->whereNull('u.deleted_at')
+            ->whereNull('d.deleted_at')
+            ->where('du.status', 'active');
+
+        if ($scopeComplexId !== null) {
+            $query->where('d.complex_id', $scopeComplexId);
+        }
+        if ($complexId !== null) {
+            $query->where('d.complex_id', $complexId);
+        }
+        if ($q !== null && $q !== '') {
+            $query->where(function ($w) use ($q): void {
+                $w->where('u.phone', 'like', '%'.$q.'%')
+                    ->orWhere('u.email', 'like', '%'.$q.'%')
+                    ->orWhere('u.full_name', 'like', '%'.$q.'%');
+            });
+        }
+        if ($role !== null && $role !== '') {
+            $query->where('du.role', $role);
+        }
+        if ($status !== null && $status !== '') {
+            $query->where('s.status', $status);
+        }
+        if ($userIds !== null) {
+            // An explicit empty list resolves to no recipients (whereIn [] would otherwise match all).
+            $query->whereIn('du.user_id', $userIds === [] ? [0] : $userIds);
+        }
+
+        return $query->distinct()->pluck('du.user_id')->map(static fn ($v): int => (int) $v)->all();
+    }
 }

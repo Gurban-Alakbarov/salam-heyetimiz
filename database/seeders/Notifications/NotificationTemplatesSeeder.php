@@ -30,6 +30,11 @@ class NotificationTemplatesSeeder extends Seeder
         foreach ($this->subscriptionTemplates() as $key => $locales) {
             $this->seedTemplate($key, NotificationCategory::Billing, $locales);
         }
+
+        // system.admin_campaign — admin free-text broadcast (INVENTORY §2; system_announcement type).
+        // Category operational; fixed push + inapp via the mask (R-NOT-04). No locale rows: the copy is
+        // supplied per-campaign in the admin's single chosen language and delivered as-is (no translation).
+        $this->seedTemplate('system.admin_campaign', NotificationCategory::Operational, []);
     }
 
     /**

@@ -18,16 +18,24 @@ final class Permission
 
     // system settings
     public const SYSTEM_SETTINGS_MANAGE = 'system.settings.manage';
+
     public const SYSTEM_SMS_MANAGE = 'system.sms.manage';
+
     public const SYSTEM_PAYMENT_MANAGE = 'system.payment.manage';
+
     public const SYSTEM_TRACCAR_MANAGE = 'system.traccar.manage';
 
     // admins & RBAC
     public const ADMINS_VIEW = 'admins.view';
+
     public const ADMINS_CREATE = 'admins.create';
+
     public const ADMINS_UPDATE = 'admins.update';
+
     public const ADMINS_DELETE = 'admins.delete';
+
     public const ADMINS_ASSIGN_ROLES = 'admins.assign_roles';
+
     public const ADMINS_IMPERSONATE = 'admins.impersonate';
 
     // audit
@@ -38,59 +46,90 @@ final class Permission
 
     // complexes
     public const COMPLEXES_VIEW = 'complexes.view';
+
     public const COMPLEXES_MANAGE = 'complexes.manage';
 
     // devices / barriers
     public const DEVICES_VIEW = 'devices.view';
+
     public const DEVICES_CREATE = 'devices.create';
+
     public const DEVICES_UPDATE = 'devices.update';
+
     public const DEVICES_RECONCILE = 'devices.reconcile';
+
     public const DEVICES_DISABLE = 'devices.disable';
+
     public const DEVICES_DECOMMISSION = 'devices.decommission';
+
     public const DEVICES_TRANSFER = 'devices.transfer';
+
     public const DEVICES_ASSIGN = 'devices.assign';
+
     public const BARRIERS_ASSIGN = 'barriers.assign';
+
     public const DEVICES_DIAGNOSTICS_VIEW = 'devices.diagnostics.view';
+
     public const DEVICES_TRACCAR_VIEW = 'devices.traccar.view';
 
     // whitelist
     public const WHITELIST_VIEW = 'whitelist.view';
+
     public const WHITELIST_MANAGE = 'whitelist.manage';
 
     // open commands
     public const COMMANDS_VIEW = 'commands.view';
+
     public const COMMANDS_TEST = 'commands.test';
 
     // visitor links (shareable guest access)
     public const VISITOR_LINKS_VIEW = 'visitor_links.view';
+
     public const VISITOR_LINKS_MANAGE = 'visitor_links.manage';
 
     // residents / roster
     public const RESIDENTS_VIEW = 'residents.view';
+
     public const RESIDENTS_CREATE = 'residents.create';
+
     public const RESIDENTS_UPDATE = 'residents.update';
+
     public const RESIDENTS_DELETE = 'residents.delete';
 
     // apartments
     public const APARTMENTS_VIEW = 'apartments.view';
+
     public const APARTMENTS_MANAGE = 'apartments.manage';
 
     // vehicles
     public const VEHICLES_VIEW = 'vehicles.view';
+
     public const VEHICLES_MANAGE = 'vehicles.manage';
 
     // finance
     public const PAYMENTS_VIEW = 'payments.view';
+
     public const ORDERS_VIEW = 'orders.view';
+
     public const REFUNDS_VIEW = 'refunds.view';
+
     public const REFUNDS_CREATE = 'refunds.create';
+
     public const SUBSCRIPTIONS_VIEW = 'subscriptions.view';
+
     public const SUBSCRIPTIONS_MANAGE = 'subscriptions.manage';
+
     public const INVOICES_VIEW = 'invoices.view';
+
     public const REPORTS_VIEW = 'reports.view';
 
     // support
     public const SUPPORT_OTP_RESEND = 'support.otp.resend';
+
+    // notifications (admin campaigns / system announcements)
+    public const NOTIFICATIONS_VIEW = 'notifications.view';
+
+    public const NOTIFICATIONS_SEND = 'notifications.send';
 
     /**
      * Full catalog as [key => [group, label]]. Order is display order within the group.
@@ -163,6 +202,9 @@ final class Permission
             self::REPORTS_VIEW => ['group' => 'finance', 'label' => 'Hesabatları gör'],
 
             self::SUPPORT_OTP_RESEND => ['group' => 'support', 'label' => 'OTP yenidən göndər'],
+
+            self::NOTIFICATIONS_VIEW => ['group' => 'notifications', 'label' => 'Bildiriş kampaniyalarını gör'],
+            self::NOTIFICATIONS_SEND => ['group' => 'notifications', 'label' => 'Sistem bildirişi göndər'],
         ];
     }
 

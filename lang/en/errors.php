@@ -8,6 +8,7 @@ return [
     'validation_failed' => 'The submitted data is invalid.',
     'conflict' => 'The operation caused a conflict.',
     'idempotency_mismatch' => 'The same key was reused with a different request.',
+    'confirmation_required' => 'Send confirmation is required (confirmed=true).',
     'rate_limited' => 'Too many requests. Try again in :retry_after_seconds seconds.',
     'cooldown' => 'Wait :retry_after_seconds seconds before trying again.',
     'subscription_required' => 'Your subscription has expired.',

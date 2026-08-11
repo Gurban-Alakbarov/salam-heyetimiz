@@ -8,6 +8,7 @@ return [
     'validation_failed' => 'Введённые данные некорректны.',
     'conflict' => 'Конфликт операции.',
     'idempotency_mismatch' => 'Тот же ключ использован с другим запросом.',
+    'confirmation_required' => 'Требуется подтверждение отправки (confirmed=true).',
     'rate_limited' => 'Слишком много запросов. Повторите через :retry_after_seconds сек.',
     'cooldown' => 'Подождите :retry_after_seconds сек. перед повторной попыткой.',
     'subscription_required' => 'Срок вашей подписки истёк.',

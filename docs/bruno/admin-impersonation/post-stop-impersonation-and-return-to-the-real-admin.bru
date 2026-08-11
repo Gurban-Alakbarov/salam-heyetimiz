@@ -1,0 +1,15 @@
+meta {
+  name: Stop impersonation and return to the real admin
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/auth/stop-impersonation
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

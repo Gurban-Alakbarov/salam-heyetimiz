@@ -1,0 +1,19 @@
+meta {
+  name: Live system health (php, db, redis, queue, disk, memory, cpu, traccar)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/system/health
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `system.settings.manage`. Real-time component status + the live Traccar device count.
+}

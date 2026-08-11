@@ -1,0 +1,15 @@
+meta {
+  name: Subscription counts by status, churn proxy
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/reports/subscriptions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

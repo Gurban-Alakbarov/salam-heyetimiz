@@ -1,0 +1,25 @@
+meta {
+  name: Reconcile a device against Traccar
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices/reconcile
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "unique_id": "864000000000001"
+}
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Request an email login OTP (returning, verified user)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+{
+    "email": "aysel@example.com"
+}
+}
+
+docs {
+  Sends a login OTP to a verified account; verification is completed via **/auth/verify-email**. Anti-enumeration — identical response regardless of existence. Rate limit 5/email/10min + 30/IP/hour. For...
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Current admin profile
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/auth/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

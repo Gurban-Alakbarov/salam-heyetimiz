@@ -1,0 +1,33 @@
+meta {
+  name: Update device
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "firmware_version": "",
+    "driver_type": "",
+    "sim_operator_id": 0,
+    "sim_iccid": "",
+    "region_id": 0,
+    "location_label": "",
+    "latitude": 0,
+    "longitude": 0,
+    "metadata": {}
+}
+}

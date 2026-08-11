@@ -1,0 +1,27 @@
+meta {
+  name: Transfer ownership to another user
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/transfer
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "new_owner_phone": "",
+    "reason": "",
+    "keep_existing_users": false
+}
+}

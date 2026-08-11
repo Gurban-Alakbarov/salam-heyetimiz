@@ -1,0 +1,25 @@
+meta {
+  name: Revoke a permission from an admin (override)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/admins/:adminId/permissions/revoke
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "permission": "refunds.create"
+}
+}

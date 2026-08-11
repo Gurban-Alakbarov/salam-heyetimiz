@@ -1,0 +1,26 @@
+meta {
+  name: Render a template with sample variables
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/notification-templates/:key/preview
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "locale": "",
+    "variables": {}
+}
+}

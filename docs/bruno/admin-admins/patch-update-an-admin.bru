@@ -1,0 +1,28 @@
+meta {
+  name: Update an admin
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/admin/v1/admins/:adminId
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "name": "",
+    "role": "",
+    "phone": "",
+    "status": ""
+}
+}

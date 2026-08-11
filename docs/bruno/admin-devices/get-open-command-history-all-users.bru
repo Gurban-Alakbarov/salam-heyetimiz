@@ -1,0 +1,15 @@
+meta {
+  name: Open-command history (all users)
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/commands
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

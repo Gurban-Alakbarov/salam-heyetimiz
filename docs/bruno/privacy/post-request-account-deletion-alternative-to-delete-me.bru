@@ -1,0 +1,26 @@
+meta {
+  name: Request account deletion (alternative to DELETE /me)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/privacy/deletion
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "confirm_phone": ""
+}
+}

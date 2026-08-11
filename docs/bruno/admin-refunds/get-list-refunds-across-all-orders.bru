@@ -1,0 +1,15 @@
+meta {
+  name: List refunds across all orders
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/refunds
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

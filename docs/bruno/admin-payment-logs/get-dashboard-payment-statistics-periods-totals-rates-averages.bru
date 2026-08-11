@@ -1,0 +1,19 @@
+meta {
+  name: Dashboard payment statistics (periods, totals, rates, averages)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/payments/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `orders.view`. Aggregated counts/amounts by period + success/refund rates + average payment/refund times (seconds).
+}

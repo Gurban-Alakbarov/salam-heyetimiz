@@ -1,0 +1,19 @@
+meta {
+  name: Revoke a user from this device (owner only)
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/v1/devices/:deviceId/users/:userId
+  body: none
+  auth: bearer
+}
+
+headers {
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

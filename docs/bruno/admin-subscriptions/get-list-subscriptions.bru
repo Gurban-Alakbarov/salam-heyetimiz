@@ -1,0 +1,15 @@
+meta {
+  name: List subscriptions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/subscriptions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

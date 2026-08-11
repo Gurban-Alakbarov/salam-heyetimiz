@@ -1,0 +1,15 @@
+meta {
+  name: List the current user's devices (owned + member)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/devices
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

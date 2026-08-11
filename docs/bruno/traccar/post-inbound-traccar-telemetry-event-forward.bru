@@ -1,0 +1,30 @@
+meta {
+  name: Inbound Traccar telemetry event-forward
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/traccar/forward
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-Traccar-Token: 
+}
+
+body:json {
+{
+    "device": {
+        "uniqueId": "864000000000001"
+    },
+    "position": {},
+    "event": {}
+}
+}
+
+docs {
+  Inbound, **shared-secret token** authenticated (no JWT). Traccar forwards position/event payloads here; the controller ingests device telemetry (online state, last position).
+}

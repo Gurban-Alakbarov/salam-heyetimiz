@@ -1,0 +1,29 @@
+meta {
+  name: Create an admin
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/admins
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "email": "",
+    "name": "",
+    "role": "",
+    "phone": "",
+    "password": ""
+}
+}

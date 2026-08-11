@@ -1,0 +1,19 @@
+meta {
+  name: Resident directory
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/residents
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked.
+}

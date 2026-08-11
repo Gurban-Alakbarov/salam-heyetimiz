@@ -1,0 +1,19 @@
+meta {
+  name: Create a sandbox test payment (returns a confirmUrl)
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/payments/test-create
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `system.settings.manage`. Validates the BirPay config by creating a real sandbox payment and returning its confirmUrl.
+}

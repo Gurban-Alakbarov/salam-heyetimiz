@@ -1,0 +1,15 @@
+meta {
+  name: Aggregated stats for the device (owner sees more granular numbers)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/v1/devices/:deviceId/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

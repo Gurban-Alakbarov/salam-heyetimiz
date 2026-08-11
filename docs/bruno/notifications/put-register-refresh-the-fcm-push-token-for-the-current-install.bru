@@ -1,0 +1,25 @@
+meta {
+  name: Register / refresh the FCM push token for the current install
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/v1/notifications/push-token
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "push_token": ""
+}
+}

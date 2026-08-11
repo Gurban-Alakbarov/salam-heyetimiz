@@ -1,0 +1,26 @@
+meta {
+  name: Upsert a locale body
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/admin/v1/notification-templates/:key/locales/:locale
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "subject": "",
+    "body": ""
+}
+}

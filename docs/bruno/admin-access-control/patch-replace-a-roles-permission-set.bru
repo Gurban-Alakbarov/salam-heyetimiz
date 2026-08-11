@@ -1,0 +1,31 @@
+meta {
+  name: Replace a role's permission set
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/admin/v1/access/roles/:role
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "permissions": [
+        "devices.create"
+    ]
+}
+}
+
+docs {
+  Requires `access.manage`. `super_admin` is immutable (always full). Audited (old → new).
+}

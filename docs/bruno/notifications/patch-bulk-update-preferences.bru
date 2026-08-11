@@ -1,0 +1,31 @@
+meta {
+  name: Bulk update preferences
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/v1/notifications/settings
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "settings": [
+        {
+            "template_key": "",
+            "channel": "",
+            "enabled": false
+        }
+    ]
+}
+}

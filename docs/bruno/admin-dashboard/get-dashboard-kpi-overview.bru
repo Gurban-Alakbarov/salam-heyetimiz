@@ -1,0 +1,15 @@
+meta {
+  name: Dashboard KPI overview
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/metrics/overview
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

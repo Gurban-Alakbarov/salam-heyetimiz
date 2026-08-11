@@ -1,0 +1,19 @@
+meta {
+  name: Unblock a user
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/users/:userId/unblock
+  body: none
+  auth: bearer
+}
+
+headers {
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

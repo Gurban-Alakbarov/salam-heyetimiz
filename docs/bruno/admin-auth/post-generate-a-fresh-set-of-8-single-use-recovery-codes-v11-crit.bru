@@ -1,0 +1,30 @@
+meta {
+  name: Generate a fresh set of 8 single-use recovery codes (v1.1, CRIT-09)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/auth/recovery-codes
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "totp": ""
+}
+}
+
+docs {
+  Invalidates the previous set atomically and returns a new set of 8 codes ONCE. Requires a fresh TOTP confirmation in the body (re-auth pattern). The plaintext codes never leave this response.
+}

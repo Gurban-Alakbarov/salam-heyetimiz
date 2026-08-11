@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Domain\Payments\Events;
+
+use App\Domain\Payments\Models\Order;
+use App\Support\Audit\AuditableEvent;
+use Illuminate\Foundation\Events\Dispatchable;
+
+class OrderExpired implements AuditableEvent
+{
+    use Dispatchable;
+
+    public function __construct(public readonly Order $order) {}
+
+    public function auditAction(): string
+    {
+        return 'order.expired';
+    }
+
+    public function auditPayload(): array
+    {
+        return ['order_id' => $this->order->id];
+    }
+}

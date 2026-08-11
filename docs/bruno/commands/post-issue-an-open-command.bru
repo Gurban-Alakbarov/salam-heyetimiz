@@ -1,0 +1,30 @@
+meta {
+  name: Issue an open command
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/devices/:deviceId/open
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "client_app_version": ""
+}
+}
+
+docs {
+  Idempotent. The `Idempotency-Key` is also persisted as `open_commands.idempotency_key` — replays return the cached command without dispatching again.  Authorization: user must be on the device roster,...
+}

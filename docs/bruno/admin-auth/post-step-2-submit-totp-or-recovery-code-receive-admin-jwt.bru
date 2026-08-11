@@ -1,0 +1,27 @@
+meta {
+  name: Step 2 — submit TOTP or recovery code, receive admin JWT
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/auth/2fa/verify
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+{
+    "challenge_token": "",
+    "totp": "",
+    "recovery_code": ""
+}
+}
+
+docs {
+  *(v1.1, CRIT-09)* Accepts EITHER a 6-digit TOTP code OR a 10-hex-character single-use recovery code. Exactly one of `totp` / `recovery_code` MUST be present. Successful recovery-code use consumes that...
+}

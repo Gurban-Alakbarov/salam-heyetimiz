@@ -1,0 +1,15 @@
+meta {
+  name: Unassign a manager from a complex
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/admin/v1/complexes/:complexId/managers/:adminId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

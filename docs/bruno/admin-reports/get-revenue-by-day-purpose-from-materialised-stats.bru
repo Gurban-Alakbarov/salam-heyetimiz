@@ -1,0 +1,15 @@
+meta {
+  name: Revenue by day / purpose (from materialised stats)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/reports/revenue
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

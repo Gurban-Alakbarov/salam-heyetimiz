@@ -1,0 +1,15 @@
+meta {
+  name: Diagnostics history
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/diagnostics
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

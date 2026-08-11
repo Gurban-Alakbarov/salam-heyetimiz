@@ -1,0 +1,19 @@
+meta {
+  name: List roles with their effective permission sets
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/access/roles
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `access.manage`. Returns each role and the permission keys granted to it.
+}

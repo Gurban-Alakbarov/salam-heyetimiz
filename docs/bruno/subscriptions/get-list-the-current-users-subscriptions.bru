@@ -1,0 +1,15 @@
+meta {
+  name: List the current user's subscriptions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/subscriptions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get a single open command (terminal state polling)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/v1/commands/:commandId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

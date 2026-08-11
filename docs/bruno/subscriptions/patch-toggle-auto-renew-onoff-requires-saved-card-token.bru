@@ -1,0 +1,26 @@
+meta {
+  name: Toggle auto-renew on/off (requires saved card token)
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/v1/subscriptions/:subscriptionId/auto-renew
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "auto_renew": false,
+    "card_token_id": 0
+}
+}

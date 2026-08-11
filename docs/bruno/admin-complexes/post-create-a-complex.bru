@@ -1,0 +1,31 @@
+meta {
+  name: Create a complex
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/complexes
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "name": "Sea Breeze",
+    "code": "SEA-BREEZE",
+    "address": ""
+}
+}
+
+docs {
+  Requires `complexes.manage`.
+}

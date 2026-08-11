@@ -1,0 +1,15 @@
+meta {
+  name: Settings change history (snapshots)
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/settings/versions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

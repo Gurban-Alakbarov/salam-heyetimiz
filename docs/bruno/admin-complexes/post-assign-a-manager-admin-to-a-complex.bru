@@ -1,0 +1,25 @@
+meta {
+  name: Assign a manager admin to a complex
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/complexes/:complexId/managers
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "admin_id": 0
+}
+}

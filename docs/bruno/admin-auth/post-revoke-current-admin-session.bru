@@ -1,0 +1,15 @@
+meta {
+  name: Revoke current admin session
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/auth/logout
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

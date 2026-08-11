@@ -1,0 +1,35 @@
+meta {
+  name: Create a payment order
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/v1/orders
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "purpose": "",
+    "items": [
+        {
+            "item_type": "",
+            "referenced_id": 0,
+            "quantity": 0
+        }
+    ],
+    "auto_renew": false,
+    "return_url": "salam://payment/return"
+}
+}

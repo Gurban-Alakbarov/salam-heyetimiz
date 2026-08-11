@@ -1,0 +1,33 @@
+meta {
+  name: Kapital Bank payment callback
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/payments/callback
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-Kapital-Signature: 
+}
+
+body:json {
+{
+    "orderId": "",
+    "status": "",
+    "amount": "",
+    "currency": "AZN",
+    "rrn": "",
+    "approvalCode": "",
+    "pan": "",
+    "cardBrand": ""
+}
+}
+
+docs {
+  Verified by HMAC signature in `X-Kapital-Signature`, then by `getOrderStatus` against the bank. Idempotent against re-delivery: identical payload hashes are deduplicated via `payment_callbacks.payload...
+}

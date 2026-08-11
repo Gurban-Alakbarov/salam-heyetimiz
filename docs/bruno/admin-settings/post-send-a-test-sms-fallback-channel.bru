@@ -1,0 +1,25 @@
+meta {
+  name: Send a test SMS (fallback channel)
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/sms/send-test
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "to": "+994501234567"
+}
+}

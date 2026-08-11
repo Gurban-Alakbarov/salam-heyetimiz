@@ -1,0 +1,28 @@
+meta {
+  name: Register (first/last name, phone, email) and send an email OTP
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+{
+    "first_name": "Aysel",
+    "last_name": "Məmmədova",
+    "phone": "+994501234567",
+    "email": "aysel@example.com"
+}
+}
+
+docs {
+  Creates an unverified account (or reuses an existing **unverified** one — re-registering the same email does not duplicate). An already-verified email returns **409**; a phone already taken by a verif...
+}

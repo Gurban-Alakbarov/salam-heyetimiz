@@ -1,0 +1,25 @@
+meta {
+  name: Send a test OTP email
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/email/send-test-otp
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "to": ""
+}
+}

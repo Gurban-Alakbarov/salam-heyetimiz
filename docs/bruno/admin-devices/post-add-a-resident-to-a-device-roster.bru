@@ -1,0 +1,26 @@
+meta {
+  name: Add a resident to a device roster
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/users
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "phone": "+994501234567",
+    "label": "Blok A"
+}
+}

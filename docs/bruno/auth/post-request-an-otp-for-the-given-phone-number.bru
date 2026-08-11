@@ -1,0 +1,22 @@
+meta {
+  name: Request an OTP for the given phone number
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/otp/request
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+{
+    "phone": "+994501234567",
+    "purpose": ""
+}
+}

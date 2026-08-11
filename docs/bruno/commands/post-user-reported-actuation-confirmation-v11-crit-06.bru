@@ -1,0 +1,31 @@
+meta {
+  name: User-reported actuation confirmation (v1.1, CRIT-06)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/commands/:commandId/feedback
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "gate_moved": false,
+    "comment": ""
+}
+}
+
+docs {
+  Used after opens where `driver_confirms_actuation = false` to capture whether the gate actually moved. One feedback per (command, user); replays return the previous value.
+}

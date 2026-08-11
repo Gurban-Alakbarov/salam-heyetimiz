@@ -1,0 +1,15 @@
+meta {
+  name: Clear all per-admin overrides (back to role defaults)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/admins/:adminId/permissions/reset
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

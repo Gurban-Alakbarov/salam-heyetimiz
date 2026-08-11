@@ -1,0 +1,1386 @@
+# =============================================================================
+# Salam Həyətimiz API — supplementary spec (real endpoints added after v1.2.0).
+#
+# This file is MERGED into v1.yaml at build time (docs/openapi/build-openapi.mjs)
+# to produce docs/openapi/openapi.json. It documents endpoints that were
+# implemented after the original contract was frozen (RBAC access control,
+# complexes, residents, Settings v2, system health, payment logs + stats,
+# impersonation, device roster) plus the real inbound webhooks.
+#
+# Paths are written in the same "bare" convention as v1.yaml (admin paths start
+# with /admin/...; everything else is bare). The build script normalises every
+# path to an absolute, executable URL: /admin/X -> /admin/v1/X, /.well-known/X
+# stays, everything else -> /v1/X. So "Try it out" hits the live API directly.
+# =============================================================================
+
+tags:
+  - name: Admin / Access Control
+    description: Dynamic RBAC — roles, permission catalog, per-admin overrides
+  - name: Admin / Impersonation
+    description: Start / stop impersonating an admin
+  - name: Admin / Complexes
+    description: Residential complex management + manager assignment
+  - name: Admin / Residents
+    description: Resident directory (complex-scoped)
+  - name: Admin / System
+    description: Live system health
+  - name: Admin / Payment Logs
+    description: Outbound BirPay calls + inbound webhooks + statistics
+  - name: Kapital Bank
+    description: BirPay (Kapital) payment integration — create, redirect, webhook, refund, sync
+  - name: Traccar
+    description: Traccar telemetry forward + integration status
+  - name: Auth / Registration
+    description: Email-OTP registration + login (unified envelope) — the going-forward mobile auth surface
+  - name: App / Bootstrap
+    description: One-shot guest + authenticated app bootstrap (so the client never fans out on launch)
+
+paths:
+
+  # ===========================================================================
+  # Auth / Registration (email-OTP — unified envelope { success,message,data,meta,errors })
+  # ===========================================================================
+  /auth/register:
+    post:
+      tags: [Auth / Registration]
+      summary: Register (first/last name, phone, email) and send an email OTP
+      operationId: register
+      security: []
+      description: |
+        Creates an unverified account (or reuses an existing **unverified** one — re-registering the same
+        email does not duplicate). An already-verified email returns **409**; a phone already taken by a
+        verified account returns **422**. A 6-digit OTP is emailed (TTL/resend from Settings). No Device /
+        Resident / Subscription is created. Rate limit: 5/email/hour + 20/IP/hour.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterInput' }
+      responses:
+        '202':
+          description: OTP sent (account unverified)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeOtp' }
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeError' }
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeError' }
+        '429':
+          description: Rate limited
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeError' }
+
+  /auth/verify-email:
+    post:
+      tags: [Auth / Registration]
+      summary: Verify the email OTP → issue tokens (auto-login). Registration + login.
+      operationId: verifyEmail
+      security: []
+      description: |
+        Verifies the outstanding email OTP for the address (used by BOTH registration and email login).
+        On success, in **one transaction**: sets email_verified_at (first time), last_login_at/ip,
+        registers the install, and issues the refresh + 15-min RS256 access token. Rate limit:
+        10/email/10min.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VerifyEmailInput' }
+      responses:
+        '200':
+          description: Verified — tokens issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeTokens' }
+        '401':
+          description: Wrong / expired / over-attempt code
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeError' }
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeError' }
+
+  /auth/resend-otp:
+    post:
+      tags: [Auth / Registration]
+      summary: Re-send the outstanding email OTP
+      operationId: resendOtp
+      security: []
+      description: Anti-enumeration — identical response whether or not the account exists. Rate limit 3/email/10min.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmailOnlyInput' }
+      responses:
+        '202':
+          description: Resent (if the account exists)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeOtp' }
+        '422': { description: Validation error, content: { application/json: { schema: { $ref: '#/components/schemas/AuthEnvelopeError' } } } }
+        '429': { description: Rate limited, content: { application/json: { schema: { $ref: '#/components/schemas/AuthEnvelopeError' } } } }
+
+  /auth/login:
+    post:
+      tags: [Auth / Registration]
+      summary: Request an email login OTP (returning, verified user)
+      operationId: emailLogin
+      security: []
+      description: |
+        Sends a login OTP to a verified account; verification is completed via **/auth/verify-email**.
+        Anti-enumeration — identical response regardless of existence. Rate limit 5/email/10min + 30/IP/hour.
+        Forward-compatible: designed to also accept an optional `password` when the future Security feature
+        ships (no breaking change).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmailOnlyInput' }
+      responses:
+        '202':
+          description: Login OTP sent (if the account exists + is verified)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthEnvelopeOtp' }
+        '422': { description: Validation error, content: { application/json: { schema: { $ref: '#/components/schemas/AuthEnvelopeError' } } } }
+        '429': { description: Rate limited, content: { application/json: { schema: { $ref: '#/components/schemas/AuthEnvelopeError' } } } }
+
+  # ===========================================================================
+  # App / Bootstrap (one-shot launch config — unified envelope)
+  # ===========================================================================
+  /bootstrap:
+    get:
+      tags: [App / Bootstrap]
+      summary: Guest app bootstrap (logged-out launch config)
+      operationId: guestBootstrap
+      security: []
+      description: |
+        Everything a logged-out client needs to start safely in ONE request — maintenance mode,
+        min/latest version + force-update flag, public OTP settings, public app settings, feature flags
+        and support contacts. All values are admin-editable in Settings.
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestBootstrapEnvelope' }
+
+  /me:
+    get:
+      tags: [App / Bootstrap]
+      summary: Current user + authenticated bootstrap (one-shot)
+      operationId: currentUser
+      security: [{ bearerAuth: [] }]
+      description: |
+        The current user PLUS everything the authed app needs on launch (no second/third request):
+        profile, registration_completed, email_verified, has_password, locale, timezone, app config +
+        feature flags, the user's installs, active subscriptions, unread-notifications count, permissions.
+        **The `data` object is intentionally extensible** — future sections (apartments, vehicles, devices,
+        complexes, notifications, invitations, visitor_passes, family_members, payments) are added as NEW
+        keys without changing the existing contract.
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MeBootstrapEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  # ===========================================================================
+  # Admin / Impersonation
+  # ===========================================================================
+  /admin/admins/{adminId}/impersonate:
+    post:
+      tags: [Admin / Impersonation]
+      summary: Start impersonating another admin
+      operationId: adminImpersonate
+      security: [{ adminBearerAuth: [] }]
+      description: Super-admin only. Issues a new admin JWT whose claims carry `impersonator_admin_id`. Audited.
+      parameters:
+        - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200':
+          description: Impersonation token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+                  admin: { $ref: '#/components/schemas/AdminProfile' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /admin/auth/stop-impersonation:
+    post:
+      tags: [Admin / Impersonation]
+      summary: Stop impersonation and return to the real admin
+      operationId: adminStopImpersonation
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200':
+          description: Returned to the original admin identity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+                  admin: { $ref: '#/components/schemas/AdminProfile' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  # ===========================================================================
+  # Admin / Access Control (dynamic RBAC)
+  # ===========================================================================
+  /admin/access/roles:
+    get:
+      tags: [Admin / Access Control]
+      summary: List roles with their effective permission sets
+      operationId: adminListRoles
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `access.manage`. Returns each role and the permission keys granted to it.
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/AccessRole' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/access/roles/{role}:
+    patch:
+      tags: [Admin / Access Control]
+      summary: Replace a role's permission set
+      operationId: adminUpdateRolePermissions
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `access.manage`. `super_admin` is immutable (always full). Audited (old → new).
+      parameters:
+        - { in: path, name: role, required: true, schema: { type: string, example: technical } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permissions]
+              properties:
+                permissions:
+                  type: array
+                  items: { type: string, example: devices.create }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessRole' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/access/permissions:
+    get:
+      tags: [Admin / Access Control]
+      summary: Full permission catalog (grouped)
+      operationId: adminListAllPermissions
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/PermissionDescriptor' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/admins/{adminId}/permissions:
+    get:
+      tags: [Admin / Access Control]
+      summary: Effective + override permissions for one admin
+      operationId: adminGetUserPermissions
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPermissions' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /admin/admins/{adminId}/permissions/grant:
+    post:
+      tags: [Admin / Access Control]
+      summary: Grant a permission override to an admin
+      operationId: adminGrantPermission
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permission]
+              properties:
+                permission: { type: string, example: refunds.create }
+      responses:
+        '200': { description: Granted, content: { application/json: { schema: { $ref: '#/components/schemas/AdminPermissions' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/admins/{adminId}/permissions/revoke:
+    post:
+      tags: [Admin / Access Control]
+      summary: Revoke a permission from an admin (override)
+      operationId: adminRevokePermission
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permission]
+              properties:
+                permission: { type: string, example: refunds.create }
+      responses:
+        '200': { description: Revoked, content: { application/json: { schema: { $ref: '#/components/schemas/AdminPermissions' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/admins/{adminId}/permissions/reset:
+    post:
+      tags: [Admin / Access Control]
+      summary: Clear all per-admin overrides (back to role defaults)
+      operationId: adminResetPermissions
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200': { description: Reset, content: { application/json: { schema: { $ref: '#/components/schemas/AdminPermissions' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Admin / Complexes
+  # ===========================================================================
+  /admin/complexes:
+    get:
+      tags: [Admin / Complexes]
+      summary: List residential complexes
+      operationId: adminListComplexes
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `complexes.view`. `complex_manager` sees only their own complexes.
+      parameters:
+        - { in: query, name: q, schema: { type: string }, description: Search by name or code }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Complex' } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Admin / Complexes]
+      summary: Create a complex
+      operationId: adminCreateComplex
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `complexes.manage`.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ComplexInput' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Complex' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/complexes/{complexId}:
+    parameters:
+      - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+    get:
+      tags: [Admin / Complexes]
+      summary: Complex detail (with stats)
+      operationId: adminGetComplex
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Complex' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Admin / Complexes]
+      summary: Update a complex
+      operationId: adminUpdateComplex
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ComplexInput' } } }
+      responses:
+        '200': { description: Updated, content: { application/json: { schema: { $ref: '#/components/schemas/Complex' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [Admin / Complexes]
+      summary: Delete a complex
+      operationId: adminDeleteComplex
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /admin/complexes/{complexId}/managers:
+    post:
+      tags: [Admin / Complexes]
+      summary: Assign a manager admin to a complex
+      operationId: adminAssignComplexManager
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [admin_id]
+              properties: { admin_id: { type: integer, format: int64 } }
+      responses:
+        '200': { description: Assigned }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/complexes/{complexId}/managers/{adminId}:
+    delete:
+      tags: [Admin / Complexes]
+      summary: Unassign a manager from a complex
+      operationId: adminUnassignComplexManager
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+        - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '204': { description: Unassigned }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Admin / Residents
+  # ===========================================================================
+  /admin/residents:
+    get:
+      tags: [Admin / Residents]
+      summary: Resident directory
+      operationId: adminListResidents
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked.
+      parameters:
+        - { in: query, name: q, schema: { type: string }, description: Search by phone }
+        - { in: query, name: complex_id, schema: { type: integer, format: int64 } }
+        - { $ref: '#/components/parameters/Limit' }
+        - { $ref: '#/components/parameters/Cursor' }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Resident' } }
+                  page: { $ref: '#/components/schemas/CursorPage' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Admin / Payment Logs + Statistics
+  # ===========================================================================
+  /admin/payment-logs:
+    get:
+      tags: [Admin / Payment Logs]
+      summary: BirPay outbound calls + inbound webhooks (decrypted, masked)
+      operationId: adminListPaymentLogs
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `orders.view`. Request/response bodies are stored encrypted + allowlisted, decrypted server-side for display.
+      parameters:
+        - { in: query, name: direction, schema: { type: string, enum: [outbound, inbound] } }
+        - { in: query, name: signature, schema: { type: string, enum: [valid, invalid] } }
+        - { in: query, name: endpoint, schema: { type: string }, description: Substring match }
+        - { in: query, name: errors, schema: { type: string, enum: ['1'] }, description: Only HTTP status >= 400 }
+        - { in: query, name: order_id, schema: { type: integer, format: int64 } }
+        - { $ref: '#/components/parameters/Limit' }
+        - { $ref: '#/components/parameters/Cursor' }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/PaymentLog' } }
+                  page: { $ref: '#/components/schemas/CursorPage' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/payments/stats:
+    get:
+      tags: [Admin / Payment Logs]
+      summary: Dashboard payment statistics (periods, totals, rates, averages)
+      operationId: adminPaymentStats
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `orders.view`. Aggregated counts/amounts by period + success/refund rates + average payment/refund times (seconds).
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentStats' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Admin / Devices (roster + reconcile — supplements existing device ops)
+  # ===========================================================================
+  /admin/devices/reconcile:
+    post:
+      tags: [Admin / Devices]
+      summary: Reconcile a device against Traccar
+      operationId: adminReconcileDevice
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [unique_id]
+              properties: { unique_id: { type: string, example: '864000000000001' } }
+      responses:
+        '200': { description: Reconciled }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/devices/{deviceId}/assign:
+    post:
+      tags: [Admin / Devices]
+      summary: Assign the owner (primary resident) of a device
+      operationId: adminAssignDevice
+      security: [{ adminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/DeviceId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties: { phone: { type: string, example: '+994501234567' } }
+      responses:
+        '200': { description: Assigned }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/devices/{deviceId}/users:
+    post:
+      tags: [Admin / Devices]
+      summary: Add a resident to a device roster
+      operationId: adminAddDeviceUser
+      security: [{ adminBearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/DeviceId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone: { type: string, example: '+994501234567' }
+                label: { type: string, example: 'Blok A' }
+      responses:
+        '200': { description: Added }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/devices/{deviceId}/users/{userId}:
+    delete:
+      tags: [Admin / Devices]
+      summary: Remove a resident from a device roster
+      operationId: adminRemoveDeviceUser
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/DeviceId' }
+        - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '204': { description: Removed }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Admin / System Health
+  # ===========================================================================
+  /admin/system/health:
+    get:
+      tags: [Admin / System]
+      summary: Live system health (php, db, redis, queue, disk, memory, cpu, traccar)
+      operationId: adminSystemHealth
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `system.settings.manage`. Real-time component status + the live Traccar device count.
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SystemHealth' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Admin / Settings v2 (DB-driven, grouped, encrypted secrets, versioned)
+  # ===========================================================================
+  /admin/settings:
+    get:
+      tags: [Admin / Settings]
+      summary: All settings grouped by section (secrets masked)
+      operationId: adminGetSettings
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `system.settings.manage`. Secret values are returned as `''` with a `secrets_set` map.
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/SettingsGroup' } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/{group}:
+    patch:
+      tags: [Admin / Settings]
+      summary: Update one settings group
+      operationId: adminUpdateSettings
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `system.settings.manage`. Blank secret = keep existing. Audited per-key (old → new, secrets redacted).
+      parameters:
+        - { in: path, name: group, required: true, schema: { type: string, example: payments } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                values: { type: object, additionalProperties: true }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/SettingsGroup' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/settings/{group}/test:
+    post:
+      tags: [Admin / Settings]
+      summary: Run a group-specific connectivity test
+      operationId: adminTestSetting
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: group, required: true, schema: { type: string, example: traccar } }
+      responses:
+        '200': { description: Test result, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/export:
+    get:
+      tags: [Admin / Settings]
+      summary: Export all settings as JSON (secrets as ciphertext)
+      operationId: adminExportSettings
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/import:
+    post:
+      tags: [Admin / Settings]
+      summary: Import settings from a JSON export
+      operationId: adminImportSettings
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, additionalProperties: true } } }
+      responses:
+        '200': { description: Imported }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/settings/versions:
+    get:
+      tags: [Admin / Settings]
+      summary: Settings change history (snapshots)
+      operationId: adminSettingsVersions
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/SettingsVersion' } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/versions/compare:
+    get:
+      tags: [Admin / Settings]
+      summary: Diff two settings versions
+      operationId: adminCompareSettingsVersions
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: query, name: from, required: true, schema: { type: integer } }
+        - { in: query, name: to, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/versions/{id}/restore:
+    post:
+      tags: [Admin / Settings]
+      summary: Restore a settings version
+      operationId: adminRestoreSettingsVersion
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: Restored }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /admin/settings/email/send-test:
+    post:
+      tags: [Admin / Settings]
+      summary: Send a test email via the configured SMTP
+      operationId: adminSendTestEmail
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties: { to: { type: string, format: email } }
+      responses:
+        '200': { description: Result, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/settings/email/send-test-otp:
+    post:
+      tags: [Admin / Settings]
+      summary: Send a test OTP email
+      operationId: adminSendTestOtp
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties: { to: { type: string, format: email } }
+      responses:
+        '200': { description: Result, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/sms/send-test:
+    post:
+      tags: [Admin / Settings]
+      summary: Send a test SMS (fallback channel)
+      operationId: adminSendTestSms
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties: { to: { type: string, example: '+994501234567' } }
+      responses:
+        '200': { description: Result, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/sms/send-test-otp:
+    post:
+      tags: [Admin / Settings]
+      summary: Send a test OTP via SMS
+      operationId: adminSendTestSmsOtp
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties: { to: { type: string, example: '+994501234567' } }
+      responses:
+        '200': { description: Result, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/traccar/status:
+    get:
+      tags: [Admin / Settings]
+      summary: Live Traccar integration status
+      operationId: adminTraccarStatus
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TraccarStatus' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/security/force-logout:
+    post:
+      tags: [Admin / Settings]
+      summary: Force-logout all admins (revoke + cutoff)
+      operationId: adminForceLogout
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `system.settings.manage`. Sets `security.force_logout_at`; every token issued before it is rejected.
+      responses:
+        '200': { description: All sessions invalidated }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/settings/payments/test-create:
+    post:
+      tags: [Admin / Settings]
+      summary: Create a sandbox test payment (returns a confirmUrl)
+      operationId: adminTestCreatePayment
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `system.settings.manage`. Validates the BirPay config by creating a real sandbox payment and returning its confirmUrl.
+      responses:
+        '200': { description: confirmUrl issued, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ===========================================================================
+  # Kapital Bank — payment lifecycle (browser redirect-back + inbound webhook)
+  # ===========================================================================
+  /payments/return:
+    get:
+      tags: [Kapital Bank]
+      summary: Browser redirect-back from the BirPay hosted checkout
+      operationId: paymentReturn
+      security: []
+      description: |
+        Public. The hosted checkout redirects the customer here after pay/cancel. Query params are **not trusted** —
+        the order is re-verified via `getOrderStatus` before any state change. Returns a small HTML/redirect.
+      parameters:
+        - { in: query, name: orderId, schema: { type: string } }
+        - { in: query, name: paymentId, schema: { type: string } }
+      responses:
+        '200': { description: Verified — redirect / status page }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /payments/webhook:
+    post:
+      tags: [Kapital Bank, Webhooks]
+      summary: Inbound BirPay (Kapital) payment webhook
+      operationId: birpayWebhook
+      security: []
+      description: |
+        Inbound, **signature-authenticated** (no JWT). `X-Signature` = Base64(HMAC-SHA256(rawBody, sharedSecret))
+        with the secret from Settings (`payments.webhook_secret`). Invalid/duplicate signatures are rejected.
+        The webhook is treated as a *hint*: `getOrderStatus` is the authoritative source of truth. Idempotent.
+        Events: `payment_succeeded`, `payment_canceled`.
+      parameters:
+        - in: header
+          name: X-Signature
+          required: true
+          schema: { type: string }
+          description: Base64 HMAC-SHA256 of the raw request body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BirPayWebhookEvent' }
+      responses:
+        '200': { description: Accepted (idempotent) }
+        '401': { description: Invalid or missing signature, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  # ===========================================================================
+  # Traccar — telemetry event-forward
+  # ===========================================================================
+  /traccar/forward:
+    post:
+      tags: [Traccar, Webhooks]
+      summary: Inbound Traccar telemetry event-forward
+      operationId: traccarForward
+      security: []
+      description: |
+        Inbound, **shared-secret token** authenticated (no JWT). Traccar forwards position/event payloads here;
+        the controller ingests device telemetry (online state, last position).
+      parameters:
+        - in: header
+          name: X-Traccar-Token
+          required: true
+          schema: { type: string }
+          description: Shared secret negotiated with the Traccar instance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TraccarForwardPayload' }
+      responses:
+        '200': { description: Ingested }
+        '401': { description: Invalid token, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+# =============================================================================
+# Schemas (merged into components.schemas)
+# =============================================================================
+components:
+  schemas:
+
+    CursorPage:
+      type: object
+      properties:
+        next_cursor: { type: string, nullable: true }
+        has_more: { type: boolean }
+        limit: { type: integer }
+
+    # ----- Auth / Registration (unified envelope) --------------------------
+    RegisterInput:
+      type: object
+      required: [first_name, last_name, phone, email]
+      additionalProperties: false
+      properties:
+        first_name: { type: string, minLength: 1, maxLength: 60, example: Aysel }
+        last_name: { type: string, minLength: 1, maxLength: 60, example: Məmmədova }
+        phone: { type: string, pattern: '^\+994\d{9}$', example: '+994501234567' }
+        email: { type: string, format: email, maxLength: 160, example: aysel@example.com }
+
+    EmailOnlyInput:
+      type: object
+      required: [email]
+      additionalProperties: false
+      properties:
+        email: { type: string, format: email, maxLength: 160, example: aysel@example.com }
+
+    VerifyEmailInput:
+      type: object
+      required: [email, code, device]
+      additionalProperties: false
+      properties:
+        email: { type: string, format: email, example: aysel@example.com }
+        code: { type: string, pattern: '^\d{6}$', example: '482931' }
+        device: { $ref: '#/components/schemas/DeviceFingerprintInput' }
+
+    DeviceFingerprintInput:
+      type: object
+      required: [install_uuid, platform]
+      properties:
+        install_uuid: { type: string, format: uuid }
+        platform: { type: string, enum: [ios, android] }
+        os_version: { type: string, maxLength: 40, nullable: true }
+        app_version: { type: string, maxLength: 20, nullable: true }
+        device_model: { type: string, maxLength: 80, nullable: true }
+        push_token: { type: string, maxLength: 255, nullable: true }
+
+    OtpMeta:
+      type: object
+      properties:
+        expires_in_seconds: { type: integer, example: 120 }
+        resend_available_in_seconds: { type: integer, example: 30 }
+
+    AuthTokensData:
+      type: object
+      properties:
+        access_token: { type: string, description: RS256 JWT, 15-min TTL }
+        refresh_token: { type: string, description: Opaque, rotating, 60-day TTL }
+        token_type: { type: string, example: Bearer }
+        expires_in: { type: integer, example: 900 }
+        refresh_expires_in: { type: integer, example: 5184000 }
+        user: { $ref: '#/components/schemas/UserSelf' }
+
+    AuthEnvelopeOtp:
+      type: object
+      description: Unified envelope — an OTP was dispatched (data null, timing in meta).
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: Təsdiq kodu email ünvanınıza göndərildi. }
+        data: { type: object, nullable: true, example: null }
+        meta: { $ref: '#/components/schemas/OtpMeta' }
+        errors: { type: object, nullable: true, example: null }
+
+    AuthEnvelopeTokens:
+      type: object
+      description: Unified envelope — verification succeeded, tokens issued.
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: Qeydiyyat tamamlandı. }
+        data: { $ref: '#/components/schemas/AuthTokensData' }
+        meta: { type: object, nullable: true, example: null }
+        errors: { type: object, nullable: true, example: null }
+
+    AuthEnvelopeError:
+      type: object
+      description: Unified envelope — failure (validation field errors, OTP code, or rate_limited).
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string, example: Təsdiq kodu yanlışdır. }
+        data: { type: object, nullable: true, example: null }
+        meta: { type: object, nullable: true, example: null }
+        errors:
+          type: object
+          additionalProperties: true
+          example: { code: wrong_code }
+
+    # ----- App bootstrap ---------------------------------------------------
+    BootstrapApp:
+      type: object
+      properties:
+        maintenance_mode: { type: boolean }
+        min_version: { type: string, example: '1.0.0' }
+        latest_version: { type: string, example: '1.0.0' }
+        force_update: { type: boolean }
+
+    GuestBootstrapEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+        data:
+          type: object
+          properties:
+            app: { $ref: '#/components/schemas/BootstrapApp' }
+            otp:
+              type: object
+              properties:
+                length: { type: integer, example: 6 }
+                ttl_seconds: { type: integer, example: 120 }
+                resend_seconds: { type: integer, example: 30 }
+            public_settings:
+              type: object
+              properties:
+                brand: { type: string }
+                default_locale: { type: string, example: az }
+                default_timezone: { type: string, example: Asia/Baku }
+                currency: { type: string, example: AZN }
+                logo_url: { type: string }
+            feature_flags: { type: object, additionalProperties: { type: boolean } }
+            support:
+              type: object
+              properties:
+                email: { type: string }
+                phone: { type: string }
+        meta: { type: object, nullable: true }
+        errors: { type: object, nullable: true }
+
+    MeBootstrapEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+        data:
+          type: object
+          description: Extensible — future sections are added as new keys without breaking the contract.
+          additionalProperties: true
+          properties:
+            user: { $ref: '#/components/schemas/UserSelf' }
+            registration_completed: { type: boolean }
+            email_verified: { type: boolean }
+            phone: { type: string }
+            has_password: { type: boolean }
+            avatar: { type: string, nullable: true }
+            locale: { type: string, example: az }
+            timezone: { type: string, example: Asia/Baku }
+            app: { $ref: '#/components/schemas/BootstrapApp' }
+            feature_flags: { type: object, additionalProperties: { type: boolean } }
+            permissions: { type: array, items: { type: string } }
+            unread_notifications_count: { type: integer }
+            user_devices:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: integer, format: int64 }
+                  platform: { type: string, enum: [ios, android] }
+                  device_model: { type: string, nullable: true }
+                  app_version: { type: string, nullable: true }
+                  os_version: { type: string, nullable: true }
+                  last_seen_at: { type: string, format: date-time, nullable: true }
+                  biometric_enrolled: { type: boolean }
+            active_subscriptions:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: integer, format: int64 }
+                  tier: { type: string, example: main }
+                  status: { type: string, example: active }
+                  starts_at: { type: string, format: date-time, nullable: true }
+                  ends_at: { type: string, format: date-time, nullable: true }
+                  auto_renew: { type: boolean }
+        meta: { type: object, nullable: true }
+        errors: { type: object, nullable: true }
+
+    AdminProfile:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        email: { type: string, format: email }
+        name: { type: string }
+        role: { type: string, example: super_admin }
+        complex_id: { type: integer, format: int64, nullable: true }
+        permissions: { type: array, items: { type: string } }
+        is_2fa_enabled: { type: boolean }
+        status: { type: string, enum: [active, disabled, offboarded] }
+        impersonator_admin_id: { type: integer, format: int64, nullable: true }
+
+    AccessRole:
+      type: object
+      properties:
+        role: { type: string, example: technical }
+        is_immutable: { type: boolean, description: 'true for super_admin (always full)' }
+        permissions: { type: array, items: { type: string, example: devices.create } }
+
+    PermissionDescriptor:
+      type: object
+      properties:
+        key: { type: string, example: devices.create }
+        group: { type: string, example: Devices }
+        description: { type: string }
+
+    AdminPermissions:
+      type: object
+      properties:
+        admin_id: { type: integer, format: int64 }
+        role: { type: string }
+        effective: { type: array, items: { type: string }, description: 'role defaults ∪ granted \ revoked' }
+        granted: { type: array, items: { type: string } }
+        revoked: { type: array, items: { type: string } }
+
+    ComplexInput:
+      type: object
+      required: [name, code]
+      additionalProperties: false
+      properties:
+        name: { type: string, example: 'Sea Breeze' }
+        code: { type: string, example: 'SEA-BREEZE' }
+        address: { type: string, nullable: true }
+
+    Complex:
+      allOf:
+        - { $ref: '#/components/schemas/ComplexInput' }
+        - type: object
+          properties:
+            id: { type: integer, format: int64 }
+            device_count: { type: integer }
+            resident_count: { type: integer }
+            manager_count: { type: integer }
+            created_at: { type: string, format: date-time }
+
+    Resident:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        phone: { type: string, example: '+99450****67', description: Masked }
+        complex: { type: string, nullable: true }
+        device_online: { type: boolean }
+        subscription_status: { type: string, nullable: true }
+        role: { type: string, nullable: true }
+
+    PaymentLog:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        order_id: { type: integer, format: int64, nullable: true }
+        direction: { type: string, enum: [outbound, inbound] }
+        endpoint: { type: string, example: /v1/payments }
+        http_method: { type: string, nullable: true }
+        http_status: { type: integer, nullable: true }
+        signature_provided: { type: boolean, nullable: true }
+        signature_valid: { type: boolean, nullable: true }
+        ip: { type: string, nullable: true }
+        latency_ms: { type: integer, nullable: true }
+        request: { description: 'Decrypted + allowlisted request body', nullable: true }
+        response: { description: 'Decrypted + allowlisted response body', nullable: true }
+        created_at: { type: string, format: date-time, nullable: true }
+
+    PaymentStats:
+      type: object
+      properties:
+        periods:
+          type: object
+          properties:
+            today: { $ref: '#/components/schemas/PeriodStat' }
+            yesterday: { $ref: '#/components/schemas/PeriodStat' }
+            this_week: { $ref: '#/components/schemas/PeriodStat' }
+            this_month: { $ref: '#/components/schemas/PeriodStat' }
+        totals:
+          type: object
+          properties:
+            paid: { type: integer }
+            pending: { type: integer }
+            authorising: { type: integer }
+            failed: { type: integer }
+            cancelled: { type: integer }
+            refunded: { type: integer }
+            partially_refunded: { type: integer }
+            total_paid_minor: { type: integer }
+            total_refunded_minor: { type: integer }
+        rates:
+          type: object
+          properties:
+            success_rate: { type: number, nullable: true, description: 'paid / terminal, %' }
+            refund_rate: { type: number, nullable: true, description: 'refunded / paid, %' }
+        avg_payment_seconds: { type: integer, nullable: true }
+        avg_refund_seconds: { type: integer, nullable: true }
+
+    PeriodStat:
+      type: object
+      properties:
+        count: { type: integer }
+        amount_minor: { type: integer }
+
+    SettingsGroup:
+      type: object
+      properties:
+        group: { type: string, example: payments }
+        label: { type: string }
+        settings:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string, example: merchant_id }
+              type: { type: string, enum: [string, int, bool, secret, select, text] }
+              value: { description: 'Secrets are returned as empty string' }
+              options: { type: array, items: { type: string }, nullable: true }
+        secrets_set: { type: object, additionalProperties: { type: boolean } }
+
+    SettingsVersion:
+      type: object
+      properties:
+        id: { type: integer }
+        created_at: { type: string, format: date-time }
+        actor: { type: string, nullable: true }
+        changed_keys: { type: array, items: { type: string } }
+
+    TestActionResult:
+      type: object
+      properties:
+        ok: { type: boolean }
+        message: { type: string }
+        detail: { description: 'Provider-specific payload (e.g. confirmUrl)', nullable: true }
+
+    SystemHealth:
+      type: object
+      properties:
+        php: { type: object, additionalProperties: true }
+        database: { type: object, additionalProperties: true }
+        redis: { type: object, additionalProperties: true }
+        queue: { type: object, additionalProperties: true }
+        disk: { type: object, additionalProperties: true }
+        memory: { type: object, additionalProperties: true }
+        cpu: { type: object, additionalProperties: true }
+        traccar: { type: object, additionalProperties: true }
+
+    TraccarStatus:
+      type: object
+      properties:
+        connected: { type: boolean }
+        version: { type: string, nullable: true }
+        device_count: { type: integer, nullable: true }
+        last_webhook_at: { type: string, format: date-time, nullable: true }
+        last_command_at: { type: string, format: date-time, nullable: true }
+        last_ack_at: { type: string, format: date-time, nullable: true }
+        last_sync_at: { type: string, format: date-time, nullable: true }
+
+    BirPayWebhookEvent:
+      type: object
+      properties:
+        event: { type: string, enum: [payment_succeeded, payment_canceled], example: payment_succeeded }
+        paymentId: { type: string, example: '0eb9510b-f8cd-48e1-9d35-8c609398253b' }
+        status: { type: string, example: PAID }
+        metadata:
+          type: object
+          properties:
+            orderNo: { type: string, example: SH-E2E-001 }
+
+    TraccarForwardPayload:
+      type: object
+      properties:
+        device:
+          type: object
+          properties:
+            uniqueId: { type: string, example: '864000000000001' }
+        position:
+          type: object
+          additionalProperties: true
+        event:
+          type: object
+          additionalProperties: true

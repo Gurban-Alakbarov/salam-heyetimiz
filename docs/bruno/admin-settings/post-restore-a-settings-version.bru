@@ -1,0 +1,15 @@
+meta {
+  name: Restore a settings version
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/versions/:id/restore
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Inspect an invitation by token (used by invitee after registration)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/v1/invitations/:token
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

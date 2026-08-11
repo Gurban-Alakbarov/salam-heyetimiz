@@ -1,0 +1,15 @@
+meta {
+  name: Remove a resident from a device roster
+  type: http
+  seq: 16
+}
+
+delete {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/users/:userId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

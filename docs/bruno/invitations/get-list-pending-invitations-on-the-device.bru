@@ -1,0 +1,15 @@
+meta {
+  name: List pending invitations on the device
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/devices/:deviceId/invitations
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

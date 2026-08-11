@@ -1,0 +1,29 @@
+meta {
+  name: Invite a new user to the device
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/devices/:deviceId/invitations
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "invitee_phone": "",
+    "role": "",
+    "payer": "",
+    "return_url": ""
+}
+}

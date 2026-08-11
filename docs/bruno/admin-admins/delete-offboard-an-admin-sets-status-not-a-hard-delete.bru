@@ -1,0 +1,15 @@
+meta {
+  name: Offboard an admin (sets status; not a hard delete)
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/admin/v1/admins/:adminId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

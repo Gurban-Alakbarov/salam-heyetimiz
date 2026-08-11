@@ -1,0 +1,15 @@
+meta {
+  name: Effective + override permissions for one admin
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/admins/:adminId/permissions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

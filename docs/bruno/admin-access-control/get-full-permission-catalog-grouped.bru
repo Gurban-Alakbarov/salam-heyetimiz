@@ -1,0 +1,15 @@
+meta {
+  name: Full permission catalog (grouped)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/access/permissions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

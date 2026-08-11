@@ -1,0 +1,25 @@
+meta {
+  name: Send a test OTP via SMS
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/sms/send-test-otp
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "to": "+994501234567"
+}
+}

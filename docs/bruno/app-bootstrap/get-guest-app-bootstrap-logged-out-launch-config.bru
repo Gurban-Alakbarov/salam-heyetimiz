@@ -1,0 +1,15 @@
+meta {
+  name: Guest app bootstrap (logged-out launch config)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/bootstrap
+  body: none
+  auth: none
+}
+
+docs {
+  Everything a logged-out client needs to start safely in ONE request — maintenance mode, min/latest version + force-update flag, public OTP settings, public app settings, feature flags and support cont...
+}

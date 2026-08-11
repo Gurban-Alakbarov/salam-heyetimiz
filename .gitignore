@@ -1,0 +1,42 @@
+# Dependencies (generated)
+/vendor/
+/node_modules/
+
+# Environment & secrets — NEVER commit
+.env
+.env.*
+!.env.example
+auth.json
+
+# Credentials / private keys (JWT .pem, FCM service-account, APNs)
+/storage/keys/
+*.pem
+*.p8
+*.p12
+*.pfx
+*.key
+*firebase-adminsdk*.json
+google-services.json
+GoogleService-Info.plist
+
+# Laravel runtime (regenerated)
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/storage/framework/testing/
+/storage/app/
+/bootstrap/cache/*.php
+/public/storage
+/public/hot
+
+# Build artifacts
+*.apk
+*.aab
+composer.phar
+
+# Editor / OS
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db

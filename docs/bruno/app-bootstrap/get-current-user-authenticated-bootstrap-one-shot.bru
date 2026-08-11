@@ -1,0 +1,19 @@
+meta {
+  name: Current user + authenticated bootstrap (one-shot)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+docs {
+  The current user PLUS everything the authed app needs on launch (no second/third request): profile, registration_completed, email_verified, has_password, locale, timezone, app config + feature flags,...
+}

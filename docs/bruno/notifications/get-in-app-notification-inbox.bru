@@ -1,0 +1,15 @@
+meta {
+  name: In-app notification inbox
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/notifications
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: List SIM operators
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/lookups/sim-operators
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

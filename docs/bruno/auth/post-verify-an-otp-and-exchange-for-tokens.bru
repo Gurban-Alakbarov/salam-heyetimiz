@@ -1,0 +1,30 @@
+meta {
+  name: Verify an OTP and exchange for tokens
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/otp/verify
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+{
+    "phone": "",
+    "code": "",
+    "device": {
+        "install_uuid": "",
+        "platform": "",
+        "os_version": "",
+        "app_version": "",
+        "device_model": "",
+        "push_token": ""
+    }
+}
+}

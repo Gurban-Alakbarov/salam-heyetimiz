@@ -1,0 +1,27 @@
+meta {
+  name: Record a consent grant or revocation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/consents
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "consent_kind": "",
+    "document_version": "",
+    "granted": false
+}
+}

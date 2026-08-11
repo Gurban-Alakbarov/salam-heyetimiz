@@ -1,0 +1,15 @@
+meta {
+  name: Browser redirect-back from the BirPay hosted checkout
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/payments/return
+  body: none
+  auth: none
+}
+
+docs {
+  Public. The hosted checkout redirects the customer here after pay/cancel. Query params are **not trusted** — the order is re-verified via `getOrderStatus` before any state change. Returns a small HTML...
+}

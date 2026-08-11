@@ -1,0 +1,15 @@
+meta {
+  name: Search the audit log
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/audit
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

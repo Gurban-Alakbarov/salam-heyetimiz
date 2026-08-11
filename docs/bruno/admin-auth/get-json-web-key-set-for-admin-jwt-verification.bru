@@ -1,0 +1,15 @@
+meta {
+  name: JSON Web Key Set for admin JWT verification
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/.well-known/jwks.json
+  body: none
+  auth: none
+}
+
+docs {
+  Public verification keys for admin-issued JWTs, keyed by `kid`. Two `kid`s may be valid simultaneously during a rotation. Mobile clients pin and do not consume JWKS; this endpoint is on the admin host...
+}

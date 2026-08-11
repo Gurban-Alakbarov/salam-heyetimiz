@@ -1,0 +1,29 @@
+meta {
+  name: Update one settings group
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/admin/v1/settings/:group
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "values": {}
+}
+}
+
+docs {
+  Requires `system.settings.manage`. Blank secret = keep existing. Audited per-key (old → new, secrets redacted).
+}

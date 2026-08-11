@@ -1,0 +1,15 @@
+meta {
+  name: Roster of users for this device
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/devices/:deviceId/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

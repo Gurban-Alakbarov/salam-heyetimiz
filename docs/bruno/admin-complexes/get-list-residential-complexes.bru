@@ -1,0 +1,19 @@
+meta {
+  name: List residential complexes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/complexes
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `complexes.view`. `complex_manager` sees only their own complexes.
+}

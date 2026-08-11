@@ -1,0 +1,11 @@
+meta {
+  name: Readiness probe (DB + Redis + queue)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/health/ready
+  body: none
+  auth: none
+}

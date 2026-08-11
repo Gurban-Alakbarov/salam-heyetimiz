@@ -1,0 +1,15 @@
+meta {
+  name: Subscription detail (with period history)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/subscriptions/:subscriptionId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

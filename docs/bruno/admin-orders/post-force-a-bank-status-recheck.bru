@@ -1,0 +1,19 @@
+meta {
+  name: Force a bank-status recheck
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/orders/:orderId/recheck
+  body: none
+  auth: bearer
+}
+
+headers {
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Inbound SMS replies from device or user
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/v1/sms/inbound
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-Sms-Signature: 
+}
+
+body:json {
+{
+    "from": "",
+    "to": "",
+    "body": "",
+    "received_at": "",
+    "provider_message_id": ""
+}
+}

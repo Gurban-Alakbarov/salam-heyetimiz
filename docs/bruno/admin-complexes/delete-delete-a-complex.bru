@@ -1,0 +1,15 @@
+meta {
+  name: Delete a complex
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/admin/v1/complexes/:complexId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

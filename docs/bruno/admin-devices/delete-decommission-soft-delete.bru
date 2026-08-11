@@ -1,0 +1,26 @@
+meta {
+  name: Decommission (soft delete)
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "reason": ""
+}
+}

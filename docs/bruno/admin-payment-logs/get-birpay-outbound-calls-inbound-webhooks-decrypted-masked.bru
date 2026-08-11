@@ -1,0 +1,19 @@
+meta {
+  name: BirPay outbound calls + inbound webhooks (decrypted, masked)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/payment-logs
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `orders.view`. Request/response bodies are stored encrypted + allowlisted, decrypted server-side for display.
+}

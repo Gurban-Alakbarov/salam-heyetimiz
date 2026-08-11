@@ -1,0 +1,25 @@
+meta {
+  name: Send a test email via the configured SMTP
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/email/send-test
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "to": ""
+}
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Force a status recheck against the bank (rare; auto-reconciler does this hourly)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/orders/:orderId/recheck
+  body: none
+  auth: bearer
+}
+
+headers {
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

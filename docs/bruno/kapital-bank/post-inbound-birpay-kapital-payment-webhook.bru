@@ -1,0 +1,31 @@
+meta {
+  name: Inbound BirPay (Kapital) payment webhook
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/v1/payments/webhook
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-Signature: 
+}
+
+body:json {
+{
+    "event": "payment_succeeded",
+    "paymentId": "0eb9510b-f8cd-48e1-9d35-8c609398253b",
+    "status": "PAID",
+    "metadata": {
+        "orderNo": "SH-E2E-001"
+    }
+}
+}
+
+docs {
+  Inbound, **signature-authenticated** (no JWT). `X-Signature` = Base64(HMAC-SHA256(rawBody, sharedSecret)) with the secret from Settings (`payments.webhook_secret`). Invalid/duplicate signatures are re...
+}

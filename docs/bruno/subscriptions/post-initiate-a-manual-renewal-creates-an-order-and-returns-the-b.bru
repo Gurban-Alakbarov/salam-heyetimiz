@@ -1,0 +1,26 @@
+meta {
+  name: Initiate a manual renewal — creates an order and returns the bank redirect
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/v1/subscriptions/:subscriptionId/renew
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+{
+    "return_url": "salam://payment/return"
+}
+}

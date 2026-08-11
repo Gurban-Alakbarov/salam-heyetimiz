@@ -1,0 +1,25 @@
+meta {
+  name: Grant a permission override to an admin
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/admins/:adminId/permissions/grant
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "permission": "refunds.create"
+}
+}

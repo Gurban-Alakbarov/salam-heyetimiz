@@ -1,0 +1,27 @@
+meta {
+  name: Queue a long-running export (CSV/Parquet to S3)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/report-jobs
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "report_kind": "",
+    "parameters": {}
+}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Open-command history for the device (current user)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/devices/:deviceId/commands
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Force-logout all admins (revoke + cutoff)
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/settings/security/force-logout
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Requires `system.settings.manage`. Sets `security.force_logout_at`; every token issued before it is rejected.
+}

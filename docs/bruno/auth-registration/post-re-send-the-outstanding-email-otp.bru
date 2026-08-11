@@ -1,0 +1,25 @@
+meta {
+  name: Re-send the outstanding email OTP
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/resend-otp
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+{
+    "email": "aysel@example.com"
+}
+}
+
+docs {
+  Anti-enumeration — identical response whether or not the account exists. Rate limit 3/email/10min.
+}

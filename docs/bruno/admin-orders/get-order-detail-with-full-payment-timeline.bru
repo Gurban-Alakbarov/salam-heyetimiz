@@ -1,0 +1,15 @@
+meta {
+  name: Order detail with full payment timeline
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/orders/:orderId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

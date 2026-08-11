@@ -1,0 +1,19 @@
+meta {
+  name: Start impersonating another admin
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/admins/:adminId/impersonate
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Super-admin only. Issues a new admin JWT whose claims carry `impersonator_admin_id`. Audited.
+}

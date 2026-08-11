@@ -1,0 +1,9 @@
+{
+    "version": "1",
+    "name": "Salam H\u0259y\u0259timiz API",
+    "type": "collection",
+    "ignore": [
+        "node_modules",
+        ".git"
+    ]
+}

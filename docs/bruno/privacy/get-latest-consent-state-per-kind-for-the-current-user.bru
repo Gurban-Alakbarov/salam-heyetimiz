@@ -1,0 +1,15 @@
+meta {
+  name: Latest consent state per kind for the current user
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/consents
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

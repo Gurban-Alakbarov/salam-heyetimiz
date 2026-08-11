@@ -1,0 +1,25 @@
+meta {
+  name: Disable (block opens; keep history)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/disable
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "reason": ""
+}
+}

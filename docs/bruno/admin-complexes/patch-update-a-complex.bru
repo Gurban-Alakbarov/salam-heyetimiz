@@ -1,0 +1,27 @@
+meta {
+  name: Update a complex
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/admin/v1/complexes/:complexId
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "name": "Sea Breeze",
+    "code": "SEA-BREEZE",
+    "address": ""
+}
+}

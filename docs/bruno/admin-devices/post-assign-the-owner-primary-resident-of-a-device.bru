@@ -1,0 +1,25 @@
+meta {
+  name: Assign the owner (primary resident) of a device
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/assign
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "phone": "+994501234567"
+}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: List device models
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/lookups/device-models
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

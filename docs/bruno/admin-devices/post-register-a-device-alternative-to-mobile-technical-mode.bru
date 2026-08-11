@@ -1,0 +1,37 @@
+meta {
+  name: Register a device (alternative to mobile technical mode)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "serial": "",
+    "device_model_id": 0,
+    "sim_phone": "",
+    "sim_operator_id": 0,
+    "sim_iccid": "",
+    "driver_type": "",
+    "firmware_version": "",
+    "region_id": 0,
+    "location_label": "",
+    "latitude": 0,
+    "longitude": 0,
+    "metadata": {}
+}
+}

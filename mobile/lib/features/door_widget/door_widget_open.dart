@@ -22,6 +22,7 @@ enum DoorWidgetOpenOutcome {
   notConfirmed, // got a 202 but couldn't confirm (transient errors / non-terminal)
   sessionExpired, // 401 / missing token on the OPEN (NO background refresh)
   unauthorized, // 403 on the OPEN — server authorization is canonical
+  locationRequired, // 403 location_required — geofenced device; open the app for GPS (GEOFENCE-4)
   networkError, // network/timeout on the OPEN (Stage 1) — never reached server
   noDevice, // no configured device
   error, // generic / unknown
@@ -170,7 +171,14 @@ BarrierRepository backgroundBarrierRepository(
 
 DoorWidgetOpenOutcome _outcomeForFailure(Failure failure) {
   if (failure is UnauthorizedFailure) return DoorWidgetOpenOutcome.sessionExpired;
-  if (failure is ForbiddenFailure) return DoorWidgetOpenOutcome.unauthorized;
+  if (failure is ForbiddenFailure) {
+    // GEOFENCE-4 (reactive): the widget sends NO location, so a geofenced device
+    // answers `location_required` (403). Surface it distinctly so the widget can
+    // prompt "open the app" (→ foreground GPS). Every other 403 stays unauthorized.
+    return failure.code == 'location_required'
+        ? DoorWidgetOpenOutcome.locationRequired
+        : DoorWidgetOpenOutcome.unauthorized;
+  }
   if (failure is NetworkFailure || failure is TimeoutFailure) {
     return DoorWidgetOpenOutcome.networkError;
   }
@@ -188,6 +196,7 @@ String doorWidgetOutcomeCode(DoorWidgetOpenOutcome outcome) => switch (outcome) 
   DoorWidgetOpenOutcome.notConfirmed => 'not_confirmed',
   DoorWidgetOpenOutcome.sessionExpired => 'session_expired',
   DoorWidgetOpenOutcome.unauthorized => 'unauthorized',
+  DoorWidgetOpenOutcome.locationRequired => 'location_required',
   DoorWidgetOpenOutcome.networkError => 'network_error',
   DoorWidgetOpenOutcome.noDevice => 'no_device',
   DoorWidgetOpenOutcome.error => 'error',

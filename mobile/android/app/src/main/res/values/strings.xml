@@ -11,8 +11,14 @@
     <string name="dw_not_confirmed">Nəticə təsdiqlənmədi</string>
     <string name="dw_no_response">Cavab alınmadı</string>
     <string name="dw_no_device">Qapı seçilməyib</string>
+    <string name="dw_location_required">Məkan tələb olunur — tətbiqi açın</string>
     <string name="dw_unauthorized">İcazə yoxdur</string>
     <string name="dw_session_expired">Sessiya bitib — tətbiqi açın</string>
     <string name="dw_network_error">Şəbəkə xətası</string>
     <string name="dw_error">Xəta baş verdi</string>
+
+    <!-- GEOFENCE-4 confirmation prompt (native ConfirmOpenActivity, shown before every open). -->
+    <string name="dw_confirm_title">Qapını açmaq istəyirsiniz?</string>
+    <string name="dw_confirm_open">Qapını aç</string>
+    <string name="dw_cancel">Ləğv et</string>
 </resources>

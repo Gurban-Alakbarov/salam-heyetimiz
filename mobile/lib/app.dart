@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
@@ -23,6 +25,11 @@ class SalamApp extends ConsumerStatefulWidget {
 }
 
 class _SalamAppState extends ConsumerState<SalamApp> {
+  /// Warm (app-already-running) widget launches — a `location_required` widget tap
+  /// arriving via onNewIntent (GEOFENCE-4). Cold launches come through
+  /// [_maybeHandleWidgetForegroundOpen] instead.
+  StreamSubscription<Uri?>? _widgetClickSub;
+
   @override
   void initState() {
     super.initState();
@@ -33,11 +40,29 @@ class _SalamAppState extends ConsumerState<SalamApp> {
         push.registerToken();
       }
     });
+    // GEOFENCE-4: the widget's `location_required` tap launches the app (HOME_WIDGET
+    // LAUNCH action) with `salamwidget://foreground?deviceId=…&widgetId=…`. Handle the
+    // warm-launch (already running) case here; best-effort so it never breaks start.
+    try {
+      _widgetClickSub = HomeWidget.widgetClicked.listen(_navigateFromWidgetLaunch);
+    } catch (_) {
+      // No home_widget channel (non-Android / tests) → nothing to listen to.
+    }
+  }
+
+  @override
+  void dispose() {
+    _widgetClickSub?.cancel();
+    super.dispose();
   }
 
   /// True once the Android "add widget" configure launch has been routed, so it is
   /// handled exactly once (W5, Model A).
   bool _configureHandled = false;
+
+  /// True once a cold-start `location_required` widget launch has been routed
+  /// (GEOFENCE-4), so the initial intent is consumed exactly once.
+  bool _foregroundHandled = false;
 
   /// If this launch came from the home-screen widget's Android configure flow, route
   /// to the per-instance barrier picker (needs an authenticated session for the device
@@ -55,6 +80,37 @@ class _SalamAppState extends ConsumerState<SalamApp> {
     }
   }
 
+  /// Cold-start counterpart of [_navigateFromWidgetLaunch]: if this launch came from a
+  /// `location_required` widget tap (GEOFENCE-4), route to that barrier's open screen.
+  /// Needs an authenticated session (device list), so it is driven off the auth
+  /// listener like the configure flow, and consumed exactly once.
+  Future<void> _maybeHandleWidgetForegroundOpen() async {
+    if (_foregroundHandled || !mounted) return;
+    try {
+      final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+      if (uri == null || uri.host != 'foreground') return;
+      _foregroundHandled = true;
+      _navigateFromWidgetLaunch(uri);
+    } catch (_) {
+      // Foreground routing is best-effort — never break app start.
+    }
+  }
+
+  /// Route a `salamwidget://foreground?deviceId=…&widgetId=…` widget launch to the
+  /// per-barrier open screen. [deviceId] is navigation context only — the screen
+  /// re-checks it against the user's own device list, and the server stays the sole
+  /// open authority. Ignored unless authenticated (a protected route would bounce to
+  /// Welcome anyway).
+  void _navigateFromWidgetLaunch(Uri? uri) {
+    if (!mounted || uri == null || uri.host != 'foreground') return;
+    final deviceId = int.tryParse(uri.queryParameters['deviceId'] ?? '');
+    if (deviceId == null) return;
+    if (ref.read(authStateProvider) != AuthState.authenticated) return;
+    final widgetId = uri.queryParameters['widgetId'];
+    final suffix = widgetId != null ? '&widgetId=$widgetId' : '';
+    ref.read(routerProvider).push('/widget/open?deviceId=$deviceId$suffix');
+  }
+
   @override
   Widget build(BuildContext context) {
     // Register the FCM token the moment the session becomes authenticated (login,
@@ -62,8 +118,10 @@ class _SalamAppState extends ConsumerState<SalamApp> {
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next == AuthState.authenticated) {
         ref.read(pushMessagingServiceProvider).registerToken();
-        // Session is ready → if we were launched to configure a widget, route there.
+        // Session is ready → route any pending widget launch (configure, or a
+        // GEOFENCE-4 `location_required` open) now that the device list is reachable.
         _maybeHandleWidgetConfigure();
+        _maybeHandleWidgetForegroundOpen();
       }
     });
 

@@ -266,6 +266,37 @@ void main() {
       expect(outcome, DoorWidgetOpenOutcome.unauthorized);
     });
 
+    test('403 location_required → locationRequired (GEOFENCE-4: distinct from unauthorized)', () async {
+      final outcome = await performDoorWidgetOpen(
+        config: config,
+        accessToken: token,
+        baseUrl: baseUrl,
+        repositoryFactory: (b, t) => _FakeBarrierRepository(
+          openResult: const Err(
+            ForbiddenFailure('İcazə yoxdur', 'location_required'),
+          ),
+        ),
+        sleep: noSleep,
+      );
+      expect(outcome, DoorWidgetOpenOutcome.locationRequired);
+      expect(outcome, isNot(DoorWidgetOpenOutcome.unauthorized));
+    });
+
+    test('403 with a different code (subscription_required) stays unauthorized', () async {
+      final outcome = await performDoorWidgetOpen(
+        config: config,
+        accessToken: token,
+        baseUrl: baseUrl,
+        repositoryFactory: (b, t) => _FakeBarrierRepository(
+          openResult: const Err(
+            ForbiddenFailure('İcazə yoxdur', 'subscription_required'),
+          ),
+        ),
+        sleep: noSleep,
+      );
+      expect(outcome, DoorWidgetOpenOutcome.unauthorized);
+    });
+
     test('network failure on the OPEN → networkError (request never reached server)', () async {
       final outcome = await performDoorWidgetOpen(
         config: config,
@@ -319,6 +350,12 @@ void main() {
       expect(code, 'not_confirmed');
       expect(code, isNot('failed'));
       expect(code, isNot('network_error'));
+    });
+
+    test('locationRequired maps to "location_required" (GEOFENCE-4), not unauthorized', () {
+      final code = doorWidgetOutcomeCode(DoorWidgetOpenOutcome.locationRequired);
+      expect(code, 'location_required');
+      expect(code, isNot('unauthorized'));
     });
 
     test('every outcome is a unique plain-ascii slug (never localized text)', () {

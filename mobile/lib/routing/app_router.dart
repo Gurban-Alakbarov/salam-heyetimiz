@@ -10,6 +10,7 @@ import 'package:salam_mobile/features/auth/presentation/screens/register_screen.
 import 'package:salam_mobile/features/auth/presentation/screens/verify_otp_screen.dart';
 import 'package:salam_mobile/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:salam_mobile/features/door_widget/presentation/door_widget_picker_screen.dart';
+import 'package:salam_mobile/features/door_widget/presentation/widget_open_screen.dart';
 import 'package:salam_mobile/features/home/home_shell.dart';
 import 'package:salam_mobile/features/notifications/presentation/notification_screen.dart';
 import 'package:salam_mobile/features/settings/settings_screen.dart';
@@ -114,6 +115,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           return id == null
               ? const HomeShell()
               : DoorWidgetPickerScreen(widgetId: id, fromConfigure: true);
+        },
+      ),
+      // GEOFENCE-4: a geofenced widget open returned `location_required`; the widget
+      // launched the app here for that barrier so the user can open it in-app (with
+      // the foreground GPS gate). deviceId is navigation context; the screen verifies
+      // it against the user's own device list.
+      GoRoute(
+        path: '/widget/open',
+        builder: (context, state) {
+          final id = int.tryParse(state.uri.queryParameters['deviceId'] ?? '');
+          return id == null
+              ? const HomeShell()
+              : WidgetOpenScreen(deviceId: id);
         },
       ),
     ],

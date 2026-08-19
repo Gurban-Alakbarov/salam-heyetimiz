@@ -10,7 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundReceiver
+import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 import java.util.Locale
 
@@ -23,9 +23,12 @@ import java.util.Locale
  * (`door_widget_locale`), so the widget follows the APP language, not the device locale. The stored
  * status is a non-localized state CODE — the background isolate stays locale-agnostic.
  *
- * Tapping fires a per-instance background broadcast (`requestCode = AppWidgetId`, URI carries the id)
- * → home_widget WorkManager → Dart `doorWidgetOpenCallback`. This provider performs NO auth / NO
- * network; it only renders state and dispatches the click.
+ * Tapping asks for confirmation first (GEOFENCE-4 D2/D5): the tap launches the transparent
+ * [ConfirmOpenActivity] (`requestCode = AppWidgetId`), which on confirm fires the per-instance
+ * background broadcast → home_widget WorkManager → Dart `doorWidgetOpenCallback`. The one exception
+ * is the `location_required` state (a geofenced barrier answered "no location"): there the tap
+ * launches the APP on that barrier (`salamwidget://foreground?deviceId=…`) for the in-app GPS open.
+ * This provider performs NO auth / NO network; it only renders state and dispatches the click.
  */
 class DoorWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(
@@ -63,7 +66,16 @@ class DoorWidgetProvider : HomeWidgetProvider() {
                 }
             }
 
-            views.setOnClickPendingIntent(R.id.door_widget_root, openIntent(context, widgetId))
+            // Confirm-first on every tap (D5); the one exception is `location_required`,
+            // where the tap opens the app on this barrier for the in-app GPS open (D3).
+            val tapIntent = if (statusCode == CODE_LOCATION_REQUIRED) {
+                val deviceId = readDeviceId(widgetData, widgetId)
+                if (deviceId != INVALID_ID) foregroundIntent(context, widgetId, deviceId)
+                else confirmIntent(context, widgetId)
+            } else {
+                confirmIntent(context, widgetId)
+            }
+            views.setOnClickPendingIntent(R.id.door_widget_root, tapIntent)
             appWidgetManager.updateAppWidget(widgetId, views)
         }
     }
@@ -80,15 +92,43 @@ class DoorWidgetProvider : HomeWidgetProvider() {
         prefs.apply()
     }
 
-    /** Per-instance background-open PendingIntent — requestCode = AppWidgetId (W5 D5). */
-    private fun openIntent(context: Context, widgetId: Int): PendingIntent {
-        val intent = Intent(context, HomeWidgetBackgroundReceiver::class.java).apply {
-            action = BACKGROUND_ACTION
-            data = Uri.parse("salamwidget://open?widgetId=$widgetId")
+    /** Confirm-first tap (D2/D5): launch the transparent [ConfirmOpenActivity] for this instance.
+     *  requestCode = AppWidgetId + a per-instance data URI so the PendingIntents never collapse. */
+    private fun confirmIntent(context: Context, widgetId: Int): PendingIntent {
+        val intent = Intent(context, ConfirmOpenActivity::class.java).apply {
+            putExtra(ConfirmOpenActivity.EXTRA_WIDGET_ID, widgetId)
+            data = Uri.parse("salamwidget://confirm?widgetId=$widgetId")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         var flags = PendingIntent.FLAG_UPDATE_CURRENT
         if (Build.VERSION.SDK_INT >= 23) flags = flags or PendingIntent.FLAG_IMMUTABLE
-        return PendingIntent.getBroadcast(context, widgetId, intent, flags)
+        return PendingIntent.getActivity(context, widgetId, intent, flags)
+    }
+
+    /** GEOFENCE-4 (D3): in `location_required`, tap launches the APP on this barrier (foreground GPS
+     *  open). deviceId comes from THIS widget's stored config; the app re-checks it server-side. */
+    private fun foregroundIntent(context: Context, widgetId: Int, deviceId: Int): PendingIntent {
+        val uri = Uri.parse("salamwidget://foreground?deviceId=$deviceId&widgetId=$widgetId")
+        return HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, uri)
+    }
+
+    /** This instance's stored deviceId (per-instance, legacy global fallback); [INVALID_ID] if none.
+     *  home_widget stores an int via putInt, but a Long fallback keeps this crash-proof either way. */
+    private fun readDeviceId(widgetData: SharedPreferences, widgetId: Int): Int {
+        for (key in listOf(deviceIdKey(widgetId), LEGACY_DEVICE_ID)) {
+            if (!widgetData.contains(key)) continue
+            val id = try {
+                widgetData.getInt(key, INVALID_ID)
+            } catch (e: ClassCastException) {
+                try {
+                    widgetData.getLong(key, INVALID_ID.toLong()).toInt()
+                } catch (e2: ClassCastException) {
+                    INVALID_ID
+                }
+            }
+            if (id != INVALID_ID) return id
+        }
+        return INVALID_ID
     }
 
     private fun localized(context: Context, code: String): Context {
@@ -105,6 +145,7 @@ class DoorWidgetProvider : HomeWidgetProvider() {
         "not_confirmed" -> R.string.dw_not_confirmed
         "no_response" -> R.string.dw_no_response
         "no_device" -> R.string.dw_no_device
+        "location_required" -> R.string.dw_location_required
         "unauthorized" -> R.string.dw_unauthorized
         "session_expired" -> R.string.dw_session_expired
         "network_error" -> R.string.dw_network_error
@@ -117,9 +158,11 @@ class DoorWidgetProvider : HomeWidgetProvider() {
         private const val KEY_LOCALE = "door_widget_locale"
         private const val DEFAULT_LOCALE = "az"
         private const val CODE_NO_DEVICE = "no_device"
+        private const val CODE_LOCATION_REQUIRED = "location_required"
+        private const val INVALID_ID = -1
+        private const val LEGACY_DEVICE_ID = "door_widget_device_id"
         private const val LEGACY_DEVICE_LABEL = "door_widget_device_label"
         private const val LEGACY_STATUS_CODE = "door_widget_status_code"
-        private const val BACKGROUND_ACTION = "es.antonborri.home_widget.action.BACKGROUND"
 
         // Mirror DoorWidgetService's per-instance key builders.
         private fun deviceIdKey(id: Int) = "door_widget_device_id_$id"

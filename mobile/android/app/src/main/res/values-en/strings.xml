@@ -9,8 +9,14 @@
     <string name="dw_not_confirmed">Result not confirmed</string>
     <string name="dw_no_response">No response received</string>
     <string name="dw_no_device">No door selected</string>
+    <string name="dw_location_required">Location required — open the app</string>
     <string name="dw_unauthorized">Access denied</string>
     <string name="dw_session_expired">Session expired — open the app</string>
     <string name="dw_network_error">Network error</string>
     <string name="dw_error">An error occurred</string>
+
+    <!-- GEOFENCE-4 confirmation prompt (native ConfirmOpenActivity, shown before every open). -->
+    <string name="dw_confirm_title">Open the door?</string>
+    <string name="dw_confirm_open">Open door</string>
+    <string name="dw_cancel">Cancel</string>
 </resources>

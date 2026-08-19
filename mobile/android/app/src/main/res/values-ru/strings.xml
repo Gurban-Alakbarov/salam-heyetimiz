@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen door widget strings — RU (W5). -->
+<resources>
+    <string name="dw_open">Открыть дверь</string>
+    <string name="dw_opening">Дверь открывается…</string>
+    <string name="dw_sent">Запрос отправлен</string>
+    <string name="dw_opened">Дверь открыта ✓</string>
+    <string name="dw_failed">Не удалось открыть дверь</string>
+    <string name="dw_not_confirmed">Результат не подтверждён</string>
+    <string name="dw_no_response">Ответ не получен</string>
+    <string name="dw_no_device">Дверь не выбрана</string>
+    <string name="dw_unauthorized">Нет доступа</string>
+    <string name="dw_session_expired">Сессия истекла — откройте приложение</string>
+    <string name="dw_network_error">Ошибка сети</string>
+    <string name="dw_error">Произошла ошибка</string>
+</resources>

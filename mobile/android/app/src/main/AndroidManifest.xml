@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Android 13+ runtime notification permission (FCM push). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Declared for the home-screen door widget's future background network call (W3). Release builds
+         otherwise inherit INTERNET only from merged plugin manifests; declaring it here is explicit. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="salam_mobile"
         android:name="${applicationName}"
@@ -36,6 +39,29 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="high_importance_channel" />
+
+        <!-- Home-screen "Qapını aç" widget (W1 static shell). exported=false: the OS AppWidget framework
+             delivers APPWIDGET_UPDATE; no external app broadcasts here. The tap only opens the app for now
+             (placeholder) — the real door-open callback is wired in W3. -->
+        <receiver
+            android:name=".DoorWidgetProvider"
+            android:label="Qapını aç"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/door_widget_info" />
+        </receiver>
+
+        <!-- W3: receives the widget's background-open broadcast and hands off to home_widget's
+             WorkManager background isolate, where doorWidgetOpenCallback reads the session token and
+             calls the open endpoint. exported=false — only our own widget PendingIntent (an explicit
+             component intent) targets it; no external app can reach it. -->
+        <receiver
+            android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

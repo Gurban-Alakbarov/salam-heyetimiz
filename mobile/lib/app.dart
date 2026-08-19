@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/design_system/theme/app_theme.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
@@ -34,6 +35,26 @@ class _SalamAppState extends ConsumerState<SalamApp> {
     });
   }
 
+  /// True once the Android "add widget" configure launch has been routed, so it is
+  /// handled exactly once (W5, Model A).
+  bool _configureHandled = false;
+
+  /// If this launch came from the home-screen widget's Android configure flow, route
+  /// to the per-instance barrier picker (needs an authenticated session for the device
+  /// list). A normal launch returns null here and nothing happens.
+  Future<void> _maybeHandleWidgetConfigure() async {
+    if (_configureHandled || !mounted) return;
+    try {
+      final raw = await HomeWidget.initiallyLaunchedFromHomeWidgetConfigure();
+      final widgetId = int.tryParse(raw ?? '');
+      if (widgetId == null || !mounted) return;
+      _configureHandled = true;
+      ref.read(routerProvider).push('/widget/configure?widgetId=$widgetId');
+    } catch (_) {
+      // Configure routing is best-effort — never break app start.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Register the FCM token the moment the session becomes authenticated (login,
@@ -41,6 +62,8 @@ class _SalamAppState extends ConsumerState<SalamApp> {
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next == AuthState.authenticated) {
         ref.read(pushMessagingServiceProvider).registerToken();
+        // Session is ready → if we were launched to configure a widget, route there.
+        _maybeHandleWidgetConfigure();
       }
     });
 

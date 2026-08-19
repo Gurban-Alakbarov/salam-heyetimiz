@@ -491,4 +491,34 @@ class AppLocalizationsRu extends AppLocalizations {
   String visitorHoursShort(int count) {
     return '$count ч';
   }
+
+  @override
+  String get doorWidgetTitle => 'Виджет на главном экране';
+
+  @override
+  String get doorWidgetIntro =>
+      'Выберите шлагбаум для виджета на главном экране. Название выбранного шлагбаума появится на виджете.';
+
+  @override
+  String doorWidgetSelected(String label) {
+    return '$label назначен для виджета';
+  }
+
+  @override
+  String get doorWidgetClear => 'Удалить выбор виджета';
+
+  @override
+  String get doorWidgetCleared => 'Выбор виджета удалён';
+
+  @override
+  String get doorWidgetUnconfigured => 'Дверь не выбрана';
+
+  @override
+  String get doorWidgetAddHint =>
+      'Добавьте виджет «Открыть дверь» на главный экран, затем выберите дверь.';
+
+  @override
+  String doorWidgetInstance(int id) {
+    return 'Виджет #$id';
+  }
 }

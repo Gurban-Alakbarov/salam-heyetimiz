@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen door widget strings — AZ (default). The widget follows the APP language
+     (W5): DoorWidgetProvider renders these via a locale-specific context built from the
+     persisted door_widget_locale, so it does NOT depend on the device locale. -->
+<resources>
+    <string name="dw_open">Qapını aç</string>
+    <string name="dw_opening">Qapı açılır…</string>
+    <string name="dw_sent">Sorğu göndərildi</string>
+    <string name="dw_opened">Qapı açıldı ✓</string>
+    <string name="dw_failed">Qapı açıla bilmədi</string>
+    <string name="dw_not_confirmed">Nəticə təsdiqlənmədi</string>
+    <string name="dw_no_response">Cavab alınmadı</string>
+    <string name="dw_no_device">Qapı seçilməyib</string>
+    <string name="dw_unauthorized">İcazə yoxdur</string>
+    <string name="dw_session_expired">Sessiya bitib — tətbiqi açın</string>
+    <string name="dw_network_error">Şəbəkə xətası</string>
+    <string name="dw_error">Xəta baş verdi</string>
+</resources>

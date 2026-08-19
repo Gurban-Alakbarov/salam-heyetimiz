@@ -57,6 +57,29 @@ class ApiClient {
     }
     return ApiClient(dio);
   }
+
+  /// A client for the home-screen widget's BACKGROUND isolate (W3), which has no
+  /// [SessionManager]. It carries a fixed bearer [accessToken] read once from
+  /// secure storage and — deliberately — NO [RefreshInterceptor]: the background
+  /// isolate must never refresh or rotate the session (W3 Q2). A 401 therefore
+  /// surfaces as an [UnauthorizedFailure] → "session expired → open the app".
+  static ApiClient background({
+    required String baseUrl,
+    required String accessToken,
+    required String localeCode,
+  }) {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 20),
+        sendTimeout: const Duration(seconds: 20),
+        headers: const {'Accept': 'application/json'},
+      ),
+    );
+    dio.interceptors.add(_StaticAuthInterceptor(accessToken, localeCode));
+    return ApiClient(dio);
+  }
 }
 
 /// Paths that never carry a bearer token and must not trigger a 401 refresh
@@ -87,6 +110,25 @@ class AuthInterceptor extends Interceptor {
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';
       }
+    }
+    handler.next(options);
+  }
+}
+
+/// Adds a fixed bearer token + Accept-Language for the background isolate (which
+/// has no [SessionManager]). Deliberately paired with NO refresh interceptor
+/// ([ApiClient.background], W3 Q2) — a 401 propagates untouched.
+class _StaticAuthInterceptor extends Interceptor {
+  _StaticAuthInterceptor(this._accessToken, this._localeCode);
+
+  final String _accessToken;
+  final String _localeCode;
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.headers['Accept-Language'] = _localeCode;
+    if (!_isPublic(options.path)) {
+      options.headers['Authorization'] = 'Bearer $_accessToken';
     }
     handler.next(options);
   }

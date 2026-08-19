@@ -490,4 +490,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String visitorHoursShort(int count) {
     return '$count h';
   }
+
+  @override
+  String get doorWidgetTitle => 'Home screen widget';
+
+  @override
+  String get doorWidgetIntro =>
+      'Choose the barrier for your home-screen widget. The selected barrier\'s name appears on the widget.';
+
+  @override
+  String doorWidgetSelected(String label) {
+    return '$label set for the widget';
+  }
+
+  @override
+  String get doorWidgetClear => 'Remove widget selection';
+
+  @override
+  String get doorWidgetCleared => 'Widget selection removed';
+
+  @override
+  String get doorWidgetUnconfigured => 'No door selected';
+
+  @override
+  String get doorWidgetAddHint =>
+      'Add the \"Open door\" widget to your home screen, then choose a door.';
+
+  @override
+  String doorWidgetInstance(int id) {
+    return 'Widget #$id';
+  }
 }

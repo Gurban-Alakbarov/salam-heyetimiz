@@ -5,6 +5,7 @@ import 'package:salam_mobile/design_system/components/app_list.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
 import 'package:salam_mobile/features/auth/domain/entity/auth_entities.dart';
+import 'package:salam_mobile/features/door_widget/presentation/door_widget_management_screen.dart';
 import 'package:salam_mobile/features/notifications/presentation/notification_screen.dart';
 import 'package:salam_mobile/features/profile/presentation/help_screen.dart';
 import 'package:salam_mobile/features/profile/presentation/personal_info_screen.dart';
@@ -75,6 +76,12 @@ class ProfileScreen extends ConsumerWidget {
               title: l.profileAppSettings,
               chevron: true,
               onTap: () => _push(context, const SettingsScreen()),
+            ),
+            AppListTile(
+              icon: Icons.widgets_outlined,
+              title: l.doorWidgetTitle,
+              chevron: true,
+              onTap: () => _push(context, const DoorWidgetManagementScreen()),
             ),
             AppListTile(
               icon: Icons.help_outline_rounded,

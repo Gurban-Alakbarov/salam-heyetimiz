@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen "Qapını aç" widget layout. All user-facing text is set at runtime by
+     DoorWidgetProvider from a locale-specific context (W5), so the widget follows the app
+     language rather than the device locale — the android:text values here are only fallbacks.
+     The whole widget is the tap target (per-instance background-open, wired in the provider). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/door_widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/door_widget_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/door_widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dw_open"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <!-- Selected barrier's label (server data, not localized); gone until configured. -->
+    <TextView
+        android:id="@+id/door_widget_device_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="#E6FFFFFF"
+        android:textSize="11sp"
+        android:visibility="gone" />
+
+    <!-- Last background-open status (localized from a state code by the provider). -->
+    <TextView
+        android:id="@+id/door_widget_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="#E6FFFFFF"
+        android:textSize="10sp"
+        android:visibility="gone" />
+</LinearLayout>

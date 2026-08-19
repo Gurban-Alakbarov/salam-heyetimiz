@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../analytics/analytics_service.dart';
 import '../config/app_config.dart';
@@ -11,6 +12,7 @@ import '../network/api_client.dart';
 import '../services/device_info_service.dart';
 import '../session/session_manager.dart';
 import '../storage/app_storage.dart';
+import '../storage/storage_keys.dart';
 
 /// Dependency injection via Riverpod (Constitution §1.4/§5, STATE_MANAGEMENT.md §5).
 /// No get_it. [appConfigProvider] is overridden per flavor in `main_<flavor>.dart`.
@@ -79,12 +81,30 @@ final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
   ThemeModeNotifier.new,
 );
 
-/// App locale (null = system). Sent as Accept-Language to the API (Phase 2).
+/// Initial app locale, hydrated from persisted `locale_code` in bootstrap and injected
+/// via a ProviderScope override (null = system/first-launch → app defaults to az).
+final initialLocaleProvider = Provider<Locale?>((ref) => null);
+
+/// App locale (null = system). Sent as Accept-Language to the API. Now PERSISTED
+/// (W5 D2): a chosen language survives restart. The home-screen widget follows this
+/// choice too — the settings screen mirrors the code to widget storage on change.
 class LocaleNotifier extends Notifier<Locale?> {
   @override
-  Locale? build() => null;
+  Locale? build() => ref.read(initialLocaleProvider);
 
-  void set(Locale? locale) => state = locale;
+  Future<void> set(Locale? locale) async {
+    state = locale;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (locale == null) {
+        await prefs.remove(StorageKeys.localeCode);
+      } else {
+        await prefs.setString(StorageKeys.localeCode, locale.languageCode);
+      }
+    } catch (_) {
+      // Persistence is best-effort — a failed write must not break switching.
+    }
+  }
 }
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(

@@ -490,4 +490,34 @@ class AppLocalizationsAz extends AppLocalizations {
   String visitorHoursShort(int count) {
     return '$count saat';
   }
+
+  @override
+  String get doorWidgetTitle => 'Ana ekran vidceti';
+
+  @override
+  String get doorWidgetIntro =>
+      'Ana ekran vidceti üçün qapı seçin. Seçdiyiniz qapının adı vidcetdə görünəcək.';
+
+  @override
+  String doorWidgetSelected(String label) {
+    return '$label vidcetə təyin edildi';
+  }
+
+  @override
+  String get doorWidgetClear => 'Vidcet təyinatını sil';
+
+  @override
+  String get doorWidgetCleared => 'Vidcet təyinatı silindi';
+
+  @override
+  String get doorWidgetUnconfigured => 'Qapı seçilməyib';
+
+  @override
+  String get doorWidgetAddHint =>
+      'Ana ekrana \"Qapını aç\" vidceti əlavə edin, sonra qapı seçin.';
+
+  @override
+  String doorWidgetInstance(int id) {
+    return 'Vidcet #$id';
+  }
 }

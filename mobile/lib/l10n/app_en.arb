@@ -187,5 +187,19 @@
   "visitorHoursShort": "{count} h",
   "@visitorHoursShort": {
     "placeholders": { "count": { "type": "int" } }
+  },
+  "doorWidgetTitle": "Home screen widget",
+  "doorWidgetIntro": "Choose the barrier for your home-screen widget. The selected barrier's name appears on the widget.",
+  "doorWidgetSelected": "{label} set for the widget",
+  "@doorWidgetSelected": {
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "doorWidgetClear": "Remove widget selection",
+  "doorWidgetCleared": "Widget selection removed",
+  "doorWidgetUnconfigured": "No door selected",
+  "doorWidgetAddHint": "Add the \"Open door\" widget to your home screen, then choose a door.",
+  "doorWidgetInstance": "Widget #{id}",
+  "@doorWidgetInstance": {
+    "placeholders": { "id": { "type": "int" } }
   }
 }

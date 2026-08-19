@@ -163,5 +163,19 @@
   "visitorHoursShort": "{count} saat",
   "@visitorHoursShort": {
     "placeholders": { "count": { "type": "int" } }
+  },
+  "doorWidgetTitle": "Ana ekran vidceti",
+  "doorWidgetIntro": "Ana ekran vidceti üçün qapı seçin. Seçdiyiniz qapının adı vidcetdə görünəcək.",
+  "doorWidgetSelected": "{label} vidcetə təyin edildi",
+  "@doorWidgetSelected": {
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "doorWidgetClear": "Vidcet təyinatını sil",
+  "doorWidgetCleared": "Vidcet təyinatı silindi",
+  "doorWidgetUnconfigured": "Qapı seçilməyib",
+  "doorWidgetAddHint": "Ana ekrana \"Qapını aç\" vidceti əlavə edin, sonra qapı seçin.",
+  "doorWidgetInstance": "Vidcet #{id}",
+  "@doorWidgetInstance": {
+    "placeholders": { "id": { "type": "int" } }
   }
 }

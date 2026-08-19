@@ -163,5 +163,19 @@
   "visitorHoursShort": "{count} ч",
   "@visitorHoursShort": {
     "placeholders": { "count": { "type": "int" } }
+  },
+  "doorWidgetTitle": "Виджет на главном экране",
+  "doorWidgetIntro": "Выберите шлагбаум для виджета на главном экране. Название выбранного шлагбаума появится на виджете.",
+  "doorWidgetSelected": "{label} назначен для виджета",
+  "@doorWidgetSelected": {
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "doorWidgetClear": "Удалить выбор виджета",
+  "doorWidgetCleared": "Выбор виджета удалён",
+  "doorWidgetUnconfigured": "Дверь не выбрана",
+  "doorWidgetAddHint": "Добавьте виджет «Открыть дверь» на главный экран, затем выберите дверь.",
+  "doorWidgetInstance": "Виджет #{id}",
+  "@doorWidgetInstance": {
+    "placeholders": { "id": { "type": "int" } }
   }
 }

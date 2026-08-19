@@ -9,6 +9,7 @@ import 'package:salam_mobile/features/auth/presentation/screens/maintenance_scre
 import 'package:salam_mobile/features/auth/presentation/screens/register_screen.dart';
 import 'package:salam_mobile/features/auth/presentation/screens/verify_otp_screen.dart';
 import 'package:salam_mobile/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:salam_mobile/features/door_widget/presentation/door_widget_picker_screen.dart';
 import 'package:salam_mobile/features/home/home_shell.dart';
 import 'package:salam_mobile/features/notifications/presentation/notification_screen.dart';
 import 'package:salam_mobile/features/settings/settings_screen.dart';
@@ -50,7 +51,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           loc == '/home' ||
           loc == '/settings' ||
           loc == '/notifications' ||
-          loc.startsWith('/devices');
+          loc.startsWith('/devices') ||
+          loc.startsWith('/widget');
 
       // Leaving the splash or a now-cleared gate → route onward.
       if (loc == '/' || loc == '/maintenance' || loc == '/force-update') {
@@ -100,6 +102,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationScreen(),
+      ),
+      // W5: the Android "add widget" configure flow lands here (per-instance barrier
+      // picker bound to the real AppWidgetId). A selection finishes the configuration.
+      GoRoute(
+        path: '/widget/configure',
+        builder: (context, state) {
+          final id = int.tryParse(
+            state.uri.queryParameters['widgetId'] ?? '',
+          );
+          return id == null
+              ? const HomeShell()
+              : DoorWidgetPickerScreen(widgetId: id, fromConfigure: true);
+        },
       ),
     ],
   );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/design_system/components/app_list.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
+import 'package:salam_mobile/features/door_widget/door_widget_providers.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 
 /// App settings — reached from Profile › App settings. Live theme-mode +
@@ -96,9 +97,15 @@ class _LangTile extends ConsumerWidget {
       trailing: selected
           ? const Icon(Icons.check, color: AppColors.brand)
           : null,
-      onTap: () => ref
-          .read(localeProvider.notifier)
-          .set(code == 'system' ? null : Locale(code)),
+      onTap: () async {
+        final locale = code == 'system' ? null : Locale(code);
+        await ref.read(localeProvider.notifier).set(locale);
+        // Mirror the choice to the home-screen widget (non-secret locale code) and
+        // refresh all instances so they re-render in the new language (W5 D2/K).
+        await ref
+            .read(doorWidgetServiceProvider)
+            .setLocale(locale?.languageCode ?? 'az');
+      },
     );
   }
 }

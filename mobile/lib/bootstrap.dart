@@ -6,7 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:salam_mobile/app.dart';
 import 'package:salam_mobile/core/config/app_config.dart';
 import 'package:salam_mobile/core/crash/crash_reporter.dart';
@@ -14,6 +16,9 @@ import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/core/logger/app_logger.dart';
 import 'package:salam_mobile/core/session/session_manager.dart';
 import 'package:salam_mobile/core/storage/app_storage.dart';
+import 'package:salam_mobile/core/storage/storage_keys.dart';
+import 'package:salam_mobile/features/door_widget/door_widget_open.dart';
+import 'package:salam_mobile/features/door_widget/door_widget_service.dart';
 import 'package:salam_mobile/features/notifications/data/push_messaging_service.dart';
 
 /// Single app entrypoint used by every flavor (`main_<flavor>.dart`). Initialises
@@ -33,6 +38,35 @@ Future<void> bootstrap(AppConfig config) async {
       try {
         await Firebase.initializeApp();
         FirebaseMessaging.onBackgroundMessage(fcmBackgroundHandler);
+      } catch (error, stack) {
+        crash.recordError(error, stack, fatal: false);
+      }
+    }
+
+    // Persisted app locale (W5 D2) — hydrate so a chosen language survives restart.
+    Locale? savedLocale;
+    var widgetLocaleCode = 'az';
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final code = prefs.getString(StorageKeys.localeCode);
+      if (code != null && code.isNotEmpty) {
+        savedLocale = Locale(code);
+        widgetLocaleCode = code;
+      }
+    } catch (_) {
+      // Locale hydration is best-effort — fall back to the app default (az).
+    }
+
+    // Home-screen door widget (W3/W5): register the background open callback + persist the
+    // active flavor base URL (Q3, non-secret) so the widget's background isolate can reach
+    // the existing open endpoint, and mirror the app locale (W5 D2) so native renders in the
+    // right language. Android-only, best-effort — a failure here must never block app start.
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      try {
+        await HomeWidget.registerInteractivityCallback(doorWidgetOpenCallback);
+        const service = DoorWidgetService();
+        await service.setBaseUrl(config.apiBaseUrl);
+        await service.setLocale(widgetLocaleCode);
       } catch (error, stack) {
         crash.recordError(error, stack, fatal: false);
       }
@@ -70,6 +104,7 @@ Future<void> bootstrap(AppConfig config) async {
           appConfigProvider.overrideWithValue(config),
           sessionManagerProvider.overrideWithValue(sessionManager),
           appVersionProvider.overrideWithValue(appVersion),
+          initialLocaleProvider.overrideWithValue(savedLocale),
         ],
         child: const SalamApp(),
       ),

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AppWidgetProviderInfo for the "Qapını aç" home-screen widget (W1). Minimal 2x1 cell; no periodic
+     update (updatePeriodMillis=0) — the widget is refreshed on demand, not on a schedule. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:initialLayout="@layout/door_widget"
+    android:previewLayout="@layout/door_widget"
+    android:resizeMode="horizontal"
+    android:updatePeriodMillis="0"
+    android:configure="com.salamheyetimiz.salam_mobile.MainActivity"
+    android:widgetCategory="home_screen" />

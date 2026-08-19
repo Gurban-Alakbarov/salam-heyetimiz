@@ -1017,6 +1017,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} h'**
   String visitorHoursShort(int count);
+
+  /// No description provided for @doorWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widget'**
+  String get doorWidgetTitle;
+
+  /// No description provided for @doorWidgetIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the barrier for your home-screen widget. The selected barrier\'s name appears on the widget.'**
+  String get doorWidgetIntro;
+
+  /// No description provided for @doorWidgetSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} set for the widget'**
+  String doorWidgetSelected(String label);
+
+  /// No description provided for @doorWidgetClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove widget selection'**
+  String get doorWidgetClear;
+
+  /// No description provided for @doorWidgetCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget selection removed'**
+  String get doorWidgetCleared;
+
+  /// No description provided for @doorWidgetUnconfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'No door selected'**
+  String get doorWidgetUnconfigured;
+
+  /// No description provided for @doorWidgetAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the \"Open door\" widget to your home screen, then choose a door.'**
+  String get doorWidgetAddHint;
+
+  /// No description provided for @doorWidgetInstance.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget #{id}'**
+  String doorWidgetInstance(int id);
 }
 
 class _AppLocalizationsDelegate

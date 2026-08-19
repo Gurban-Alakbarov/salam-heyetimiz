@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/providers.dart';
 import '../../core/error/failure.dart';
 import '../../core/services/app_version.dart';
+import '../door_widget/door_widget_providers.dart';
 import '../notifications/notifications_providers.dart';
 import 'data/datasource/auth_remote_datasource.dart';
 import 'data/repository_impl.dart';
@@ -62,9 +63,23 @@ final logoutUseCaseProvider = Provider<LogoutUseCase>(
   (ref) => LogoutUseCase(
     ref.watch(authRepositoryProvider),
     ref.watch(analyticsProvider),
-    // De-register this install's push token (DELETE /v1/notifications/push-token)
-    // while the session is still valid, before it is cleared. Inert off Android.
-    () => ref.read(pushMessagingServiceProvider).deregisterToken(),
+    // Pre-logout cleanup, run while the session token is still valid. Best-effort:
+    // de-register this install's FCM push token (DELETE /v1/notifications/push-token,
+    // inert off Android) AND drop the home-screen widget's saved barrier so a
+    // logged-out (or the next) user never sees the previous resident's door. Each
+    // step is guarded independently so one failure can't skip the other.
+    () async {
+      try {
+        await ref.read(pushMessagingServiceProvider).deregisterToken();
+      } catch (_) {
+        // ignore — a missed de-registration must not block logout
+      }
+      try {
+        await ref.read(doorWidgetServiceProvider).clearAll();
+      } catch (_) {
+        // ignore — widget cleanup is non-critical and non-sensitive
+      }
+    },
   ),
 );
 

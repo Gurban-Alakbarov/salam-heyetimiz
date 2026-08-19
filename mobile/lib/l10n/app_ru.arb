@@ -127,6 +127,16 @@
   "errWhitelist": "Устройство отклонило команду (whitelist)",
   "errNotFound": "Не найдено",
 
+  "barrierLocating": "Определение местоположения…",
+  "errLocationRequired": "Для открытия нужно местоположение.",
+  "errOutsideGeofence": "Вы слишком далеко от шлагбаума.",
+  "errLocationImprecise": "Местоположение недостаточно точное.",
+  "errLocationPermissionDenied": "Для открытия нужен доступ к местоположению.",
+  "errLocationPermissionPermanent": "Доступ к местоположению отключён. Включите его в настройках.",
+  "errLocationServiceDisabled": "Геолокация (GPS) отключена. Включите её, чтобы открыть.",
+  "errLocationTimeout": "Не удалось определить местоположение. Повторите попытку.",
+  "locationOpenSettings": "Открыть настройки",
+
   "directions": "Маршрут",
   "inviteVisitor": "Пригласить",
   "directionsNoLocation": "Для этого шлагбаума не задано местоположение",

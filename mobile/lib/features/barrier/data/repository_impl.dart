@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/error/failure.dart';
+import '../../../core/location/location_service.dart';
 import '../../../core/network/envelope.dart';
 import '../domain/entity/barrier_entities.dart';
 import '../domain/repository.dart';
@@ -24,15 +25,17 @@ class BarrierRepositoryImpl implements BarrierRepository {
   }
 
   @override
-  Future<Result<OpenAck>> open(int deviceId) => _guard(
-    () async =>
-        openAckDtoToEntity(OpenAckDto.fromJson(await _remote.open(deviceId))),
+  Future<Result<OpenAck>> open(int deviceId, {GeoFix? fix}) => _guard(
+    () async => openAckDtoToEntity(
+      OpenAckDto.fromJson(await _remote.open(deviceId, fix: fix)),
+    ),
   );
 
   @override
-  Future<Result<OpenAck>> close(int deviceId) => _guard(
-    () async =>
-        openAckDtoToEntity(OpenAckDto.fromJson(await _remote.close(deviceId))),
+  Future<Result<OpenAck>> close(int deviceId, {GeoFix? fix}) => _guard(
+    () async => openAckDtoToEntity(
+      OpenAckDto.fromJson(await _remote.close(deviceId, fix: fix)),
+    ),
   );
 
   @override

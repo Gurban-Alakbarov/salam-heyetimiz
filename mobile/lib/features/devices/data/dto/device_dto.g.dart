@@ -18,6 +18,8 @@ _DeviceDto _$DeviceDtoFromJson(Map<String, dynamic> json) => _DeviceDto(
   suspensionReason: json['suspension_reason'] as String?,
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
+  geofenceEnabled: json['geofence_enabled'] as bool?,
+  geofenceRadiusM: (json['geofence_radius_m'] as num?)?.toInt(),
   lastOnlineAt: json['last_online_at'] as String?,
   deviceModel: json['device_model'] == null
       ? null
@@ -44,6 +46,8 @@ Map<String, dynamic> _$DeviceDtoToJson(_DeviceDto instance) =>
       'suspension_reason': instance.suspensionReason,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
+      'geofence_enabled': instance.geofenceEnabled,
+      'geofence_radius_m': instance.geofenceRadiusM,
       'last_online_at': instance.lastOnlineAt,
       'device_model': instance.deviceModel?.toJson(),
       'cooldown_seconds_remaining': instance.cooldownSecondsRemaining,

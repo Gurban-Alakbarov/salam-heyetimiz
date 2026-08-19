@@ -127,6 +127,16 @@
   "errWhitelist": "Cihaz komandanı qəbul etmədi (whitelist)",
   "errNotFound": "Tapılmadı",
 
+  "barrierLocating": "Məkan alınır…",
+  "errLocationRequired": "Qapını açmaq üçün məkan lazımdır.",
+  "errOutsideGeofence": "Qapıdan çox uzaqdasınız.",
+  "errLocationImprecise": "Məkanınız kifayət qədər dəqiq deyil.",
+  "errLocationPermissionDenied": "Bu qapını açmaq üçün məkan icazəsi lazımdır.",
+  "errLocationPermissionPermanent": "Məkan icazəsi bağlıdır. Ayarlardan aktivləşdirin.",
+  "errLocationServiceDisabled": "Məkan (GPS) bağlıdır. Açmaq üçün onu yandırın.",
+  "errLocationTimeout": "Məkanınız alınmadı. Yenidən cəhd edin.",
+  "locationOpenSettings": "Ayarları aç",
+
   "directions": "Yol göstər",
   "inviteVisitor": "Dəvət et",
   "directionsNoLocation": "Bu barrier üçün məkan təyin edilməyib",

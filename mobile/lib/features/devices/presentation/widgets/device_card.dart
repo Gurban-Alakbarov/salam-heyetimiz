@@ -301,6 +301,7 @@ class _OpenAction extends ConsumerWidget {
         deviceId: device.id,
         canDo: device.canOpen,
         direction: BarrierDirection.open,
+        geofenceEnabled: device.geofenceEnabled,
       );
     }
 

@@ -45,6 +45,14 @@ class DeviceOfflineFailure extends Failure {
     : super(code: 'device_offline');
 }
 
+/// Client-side location acquisition failure (GEOFENCE-3). NOT an HTTP failure —
+/// raised before the request when a geofenced device needs a fix. [code] ∈
+/// `permission_denied` | `permanently_denied` | `service_disabled` | `timeout` | `error`.
+class LocationFailure extends Failure {
+  const LocationFailure(String code, [super.message = 'Məkan alınmadı'])
+    : super(code: code);
+}
+
 /// 404.
 class NotFoundFailure extends Failure {
   const NotFoundFailure([super.message = 'Tapılmadı']);

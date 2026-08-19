@@ -16,6 +16,8 @@ Device deviceDtoToEntity(DeviceDto d) => Device(
   suspensionReason: d.suspensionReason ?? 'none',
   latitude: d.latitude,
   longitude: d.longitude,
+  geofenceEnabled: d.geofenceEnabled ?? false,
+  geofenceRadiusM: d.geofenceRadiusM,
   lastOnlineAt: _date(d.lastOnlineAt),
   cooldownSecondsRemaining: d.cooldownSecondsRemaining,
   model: d.deviceModel == null

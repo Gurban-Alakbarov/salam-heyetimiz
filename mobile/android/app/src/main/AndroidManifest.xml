@@ -4,6 +4,11 @@
     <!-- Declared for the home-screen door widget's future background network call (W3). Release builds
          otherwise inherit INTERNET only from merged plugin manifests; declaring it here is explicit. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- GEOFENCE-3 — FOREGROUND location for the geofence open gate only. The app requests
+         When-In-Use and reads a single fresh fix at open time. ACCESS_BACKGROUND_LOCATION is
+         DELIBERATELY NOT declared (no background/widget GPS — GEOFENCE-1 LOCKED). -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="salam_mobile"
         android:name="${applicationName}"

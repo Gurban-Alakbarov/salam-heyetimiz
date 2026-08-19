@@ -22,6 +22,11 @@ abstract class Device with _$Device {
     @Default('none') String suspensionReason,
     double? latitude,
     double? longitude,
+    // GEOFENCE-3 — when true the app must attach the caller's GPS to /open (the
+    // backend rejects with location_required otherwise). Radius is informational;
+    // the backend holds + enforces it.
+    @Default(false) bool geofenceEnabled,
+    int? geofenceRadiusM,
     DateTime? lastOnlineAt,
     DeviceModel? model,
     int? cooldownSecondsRemaining,

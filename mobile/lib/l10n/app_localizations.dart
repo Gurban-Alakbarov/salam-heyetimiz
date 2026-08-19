@@ -832,6 +832,60 @@ abstract class AppLocalizations {
   /// **'Not found'**
   String get errNotFound;
 
+  /// No description provided for @barrierLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting location…'**
+  String get barrierLocating;
+
+  /// No description provided for @errLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is required to open the gate.'**
+  String get errLocationRequired;
+
+  /// No description provided for @errOutsideGeofence.
+  ///
+  /// In en, this message translates to:
+  /// **'You are too far from the gate.'**
+  String get errOutsideGeofence;
+
+  /// No description provided for @errLocationImprecise.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is not accurate enough.'**
+  String get errLocationImprecise;
+
+  /// No description provided for @errLocationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is required to open this gate.'**
+  String get errLocationPermissionDenied;
+
+  /// No description provided for @errLocationPermissionPermanent.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is turned off. Enable it in Settings.'**
+  String get errLocationPermissionPermanent;
+
+  /// No description provided for @errLocationServiceDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location (GPS) is turned off. Turn it on to open.'**
+  String get errLocationServiceDisabled;
+
+  /// No description provided for @errLocationTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get your location. Please try again.'**
+  String get errLocationTimeout;
+
+  /// No description provided for @locationOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get locationOpenSettings;
+
   /// No description provided for @directions.
   ///
   /// In en, this message translates to:

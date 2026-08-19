@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salam_mobile/core/error/failure.dart';
+import 'package:salam_mobile/core/location/location_service.dart';
 import 'package:salam_mobile/features/barrier/domain/entity/barrier_entities.dart';
 import 'package:salam_mobile/features/barrier/domain/repository.dart';
 import 'package:salam_mobile/features/door_widget/door_widget_open.dart';
@@ -21,7 +22,7 @@ class _FakeBarrierRepository implements BarrierRepository {
   int? openedDeviceId;
 
   @override
-  Future<Result<OpenAck>> open(int deviceId) async {
+  Future<Result<OpenAck>> open(int deviceId, {GeoFix? fix}) async {
     openCalls++;
     openedDeviceId = deviceId;
     return openResult;
@@ -35,7 +36,8 @@ class _FakeBarrierRepository implements BarrierRepository {
   }
 
   @override
-  Future<Result<OpenAck>> close(int deviceId) => throw UnimplementedError();
+  Future<Result<OpenAck>> close(int deviceId, {GeoFix? fix}) =>
+      throw UnimplementedError();
   @override
   Future<Result<void>> feedback(
     int commandId, {

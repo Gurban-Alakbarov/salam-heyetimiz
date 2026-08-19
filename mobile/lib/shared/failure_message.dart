@@ -12,7 +12,19 @@ String deviceFailureMessage(AppLocalizations l, Failure failure) {
       return switch (code) {
         'subscription_required' => l.errSubscriptionRequired,
         'device_disabled' => l.errDeviceDisabled,
+        // GEOFENCE-3 — distance-gate codes (403) must not fall to the generic message.
+        'location_required' => l.errLocationRequired,
+        'outside_geofence' => l.errOutsideGeofence,
+        'location_imprecise' => l.errLocationImprecise,
         _ => l.errAccessDenied,
+      };
+    case LocationFailure(:final code):
+      return switch (code) {
+        'permission_denied' => l.errLocationPermissionDenied,
+        'permanently_denied' => l.errLocationPermissionPermanent,
+        'service_disabled' => l.errLocationServiceDisabled,
+        'timeout' => l.errLocationTimeout,
+        _ => l.errLocationRequired,
       };
     case RateLimitedFailure(:final retryAfterSeconds):
       return l.errRateLimited(retryAfterSeconds);

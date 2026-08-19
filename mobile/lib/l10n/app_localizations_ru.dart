@@ -394,6 +394,37 @@ class AppLocalizationsRu extends AppLocalizations {
   String get errNotFound => 'Не найдено';
 
   @override
+  String get barrierLocating => 'Определение местоположения…';
+
+  @override
+  String get errLocationRequired => 'Для открытия нужно местоположение.';
+
+  @override
+  String get errOutsideGeofence => 'Вы слишком далеко от шлагбаума.';
+
+  @override
+  String get errLocationImprecise => 'Местоположение недостаточно точное.';
+
+  @override
+  String get errLocationPermissionDenied =>
+      'Для открытия нужен доступ к местоположению.';
+
+  @override
+  String get errLocationPermissionPermanent =>
+      'Доступ к местоположению отключён. Включите его в настройках.';
+
+  @override
+  String get errLocationServiceDisabled =>
+      'Геолокация (GPS) отключена. Включите её, чтобы открыть.';
+
+  @override
+  String get errLocationTimeout =>
+      'Не удалось определить местоположение. Повторите попытку.';
+
+  @override
+  String get locationOpenSettings => 'Открыть настройки';
+
+  @override
   String get directions => 'Маршрут';
 
   @override

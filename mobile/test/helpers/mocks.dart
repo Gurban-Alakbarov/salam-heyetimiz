@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:salam_mobile/core/analytics/analytics_service.dart';
 import 'package:salam_mobile/core/crash/crash_reporter.dart';
+import 'package:salam_mobile/core/location/location_service.dart';
 import 'package:salam_mobile/core/session/session_manager.dart';
 import 'package:salam_mobile/core/storage/app_storage.dart';
 import 'package:salam_mobile/core/network/api_client.dart';
@@ -48,6 +49,8 @@ class MockBarrierRepository extends Mock implements BarrierRepository {}
 class MockBarrierRemoteDataSource extends Mock
     implements BarrierRemoteDataSource {}
 
+class MockLocationService extends Mock implements LocationService {}
+
 class MockVisitorRepository extends Mock implements VisitorRepository {}
 
 class MockVisitorRemoteDataSource extends Mock
@@ -93,4 +96,7 @@ DioException dioOffline() => DioException(
 /// Registers fallback values for mocktail `any()` on custom types.
 void registerCommonFallbacks() {
   registerFallbackValue(const Session(accessToken: 'a', refreshToken: 'r'));
+  registerFallbackValue(
+    const GeoFix(latitude: 0, longitude: 0, accuracy: 0),
+  );
 }

@@ -395,6 +395,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errNotFound => 'Not found';
 
   @override
+  String get barrierLocating => 'Getting location…';
+
+  @override
+  String get errLocationRequired => 'Location is required to open the gate.';
+
+  @override
+  String get errOutsideGeofence => 'You are too far from the gate.';
+
+  @override
+  String get errLocationImprecise => 'Your location is not accurate enough.';
+
+  @override
+  String get errLocationPermissionDenied =>
+      'Location permission is required to open this gate.';
+
+  @override
+  String get errLocationPermissionPermanent =>
+      'Location permission is turned off. Enable it in Settings.';
+
+  @override
+  String get errLocationServiceDisabled =>
+      'Location (GPS) is turned off. Turn it on to open.';
+
+  @override
+  String get errLocationTimeout =>
+      'Could not get your location. Please try again.';
+
+  @override
+  String get locationOpenSettings => 'Open Settings';
+
+  @override
   String get directions => 'Directions';
 
   @override

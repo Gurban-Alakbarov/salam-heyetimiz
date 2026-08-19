@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salam_mobile/core/error/failure.dart';
+import 'package:salam_mobile/core/location/location_service.dart';
 import 'package:salam_mobile/design_system/components/app_components.dart';
 import 'package:salam_mobile/design_system/components/data_components.dart';
 import 'package:salam_mobile/features/barrier/barrier_providers.dart';
@@ -134,11 +135,11 @@ void main() {
 /// polled status reports `opened` (actuation confirmed).
 class _FakeBarrierRepo implements BarrierRepository {
   @override
-  Future<Result<OpenAck>> open(int deviceId) async =>
+  Future<Result<OpenAck>> open(int deviceId, {GeoFix? fix}) async =>
       const Success(OpenAck(commandId: 1, expectedCompletionMs: 600));
 
   @override
-  Future<Result<OpenAck>> close(int deviceId) async =>
+  Future<Result<OpenAck>> close(int deviceId, {GeoFix? fix}) async =>
       const Success(OpenAck(commandId: 2, expectedCompletionMs: 600));
 
   @override

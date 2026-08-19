@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
 import '../../core/error/failure.dart';
+import '../../core/location/location_service.dart';
 import 'data/datasource/barrier_remote_datasource.dart';
 import 'data/repository_impl.dart';
 import 'domain/entity/barrier_entities.dart';
@@ -47,6 +48,12 @@ class BarrierIdle extends BarrierOpenState {
 
 class BarrierSending extends BarrierOpenState {
   const BarrierSending();
+}
+
+/// GEOFENCE-3 — acquiring the caller's GPS fix before the request (geofenced device
+/// only). Treated as in-flight by the UI so the button stays locked.
+class BarrierLocating extends BarrierOpenState {
+  const BarrierLocating();
 }
 
 class BarrierPending extends BarrierOpenState {
@@ -102,8 +109,9 @@ mixin BarrierCommandMachine on Notifier<BarrierOpenState> {
   int _maxPolls = 0;
   int _expectedMs = 5000;
 
-  /// Issue the command (repository.open or repository.close).
-  Future<Result<OpenAck>> sendCommand(int deviceId);
+  /// Issue the command (repository.open or repository.close). [fix] is attached
+  /// only for geofenced devices (GEOFENCE-3); null keeps the historical body.
+  Future<Result<OpenAck>> sendCommand(int deviceId, {GeoFix? fix});
 
   String get attemptLog;
   String get eventStarted;
@@ -114,14 +122,44 @@ mixin BarrierCommandMachine on Notifier<BarrierOpenState> {
   void attachDispose() => ref.onDispose(_stopPolling);
 
   /// User pressed the action. Ignored if a command is already in flight.
-  Future<void> dispatch(int deviceId) async {
+  ///
+  /// GEOFENCE-3 — when [geofenceEnabled] is true, a fresh foreground GPS fix is
+  /// acquired FIRST and attached to the request. Any acquisition failure ends in
+  /// [BarrierFailed] with a [LocationFailure] and NO request is sent. When false
+  /// the flow is byte-identical to before (no GPS call).
+  Future<void> dispatch(int deviceId, {bool geofenceEnabled = false}) async {
     if (_inFlight) return;
     _inFlight = true;
-    state = const BarrierSending();
     _start = DateTime.now();
     ref.read(crashReporterProvider).log(attemptLog);
 
-    final result = await sendCommand(deviceId);
+    GeoFix? fix;
+    if (geofenceEnabled) {
+      state = const BarrierLocating();
+      final located = await ref.read(locationServiceProvider).getCurrent();
+      switch (located) {
+        case LocationOk(fix: final acquired):
+          fix = acquired;
+        case LocationServiceDisabled():
+          _failLocation('service_disabled');
+          return;
+        case LocationPermissionDenied():
+          _failLocation('permission_denied');
+          return;
+        case LocationPermissionPermanentlyDenied():
+          _failLocation('permanently_denied');
+          return;
+        case LocationTimeout():
+          _failLocation('timeout');
+          return;
+        case LocationError():
+          _failLocation('error');
+          return;
+      }
+    }
+
+    state = const BarrierSending();
+    final result = await sendCommand(deviceId, fix: fix);
     result.fold(
       (failure) {
         _inFlight = false;
@@ -227,6 +265,14 @@ mixin BarrierCommandMachine on Notifier<BarrierOpenState> {
     state = terminal;
   }
 
+  /// GEOFENCE-3 — GPS acquisition failed; end in [BarrierFailed] without sending a
+  /// request (no cooldown reserved, no command issued).
+  void _failLocation(String code) {
+    _inFlight = false;
+    state = BarrierFailed(LocationFailure(code), 'location_$code');
+    _logFailed('location_$code');
+  }
+
   void _stopPolling() {
     _pollTimer?.cancel();
     _pollTimer = null;
@@ -272,8 +318,8 @@ class BarrierOpenNotifier extends Notifier<BarrierOpenState>
   }
 
   @override
-  Future<Result<OpenAck>> sendCommand(int deviceId) =>
-      ref.read(barrierRepositoryProvider).open(deviceId);
+  Future<Result<OpenAck>> sendCommand(int deviceId, {GeoFix? fix}) =>
+      ref.read(barrierRepositoryProvider).open(deviceId, fix: fix);
 
   @override
   String get attemptLog => 'barrier_open_attempt';
@@ -286,8 +332,9 @@ class BarrierOpenNotifier extends Notifier<BarrierOpenState>
   @override
   String get eventTimeout => BarrierEvents.openTimeout;
 
-  /// User pressed "Aç" (Open).
-  Future<void> open(int deviceId) => dispatch(deviceId);
+  /// User pressed "Aç" (Open). GEOFENCE-3 — [geofenceEnabled] gates the GPS fix.
+  Future<void> open(int deviceId, {bool geofenceEnabled = false}) =>
+      dispatch(deviceId, geofenceEnabled: geofenceEnabled);
 }
 
 final barrierOpenProvider =
@@ -305,8 +352,8 @@ class BarrierCloseNotifier extends Notifier<BarrierOpenState>
   }
 
   @override
-  Future<Result<OpenAck>> sendCommand(int deviceId) =>
-      ref.read(barrierRepositoryProvider).close(deviceId);
+  Future<Result<OpenAck>> sendCommand(int deviceId, {GeoFix? fix}) =>
+      ref.read(barrierRepositoryProvider).close(deviceId, fix: fix);
 
   @override
   String get attemptLog => 'barrier_close_attempt';
@@ -319,8 +366,9 @@ class BarrierCloseNotifier extends Notifier<BarrierOpenState>
   @override
   String get eventTimeout => BarrierEvents.closeTimeout;
 
-  /// User pressed "Bağla" (Close).
-  Future<void> close(int deviceId) => dispatch(deviceId);
+  /// User pressed "Bağla" (Close). GEOFENCE-3 — [geofenceEnabled] gates the GPS fix.
+  Future<void> close(int deviceId, {bool geofenceEnabled = false}) =>
+      dispatch(deviceId, geofenceEnabled: geofenceEnabled);
 }
 
 final barrierCloseProvider =

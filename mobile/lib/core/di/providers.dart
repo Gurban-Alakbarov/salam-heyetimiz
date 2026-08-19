@@ -7,6 +7,7 @@ import '../config/app_config.dart';
 import '../connectivity/connectivity_service.dart';
 import '../crash/crash_reporter.dart';
 import '../feature_flags/feature_flag_service.dart';
+import '../location/location_service.dart';
 import '../logger/app_logger.dart';
 import '../network/api_client.dart';
 import '../services/device_info_service.dart';
@@ -48,6 +49,12 @@ final connectivityServiceProvider = Provider<ConnectivityService>(
 
 final deviceInfoServiceProvider = Provider<DeviceInfoService>(
   (ref) => DeviceInfoService(ref.watch(secureStoreProvider)),
+);
+
+/// Foreground GPS acquisition for the geofence open gate (GEOFENCE-3). Only used
+/// when a device has `geofenceEnabled` — otherwise the open flow never touches it.
+final locationServiceProvider = Provider<LocationService>(
+  (ref) => const LocationService(),
 );
 
 /// The token authority. Constructed + `load()`ed in bootstrap, then injected

@@ -394,6 +394,36 @@ class AppLocalizationsAz extends AppLocalizations {
   String get errNotFound => 'Tapılmadı';
 
   @override
+  String get barrierLocating => 'Məkan alınır…';
+
+  @override
+  String get errLocationRequired => 'Qapını açmaq üçün məkan lazımdır.';
+
+  @override
+  String get errOutsideGeofence => 'Qapıdan çox uzaqdasınız.';
+
+  @override
+  String get errLocationImprecise => 'Məkanınız kifayət qədər dəqiq deyil.';
+
+  @override
+  String get errLocationPermissionDenied =>
+      'Bu qapını açmaq üçün məkan icazəsi lazımdır.';
+
+  @override
+  String get errLocationPermissionPermanent =>
+      'Məkan icazəsi bağlıdır. Ayarlardan aktivləşdirin.';
+
+  @override
+  String get errLocationServiceDisabled =>
+      'Məkan (GPS) bağlıdır. Açmaq üçün onu yandırın.';
+
+  @override
+  String get errLocationTimeout => 'Məkanınız alınmadı. Yenidən cəhd edin.';
+
+  @override
+  String get locationOpenSettings => 'Ayarları aç';
+
+  @override
   String get directions => 'Yol göstər';
 
   @override

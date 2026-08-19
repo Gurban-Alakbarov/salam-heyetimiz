@@ -33,6 +33,9 @@ String failureMessage(AppLocalizations l, Failure failure) {
       return failure.message;
     case DeviceOfflineFailure():
       return failure.message;
+    case LocationFailure():
+      // Location errors only arise on the barrier/open surface — mapped there.
+      return failure.message;
     case NotFoundFailure():
       return failure.message;
     case UnknownFailure():

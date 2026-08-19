@@ -19,6 +19,8 @@ abstract class DeviceDto with _$DeviceDto {
     String? suspensionReason,
     double? latitude,
     double? longitude,
+    bool? geofenceEnabled,
+    int? geofenceRadiusM,
     String? lastOnlineAt,
     DeviceModelDto? deviceModel,
     int? cooldownSecondsRemaining,

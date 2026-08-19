@@ -36,7 +36,14 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
 
   void _open(int deviceId) {
     setState(() => _activeDeviceId = deviceId);
-    ref.read(barrierOpenProvider.notifier).open(deviceId);
+    // GEOFENCE-3 — the notifier needs to know whether to acquire a GPS fix first.
+    final devices = ref.read(deviceListProvider).value?.devices ?? const [];
+    final geofenceEnabled = devices.any(
+      (d) => d.id == deviceId && d.geofenceEnabled,
+    );
+    ref
+        .read(barrierOpenProvider.notifier)
+        .open(deviceId, geofenceEnabled: geofenceEnabled);
   }
 
   @override

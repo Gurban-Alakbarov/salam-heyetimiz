@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/core/error/failure.dart';
 import 'package:salam_mobile/design_system/components/app_components.dart';
 import 'package:salam_mobile/design_system/components/app_inputs.dart';
@@ -20,12 +21,17 @@ class BarrierActionButton extends ConsumerStatefulWidget {
     required this.deviceId,
     required this.canDo,
     required this.direction,
+    this.geofenceEnabled = false,
     super.key,
   });
 
   final int deviceId;
   final bool canDo;
   final BarrierDirection direction;
+
+  /// GEOFENCE-3 — when true, a foreground GPS fix is acquired before the command.
+  /// Defaults to false so non-geofenced devices behave exactly as before.
+  final bool geofenceEnabled;
 
   @override
   ConsumerState<BarrierActionButton> createState() =>
@@ -71,19 +77,26 @@ class _BarrierActionButtonState extends ConsumerState<BarrierActionButton> {
     if (_isOpen) {
       state = ref.watch(barrierOpenProvider);
       ref.listen(barrierOpenProvider, _onState);
-      trigger = () => ref.read(barrierOpenProvider.notifier).open(widget.deviceId);
+      trigger = () => ref
+          .read(barrierOpenProvider.notifier)
+          .open(widget.deviceId, geofenceEnabled: widget.geofenceEnabled);
     } else {
       state = ref.watch(barrierCloseProvider);
       ref.listen(barrierCloseProvider, _onState);
-      trigger = () =>
-          ref.read(barrierCloseProvider.notifier).close(widget.deviceId);
+      trigger = () => ref
+          .read(barrierCloseProvider.notifier)
+          .close(widget.deviceId, geofenceEnabled: widget.geofenceEnabled);
     }
 
-    final inProgress = state is BarrierSending || state is BarrierPending;
+    final inProgress =
+        state is BarrierSending ||
+        state is BarrierPending ||
+        state is BarrierLocating;
     final cooling = _cooldownLeft > 0;
     final enabled = widget.canDo && !inProgress && !cooling;
 
     final label = switch (state) {
+      BarrierLocating() => l.barrierLocating,
       BarrierSending() => labels.sending,
       BarrierPending() => labels.pending,
       _ => labels.idle,
@@ -106,6 +119,17 @@ class _BarrierActionButtonState extends ConsumerState<BarrierActionButton> {
         // Actuation feedback only for open ("did the gate move?").
         if (_isOpen && state is BarrierSuccess && !state.actuated)
           _FeedbackRow(commandId: state.commandId),
+        // GEOFENCE-3 — permanently-denied location: offer an OS Settings deep-link.
+        if (state is BarrierFailed &&
+            state.failure is LocationFailure &&
+            (state.failure as LocationFailure).code == 'permanently_denied')
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: AppTextButton(
+              label: l.locationOpenSettings,
+              onPressed: () => ref.read(locationServiceProvider).openSettings(),
+            ),
+          ),
       ],
     );
   }
@@ -116,17 +140,20 @@ class BarrierOpenButton extends StatelessWidget {
   const BarrierOpenButton({
     required this.deviceId,
     required this.canOpen,
+    this.geofenceEnabled = false,
     super.key,
   });
 
   final int deviceId;
   final bool canOpen;
+  final bool geofenceEnabled;
 
   @override
   Widget build(BuildContext context) => BarrierActionButton(
     deviceId: deviceId,
     canDo: canOpen,
     direction: BarrierDirection.open,
+    geofenceEnabled: geofenceEnabled,
   );
 }
 
@@ -188,6 +215,12 @@ class _BarrierStatus extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return switch (state) {
       BarrierIdle() => const SizedBox.shrink(),
+      BarrierLocating() => _line(
+        context,
+        l.barrierLocating,
+        AppColors.info,
+        Icons.my_location_outlined,
+      ),
       BarrierSending() => _line(
         context,
         labels.sending,
@@ -256,8 +289,15 @@ class _BarrierStatus extends StatelessWidget {
     if (reason == 'device_offline' || state.failure is DeviceOfflineFailure) {
       return l.errDeviceOffline;
     }
-    if (reason == 'access_denied' || state.failure is ForbiddenFailure) {
-      return l.errAccessDenied;
+    // GEOFENCE-3 — geofence 403 codes get a specific message; every other
+    // ForbiddenFailure (incl. subscription_required) keeps the generic one (D5).
+    if (state.failure is ForbiddenFailure) {
+      return switch ((state.failure as ForbiddenFailure).code) {
+        'location_required' => l.errLocationRequired,
+        'outside_geofence' => l.errOutsideGeofence,
+        'location_imprecise' => l.errLocationImprecise,
+        _ => l.errAccessDenied,
+      };
     }
     if (reason == 'offline' ||
         state.failure is NetworkFailure ||

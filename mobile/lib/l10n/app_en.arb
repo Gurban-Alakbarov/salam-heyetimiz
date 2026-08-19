@@ -151,6 +151,16 @@
   "errWhitelist": "The device rejected the command (whitelist)",
   "errNotFound": "Not found",
 
+  "barrierLocating": "Getting location…",
+  "errLocationRequired": "Location is required to open the gate.",
+  "errOutsideGeofence": "You are too far from the gate.",
+  "errLocationImprecise": "Your location is not accurate enough.",
+  "errLocationPermissionDenied": "Location permission is required to open this gate.",
+  "errLocationPermissionPermanent": "Location permission is turned off. Enable it in Settings.",
+  "errLocationServiceDisabled": "Location (GPS) is turned off. Turn it on to open.",
+  "errLocationTimeout": "Could not get your location. Please try again.",
+  "locationOpenSettings": "Open Settings",
+
   "directions": "Directions",
   "inviteVisitor": "Invite",
   "directionsNoLocation": "No location set for this barrier",

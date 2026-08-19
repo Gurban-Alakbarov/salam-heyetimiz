@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- GEOFENCE-3 — foreground (When-In-Use) location only, read once at open time for the
+	     geofence gate. No "Always"/background location key is declared. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Şlaqbaumu açmaq üçün yaxınlıqda olduğunuzu təsdiqləməyə məkanınız istifadə olunur.</string>
 	<!-- map_launcher: navigation apps the "Directions" action can detect/hand off to. -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>

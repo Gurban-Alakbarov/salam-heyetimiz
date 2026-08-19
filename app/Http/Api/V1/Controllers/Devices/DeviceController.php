@@ -2,12 +2,14 @@
 
 namespace App\Http\Api\V1\Controllers\Devices;
 
+use App\Domain\Devices\Actions\SetDeviceGeofence;
 use App\Domain\Devices\Enums\DeviceListFilter;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Devices\Queries\DeviceQuery;
 use App\Domain\Roster\Enums\DeviceUserRole;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
 use App\Domain\Subscriptions\Queries\SubscriptionStatusQuery;
+use App\Http\Api\V1\Requests\Devices\UpdateGeofenceRequest;
 use App\Http\Resources\DeviceDetailResource;
 use App\Http\Resources\DeviceResource;
 use App\Support\Pagination\Cursor;
@@ -48,6 +50,32 @@ class DeviceController
 
         // Non-members get 404 (no existence leak).
         abort_unless($request->user()?->can('view', $device) ?? false, 404);
+
+        $userId = (int) $request->user()->getKey();
+        $this->attachCallerContext($device, $userId);
+        $device->subscription_brief = $this->subscriptions->forUserDevice($userId, $deviceId);
+
+        return new DeviceDetailResource($device);
+    }
+
+    /**
+     * PATCH /v1/devices/{deviceId}/geofence — the device OWNER configures their device's distance
+     * restriction (GEOFENCE-1 D5). Owner-only: it only toggles the geofence + radius (via
+     * SetDeviceGeofence), never coordinates/ownership/roster/subscription. Non-members see 404; a
+     * member who is not the owner gets 403.
+     */
+    public function updateGeofence(UpdateGeofenceRequest $request, int $deviceId, SetDeviceGeofence $action): DeviceDetailResource
+    {
+        $device = Device::query()->with('model')->findOrFail($deviceId);
+
+        abort_unless($request->user()?->can('view', $device) ?? false, 404);
+        abort_unless($request->user()?->can('configure', $device) ?? false, 403);
+
+        $device = $action->handle(
+            $device,
+            $request->boolean('geofence_enabled'),
+            $request->filled('geofence_radius_m') ? (int) $request->input('geofence_radius_m') : null,
+        );
 
         $userId = (int) $request->user()->getKey();
         $this->attachCallerContext($device, $userId);

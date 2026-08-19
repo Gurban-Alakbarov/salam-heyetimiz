@@ -34,4 +34,19 @@ class DevicePolicy
             ->where('status', DeviceUserStatus::Active->value)
             ->exists();
     }
+
+    /**
+     * A mobile user may CONFIGURE a device (its geofence) only if they OWN it — owner-only, NOT roster
+     * members (GEOFENCE-1 D5). Admins may configure any. The request/action restricts this to geofence
+     * settings, so it can never change ownership, coordinates, roster, or subscription.
+     */
+    public function configure(mixed $actor, Device $device): bool
+    {
+        if ($actor instanceof AdminUser) {
+            return true;
+        }
+
+        return $actor instanceof User
+            && (int) $device->owner_user_id === (int) $actor->getKey();
+    }
 }

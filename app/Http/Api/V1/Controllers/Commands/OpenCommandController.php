@@ -2,12 +2,12 @@
 
 namespace App\Http\Api\V1\Controllers\Commands;
 
-use App\Domain\Devices\Models\Device;
 use App\Domain\DeviceComm\Actions\OpenDevice;
 use App\Domain\DeviceComm\Actions\SubmitOpenFeedback;
 use App\Domain\DeviceComm\Enums\CommandDirection;
 use App\Domain\DeviceComm\Models\OpenCommand;
 use App\Domain\DeviceComm\Queries\OpenCommandQuery;
+use App\Domain\Devices\Models\Device;
 use App\Http\Api\V1\Requests\Commands\OpenDeviceRequest;
 use App\Http\Api\V1\Requests\Commands\SubmitFeedbackRequest;
 use App\Http\Resources\OpenCommandResource;
@@ -36,6 +36,9 @@ class OpenCommandController
             clientAppVersion: $request->input('client_app_version'),
             clientIp: $request->ip(),
             direction: CommandDirection::tryFrom((string) $request->input('direction', 'open')) ?? CommandDirection::Open,
+            latitude: $request->filled('latitude') ? (float) $request->input('latitude') : null,
+            longitude: $request->filled('longitude') ? (float) $request->input('longitude') : null,
+            accuracy: $request->filled('accuracy') ? (float) $request->input('accuracy') : null,
         );
 
         return response()->json([

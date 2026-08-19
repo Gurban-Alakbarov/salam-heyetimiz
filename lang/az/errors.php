@@ -16,6 +16,12 @@ return [
     'cooldown' => 'Yenidən cəhd üçün :retry_after_seconds saniyə gözləyin.',
     'subscription_required' => 'Aboneliyiniz başa çatıb.',
     'device_disabled' => 'Cihaz admin tərəfindən bağlanıb.',
+    // GEOFENCE-1 — məsafə məhdudiyyəti.
+    'location_required' => 'Məkan tələb olunur — tətbiqi açın.',
+    'outside_geofence' => 'Qapıya çox uzaqsınız.',
+    'location_imprecise' => 'Məkan kifayət qədər dəqiq deyil.',
+    'geofence_radius_required' => 'Məsafə həddi (radius) tələb olunur.',
+    'geofence_device_location_missing' => 'Cihazın koordinatı təyin edilməyib.',
     'device_offline' => 'Cihaz əlçatan deyil.',
     'payment_required' => 'Ödəniş tələb olunur.',
     'payment_provider_unavailable' => 'Ödəniş provayderi hazırda əlçatan deyil. Yenidən cəhd edin.',

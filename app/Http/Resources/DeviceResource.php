@@ -30,6 +30,10 @@ class DeviceResource extends JsonResource
             'suspension_reason' => $this->caller_suspension_reason,
             'latitude' => $this->latitude !== null ? (float) $this->latitude : null,
             'longitude' => $this->longitude !== null ? (float) $this->longitude : null,
+            // GEOFENCE-1 — when true the app must attach the caller's GPS to /open (else the backend
+            // rejects with location_required). The backend holds + enforces the radius.
+            'geofence_enabled' => (bool) $this->geofence_enabled,
+            'geofence_radius_m' => $this->geofence_radius_m,
             'last_online_at' => optional($this->last_online_at)->toIso8601String(),
             'image_url' => $this->image_url,
             'address' => $this->address,

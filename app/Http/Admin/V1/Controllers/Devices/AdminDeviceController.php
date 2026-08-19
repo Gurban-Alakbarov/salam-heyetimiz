@@ -9,6 +9,7 @@ use App\Domain\Devices\Actions\DecommissionDevice;
 use App\Domain\Devices\Actions\DisableDevice;
 use App\Domain\Devices\Actions\EnableDevice;
 use App\Domain\Devices\Actions\RegisterDevice;
+use App\Domain\Devices\Actions\SetDeviceGeofence;
 use App\Domain\Devices\Actions\TransferDevice;
 use App\Domain\Devices\Actions\UpdateDevice;
 use App\Domain\Devices\Models\Device;
@@ -127,13 +128,27 @@ class AdminDeviceController
     }
 
     /** PATCH /admin/v1/devices/{deviceId} — adminUpdateDevice (devices.update). */
-    public function update(UpdateDeviceRequest $request, int $deviceId, UpdateDevice $action): JsonResponse
+    public function update(UpdateDeviceRequest $request, int $deviceId, UpdateDevice $action, SetDeviceGeofence $geofence): JsonResponse
     {
         $this->requirePermission($request, Permission::DEVICES_UPDATE);
 
         $device = Device::query()->findOrFail($deviceId);
         $this->assertDeviceInScope($request, $device);
         $device = $action->handle($device, $request->toUpdateArray(), $request->user());
+
+        // GEOFENCE-1 — geofence goes through the shared action (so its radius/coords rule runs) AFTER
+        // the other fields (e.g. a coordinate update in the same PATCH is seen). Effective values fall
+        // back to the device's current state for a partial PATCH.
+        if ($request->touchesGeofence()) {
+            $v = $request->validated();
+            $enabled = array_key_exists('geofence_enabled', $v)
+                ? (bool) $v['geofence_enabled']
+                : (bool) $device->geofence_enabled;
+            $radius = array_key_exists('geofence_radius_m', $v)
+                ? ($v['geofence_radius_m'] !== null ? (int) $v['geofence_radius_m'] : null)
+                : $device->geofence_radius_m;
+            $device = $geofence->handle($device, $enabled, $radius);
+        }
 
         return $this->adminDevice($device)->response()->setStatusCode(200);
     }

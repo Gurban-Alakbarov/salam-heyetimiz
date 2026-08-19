@@ -601,6 +601,67 @@
         }
       }
     },
+    "/v1/devices/{deviceId}/geofence": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DeviceId"
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Configure the distance restriction (device owner)",
+        "operationId": "updateDeviceGeofence",
+        "description": "The device OWNER turns the distance restriction (geofence) on/off and sets its radius.\nEnabling requires a positive `geofence_radius_m` AND the device to already have coordinates\n(coordinates are admin-set — owners cannot change them, nor ownership). A roster member who\nis not the owner gets 403; a non-member gets 404. GEOFENCE-1.\n",
+        "x-authorization": "user; device owner only",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceGeofenceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is on the roster but is not the device owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "description": "geofence_radius_required / geofence_device_location_missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/devices/{deviceId}/stats": {
       "parameters": [
         {
@@ -676,6 +737,26 @@
                   "client_app_version": {
                     "type": "string",
                     "maxLength": 20
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "double",
+                    "minimum": -90,
+                    "maximum": 90,
+                    "description": "*(GEOFENCE-1)* Caller's current latitude. Required only when the device's\n`geofence_enabled` is true (else the server rejects with `location_required`).\n"
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "double",
+                    "minimum": -180,
+                    "maximum": 180,
+                    "description": "Caller's current longitude (see `latitude`)."
+                  },
+                  "accuracy": {
+                    "type": "number",
+                    "format": "double",
+                    "minimum": 0,
+                    "description": "Horizontal accuracy of the fix in metres. Applied as a tolerance margin; a fix\nwhose accuracy exceeds the device radius is rejected as `location_imprecise`.\n"
                   }
                 }
               }
@@ -694,7 +775,7 @@
             }
           },
           "403": {
-            "description": "subscription_required / device_disabled / forbidden",
+            "description": "subscription_required / device_disabled / forbidden /\nlocation_required / outside_geofence / location_imprecise (GEOFENCE-1)\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -7689,6 +7770,17 @@
             "type": "number",
             "nullable": true
           },
+          "geofence_enabled": {
+            "type": "boolean",
+            "description": "*(GEOFENCE-1)* When true the app MUST attach the caller's GPS\n(`latitude`/`longitude`, optional `accuracy`) to `POST /devices/{id}/open`, or the\nserver rejects with `location_required`. The backend holds and enforces the radius.\n"
+          },
+          "geofence_radius_m": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Allowed distance from the device in metres (null when the geofence is off)."
+          },
           "last_online_at": {
             "type": "string",
             "format": "date-time",
@@ -7737,6 +7829,26 @@
             }
           }
         ]
+      },
+      "DeviceGeofenceUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "geofence_enabled"
+        ],
+        "properties": {
+          "geofence_enabled": {
+            "type": "boolean",
+            "description": "Turn the device distance restriction on or off."
+          },
+          "geofence_radius_m": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "nullable": true,
+            "description": "Allowed distance from the device in metres. Required (positive) when\n`geofence_enabled` is true; cleared when false.\n"
+          }
+        }
       },
       "DeviceListResponse": {
         "type": "object",
@@ -9424,6 +9536,17 @@
             "type": "number",
             "nullable": true
           },
+          "geofence_enabled": {
+            "type": "boolean",
+            "description": "*(GEOFENCE-1)* Distance restriction toggle."
+          },
+          "geofence_radius_m": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Allowed distance in metres (null when off)."
+          },
           "last_online_at": {
             "type": "string",
             "format": "date-time",
@@ -9532,6 +9655,16 @@
           "longitude": {
             "type": "number",
             "nullable": true
+          },
+          "geofence_enabled": {
+            "type": "boolean",
+            "description": "*(GEOFENCE-1)* Enabling needs a positive geofence_radius_m and existing device coordinates (else 422)."
+          },
+          "geofence_radius_m": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 65535
           },
           "metadata": {
             "type": "object",

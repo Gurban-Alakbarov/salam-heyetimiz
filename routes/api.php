@@ -96,6 +96,10 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
         Route::get('/', [DeviceController::class, 'index'])->name('listMyDevices');
         Route::get('/{deviceId}', [DeviceController::class, 'show'])->whereNumber('deviceId')->name('getDevice');
 
+        // GEOFENCE-1 D5 — the device OWNER toggles their device's distance restriction (owner-only,
+        // enforced by the DevicePolicy `configure` ability; geofence fields only, never coordinates).
+        Route::patch('/{deviceId}/geofence', [DeviceController::class, 'updateGeofence'])->whereNumber('deviceId')->name('updateDeviceGeofence');
+
         // DeviceComm core (batch 09-A)
         Route::post('/{deviceId}/open', [OpenCommandController::class, 'open'])->whereNumber('deviceId')->middleware('throttle:open')->name('openDevice');
         Route::get('/{deviceId}/commands', [OpenCommandController::class, 'index'])->whereNumber('deviceId')->name('listDeviceCommands');

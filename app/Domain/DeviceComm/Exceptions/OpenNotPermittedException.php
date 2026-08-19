@@ -33,6 +33,24 @@ class OpenNotPermittedException extends DomainException
         return new self('forbidden');
     }
 
+    /** Geofence is enabled for the device but the caller sent no location (GEOFENCE-1). */
+    public static function locationRequired(int $deviceId): self
+    {
+        return new self('location_required', ['device_id' => $deviceId]);
+    }
+
+    /** The caller's location is outside the device's configured radius (accuracy margin applied). */
+    public static function outsideGeofence(int $deviceId): self
+    {
+        return new self('outside_geofence', ['device_id' => $deviceId]);
+    }
+
+    /** The caller's GPS accuracy is too poor to make a reliable in-zone decision (D4). */
+    public static function locationImprecise(int $deviceId): self
+    {
+        return new self('location_imprecise', ['device_id' => $deviceId]);
+    }
+
     public function httpStatus(): int
     {
         return 403;

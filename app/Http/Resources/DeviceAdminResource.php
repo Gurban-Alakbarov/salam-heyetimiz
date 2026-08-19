@@ -42,6 +42,8 @@ class DeviceAdminResource extends JsonResource
             'address' => $this->address,
             'latitude' => $this->latitude !== null ? (float) $this->latitude : null,
             'longitude' => $this->longitude !== null ? (float) $this->longitude : null,
+            'geofence_enabled' => (bool) $this->geofence_enabled,
+            'geofence_radius_m' => $this->geofence_radius_m,
             'last_online_at' => optional($this->last_online_at)->toIso8601String(),
             'online' => $this->isOnline(),
             'last_signal_strength' => $this->last_signal_strength !== null ? (int) $this->last_signal_strength : null,

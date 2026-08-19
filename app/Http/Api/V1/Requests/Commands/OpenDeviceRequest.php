@@ -24,6 +24,12 @@ class OpenDeviceRequest extends FormRequest
             // (the historical behaviour is unchanged). 'close' issues a close command that reads the
             // device model's close_command (VL110C RELAY,0#).
             'direction' => ['sometimes', 'nullable', 'string', 'in:open,close'],
+            // GEOFENCE-1 — the caller's ephemeral GPS fix. Optional at the transport level; the open
+            // action REQUIRES it only when the target device has geofencing enabled (else it is
+            // ignored). Never stored as location history — used once to compute distance server-side.
+            'latitude' => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
+            'accuracy' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:100000'],
         ];
     }
 }

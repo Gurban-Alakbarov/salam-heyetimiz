@@ -552,6 +552,41 @@ paths:
               schema: { $ref: '#/components/schemas/DeviceDetail' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /devices/{deviceId}/geofence:
+    parameters: [{ $ref: '#/components/parameters/DeviceId' }]
+    patch:
+      tags: [Devices]
+      summary: Configure the distance restriction (device owner)
+      operationId: updateDeviceGeofence
+      description: |
+        The device OWNER turns the distance restriction (geofence) on/off and sets its radius.
+        Enabling requires a positive `geofence_radius_m` AND the device to already have coordinates
+        (coordinates are admin-set — owners cannot change them, nor ownership). A roster member who
+        is not the owner gets 403; a non-member gets 404. GEOFENCE-1.
+      x-authorization: user; device owner only
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DeviceGeofenceUpdate' }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeviceDetail' }
+        '403':
+          description: Caller is on the roster but is not the device owner
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422':
+          description: geofence_radius_required / geofence_device_location_missing
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
   /devices/{deviceId}/stats:
     parameters: [{ $ref: '#/components/parameters/DeviceId' }]
     get:
@@ -596,6 +631,27 @@ paths:
               additionalProperties: false
               properties:
                 client_app_version: { type: string, maxLength: 20 }
+                latitude:
+                  type: number
+                  format: double
+                  minimum: -90
+                  maximum: 90
+                  description: |
+                    *(GEOFENCE-1)* Caller's current latitude. Required only when the device's
+                    `geofence_enabled` is true (else the server rejects with `location_required`).
+                longitude:
+                  type: number
+                  format: double
+                  minimum: -180
+                  maximum: 180
+                  description: Caller's current longitude (see `latitude`).
+                accuracy:
+                  type: number
+                  format: double
+                  minimum: 0
+                  description: |
+                    Horizontal accuracy of the fix in metres. Applied as a tolerance margin; a fix
+                    whose accuracy exceeds the device radius is rejected as `location_imprecise`.
       responses:
         '202':
           description: Command queued; poll `/commands/{id}` or subscribe via WebSocket
@@ -603,7 +659,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OpenCommandAccepted' }
         '403':
-          description: subscription_required / device_disabled / forbidden
+          description: |
+            subscription_required / device_disabled / forbidden /
+            location_required / outside_geofence / location_imprecise (GEOFENCE-1)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -2923,6 +2981,18 @@ components:
             - device_suspended
         latitude: { type: number, nullable: true }
         longitude: { type: number, nullable: true }
+        geofence_enabled:
+          type: boolean
+          description: |
+            *(GEOFENCE-1)* When true the app MUST attach the caller's GPS
+            (`latitude`/`longitude`, optional `accuracy`) to `POST /devices/{id}/open`, or the
+            server rejects with `location_required`. The backend holds and enforces the radius.
+        geofence_radius_m:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 65535
+          description: Allowed distance from the device in metres (null when the geofence is off).
         last_online_at: { type: string, format: date-time, nullable: true }
         image_url: { type: string, maxLength: 2048, nullable: true, description: Barrier photo URL (null → app shows a placeholder) }
         address: { type: string, maxLength: 255, nullable: true, description: Full street address (null → app shows a fallback) }
@@ -2939,6 +3009,23 @@ components:
                 model_code: { type: string }
             cooldown_seconds_remaining: { type: integer, nullable: true }
             subscription: { $ref: '#/components/schemas/SubscriptionBrief' }
+
+    DeviceGeofenceUpdate:
+      type: object
+      additionalProperties: false
+      required: [geofence_enabled]
+      properties:
+        geofence_enabled:
+          type: boolean
+          description: Turn the device distance restriction on or off.
+        geofence_radius_m:
+          type: integer
+          minimum: 1
+          maximum: 65535
+          nullable: true
+          description: |
+            Allowed distance from the device in metres. Required (positive) when
+            `geofence_enabled` is true; cleared when false.
 
     DeviceListResponse:
       type: object
@@ -3551,6 +3638,8 @@ components:
         address: { type: string, maxLength: 255, nullable: true }
         latitude: { type: number, nullable: true }
         longitude: { type: number, nullable: true }
+        geofence_enabled: { type: boolean, description: '*(GEOFENCE-1)* Distance restriction toggle.' }
+        geofence_radius_m: { type: integer, nullable: true, minimum: 1, maximum: 65535, description: Allowed distance in metres (null when off). }
         last_online_at: { type: string, format: date-time, nullable: true }
         last_signal_strength: { type: integer, nullable: true }
         whitelist_capacity_used: { type: integer }
@@ -3586,6 +3675,8 @@ components:
         address: { type: string, maxLength: 255, nullable: true }
         latitude: { type: number, nullable: true }
         longitude: { type: number, nullable: true }
+        geofence_enabled: { type: boolean, description: '*(GEOFENCE-1)* Enabling needs a positive geofence_radius_m and existing device coordinates (else 422).' }
+        geofence_radius_m: { type: integer, nullable: true, minimum: 1, maximum: 65535 }
         metadata: { type: object, additionalProperties: true, nullable: true }
 
     AdminDeviceListResponse:

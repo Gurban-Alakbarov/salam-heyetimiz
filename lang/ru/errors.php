@@ -13,6 +13,12 @@ return [
     'cooldown' => 'Подождите :retry_after_seconds сек. перед повторной попыткой.',
     'subscription_required' => 'Срок вашей подписки истёк.',
     'device_disabled' => 'Устройство отключено администратором.',
+    // GEOFENCE-1 — ограничение по расстоянию.
+    'location_required' => 'Требуется местоположение — откройте приложение.',
+    'outside_geofence' => 'Вы слишком далеко от шлагбаума.',
+    'location_imprecise' => 'Местоположение недостаточно точное.',
+    'geofence_radius_required' => 'Требуется радиус расстояния.',
+    'geofence_device_location_missing' => 'У устройства не заданы координаты.',
     'device_offline' => 'Устройство недоступно.',
     'payment_required' => 'Требуется оплата.',
     'payment_provider_unavailable' => 'Платёжный провайдер сейчас недоступен. Повторите попытку.',

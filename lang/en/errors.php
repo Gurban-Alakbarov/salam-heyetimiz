@@ -13,6 +13,12 @@ return [
     'cooldown' => 'Wait :retry_after_seconds seconds before trying again.',
     'subscription_required' => 'Your subscription has expired.',
     'device_disabled' => 'The device has been disabled by an administrator.',
+    // GEOFENCE-1 — distance restriction.
+    'location_required' => 'Location required — open the app.',
+    'outside_geofence' => 'You are too far from the barrier.',
+    'location_imprecise' => 'Your location is not accurate enough.',
+    'geofence_radius_required' => 'A distance radius is required.',
+    'geofence_device_location_missing' => 'The device has no coordinates set.',
     'device_offline' => 'The device is unreachable.',
     'payment_required' => 'Payment is required.',
     'payment_provider_unavailable' => 'The payment provider is currently unavailable. Please try again.',

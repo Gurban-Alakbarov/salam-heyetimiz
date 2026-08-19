@@ -35,6 +35,8 @@ class Device extends Model
             'sim_status' => SimStatus::class,
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'geofence_enabled' => 'boolean',
+            'geofence_radius_m' => 'integer',
             'last_online_at' => 'datetime',
             'last_signal_strength' => 'integer',
             'consecutive_offline_diagnostics' => 'integer',

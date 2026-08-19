@@ -6149,7 +6149,7 @@
             "adminBearerAuth": []
           }
         ],
-        "description": "Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked.",
+        "description": "Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked; email is returned in full (admin surface only).",
         "parameters": [
           {
             "in": "query",
@@ -6157,7 +6157,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Search by phone"
+            "description": "Search by phone, email or name"
           },
           {
             "in": "query",
@@ -11474,6 +11474,12 @@
             "type": "string",
             "example": "+99450****67",
             "description": "Masked"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "example": "resident@example.com"
           },
           "complex": {
             "type": "string",

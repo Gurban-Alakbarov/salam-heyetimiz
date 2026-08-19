@@ -513,9 +513,9 @@ paths:
       summary: Resident directory
       operationId: adminListResidents
       security: [{ adminBearerAuth: [] }]
-      description: Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked.
+      description: Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked; email is returned in full (admin surface only).
       parameters:
-        - { in: query, name: q, schema: { type: string }, description: Search by phone }
+        - { in: query, name: q, schema: { type: string }, description: "Search by phone, email or name" }
         - { in: query, name: complex_id, schema: { type: integer, format: int64 } }
         - { $ref: '#/components/parameters/Limit' }
         - { $ref: '#/components/parameters/Cursor' }
@@ -1248,6 +1248,8 @@ components:
       properties:
         id: { type: integer, format: int64 }
         phone: { type: string, example: '+99450****67', description: Masked }
+        # Full email — admin surface only.
+        email: { type: string, format: email, nullable: true, example: 'resident@example.com' }
         complex: { type: string, nullable: true }
         device_online: { type: boolean }
         subscription_status: { type: string, nullable: true }

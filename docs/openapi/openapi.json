@@ -1895,6 +1895,19 @@
             "description": "ok"
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "De-register the current install's push token (used on logout)",
+        "description": "Clears the push token for the caller's current install only — the install is resolved from the JWT `fp` claim (= install_uuid). Other devices' tokens are untouched (multi-device preserved). No request body.",
+        "operationId": "deletePushToken",
+        "responses": {
+          "204": {
+            "description": "ok"
+          }
+        }
       }
     },
     "/v1/consents": {
@@ -4640,6 +4653,197 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/admin/v1/notifications": {
+      "get": {
+        "tags": [
+          "Admin / Notifications"
+        ],
+        "summary": "List notification campaigns",
+        "operationId": "adminListNotificationCampaigns",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "x-authorization": "notifications.view",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "queued",
+                "sending",
+                "sent",
+                "failed"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok (complex_manager sees only its own complex's campaigns)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationCampaignListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin / Notifications"
+        ],
+        "summary": "Create and send a system notification (send now)",
+        "description": "Fan-out to a resident audience as push + inapp (fixed channels; no campaign channels_mask). complex_manager is server-scoped to its own complex. Recipients dedupe to distinct user_id. Requires confirmed=true and an Idempotency-Key.",
+        "operationId": "adminSendNotification",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "x-authorization": "notifications.send",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyRequired"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationCampaignCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "accepted — fan-out queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationCampaign"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "description": "confirmation required (confirmed=true missing)"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/v1/notifications/audience/preview": {
+      "post": {
+        "tags": [
+          "Admin / Notifications"
+        ],
+        "summary": "Resolve the recipient count for an audience (before confirmation)",
+        "operationId": "adminPreviewNotificationAudience",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "x-authorization": "notifications.view",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "audience"
+                ],
+                "properties": {
+                  "audience": {
+                    "$ref": "#/components/schemas/AudienceSpec"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudiencePreview"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/v1/notifications/{campaignId}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "campaignId",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Admin / Notifications"
+        ],
+        "summary": "Campaign detail + delivery stats",
+        "operationId": "adminGetNotificationCampaign",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "x-authorization": "notifications.view",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationCampaign"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -7964,6 +8168,12 @@
             "type": "string",
             "example": "+994 50 *** 45 67"
           },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "example": "resident@example.com"
+          },
           "full_name": {
             "type": "string",
             "nullable": true
@@ -8956,6 +9166,213 @@
           },
           "enabled": {
             "type": "boolean"
+          }
+        }
+      },
+      "AudienceSpec": {
+        "type": "object",
+        "description": "Recipient audience for an admin campaign. Recipients resolve to distinct user_id; complex_manager is server-scoped to its own complex. No other audience types.",
+        "required": [
+          "scope"
+        ],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "all_users",
+              "user_ids",
+              "filter",
+              "complex"
+            ]
+          },
+          "user_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "filter": {
+            "type": "object",
+            "properties": {
+              "q": {
+                "type": "string"
+              },
+              "complex_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "role": {
+                "type": "string"
+              },
+              "subscription_status": {
+                "type": "string"
+              }
+            }
+          },
+          "complex_id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AudiencePreview": {
+        "type": "object",
+        "required": [
+          "recipient_count"
+        ],
+        "properties": {
+          "recipient_count": {
+            "type": "integer",
+            "description": "Server-resolved distinct user_id count (scoped)."
+          }
+        }
+      },
+      "NotificationCampaignCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "body",
+          "language",
+          "audience",
+          "confirmed"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "system"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "az",
+              "ru",
+              "en"
+            ]
+          },
+          "audience": {
+            "$ref": "#/components/schemas/AudienceSpec"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "description": "Must be true — server returns 409 otherwise (mandatory send confirmation)."
+          }
+        }
+      },
+      "NotificationCampaign": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "title",
+          "body",
+          "language",
+          "audience_scope",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "system"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "az",
+              "ru",
+              "en"
+            ]
+          },
+          "audience_scope": {
+            "type": "string",
+            "enum": [
+              "all_users",
+              "user_ids",
+              "filter",
+              "complex"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "queued",
+              "sending",
+              "sent",
+              "failed"
+            ]
+          },
+          "total_recipients": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sent_count": {
+            "type": "integer"
+          },
+          "failed_count": {
+            "type": "integer"
+          },
+          "created_by_admin_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NotificationCampaignListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "page"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationCampaign"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageInfo"
           }
         }
       },

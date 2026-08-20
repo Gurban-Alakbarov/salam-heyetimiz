@@ -261,9 +261,10 @@
 
             if (btn) { btn.addEventListener('click', open); }
 
-            // Directions app picker — mirrors the mobile app: AzNav is the ONLY navigation provider.
-            // On Android the intent:// opens AzNav if installed, else Chrome follows the
-            // browser_fallback_url to the Play Store; other platforms open the Play Store listing.
+            // Directions app picker. Android: AzNav is the only provider — an intent:// opens it,
+            // and if AzNav is not installed Chrome follows browser_fallback_url to its Play Store
+            // page. iOS / any non-Android: AzNav is Android-only, so open Apple Maps with the
+            // coordinates instead — the Play Store (Android) link is NEVER used off Android.
             var dirBtn = document.getElementById('dirBtn');
             var dirSheet = document.getElementById('dirSheet');
             var dirList = document.getElementById('dirList');
@@ -277,15 +278,21 @@
                 var ll = c.lat + ',' + c.lng;
                 var isAndroid = /android/i.test(navigator.userAgent);
 
-                // AzNav is the ONLY navigation provider. On Android an intent:// tries the geo: route and,
-                // if AzNav is not installed, Chrome follows browser_fallback_url to the Play Store page.
-                // On other platforms (AzNav is Android-only) the option opens the Play Store listing.
-                var azNavUrl = isAndroid
-                    ? 'intent://' + ll + '?q=' + ll + '#Intent;scheme=geo;package=net.sinam.aznav;S.browser_fallback_url=' + encodeURIComponent(AZNAV_PLAY) + ';end'
-                    : AZNAV_PLAY;
+                // Android → AzNav. The intent:// tries the geo: route; if AzNav is not installed,
+                // Chrome follows browser_fallback_url to its Play Store page (Android-only path).
+                if (isAndroid) {
+                    var azNavUrl = 'intent://' + ll + '?q=' + ll + '#Intent;scheme=geo;package=net.sinam.aznav;S.browser_fallback_url=' + encodeURIComponent(AZNAV_PLAY) + ';end';
+                    return [
+                        { name: 'AzNav', color: '#0b7285', url: azNavUrl },
+                    ];
+                }
 
+                // iOS / any non-Android → Apple Maps directions to the destination coordinates
+                // (opens the native Maps app on iOS, web Apple Maps elsewhere). The Android-only
+                // Play Store link is never used here.
+                var appleMapsUrl = 'https://maps.apple.com/?daddr=' + ll + '&dirflg=d';
                 return [
-                    { name: 'AzNav', color: '#0b7285', url: azNavUrl },
+                    { name: 'Apple Maps', color: '#0b7285', url: appleMapsUrl },
                 ];
             }
 

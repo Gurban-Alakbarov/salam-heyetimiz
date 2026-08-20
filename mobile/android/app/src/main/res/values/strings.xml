@@ -3,10 +3,13 @@
      (W5): DoorWidgetProvider renders these via a locale-specific context built from the
      persisted door_widget_locale, so it does NOT depend on the device locale. -->
 <resources>
-    <string name="dw_open">Qapını aç</string>
-    <string name="dw_opening">Qapı açılır…</string>
+    <!-- User-visible launcher / app name (fixed, not localized). -->
+    <string name="app_name">Salam Həyətimiz</string>
+
+    <string name="dw_open">Aç</string>
+    <string name="dw_opening">Açılır...</string>
     <string name="dw_sent">Sorğu göndərildi</string>
-    <string name="dw_opened">Qapı açıldı ✓</string>
+    <string name="dw_opened">Açıldı</string>
     <string name="dw_failed">Qapı açıla bilmədi</string>
     <string name="dw_not_confirmed">Nəticə təsdiqlənmədi</string>
     <string name="dw_no_response">Cavab alınmadı</string>

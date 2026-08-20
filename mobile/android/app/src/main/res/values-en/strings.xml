@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Home-screen door widget strings — EN (W5). -->
 <resources>
-    <string name="dw_open">Open door</string>
-    <string name="dw_opening">Opening door…</string>
+    <string name="dw_open">Open</string>
+    <string name="dw_opening">Opening...</string>
     <string name="dw_sent">Request sent</string>
-    <string name="dw_opened">Door opened ✓</string>
+    <string name="dw_opened">Opened</string>
     <string name="dw_failed">Door could not be opened</string>
     <string name="dw_not_confirmed">Result not confirmed</string>
     <string name="dw_no_response">No response received</string>

@@ -36,6 +36,10 @@ const int kDoorWidgetMaxTransientPollErrors = 3;
 /// Transient in-progress code written before/while polling.
 const String kDoorWidgetOpeningCode = 'opening';
 
+/// How long the terminal result (Açıldı / error) lingers before the widget returns to
+/// its normal "Aç" state. Pure display — never affects the open/poll/idempotency.
+const Duration kDoorWidgetResultLinger = Duration(seconds: 3);
+
 /// Background entry point. W5: the widget's click URI carries `?widgetId=<AppWidgetId>`,
 /// so the callback reads/writes ONLY that instance's config + status + cooldown. Runs
 /// in the home_widget background isolate — no ProviderScope, no SessionManager. Never
@@ -76,7 +80,24 @@ Future<void> doorWidgetOpenCallback(Uri? uri) async {
     repositoryFactory: backgroundBarrierRepository,
   );
 
-  await _writeCode(statusKey, doorWidgetOutcomeCode(outcome));
+  final code = doorWidgetOutcomeCode(outcome);
+  await _writeCode(statusKey, code);
+
+  // Show the result briefly, then return the widget to its normal "Aç" state. This is a
+  // pure DISPLAY reset — the open command, bounded poll, idempotency and outcome above are
+  // untouched. `location_required` must persist (it drives the GEOFENCE-4 "open the app"
+  // tap), so it is skipped. Only clears if this instance is still showing THIS result, so a
+  // newer open (its `opening`) is never clobbered.
+  if (outcome != DoorWidgetOpenOutcome.locationRequired) {
+    await Future<void>.delayed(kDoorWidgetResultLinger);
+    final current = await HomeWidget.getWidgetData<String>(statusKey);
+    if (current == code) {
+      await HomeWidget.saveWidgetData<String>(statusKey, null);
+      await HomeWidget.updateWidget(
+        qualifiedAndroidName: DoorWidgetService.androidProvider,
+      );
+    }
+  }
 }
 
 /// Whether a fresh open should fire given the last-attempt time (pure → testable).

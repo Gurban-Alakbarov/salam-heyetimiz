@@ -46,36 +46,61 @@ class DoorWidgetProvider : HomeWidgetProvider() {
                 ?: widgetData.getString(LEGACY_STATUS_CODE, null))?.trim()
 
             val views = RemoteViews(context.packageName, R.layout.door_widget)
-            views.setTextViewText(R.id.door_widget_title, loc.getString(R.string.dw_open))
+
+            // Pending = an open in progress for THIS instance (`opening`). Isolated to the clicked
+            // AppWidgetId because the status lives in a per-instance key. A stale `opening` (older
+            // than STALE_OPENING_MS — e.g. a dead isolate) reverts to normal so it never gets stuck.
+            val lastOpenMs = readLong(widgetData, lastOpenMsKey(widgetId))
+            val pending = statusCode == CODE_OPENING &&
+                (lastOpenMs <= 0L || System.currentTimeMillis() - lastOpenMs <= STALE_OPENING_MS)
 
             if (label.isNullOrEmpty()) {
-                // No configured device → hide label, show the localized "no door" hint.
+                // No configured device → the "no door" hint, no icon/spinner, normal bg, tap = confirm.
                 views.setViewVisibility(R.id.door_widget_device_label, View.GONE)
-                views.setTextViewText(R.id.door_widget_status, loc.getString(R.string.dw_no_device))
-                views.setViewVisibility(R.id.door_widget_status, View.VISIBLE)
+                views.setViewVisibility(R.id.door_widget_icon, View.GONE)
+                views.setViewVisibility(R.id.door_widget_progress, View.GONE)
+                views.setTextViewText(R.id.door_widget_title, loc.getString(R.string.dw_no_device))
+                views.setInt(R.id.door_widget_root, "setBackgroundResource", R.drawable.door_widget_bg)
+                views.setOnClickPendingIntent(R.id.door_widget_root, confirmIntent(context, widgetId))
             } else {
                 views.setTextViewText(R.id.door_widget_device_label, label)
                 views.setViewVisibility(R.id.door_widget_device_label, View.VISIBLE)
-                // Open-status only. A configured widget never shows the "no door" hint (guard).
-                val resId = if (statusCode == null || statusCode == CODE_NO_DEVICE) 0 else statusResId(statusCode)
-                if (resId == 0) {
-                    views.setViewVisibility(R.id.door_widget_status, View.GONE)
+
+                if (pending) {
+                    // In progress: spinner + "Açılır…" + amber bg. Tap HARD-DISABLED (no re-tap /
+                    // double-submit; the Dart debounce is the backstop). Only THIS instance changes.
+                    views.setViewVisibility(R.id.door_widget_icon, View.GONE)
+                    views.setViewVisibility(R.id.door_widget_progress, View.VISIBLE)
+                    views.setTextViewText(R.id.door_widget_title, loc.getString(R.string.dw_opening))
+                    views.setInt(R.id.door_widget_root, "setBackgroundResource", R.drawable.door_widget_bg_pending)
+                    views.setOnClickPendingIntent(R.id.door_widget_root, null)
                 } else {
-                    views.setTextViewText(R.id.door_widget_status, loc.getString(resId))
-                    views.setViewVisibility(R.id.door_widget_status, View.VISIBLE)
+                    // Normal / result: state icon + label + green bg + tap enabled. A stale `opening`
+                    // is treated as normal.
+                    val effectiveCode = if (statusCode == CODE_OPENING) null else statusCode
+                    val titleRes = if (effectiveCode == null || effectiveCode == CODE_NO_DEVICE) {
+                        R.string.dw_open
+                    } else {
+                        val r = statusResId(effectiveCode); if (r == 0) R.string.dw_open else r
+                    }
+                    views.setViewVisibility(R.id.door_widget_progress, View.GONE)
+                    views.setViewVisibility(R.id.door_widget_icon, View.VISIBLE)
+                    views.setImageViewResource(R.id.door_widget_icon, statusIconRes(effectiveCode))
+                    views.setTextViewText(R.id.door_widget_title, loc.getString(titleRes))
+                    views.setInt(R.id.door_widget_root, "setBackgroundResource", R.drawable.door_widget_bg)
+
+                    // Confirm-first on every tap (D5); the exception is `location_required`, where the
+                    // tap opens the app on this barrier for the in-app GPS open (GEOFENCE-4 D3).
+                    val tapIntent = if (effectiveCode == CODE_LOCATION_REQUIRED) {
+                        val deviceId = readDeviceId(widgetData, widgetId)
+                        if (deviceId != INVALID_ID) foregroundIntent(context, widgetId, deviceId)
+                        else confirmIntent(context, widgetId)
+                    } else {
+                        confirmIntent(context, widgetId)
+                    }
+                    views.setOnClickPendingIntent(R.id.door_widget_root, tapIntent)
                 }
             }
-
-            // Confirm-first on every tap (D5); the one exception is `location_required`,
-            // where the tap opens the app on this barrier for the in-app GPS open (D3).
-            val tapIntent = if (statusCode == CODE_LOCATION_REQUIRED) {
-                val deviceId = readDeviceId(widgetData, widgetId)
-                if (deviceId != INVALID_ID) foregroundIntent(context, widgetId, deviceId)
-                else confirmIntent(context, widgetId)
-            } else {
-                confirmIntent(context, widgetId)
-            }
-            views.setOnClickPendingIntent(R.id.door_widget_root, tapIntent)
             appWidgetManager.updateAppWidget(widgetId, views)
         }
     }
@@ -153,12 +178,36 @@ class DoorWidgetProvider : HomeWidgetProvider() {
         else -> 0
     }
 
+    /** White CTA icon for the state: check on success, error on failure/geofence, door otherwise. */
+    private fun statusIconRes(code: String?): Int = when (code) {
+        "opened", "sent" -> R.drawable.ic_dw_opened
+        "failed", "no_response", "not_confirmed", "session_expired",
+        "unauthorized", "network_error", "error", "location_required" -> R.drawable.ic_dw_error
+        else -> R.drawable.ic_dw_open
+    }
+
+    /** Read a Long pref (home_widget stores epoch-ms via putLong); 0 if absent/unreadable. */
+    private fun readLong(widgetData: SharedPreferences, key: String): Long {
+        if (!widgetData.contains(key)) return 0L
+        return try {
+            widgetData.getLong(key, 0L)
+        } catch (e: ClassCastException) {
+            try {
+                widgetData.getInt(key, 0).toLong()
+            } catch (e2: ClassCastException) {
+                0L
+            }
+        }
+    }
+
     companion object {
         private const val PREFS = "HomeWidgetPreferences"
         private const val KEY_LOCALE = "door_widget_locale"
         private const val DEFAULT_LOCALE = "az"
         private const val CODE_NO_DEVICE = "no_device"
         private const val CODE_LOCATION_REQUIRED = "location_required"
+        private const val CODE_OPENING = "opening"
+        private const val STALE_OPENING_MS = 30_000L // a stuck `opening` reverts to normal after this
         private const val INVALID_ID = -1
         private const val LEGACY_DEVICE_ID = "door_widget_device_id"
         private const val LEGACY_DEVICE_LABEL = "door_widget_device_label"

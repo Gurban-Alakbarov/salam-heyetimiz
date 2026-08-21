@@ -1,0 +1,15 @@
+meta {
+  name: Remove the barrier photo
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/image
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

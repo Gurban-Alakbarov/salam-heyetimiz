@@ -1,0 +1,420 @@
+
+
+=================================================
+## [Objects] Creates an access token to interact checkout APIs   (page 1e548b50-7ada-8155-9e8e-f1b4c24b3a2d)
+=================================================
+Get Bearer Token
+
+### Body Params
+| Name | Type | Description | Required? |
+| client_id | string | yes |
+| client_secret | string | yes |
+| grant_type | string | yes |
+| scope | string | yes |
+
+### Responses
+| Response Body |
+| 200 | {
+    "accessToken": "accessToken",
+    "refreshToken": "refreshToken",
+    "accessExpiresIn": 500,
+    "refreshExpiresIn": 1000
+} |
+| 401 | {
+"error": "invalid_request",
+"error_description": "Missing form parameter: field_name"
+} |
+
+## Code Examples
+
+### Request
+
+```
+curl --location --request POST 'https://base_url/api/oauth2/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'scope=email' \
+--data-urlencode 'client_id=client_id' \
+--data-urlencode 'client_secret=client_secret'
+```
+
+
+=================================================
+## [Objects] Retrieves a payment using the ID specified.   (page 1e548b50-7ada-81ab-b83e-e6e7c4bfc84e)
+=================================================
+Retrieve  payment
+
+### Responses
+| Response Body |
+| 200 | {
+    "id": "6b27a890-365f-4b92-9a32-6a1301f8439d",
+    "rrn": 33,
+    "type": "purchase",
+    "amount": {
+        "value": 10.00,
+        "currency": "azn"
+    },
+    "status": "canceled",
+    "createdAt": "2024-07-26T05:44:38.341Z",
+    "expiresAt": "2024-07-26T05:44:39.734Z",
+    "paid": false,
+    "captured": true,
+    "settled": false,
+    "refunded": false,
+    "description": "m10 pos payment",
+    "paymentMethod": {
+        "type": "birbank"
+    },
+    "cancelationParty": "merchant",
+    "cancelationReason": "canceled_by_merchant",
+    "confirmation": {
+        "type": "mobile",
+        "confirmUrl": "birbank://v1/payments?paymentId=6b27a890-365f-4b92-9a32-6a1301f8439d",
+        "returnUrl": "ww"
+    },
+    "metadata": {},
+    "merchant": {
+        "id": "f346ef13-1327-40a2-acde-a9bdd0ff4a7c",
+        "name": "developer",
+        "mcc": "9402"
+    }
+} |
+| 400 | {
+    "id": "bd017617-bd21-4110-aa4a-37f406b43305",
+    "code": "bad_request",
+    "status": 400,
+    "method": "GET",
+    "path": "/v1/payments/6b27a890-365f-4b92-9a32-6a1301f8439d1",
+    "message": "The value '6b27a890-365f-4b92-9a32-6a1301f8439d1' of parameter 'id' is invalid",
+    "timestamp": "2024-07-26T05:46:58.125Z",
+    "errors": []
+} |
+
+## Code Examples
+
+### Request
+
+```
+curl --location --request GET '{base_url}/v1/payments/df4cad71-77f1-4b02-b448-cae4ed146a83' \
+--header 'Authorization: Bearer ***' \
+--data ''
+```
+
+
+=================================================
+## [Objects] Retrieves a payment using the ID specified.   (page 1e548b50-7ada-816a-bbf1-db78c4bcee2a)
+=================================================
+Retrieve a refund
+
+### Responses
+| Response Body |
+| 200 | {
+    "id": "8ce1a742-428d-4158-93b1-3dfe509f04b5",
+    "originalId" : "9ce1a742-428d-4158-93b1-3dfe509f04b5"
+    "amount": {
+        "value": 4,
+        "currency": "azn"
+    },
+    "status": "pending",
+    "createdAt": "2024-07-26T06:35:55.005Z",
+    "expiresAt": "2024-07-26T07:05:55.005Z",
+    "description": "refund",
+    "confirmation": {
+        "type": "qr",
+        "confirmData": "birbank://v1/refunds?refundId=8ce1a742-428d-4158-93b1-3dfe509f04b5"
+    }
+} |
+| 400 | {
+"id": "620e2c40-ebc9-447b-842c-3199ad207463",
+"code": "payment_not_found",
+"status": 400,
+"method": "GET",
+"path": "/v1/payments/df4cad71-77f1-4b02-b448-cae4ed146a81",
+"message": "Payment with id df4cad71-77f1-4b02-b448-cae4ed146a81 not found",
+"timestamp": "2024-07-01T12:38:23.938Z",
+"errors": []
+} |
+
+## Code Examples
+
+### Request
+
+```
+curl --location --request GET '{base_url}/v1/refunds/f436bf41-11c1-4402-ad93-029b76f210d9' \
+--header 'Authorization: Bearer '
+```
+
+
+=================================================
+## [Objects] Used for creating payment   (page 1e548b50-7ada-8149-a800-ca9b172691cd)
+=================================================
+Create payment
+
+### Body Params
+| Description | Example value | Available Values | Type | Property |
+| Always "amount" | "amount": {
+      "value": 10.0,
+      "currency": "AZN"
+    } | object | amount* |
+| Always true on BIRBANK and QR payment | true, false | boolean | capture* |
+| Description of payment | “payment for order id 1235” | string(255) | description |
+| This object is used when creating payment. | "paymentMethodData": {
+    "type": "M10"
+} | object | paymentMethodData |
+| The field is not mandatory when confirmation type is QR. | M10, BIRBANK, BANK_CARD | enum | paymentMethodData.type |
+| This object is defined when confirmation is required from customer. | "confirmation": {
+    "type": "QR"
+} | object | confirmation |
+| This type defines what kind of confirmation will user pass. 
+
+If confirmation is provided, type is mandatory. | QR, MOBILE, REDIRECT | confirmation.type* |
+| This field is used for where acquirer will return the customer. | string(2048) | confirmation.returnUrl |
+| This field used for POS terminal payments. The field is mandatory for POS terminals. | “posDetail” :{
+   "merchantId": "RT123456",
+   "terminalId": "RT123456"
+} | object | posDetail |
+| Merchant can pass specific read-only data to this field. | "metadata": {
+   "orderNo": "1234",
+   "instalmentTerms:": "3,6,9"
+} | in order to show taksit options to customer add instalmentTerms tag to metadata | object(k, v) | metadata |
+
+### Responses
+| Response Body |
+| 200 | {
+    "id": "5b16478f-3d22-46d7-82ed-7182dfd21870",
+    "rrn": 34,
+    "type": "purchase",
+    "amount": {
+        "value": 10.0,
+        "currency": "azn"
+    },
+    "status": "pending",
+    "createdAt": "2024-07-26T06:03:53.679Z",
+    "expiresAt": "2024-07-26T06:33:53.679Z",
+    "paid": false,
+    "captured": true,
+    "settled": false,
+    "refunded": false,
+    "description": "m10 pos payment",
+    "paymentMethod": {
+        "type": "birbank"
+    },
+    "confirmation": {
+        "type": "qr",
+        "confirmData": "birbank://v1/payments?paymentId=5b16478f-3d22-46d7-82ed-7182dfd21870",
+        "returnUrl": ""
+    },
+    "metadata": {},
+    "merchant": {
+        "id": "f346ef13-1327-40a2-acde-a9bdd0ff4a7c",
+        "name": "developer",
+        "mcc": "9402"
+    }
+} |
+| 400 | {
+    "id": "8362e11f-8d9b-47c7-a3e8-e495ab051a87",
+    "code": "bad_request",
+    "status": 400,
+    "method": "POST",
+    "path": "/v1/payments",
+    "message": "Validation error",
+    "timestamp": "2024-07-01T12:43:11.331Z",
+    "errors": [
+        {
+            "property": "amount.value",
+            "message": "must not be null"
+        }
+    ]
+} |
+
+## Code Examples
+
+### Request
+
+```
+curl --location --request POST '{base_url}/v1/payments' \
+--header 'X-Idempotency-Key: 7de10aee-9016-4298-80bc-b4b1c3c1e45d' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer *' \
+--data '{
+    "amount": {
+        "value": 10.0,
+        "currency": "AZN"
+    },
+    "capture": true,
+    "description": "m10 pos payment",
+    "paymentMethodData": {
+        "type": "BIRBANK"
+    },
+    "confirmation": {
+        "type": "QR",
+        "returnUrl": ""
+    },
+    "posDetail": {
+        "merchantId": "RT123456",
+        "terminalId": "RT123456"
+    }
+}'
+```
+
+
+=================================================
+## [Objects] Used for creating refund   (page 1e548b50-7ada-8143-9437-e2ae693d19d7)
+=================================================
+Create a refund
+Payment can be refunded multiple times if refundable amount is not exceeded.
+
+### Body Params
+| Description | Example value | Available Values | Type | Property |
+| Id of original payment. | 4f28fcba-81a9-4178-9276-0b38d11dc19e | string(uuid) | id* |
+| Amount of refund. If not provided full refund will be performed. | bigdecimal | amount |
+| If confirmation is not provided payment is refunded directly. If required confirmation should be provided. | "confirmation": {
+     "type": "QR"
+} | object | confirmation |
+| QR, MOBILE | enum | confirmation.type |
+
+### Responses
+| Response Body |
+| 200 | {
+    "id": "2d5c25b4-1094-4fba-8d50-e7cddf147845",
+    "originalId" : "53e53e63-c4c1-4b74-adda-709f8d9b6cce" 
+    "amount": {
+        "value": 4,
+        "currency": "azn"
+    },
+    "status": "pending",
+    "createdAt": "2024-07-26T06:43:48.068Z",
+    "expiresAt": "2024-07-26T07:13:48.068Z",
+    "description": "refund",
+    "confirmation": {
+        "type": "qr",
+        "confirmData": "birbank://v1/refunds?refundId=2d5c25b4-1094-4fba-8d50-e7cddf147845"
+    }
+} |
+| 400 | {
+"id": "53e53e63-c4c1-4b74-adda-709f8d9b6cce",
+"code": "invalid_operation",
+"status": 400,
+"method": "POST",
+"path": "/v1/refunds",
+"message": "Payment a5668065-3a23-445c-a9a9-2ffb95d382ac can't be refunded without completion",
+"timestamp": "2024-07-01T13:00:46.650Z",
+"errors": []
+} |
+
+## Code Examples
+
+### Request 
+
+```
+curl --location --request POST '{base_url}/v1/refunds' \
+--header 'X-Idempotency-Key: bfb19819-dd0a-452a-a24d-3767d620e8e8' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer ****' \
+--data '{
+    "id": "4f28fcba-81a9-4178-9276-0b38d11dc19e",
+    "amount": 4,
+    "description": "refund"
+}'
+```
+With confirmation
+
+```
+curl --location --request POST '{base_url}/v1/refunds' \
+--header 'X-Idempotency-Key: 9fbe563e-a9ff-4b73-a064-bbcbe40ad699' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer ' \
+--header 'Cookie: KC_ROUTE=kc2' \
+--data '{
+    "id": "e15b12b2-1e44-46e8-b2b7-e0ceb3d90419",
+    "amount": 0.05,
+    "description": "refund",
+    "confirmation": {
+        "type": "QR"
+    }
+}'
+```
+
+
+=================================================
+## [Objects] Used for canceling payment   (page 1e548b50-7ada-8112-b1b2-e7985fbc954f)
+=================================================
+Cancel payment
+
+### This endpoint is used to cancel the operation. Payment cancelation depends on payment status. See the payment state flow.
+payment_state.svg
+
+### Responses
+| Response Body |
+| 200 | {
+    "id": "fb48f950-a672-4fd4-95b1-2c0ae70d0376",
+    "rrn": 35,
+    "type": "purchase",
+    "amount": {
+        "value": 10.00,
+        "currency": "azn"
+    },
+    "status": "canceled",
+    "createdAt": "2024-07-26T06:09:11.251Z",
+    "expiresAt": "2024-07-26T06:09:13.210Z",
+    "paid": false,
+    "captured": true,
+    "settled": false,
+    "refunded": false,
+    "description": "m10 pos payment",
+    "paymentMethod": {
+        "type": "birbank"
+    },
+    "cancelationParty": "merchant",
+    "cancelationReason": "canceled_by_merchant",
+    "confirmation": {
+        "type": "qr",
+        "confirmData": "birbank://v1/payments?paymentId=fb48f950-a672-4fd4-95b1-2c0ae70d0376",
+        "returnUrl": ""
+    },
+    "metadata": {},
+    "merchant": {
+        "id": "f346ef13-1327-40a2-acde-a9bdd0ff4a7c",
+        "name": "developer",
+        "mcc": "9402"
+    }
+} |
+| 400 | {
+    "id": "c72455cf-9061-481c-bcd8-dbb25452b7ea",
+    "code": "invalid_operation",
+    "status": 400,
+    "method": "PUT",
+    "path": "/v1/payments/fb48f950-a672-4fd4-95b1-2c0ae70d0376/cancel",
+    "message": "Payment `fb48f950-a672-4fd4-95b1-2c0ae70d0376` is completed as `canceled`",
+    "timestamp": "2024-07-26T06:20:22.283Z",
+    "errors": []
+} |
+
+## Code Examples
+
+### Request
+
+```
+curl --location --request PUT '{base_url}/v1/payments/72cd6bce-4368-4fd7-9074-80132a400ce5/cancel' \ \
+--header 'Authorization: ••••••'
+```
+
+
+=================================================
+## [Endpoints] This object is availabe when payment is created.    (page 1e648b50-7ada-81cf-a1e1-dee49189939d)
+=================================================
+Payment
+
+## Fields
+
+## Sample JSON
+
+
+=================================================
+## [Endpoints] Objects   (page 1e648b50-7ada-8019-a88f-ed6b8629e512)
+=================================================
+Refund
+
+## Fields
+
+## Sample JSON

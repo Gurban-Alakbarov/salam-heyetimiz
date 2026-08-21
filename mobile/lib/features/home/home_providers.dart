@@ -22,8 +22,11 @@ final homeProvider = FutureProvider.autoDispose<HomeData>((ref) async {
 /// Held in a provider so in-tab widgets (e.g. the Home "Active devices" card) can
 /// switch tabs without pushing a screen.
 class HomeTabController extends Notifier<int> {
+  /// Default landing tab = Devices (1). Authenticated users open the shell on their
+  /// barriers; the Home + Profile tabs stay one tap away on the bottom nav. This only
+  /// sets the initial tab — navigation/auth flow, logout, and deep-links are untouched.
   @override
-  int build() => 0;
+  int build() => 1;
 
   void select(int index) => state = index;
 }

@@ -705,7 +705,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"serial\": \"\",\n    \"device_model_id\": 0,\n    \"sim_phone\": \"\",\n    \"sim_operator_id\": 0,\n    \"sim_iccid\": \"\",\n    \"driver_type\": \"\",\n    \"firmware_version\": \"\",\n    \"region_id\": 0,\n    \"location_label\": \"\",\n    \"latitude\": 0,\n    \"longitude\": 0,\n    \"metadata\": {}\n}",
+                            "raw": "{\n    \"serial\": \"\",\n    \"device_model_id\": 0,\n    \"sim_phone\": \"\",\n    \"sim_operator_id\": 0,\n    \"sim_iccid\": \"\",\n    \"driver_type\": \"\",\n    \"firmware_version\": \"\",\n    \"region_id\": 0,\n    \"location_label\": \"\",\n    \"image_url\": \"\",\n    \"address\": \"\",\n    \"latitude\": 0,\n    \"longitude\": 0,\n    \"metadata\": {}\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1952,6 +1952,35 @@
                             }
                         }
                     }
+                },
+                {
+                    "name": "De-register the current install's push token (used on logout)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/v1/notifications/push-token",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "v1",
+                                "notifications",
+                                "push-token"
+                            ]
+                        },
+                        "description": "Clears the push token for the caller's current install only — the install is resolved from the JWT `fp` claim (= install_uuid). Other devices' tokens are untouched (multi-device preserved). No request body.",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
                 }
             ]
         },
@@ -2711,7 +2740,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"serial\": \"\",\n    \"device_model_id\": 0,\n    \"sim_phone\": \"\",\n    \"sim_operator_id\": 0,\n    \"sim_iccid\": \"\",\n    \"driver_type\": \"\",\n    \"firmware_version\": \"\",\n    \"region_id\": 0,\n    \"location_label\": \"\",\n    \"latitude\": 0,\n    \"longitude\": 0,\n    \"metadata\": {}\n}",
+                            "raw": "{\n    \"serial\": \"\",\n    \"device_model_id\": 0,\n    \"sim_phone\": \"\",\n    \"sim_operator_id\": 0,\n    \"sim_iccid\": \"\",\n    \"driver_type\": \"\",\n    \"firmware_version\": \"\",\n    \"region_id\": 0,\n    \"location_label\": \"\",\n    \"image_url\": \"\",\n    \"address\": \"\",\n    \"latitude\": 0,\n    \"longitude\": 0,\n    \"metadata\": {}\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -2797,7 +2826,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"firmware_version\": \"\",\n    \"driver_type\": \"\",\n    \"sim_operator_id\": 0,\n    \"sim_iccid\": \"\",\n    \"region_id\": 0,\n    \"location_label\": \"\",\n    \"latitude\": 0,\n    \"longitude\": 0,\n    \"metadata\": {}\n}",
+                            "raw": "{\n    \"firmware_version\": \"\",\n    \"driver_type\": \"\",\n    \"sim_operator_id\": 0,\n    \"sim_iccid\": \"\",\n    \"region_id\": 0,\n    \"location_label\": \"\",\n    \"image_url\": \"\",\n    \"address\": \"\",\n    \"latitude\": 0,\n    \"longitude\": 0,\n    \"metadata\": {}\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -2858,6 +2887,80 @@
                                     "language": "json"
                                 }
                             }
+                        }
+                    }
+                },
+                {
+                    "name": "Upload the barrier photo (multipart)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/v1/devices/:deviceId/image",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "v1",
+                                "devices",
+                                ":deviceId",
+                                "image"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "deviceId",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Admin-only image upload. Server-side validated (real image + MIME + extension, ≤5 MB), optimised (downscaled to 1600px + WebP when GD is available), stored on the public disk, and the resulting public URL is written to `image_url`. Replaces (and deletes) any previously uploaded file. The response `image_url` contract is unchanged — a plain string URL.\n",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{adminJwt}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Remove the barrier photo",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/v1/devices/:deviceId/image",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "v1",
+                                "devices",
+                                ":deviceId",
+                                "image"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "deviceId",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{adminJwt}}",
+                                    "type": "string"
+                                }
+                            ]
                         }
                     }
                 },
@@ -4868,6 +4971,186 @@
             ]
         },
         {
+            "name": "Admin / Notifications",
+            "item": [
+                {
+                    "name": "List notification campaigns",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/v1/notifications?limit=&cursor=&status=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "v1",
+                                "notifications"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "cursor",
+                                    "value": "",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{adminJwt}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create and send a system notification (send now)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Idempotency-Key",
+                                "value": "",
+                                "description": "Required. Same `(scope, actor, key)` returns the cached response for 24 h.\n"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/v1/notifications",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "v1",
+                                "notifications"
+                            ]
+                        },
+                        "description": "Fan-out to a resident audience as push + inapp (fixed channels; no campaign channels_mask). complex_manager is server-scoped to its own complex. Recipients dedupe to distinct user_id. Requires confirmed=true and an Idempotency-Key.",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{adminJwt}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"type\": \"\",\n    \"title\": \"\",\n    \"body\": \"\",\n    \"language\": \"\",\n    \"audience\": {\n        \"scope\": \"\",\n        \"user_ids\": [\n            0\n        ],\n        \"filter\": {\n            \"q\": \"\",\n            \"complex_id\": 0,\n            \"role\": \"\",\n            \"subscription_status\": \"\"\n        },\n        \"complex_id\": 0\n    },\n    \"confirmed\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Resolve the recipient count for an audience (before confirmation)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/v1/notifications/audience/preview",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "v1",
+                                "notifications",
+                                "audience",
+                                "preview"
+                            ]
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{adminJwt}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"audience\": {\n        \"scope\": \"\",\n        \"user_ids\": [\n            0\n        ],\n        \"filter\": {\n            \"q\": \"\",\n            \"complex_id\": 0,\n            \"role\": \"\",\n            \"subscription_status\": \"\"\n        },\n        \"complex_id\": 0\n    }\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Campaign detail + delivery stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/v1/notifications/:campaignId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "v1",
+                                "notifications",
+                                ":campaignId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "campaignId",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{adminJwt}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "name": "Admin / Notification Templates",
             "item": [
                 {
@@ -5950,7 +6233,7 @@
                                 }
                             ]
                         },
-                        "description": "Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked.",
+                        "description": "Requires `residents.view`. `complex_manager` is scoped to their complexes. Phone is masked; email is returned in full (admin surface only).",
                         "auth": {
                             "type": "bearer",
                             "bearer": [

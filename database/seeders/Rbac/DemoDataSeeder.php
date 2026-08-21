@@ -83,6 +83,10 @@ class DemoDataSeeder extends Seeder
                     'region_id' => $regionIds[$ci % count($regionIds)],
                     'complex_id' => $cid,
                     'location_label' => 'Giriş '.(($seq % 4) + 1),
+                    // Mixed on purpose: some rows stay NULL so the app's image/address
+                    // fallbacks (premium placeholder / "Ünvan daxil edilməyib") are exercised.
+                    'image_url' => $seq % 3 === 0 ? null : 'https://picsum.photos/seed/salam'.$seq.'/640/360',
+                    'address' => $seq % 4 === 0 ? null : 'Nizami küç. '.($seq * 3).', Bakı',
                     'last_online_at' => $online ? now()->subMinutes(2) : now()->subHours(6),
                     'last_signal_strength' => $online ? 28 : 12,
                 ],

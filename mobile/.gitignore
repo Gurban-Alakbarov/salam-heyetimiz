@@ -43,15 +43,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# ---- Repository hygiene (Salam) ----
-/android/local.properties
-/android/.gradle/
-/android/.kotlin/
-.gradle/
-.flutter-plugins
-/ios/Flutter/ephemeral/
-/ios/Flutter/Generated.xcconfig
-/ios/Flutter/flutter_export_environment.sh
-*.apk
-*.aab

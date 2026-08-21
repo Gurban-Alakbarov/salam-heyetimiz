@@ -1,0 +1,154 @@
+# Checkout Merchant API Reference - V1.3
+
+## Introduction
+The reference is your key to a comprehensive understanding of the Checkout API.
+> Before interact with APIs merchant should be authenticated. Each Idempotent APIs requires X-Idempotency-Key on the request header.
+
+### Code samples
+Samples requests and responses are shown for each endpoint. Requests are in cURL format. In order to work with APIs , X-Idempotency-Key should be provided. Below idempotent required APIs are defined.  Each POST APIs is retryable. With same idempotency key those APIs can be retried in case of 5xx errors.
+
+### Test Cases 
+| Expected | Pre-conditions | Steps | ID | Case | Endpoint |
+| 1.  payment response with status pending, confirmation url and etc | 1. Merchant should be authenticated
+2. Merchant should obtain terminalId and merchantId for payments | 1. send create payment request with
+ confirmation type REDIRECT to see checkout page
+2. redirect to confirmation url
+3. check payment methods availability
+4. complete payment with relevant flows (see integration scenarios) | P1.1 | create payment | POST /v1/payments |
+| 1. payment response with details | 1. Merchant should be authenticated
+2. Payment ID should be available | 1. send check payment | P1.2 | check payment status | POST /v1/payments/{id} |
+| 1. refund response with status succeeded or canceled. | 1. Merchant should be authenticated.
+2. Original ID should be available.
+3. Refund amount should be available.
+4. Merchant balance should be sufficient to make payment.
+5. Amount should not be greated than original amount. | 1. send create refund request | P1.3 | create refund | POST /v1/refunds |
+| 1. refund response with details | 1. Merchant should be authenticated
+2. Refund ID should be available | 1. send check refund | P1.4 | check refund status | POST /v1/refunds/{id} |
+
+### Test Data 
+merchantId - E1040009, terminalId -   E1040009
+Card : 4169738886501026 - 369 - 1025
+SUPPORTED ENDPOINTS
+URLs
+| Production | Preprod |
+| api.birpay.az | preapi.birpay.az | url |
+Merchant APIs
+| HTTP method | Endpoint |
+| GET | /v1/payments/{paymentId} |
+| POST | /v1/payments |
+| PUT | /v1/payments/{paymentId}/cancel |
+| GET | /v1/refunds/{refundId} |
+| POST | /v1/refunds |
+
+## Status Codes
+HTTP response codes are used to indicate general classes of success and error. 
+
+### Success Code
+| Description | HTTP Status Quote |
+| Successfully processed request. | 200 |
+| Resouce is created. | 201 |
+
+### Error Codes
+Error responses contain more detail about the error in the response body, in the "code" and "message"properties.
+| Explanation | Code | HTTP Status Quote |
+| occurs when action is not supported on provided item. | invalid_operation | 400 |
+| occurs when merchant id is provided, but does not linked to merchant. | invalid_merchant |
+| occurs when merchant is not eligible to perform action on given resource. | invalid_policy |
+| not all requirer parameters are provided. In | bad_request |
+| occurs when fetching payment not belong to merchant. | unauthorized_payment | 403 |
+| The bearer token is not valid. | access_denied | 403 |
+| The bearer token is expired | token_expired | 401 |
+| error occurs due to internal reasons | unexpected_payment_error | 500 |
+| Error occures due to external reasons. | bad_gateway | 502 |
+| Error occurs due to internal reasons. | internal_server_error | 500 |
+| Error occurs due to internal timeouts. | gateway_timeout | 504 |
+
+## Payment Status
+| Description | Status | Note |
+| The payment is initially created with a PENDING status. In this case, no transaction is created, and the next action is waiting for the customer or client. | pending |
+| The payment is considered successful when the merchant completes it. | succeeded |
+| When no action is performed after the payment is created, it will be automatically cancelled after the expiry date provided by the merchant, or if the merchant intentionally wants to cancel the order. | canceled |
+| This condition is utilized when the merchant intends to perform after compelation (only for cards) | waiting_for_capture |
+
+## Payment Cancelation
+Payment can be canceled by merchant, customer or payment network. Each party has its own cancelation reasons.
+| Description | Party |
+| Internal schedulers continuously monitor payments to finalize them. If a payment is eligible for cancellation, the system will cancel it as part of the checkout process.. | CHECKOUT |
+| If merchant wants to cancel payment before customer pays it can use cancel API. In this case cancelation party will be merchant. | MERCHANT |
+| M10, Birbank, or the bank can also cancel the payment. In such cases, the cancellation is initiated by the payment network. | PAYMENT_NETWORK |
+| Description | Reason |
+| When merchant cancels payment. | CANCELED_BY_MERCHANT |
+| When payment network cancels payment. | CANCELED_BY_PAYMENT_NETWORK |
+| When customer does not confirm payment in time. | EXPIRED_ON_CONFIRMATION |
+| When customer does not have sufficient funds. | INSUFFICIENT_FUNDS |
+| When 3DS verification is failed. | THREE_DS_VERIFICATION_FAILED |
+| Such as when the capture is not performed in time. | EXPIRED_ON_CAPTURE |
+| For card payments, if the issuer declines to process the payment, the transaction will fail and the customer will be shown a failure page. | ISSUER_DECLINE |
+| Such declines are uncommon but can occur in extreme cases. | GENERAL_DECLINE |
+
+## Integration scenarios
+
+### Sequence Flows
+
+### Web2App
+
+### App2App
+
+### Card Payment
+
+## Webhook
+image.png
+To monitor the status of payments or refunds, you can set up event webhooks. Before processing webhooks merchant should provide webhook url. Merchant can register events listed below: 
+
+### Available events
+- payment_succeeded
+- payment_canceled
+
+### Payload
+Webhook requests are sent using the POST method, and an HTTP 200 status is expected in response. If a different status or an error occurs, a retry mechanism is triggered, resending the data. Multiple retry attempts are made within an hour. If no successful (200) response is received after the predefined number of retries, the event is discarded.
+
+```
+{
+  "event": "payment_succeeded",
+  "payload": {
+    "id": "e469456c-0a53-4c31-bb43-d77ab197f94a",
+    "type": "purchase",
+    "paymentMethod": "birbank",
+    "status": "succeeded"
+  }
+}
+```
+
+### Signature
+In order to verify payload we provide signature header.  The primary goal is to ensure that the payload received by the system:
+- Has not been altered during transmission
+- Comes from a trusted source that holds the same shared secret
+- Is processed only if the integrity and authenticity of the data are verified
+Each incoming request is included a cryptographic signature (X-Signature) header. Upon receipt, the system performs the following steps:
+
+### Code Sample
+
+```
+public class HmacShaVerifier {
+
+    private static final String HMAC_SHA_256 = "HmacSHA256";
+
+    public boolean isValid(String payload, String signature, String sentSignature) {
+        try {
+            Mac mac = Mac.getInstance(HMAC_SHA_256);
+            SecretKeySpec secretKeySpec =
+                new SecretKeySpec(signature.getBytes(StandardCharsets.UTF_8), HMAC_SHA_256);
+            mac.init(secretKeySpec);
+            byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+            String generatedSignature = Base64.getEncoder().encodeToString(hash);
+            return generatedSignature.equals(sentSignature);
+        } catch (Exception e) {
+            throw new RuntimeException("HMAC verification failed", e);
+        }
+    }
+}
+```
+
+## Objects
+
+## Endpoints

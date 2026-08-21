@@ -7,6 +7,10 @@ import 'package:salam_mobile/features/auth/auth_providers.dart';
 import 'package:salam_mobile/features/auth/presentation/failure_l10n.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 
+/// Brand-asset green (#00B800) — the loading background's colour, painted behind the
+/// image so there is never a white flash before it decodes (matches the native launch).
+const Color _kLoadingGreen = Color(0xFF00B800);
+
 /// Splash = launch gate. Watching [bootstrapControllerProvider] runs the boot
 /// sequence (bootstrap → flags → maintenance/force-update → session restore).
 /// Routing to the resolved destination is handled by the go_router redirect;
@@ -35,24 +39,36 @@ class SplashScreen extends ConsumerWidget {
       );
     }
 
-    return const Scaffold(
-      backgroundColor: AppColors.brand,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Salam Həyətimiz',
-              style: TextStyle(
-                color: AppColors.onBrand,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+    // Loading: full-bleed brand background (loading_bg) with the centred white-bubble
+    // logo (loading_logo) + a spinner. Both images keep their aspect ratio — the
+    // background covers (cropping, never stretching), the logo scales by width only.
+    final logoWidth = (MediaQuery.sizeOf(context).width * 0.62)
+        .clamp(180.0, 360.0)
+        .toDouble();
+
+    return Scaffold(
+      backgroundColor: _kLoadingGreen,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const ColoredBox(color: _kLoadingGreen),
+          Image.asset('assets/images/loading_bg.png', fit: BoxFit.cover),
+          SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/images/loading_logo.png',
+                    width: logoWidth,
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  const CircularProgressIndicator(color: AppColors.onBrand),
+                ],
               ),
             ),
-            SizedBox(height: AppSpacing.xl),
-            CircularProgressIndicator(color: AppColors.onBrand),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

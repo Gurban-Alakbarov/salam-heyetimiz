@@ -1,0 +1,47 @@
+meta {
+  name: Create and send a system notification (send now)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/notifications
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: 
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+{
+    "type": "",
+    "title": "",
+    "body": "",
+    "language": "",
+    "audience": {
+        "scope": "",
+        "user_ids": [
+            0
+        ],
+        "filter": {
+            "q": "",
+            "complex_id": 0,
+            "role": "",
+            "subscription_status": ""
+        },
+        "complex_id": 0
+    },
+    "confirmed": false
+}
+}
+
+docs {
+  Fan-out to a resident audience as push + inapp (fixed channels; no campaign channels_mask). complex_manager is server-scoped to its own complex. Recipients dedupe to distinct user_id. Requires confirm...
+}

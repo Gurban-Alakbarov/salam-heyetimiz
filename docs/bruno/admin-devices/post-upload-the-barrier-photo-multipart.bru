@@ -1,0 +1,19 @@
+meta {
+  name: Upload the barrier photo (multipart)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/admin/v1/devices/:deviceId/image
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+docs {
+  Admin-only image upload. Server-side validated (real image + MIME + extension, ≤5 MB), optimised (downscaled to 1600px + WebP when GD is available), stored on the public disk, and the resulting public...
+}

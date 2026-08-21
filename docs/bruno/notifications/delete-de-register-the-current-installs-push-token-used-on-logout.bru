@@ -1,0 +1,19 @@
+meta {
+  name: De-register the current install's push token (used on logout)
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/v1/notifications/push-token
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+docs {
+  Clears the push token for the caller's current install only — the install is resolved from the JWT `fp` claim (= install_uuid). Other devices' tokens are untouched (multi-device preserved). No request...
+}

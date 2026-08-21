@@ -97,6 +97,12 @@ flutter:
   # Generate localizations (l10n.yaml → lib/l10n/app_localizations.dart).
   generate: true
 
+  # Splash / loading screen assets (SplashScreen widget). The green pattern fills the
+  # screen (BoxFit.cover); the white-bubble logo sits centred over it.
+  assets:
+    - assets/images/loading_bg.png
+    - assets/images/loading_logo.png
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

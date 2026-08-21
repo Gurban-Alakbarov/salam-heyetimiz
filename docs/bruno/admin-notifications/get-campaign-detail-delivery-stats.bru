@@ -1,0 +1,15 @@
+meta {
+  name: Campaign detail + delivery stats
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/admin/v1/notifications/:campaignId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}

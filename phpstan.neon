@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    # PROJECT_CONSTITUTION R-CODE-01: PHPStan / Larastan level 8 must pass in CI.
+    level: 8
+
+    # Models declare casts via the Laravel 11+ casts() method (not the $casts property);
+    # Larastan only reads that method when this is enabled, so enum/date/array cast types
+    # (e.g. AdminUser::$role → AdminRole) are resolved instead of falling back to the raw column type.
+    parseModelCastsMethod: true
+
+    paths:
+        - app
+        - database
+        - routes
+
+    excludePaths:
+        - app/Domain/*/Models/*.php # Eloquent magic — revisit with model property generics later

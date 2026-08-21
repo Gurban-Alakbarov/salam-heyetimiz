@@ -47,7 +47,15 @@ final class TraccarIngestionService
             (array) data_get($payload, 'position.attributes', []),
         );
         $online = data_get($payload, 'device.status') !== 'offline';
-        $reportedAt = $this->parseTime(data_get($payload, 'position.serverTime') ?? data_get($payload, 'position.deviceTime') ?? data_get($payload, 'position.fixTime'));
+        // Prefer Traccar's server-receipt time for connectivity: some devices (e.g. Jimi
+        // VL110C / GT06 without a GPS fix) report a wrong on-device clock, which would make
+        // last_online_at stale and the admin show a live device as offline. serverTime is the
+        // moment Traccar received the packet, so it always reflects real connectivity.
+        $reportedAt = $this->parseTime(
+            data_get($payload, 'position.serverTime')
+                ?? data_get($payload, 'position.deviceTime')
+                ?? data_get($payload, 'position.fixTime'),
+        );
 
         $this->recordDiagnostic($device, $attributes, $online, $reportedAt);
         $this->updateDeviceStatus($device, $online, $attributes, $reportedAt);

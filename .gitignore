@@ -1,42 +1,79 @@
-# Dependencies (generated)
+# ─────────────────────────────────────────────────────────────────────────────
+# Salam Həyətimiz — canonical monorepo .gitignore.
+# Security-first: real secrets, credentials and keys are NEVER tracked. Dependencies,
+# build output and runtime artifacts are regenerated (composer install / flutter pub
+# get / npm ci), so they stay out of the source-of-truth. Only .env.example (a template
+# with no real values) is tracked.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Dependencies (generated) ─────────────────────────────────────────────────
 /vendor/
 /node_modules/
+node_modules/
+admin-ui/node_modules/
 
-# Environment & secrets — NEVER commit
+# ── Environment & secrets — NEVER commit ─────────────────────────────────────
 .env
 .env.*
 !.env.example
+.env.backup
+.env.production
 auth.json
 
-# Credentials / private keys (JWT .pem, FCM service-account, APNs)
+# ── Credentials / private keys (JWT .pem, FCM service-account, APNs, keystores) ─
 /storage/keys/
+/storage/*.key
 *.pem
 *.p8
 *.p12
 *.pfx
 *.key
+*.jks
+*.keystore
 *firebase-adminsdk*.json
+*service-account*.json
 google-services.json
 GoogleService-Info.plist
 
-# Laravel runtime (regenerated)
+# ── Laravel runtime (regenerated) ────────────────────────────────────────────
 /storage/logs/
 /storage/framework/cache/
 /storage/framework/sessions/
 /storage/framework/views/
 /storage/framework/testing/
 /storage/app/
+/storage/pail
 /bootstrap/cache/*.php
 /public/storage
 /public/hot
+/public/build
 
-# Build artifacts
+# ── Build artifacts ──────────────────────────────────────────────────────────
 *.apk
 *.aab
 composer.phar
+admin-ui/dist/
+*.tsbuildinfo
 
-# Editor / OS
+# ── Tooling caches / junk ────────────────────────────────────────────────────
+/.phpunit.cache
+.phpunit.result.cache
+.phpactor.json
+npm-debug.log
+yarn-error.log
+.rnd
+*.rnd
+
+# ── Local dev / agent config (machine-specific — not shared) ─────────────────
+.claude/
+Homestead.json
+Homestead.yaml
+
+# ── Editor / OS ──────────────────────────────────────────────────────────────
 /.idea/
 /.vscode/
+/.fleet
+/.nova
+/.zed
 .DS_Store
 Thumbs.db

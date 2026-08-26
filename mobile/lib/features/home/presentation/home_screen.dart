@@ -7,6 +7,7 @@ import 'package:salam_mobile/design_system/components/data_components.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/home/domain/home_data.dart';
 import 'package:salam_mobile/features/home/home_providers.dart';
+import 'package:salam_mobile/features/invitations/presentation/screens/invitations_screen.dart';
 import 'package:salam_mobile/features/subscriptions/presentation/screens/active_subscriptions_screen.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 import 'package:salam_mobile/shared/failure_message.dart';
@@ -59,6 +60,11 @@ class HomeScreen extends ConsumerWidget {
               builder: (_) => const ActiveSubscriptionsScreen(),
             ),
           ),
+          onInvitationsTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const InvitationsScreen(),
+            ),
+          ),
         ),
       ),
     );
@@ -70,11 +76,13 @@ class _HomeView extends StatelessWidget {
     required this.home,
     required this.onDevicesTap,
     required this.onSubscriptionsTap,
+    required this.onInvitationsTap,
   });
 
   final HomeData home;
   final VoidCallback onDevicesTap;
   final VoidCallback onSubscriptionsTap;
+  final VoidCallback onInvitationsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +130,15 @@ class _HomeView extends StatelessWidget {
                 label: l.homeActiveSubscriptions,
                 icon: Icons.card_membership_outlined,
                 onTap: onSubscriptionsTap,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: _StatCard(
+                count: home.invitationCount,
+                label: l.homeInvitations,
+                icon: Icons.mail_outline,
+                onTap: onInvitationsTap,
               ),
             ),
           ],

@@ -1119,6 +1119,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Widget #{id}'**
   String doorWidgetInstance(int id);
+
+  /// No description provided for @homeInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'My Invitations'**
+  String get homeInvitations;
+
+  /// No description provided for @invitationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Invitations'**
+  String get invitationsTitle;
+
+  /// No description provided for @invitationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t sent any invitations yet.'**
+  String get invitationsEmpty;
+
+  /// No description provided for @invitationFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get invitationFilterAll;
+
+  /// No description provided for @invitationFilterActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get invitationFilterActive;
+
+  /// No description provided for @invitationFilterUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get invitationFilterUsed;
+
+  /// No description provided for @invitationFilterExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get invitationFilterExpired;
+
+  /// No description provided for @invitationFilterRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked'**
+  String get invitationFilterRevoked;
+
+  /// No description provided for @invitationStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get invitationStatusActive;
+
+  /// No description provided for @invitationStatusUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get invitationStatusUsed;
+
+  /// No description provided for @invitationStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get invitationStatusExpired;
+
+  /// No description provided for @invitationStatusRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked'**
+  String get invitationStatusRevoked;
+
+  /// No description provided for @invitationSentAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get invitationSentAt;
+
+  /// No description provided for @invitationDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get invitationDuration;
+
+  /// No description provided for @invitationExpiresAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get invitationExpiresAt;
+
+  /// No description provided for @invitationRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} left'**
+  String invitationRemaining(String time);
+
+  /// No description provided for @invitationUsedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get invitationUsedAt;
+
+  /// No description provided for @invitationFirstUsedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'First used'**
+  String get invitationFirstUsedAt;
+
+  /// No description provided for @invitationLastUsedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Last used'**
+  String get invitationLastUsedAt;
+
+  /// No description provided for @invitationUsageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses'**
+  String get invitationUsageCount;
+
+  /// No description provided for @invitationUsageValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} times'**
+  String invitationUsageValue(int count);
+
+  /// No description provided for @invitationUnlimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited'**
+  String get invitationUnlimited;
+
+  /// No description provided for @invitationDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation'**
+  String get invitationDefaultTitle;
 }
 
 class _AppLocalizationsDelegate

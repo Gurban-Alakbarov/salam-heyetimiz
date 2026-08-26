@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HomeData {
 
- String? get fullName; String? get email; String? get phone; int get deviceCount; int get subscriptionCount; DateTime? get lastActivityAt;
+ String? get fullName; String? get email; String? get phone; int get deviceCount; int get subscriptionCount; int get invitationCount; DateTime? get lastActivityAt;
 /// Create a copy of HomeData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $HomeDataCopyWith<HomeData> get copyWith => _$HomeDataCopyWithImpl<HomeData>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeData&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.deviceCount, deviceCount) || other.deviceCount == deviceCount)&&(identical(other.subscriptionCount, subscriptionCount) || other.subscriptionCount == subscriptionCount)&&(identical(other.lastActivityAt, lastActivityAt) || other.lastActivityAt == lastActivityAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeData&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.deviceCount, deviceCount) || other.deviceCount == deviceCount)&&(identical(other.subscriptionCount, subscriptionCount) || other.subscriptionCount == subscriptionCount)&&(identical(other.invitationCount, invitationCount) || other.invitationCount == invitationCount)&&(identical(other.lastActivityAt, lastActivityAt) || other.lastActivityAt == lastActivityAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,fullName,email,phone,deviceCount,subscriptionCount,lastActivityAt);
+int get hashCode => Object.hash(runtimeType,fullName,email,phone,deviceCount,subscriptionCount,invitationCount,lastActivityAt);
 
 @override
 String toString() {
-  return 'HomeData(fullName: $fullName, email: $email, phone: $phone, deviceCount: $deviceCount, subscriptionCount: $subscriptionCount, lastActivityAt: $lastActivityAt)';
+  return 'HomeData(fullName: $fullName, email: $email, phone: $phone, deviceCount: $deviceCount, subscriptionCount: $subscriptionCount, invitationCount: $invitationCount, lastActivityAt: $lastActivityAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $HomeDataCopyWith<$Res>  {
   factory $HomeDataCopyWith(HomeData value, $Res Function(HomeData) _then) = _$HomeDataCopyWithImpl;
 @useResult
 $Res call({
- String? fullName, String? email, String? phone, int deviceCount, int subscriptionCount, DateTime? lastActivityAt
+ String? fullName, String? email, String? phone, int deviceCount, int subscriptionCount, int invitationCount, DateTime? lastActivityAt
 });
 
 
@@ -62,13 +62,14 @@ class _$HomeDataCopyWithImpl<$Res>
 
 /// Create a copy of HomeData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? fullName = freezed,Object? email = freezed,Object? phone = freezed,Object? deviceCount = null,Object? subscriptionCount = null,Object? lastActivityAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? fullName = freezed,Object? email = freezed,Object? phone = freezed,Object? deviceCount = null,Object? subscriptionCount = null,Object? invitationCount = null,Object? lastActivityAt = freezed,}) {
   return _then(_self.copyWith(
 fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String?,deviceCount: null == deviceCount ? _self.deviceCount : deviceCount // ignore: cast_nullable_to_non_nullable
 as int,subscriptionCount: null == subscriptionCount ? _self.subscriptionCount : subscriptionCount // ignore: cast_nullable_to_non_nullable
+as int,invitationCount: null == invitationCount ? _self.invitationCount : invitationCount // ignore: cast_nullable_to_non_nullable
 as int,lastActivityAt: freezed == lastActivityAt ? _self.lastActivityAt : lastActivityAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? fullName,  String? email,  String? phone,  int deviceCount,  int subscriptionCount,  DateTime? lastActivityAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? fullName,  String? email,  String? phone,  int deviceCount,  int subscriptionCount,  int invitationCount,  DateTime? lastActivityAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeData() when $default != null:
-return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.subscriptionCount,_that.lastActivityAt);case _:
+return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.subscriptionCount,_that.invitationCount,_that.lastActivityAt);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.s
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? fullName,  String? email,  String? phone,  int deviceCount,  int subscriptionCount,  DateTime? lastActivityAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? fullName,  String? email,  String? phone,  int deviceCount,  int subscriptionCount,  int invitationCount,  DateTime? lastActivityAt)  $default,) {final _that = this;
 switch (_that) {
 case _HomeData():
-return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.subscriptionCount,_that.lastActivityAt);case _:
+return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.subscriptionCount,_that.invitationCount,_that.lastActivityAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.s
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? fullName,  String? email,  String? phone,  int deviceCount,  int subscriptionCount,  DateTime? lastActivityAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? fullName,  String? email,  String? phone,  int deviceCount,  int subscriptionCount,  int invitationCount,  DateTime? lastActivityAt)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeData() when $default != null:
-return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.subscriptionCount,_that.lastActivityAt);case _:
+return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.subscriptionCount,_that.invitationCount,_that.lastActivityAt);case _:
   return null;
 
 }
@@ -211,7 +212,7 @@ return $default(_that.fullName,_that.email,_that.phone,_that.deviceCount,_that.s
 
 
 class _HomeData implements HomeData {
-  const _HomeData({this.fullName, this.email, this.phone, this.deviceCount = 0, this.subscriptionCount = 0, this.lastActivityAt});
+  const _HomeData({this.fullName, this.email, this.phone, this.deviceCount = 0, this.subscriptionCount = 0, this.invitationCount = 0, this.lastActivityAt});
   
 
 @override final  String? fullName;
@@ -219,6 +220,7 @@ class _HomeData implements HomeData {
 @override final  String? phone;
 @override@JsonKey() final  int deviceCount;
 @override@JsonKey() final  int subscriptionCount;
+@override@JsonKey() final  int invitationCount;
 @override final  DateTime? lastActivityAt;
 
 /// Create a copy of HomeData
@@ -231,16 +233,16 @@ _$HomeDataCopyWith<_HomeData> get copyWith => __$HomeDataCopyWithImpl<_HomeData>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeData&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.deviceCount, deviceCount) || other.deviceCount == deviceCount)&&(identical(other.subscriptionCount, subscriptionCount) || other.subscriptionCount == subscriptionCount)&&(identical(other.lastActivityAt, lastActivityAt) || other.lastActivityAt == lastActivityAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeData&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.deviceCount, deviceCount) || other.deviceCount == deviceCount)&&(identical(other.subscriptionCount, subscriptionCount) || other.subscriptionCount == subscriptionCount)&&(identical(other.invitationCount, invitationCount) || other.invitationCount == invitationCount)&&(identical(other.lastActivityAt, lastActivityAt) || other.lastActivityAt == lastActivityAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,fullName,email,phone,deviceCount,subscriptionCount,lastActivityAt);
+int get hashCode => Object.hash(runtimeType,fullName,email,phone,deviceCount,subscriptionCount,invitationCount,lastActivityAt);
 
 @override
 String toString() {
-  return 'HomeData(fullName: $fullName, email: $email, phone: $phone, deviceCount: $deviceCount, subscriptionCount: $subscriptionCount, lastActivityAt: $lastActivityAt)';
+  return 'HomeData(fullName: $fullName, email: $email, phone: $phone, deviceCount: $deviceCount, subscriptionCount: $subscriptionCount, invitationCount: $invitationCount, lastActivityAt: $lastActivityAt)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$HomeDataCopyWith<$Res> implements $HomeDataCopyWith<$Res>
   factory _$HomeDataCopyWith(_HomeData value, $Res Function(_HomeData) _then) = __$HomeDataCopyWithImpl;
 @override @useResult
 $Res call({
- String? fullName, String? email, String? phone, int deviceCount, int subscriptionCount, DateTime? lastActivityAt
+ String? fullName, String? email, String? phone, int deviceCount, int subscriptionCount, int invitationCount, DateTime? lastActivityAt
 });
 
 
@@ -268,13 +270,14 @@ class __$HomeDataCopyWithImpl<$Res>
 
 /// Create a copy of HomeData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? fullName = freezed,Object? email = freezed,Object? phone = freezed,Object? deviceCount = null,Object? subscriptionCount = null,Object? lastActivityAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = freezed,Object? email = freezed,Object? phone = freezed,Object? deviceCount = null,Object? subscriptionCount = null,Object? invitationCount = null,Object? lastActivityAt = freezed,}) {
   return _then(_HomeData(
 fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String?,deviceCount: null == deviceCount ? _self.deviceCount : deviceCount // ignore: cast_nullable_to_non_nullable
 as int,subscriptionCount: null == subscriptionCount ? _self.subscriptionCount : subscriptionCount // ignore: cast_nullable_to_non_nullable
+as int,invitationCount: null == invitationCount ? _self.invitationCount : invitationCount // ignore: cast_nullable_to_non_nullable
 as int,lastActivityAt: freezed == lastActivityAt ? _self.lastActivityAt : lastActivityAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));

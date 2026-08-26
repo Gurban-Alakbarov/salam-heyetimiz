@@ -110,6 +110,9 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
         Route::get('/{deviceId}/visitor-links', [VisitorLinkController::class, 'index'])->whereNumber('deviceId')->name('listVisitorLinks');
     });
 
+    // The caller's own visitor links across all their devices ("Dəvətlərim" / My invitations).
+    Route::get('visitor-links', [VisitorLinkController::class, 'mine'])->name('listMyVisitorLinks');
+
     // Revoke one of the caller's own visitor links.
     Route::post('visitor-links/{id}/revoke', [VisitorLinkController::class, 'revoke'])->whereNumber('id')->name('revokeVisitorLink');
 

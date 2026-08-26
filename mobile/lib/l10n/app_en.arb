@@ -211,5 +211,35 @@
   "doorWidgetInstance": "Widget #{id}",
   "@doorWidgetInstance": {
     "placeholders": { "id": { "type": "int" } }
-  }
+  },
+
+  "homeInvitations": "My Invitations",
+  "invitationsTitle": "My Invitations",
+  "invitationsEmpty": "You haven't sent any invitations yet.",
+  "invitationFilterAll": "All",
+  "invitationFilterActive": "Active",
+  "invitationFilterUsed": "Used",
+  "invitationFilterExpired": "Expired",
+  "invitationFilterRevoked": "Revoked",
+  "invitationStatusActive": "Active",
+  "invitationStatusUsed": "Used",
+  "invitationStatusExpired": "Expired",
+  "invitationStatusRevoked": "Revoked",
+  "invitationSentAt": "Sent",
+  "invitationDuration": "Duration",
+  "invitationExpiresAt": "Expires",
+  "invitationRemaining": "{time} left",
+  "@invitationRemaining": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "invitationUsedAt": "Used",
+  "invitationFirstUsedAt": "First used",
+  "invitationLastUsedAt": "Last used",
+  "invitationUsageCount": "Uses",
+  "invitationUsageValue": "{count} times",
+  "@invitationUsageValue": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "invitationUnlimited": "Unlimited",
+  "invitationDefaultTitle": "Invitation"
 }

@@ -187,5 +187,35 @@
   "doorWidgetInstance": "Vidcet #{id}",
   "@doorWidgetInstance": {
     "placeholders": { "id": { "type": "int" } }
-  }
+  },
+
+  "homeInvitations": "Dəvətlərim",
+  "invitationsTitle": "Dəvətlərim",
+  "invitationsEmpty": "Hazırda göndərilmiş dəvətiniz yoxdur.",
+  "invitationFilterAll": "Hamısı",
+  "invitationFilterActive": "Aktiv",
+  "invitationFilterUsed": "İstifadə olunub",
+  "invitationFilterExpired": "Vaxtı bitib",
+  "invitationFilterRevoked": "Ləğv edilib",
+  "invitationStatusActive": "Aktiv",
+  "invitationStatusUsed": "İstifadə olunub",
+  "invitationStatusExpired": "Vaxtı bitib",
+  "invitationStatusRevoked": "Ləğv edilib",
+  "invitationSentAt": "Göndərilib",
+  "invitationDuration": "Müddət",
+  "invitationExpiresAt": "Bitmə",
+  "invitationRemaining": "{time} qalıb",
+  "@invitationRemaining": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "invitationUsedAt": "İstifadə edildi",
+  "invitationFirstUsedAt": "İlk istifadə",
+  "invitationLastUsedAt": "Son istifadə",
+  "invitationUsageCount": "İstifadə sayı",
+  "invitationUsageValue": "{count} dəfə",
+  "@invitationUsageValue": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "invitationUnlimited": "Limitsiz",
+  "invitationDefaultTitle": "Dəvət"
 }

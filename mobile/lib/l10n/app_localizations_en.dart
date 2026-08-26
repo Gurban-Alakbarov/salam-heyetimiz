@@ -551,4 +551,77 @@ class AppLocalizationsEn extends AppLocalizations {
   String doorWidgetInstance(int id) {
     return 'Widget #$id';
   }
+
+  @override
+  String get homeInvitations => 'My Invitations';
+
+  @override
+  String get invitationsTitle => 'My Invitations';
+
+  @override
+  String get invitationsEmpty => 'You haven\'t sent any invitations yet.';
+
+  @override
+  String get invitationFilterAll => 'All';
+
+  @override
+  String get invitationFilterActive => 'Active';
+
+  @override
+  String get invitationFilterUsed => 'Used';
+
+  @override
+  String get invitationFilterExpired => 'Expired';
+
+  @override
+  String get invitationFilterRevoked => 'Revoked';
+
+  @override
+  String get invitationStatusActive => 'Active';
+
+  @override
+  String get invitationStatusUsed => 'Used';
+
+  @override
+  String get invitationStatusExpired => 'Expired';
+
+  @override
+  String get invitationStatusRevoked => 'Revoked';
+
+  @override
+  String get invitationSentAt => 'Sent';
+
+  @override
+  String get invitationDuration => 'Duration';
+
+  @override
+  String get invitationExpiresAt => 'Expires';
+
+  @override
+  String invitationRemaining(String time) {
+    return '$time left';
+  }
+
+  @override
+  String get invitationUsedAt => 'Used';
+
+  @override
+  String get invitationFirstUsedAt => 'First used';
+
+  @override
+  String get invitationLastUsedAt => 'Last used';
+
+  @override
+  String get invitationUsageCount => 'Uses';
+
+  @override
+  String invitationUsageValue(int count) {
+    return '$count times';
+  }
+
+  @override
+  String get invitationUnlimited => 'Unlimited';
+
+  @override
+  String get invitationDefaultTitle => 'Invitation';
 }

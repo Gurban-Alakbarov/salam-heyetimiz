@@ -12,6 +12,7 @@ import 'package:salam_mobile/features/barrier/data/datasource/barrier_remote_dat
 import 'package:salam_mobile/features/barrier/domain/repository.dart';
 import 'package:salam_mobile/features/devices/data/datasource/device_remote_datasource.dart';
 import 'package:salam_mobile/features/devices/domain/repository.dart';
+import 'package:salam_mobile/features/invitations/data/datasource/invitation_remote_datasource.dart';
 import 'package:salam_mobile/features/notifications/data/datasource/notification_remote_datasource.dart';
 import 'package:salam_mobile/features/notifications/domain/repository.dart';
 import 'package:salam_mobile/features/subscriptions/data/datasource/subscription_remote_datasource.dart';
@@ -37,6 +38,9 @@ class MockDeviceRemoteDataSource extends Mock
     implements DeviceRemoteDataSource {}
 
 class MockDeviceRepository extends Mock implements DeviceRepository {}
+
+class MockInvitationRemoteDataSource extends Mock
+    implements InvitationRemoteDataSource {}
 
 class MockSubscriptionRemoteDataSource extends Mock
     implements SubscriptionRemoteDataSource {}

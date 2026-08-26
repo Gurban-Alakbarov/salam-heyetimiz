@@ -6,6 +6,7 @@ use App\Domain\Admin\Services\SettingsService;
 use App\Domain\Notifications\Queries\NotificationQuery;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
 use App\Domain\Users\Models\User;
+use App\Domain\Visitor\Models\VisitorLink;
 use App\Http\Api\V1\Support\RespondsWithEnvelope;
 use App\Http\Resources\UserSelfResource;
 use Illuminate\Http\JsonResponse;
@@ -76,6 +77,7 @@ class BootstrapController
             'feature_flags' => $this->featureFlags(),
             'permissions' => [],                    // mobile users have no RBAC (reserved/extensible)
             'unread_notifications_count' => $this->notifications->unreadCount((int) $user->getKey()),
+            'active_invitations_count' => $this->activeInvitationsCount((int) $user->getKey()),
             'user_devices' => $this->userDevices($user),
             'active_subscriptions' => $this->activeSubscriptions((int) $user->getKey()),
             // Future sections (apartments, vehicles, devices, complexes, notifications, invitations,
@@ -131,6 +133,15 @@ class BootstrapController
                 'ends_at' => optional($s->ends_at)->toIso8601String(),
                 'auto_renew' => (bool) $s->auto_renew,
             ])->all();
+    }
+
+    /** Count of the user's own visitor links that are still live (active) — for the Home "Dəvətlərim" card. */
+    private function activeInvitationsCount(int $userId): int
+    {
+        return VisitorLink::query()
+            ->where('created_by_user_id', $userId)
+            ->active(now())
+            ->count();
     }
 
     private function str(string $group, string $key): string

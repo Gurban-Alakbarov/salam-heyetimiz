@@ -13,6 +13,7 @@ abstract class HomeData with _$HomeData {
     String? phone,
     @Default(0) int deviceCount,
     @Default(0) int subscriptionCount,
+    @Default(0) int invitationCount,
     DateTime? lastActivityAt,
   }) = _HomeData;
 }

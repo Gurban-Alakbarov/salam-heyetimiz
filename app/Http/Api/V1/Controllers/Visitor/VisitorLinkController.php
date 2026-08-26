@@ -7,9 +7,11 @@ use App\Domain\Devices\Models\Device;
 use App\Domain\Subscriptions\Enums\SuspensionReason;
 use App\Domain\Subscriptions\Queries\SubscriptionStatusQuery;
 use App\Domain\Visitor\Models\VisitorLink;
+use App\Domain\Visitor\Queries\VisitorLinkQuery;
 use App\Domain\Visitor\Services\VisitorLinkService;
 use App\Http\Api\V1\Requests\Visitor\CreateVisitorLinkRequest;
 use App\Http\Resources\VisitorLinkResource;
+use App\Support\Pagination\Cursor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -52,6 +54,26 @@ class VisitorLinkController
             ->get();
 
         return response()->json(['data' => VisitorLinkResource::collection($links)]);
+    }
+
+    /**
+     * GET /v1/visitor-links — the caller's OWN visitor links across ALL their devices ("Dəvətlərim").
+     * Ownership is enforced in the query (created_by_user_id); a user can never see another's links.
+     * Optional ?status=active|used|expired|revoked (server-side filter) + ?cursor (id pagination).
+     */
+    public function mine(Request $request, VisitorLinkQuery $query): JsonResponse
+    {
+        $result = $query->forUser(
+            userId: (int) $request->user()->getKey(),
+            status: $request->query('status'),
+            limit: max(1, min(100, (int) $request->query('limit', 25))),
+            cursor: Cursor::decode($request->query('cursor')),
+        );
+
+        return response()->json([
+            'data' => VisitorLinkResource::collection($result['data']),
+            'page' => $result['page'],
+        ]);
     }
 
     /** POST /v1/visitor-links/{id}/revoke — revoke the caller's own link. */

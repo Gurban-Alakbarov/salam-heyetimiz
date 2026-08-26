@@ -187,5 +187,35 @@
   "doorWidgetInstance": "Виджет #{id}",
   "@doorWidgetInstance": {
     "placeholders": { "id": { "type": "int" } }
-  }
+  },
+
+  "homeInvitations": "Мои приглашения",
+  "invitationsTitle": "Мои приглашения",
+  "invitationsEmpty": "Вы ещё не отправили ни одного приглашения.",
+  "invitationFilterAll": "Все",
+  "invitationFilterActive": "Активные",
+  "invitationFilterUsed": "Использованные",
+  "invitationFilterExpired": "Истёкшие",
+  "invitationFilterRevoked": "Отозванные",
+  "invitationStatusActive": "Активно",
+  "invitationStatusUsed": "Использовано",
+  "invitationStatusExpired": "Истекло",
+  "invitationStatusRevoked": "Отозвано",
+  "invitationSentAt": "Отправлено",
+  "invitationDuration": "Срок",
+  "invitationExpiresAt": "Истекает",
+  "invitationRemaining": "Осталось {time}",
+  "@invitationRemaining": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "invitationUsedAt": "Использовано",
+  "invitationFirstUsedAt": "Первое использование",
+  "invitationLastUsedAt": "Последнее использование",
+  "invitationUsageCount": "Использований",
+  "invitationUsageValue": "{count} раз",
+  "@invitationUsageValue": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "invitationUnlimited": "Без лимита",
+  "invitationDefaultTitle": "Приглашение"
 }

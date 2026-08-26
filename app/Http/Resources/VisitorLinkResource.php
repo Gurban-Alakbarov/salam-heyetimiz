@@ -30,6 +30,16 @@ class VisitorLinkResource extends JsonResource
             'expires_at' => optional($this->expires_at)->toIso8601String(),
             'max_usage' => $this->max_usage,
             'usage_count' => (int) $this->usage_count,
+            // Earliest recorded use — included ONLY when the query eager-loads it (withMin as
+            // first_used_at, e.g. the "my invitations" listing); the key is omitted elsewhere, so the
+            // per-device / create / revoke responses stay byte-for-byte unchanged. Never fabricated —
+            // it comes straight from visitor_link_usages.used_at.
+            'first_used_at' => $this->whenHas(
+                'first_used_at',
+                fn ($value) => $value !== null
+                    ? \Illuminate\Support\Carbon::parse($value)->toIso8601String()
+                    : null,
+            ),
             'last_used_at' => optional($this->last_used_at)->toIso8601String(),
             'revoked_at' => optional($this->revoked_at)->toIso8601String(),
             'created_at' => optional($this->created_at)->toIso8601String(),

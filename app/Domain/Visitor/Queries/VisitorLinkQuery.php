@@ -46,6 +46,40 @@ final class VisitorLinkQuery
     }
 
     /**
+     * The caller's OWN visitor links across every device — the resident "Dəvətlərim / My invitations"
+     * listing (GET /v1/visitor-links). Ownership is enforced HERE (created_by_user_id), never in the
+     * client. Status is derived (active/used/expired/revoked) and mirrors VisitorLink's predicates in SQL,
+     * so the filter and the per-row statusLabel always agree. `first_used_at` is the earliest recorded
+     * usage (a MIN subquery — no N+1). Cursor-paginated by id, exactly like the admin directory.
+     *
+     * @return array{data: Collection<int, VisitorLink>, page: array{next_cursor: ?string, has_more: bool, limit: int}}
+     */
+    public function forUser(int $userId, ?string $status, int $limit, ?int $cursor): array
+    {
+        $now = Carbon::now();
+
+        $query = VisitorLink::query()
+            ->where('created_by_user_id', $userId)
+            ->withMin('usages as first_used_at', 'used_at')
+            ->when($cursor !== null, fn (Builder $q) => $q->where('id', '<', $cursor));
+
+        $this->applyStatus($query, $status, $now);
+
+        $rows = $query->orderByDesc('id')->limit($limit + 1)->get();
+        $hasMore = $rows->count() > $limit;
+        $data = $rows->take($limit)->values();
+
+        return [
+            'data' => $data,
+            'page' => [
+                'next_cursor' => $hasMore && $data->isNotEmpty() ? Cursor::encode((int) $data->last()->getKey()) : null,
+                'has_more' => $hasMore,
+                'limit' => $limit,
+            ],
+        ];
+    }
+
+    /**
      * @param  Builder<VisitorLink>  $query
      */
     private function applyStatus(Builder $query, ?string $status, Carbon $now): void
@@ -53,6 +87,10 @@ final class VisitorLinkQuery
         match ($status) {
             'revoked' => $query->whereNotNull('revoked_at'),
             'expired' => $query->whereNull('revoked_at')->whereNotNull('expires_at')->where('expires_at', '<=', $now),
+            // Usage-exhausted but not yet revoked/expired — matches VisitorLink::statusLabel()'s 'used_up'.
+            'used' => $query->whereNull('revoked_at')
+                ->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', $now))
+                ->whereNotNull('max_usage')->whereColumn('usage_count', '>=', 'max_usage'),
             'active' => $query->whereNull('revoked_at')
                 ->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', $now))
                 ->where(fn (Builder $q) => $q->whereNull('max_usage')->orWhereColumn('usage_count', '<', 'max_usage')),

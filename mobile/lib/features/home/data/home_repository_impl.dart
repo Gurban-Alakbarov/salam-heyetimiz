@@ -42,6 +42,9 @@ class HomeRepositoryImpl implements HomeRepository {
           phone: (data['phone'] ?? user['phone']) as String?,
           deviceCount: deviceCount,
           subscriptionCount: subs.length,
+          // Active visitor-links the user created — a single int on /v1/me, so the Home
+          // "Dəvətlərim" card needs no extra request (same pattern as subscriptionCount).
+          invitationCount: (data['active_invitations_count'] as num?)?.toInt() ?? 0,
           lastActivityAt: DateTime.tryParse(
             user['last_login_at']?.toString() ?? '',
           ),

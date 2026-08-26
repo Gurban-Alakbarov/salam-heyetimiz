@@ -550,4 +550,77 @@ class AppLocalizationsAz extends AppLocalizations {
   String doorWidgetInstance(int id) {
     return 'Vidcet #$id';
   }
+
+  @override
+  String get homeInvitations => 'Dəvətlərim';
+
+  @override
+  String get invitationsTitle => 'Dəvətlərim';
+
+  @override
+  String get invitationsEmpty => 'Hazırda göndərilmiş dəvətiniz yoxdur.';
+
+  @override
+  String get invitationFilterAll => 'Hamısı';
+
+  @override
+  String get invitationFilterActive => 'Aktiv';
+
+  @override
+  String get invitationFilterUsed => 'İstifadə olunub';
+
+  @override
+  String get invitationFilterExpired => 'Vaxtı bitib';
+
+  @override
+  String get invitationFilterRevoked => 'Ləğv edilib';
+
+  @override
+  String get invitationStatusActive => 'Aktiv';
+
+  @override
+  String get invitationStatusUsed => 'İstifadə olunub';
+
+  @override
+  String get invitationStatusExpired => 'Vaxtı bitib';
+
+  @override
+  String get invitationStatusRevoked => 'Ləğv edilib';
+
+  @override
+  String get invitationSentAt => 'Göndərilib';
+
+  @override
+  String get invitationDuration => 'Müddət';
+
+  @override
+  String get invitationExpiresAt => 'Bitmə';
+
+  @override
+  String invitationRemaining(String time) {
+    return '$time qalıb';
+  }
+
+  @override
+  String get invitationUsedAt => 'İstifadə edildi';
+
+  @override
+  String get invitationFirstUsedAt => 'İlk istifadə';
+
+  @override
+  String get invitationLastUsedAt => 'Son istifadə';
+
+  @override
+  String get invitationUsageCount => 'İstifadə sayı';
+
+  @override
+  String invitationUsageValue(int count) {
+    return '$count dəfə';
+  }
+
+  @override
+  String get invitationUnlimited => 'Limitsiz';
+
+  @override
+  String get invitationDefaultTitle => 'Dəvət';
 }

@@ -53,10 +53,19 @@ class NotificationTemplatesSeeder extends Seeder
         );
 
         foreach ($locales as $locale => $copy) {
-            NotificationTemplateLocale::query()->updateOrCreate(
-                ['notification_template_id' => $template->getKey(), 'locale' => $locale],
-                ['subject' => $copy['subject'], 'body' => $copy['body']],
-            );
+            $row = NotificationTemplateLocale::query()
+                ->where('notification_template_id', $template->getKey())->where('locale', $locale)->first();
+
+            // B10: copy edited in the admin template editor (updated_by_admin_id set) is never overwritten by a
+            // re-seed; missing locales are created and never-edited rows keep receiving seed updates.
+            if ($row === null) {
+                NotificationTemplateLocale::query()->create([
+                    'notification_template_id' => $template->getKey(), 'locale' => $locale,
+                    'subject' => $copy['subject'], 'body' => $copy['body'],
+                ]);
+            } elseif ($row->updated_by_admin_id === null) {
+                $row->forceFill(['subject' => $copy['subject'], 'body' => $copy['body']])->save();
+            }
         }
     }
 

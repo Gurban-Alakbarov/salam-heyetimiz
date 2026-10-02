@@ -36,4 +36,9 @@ export const PERM = {
   complexesManage: 'complexes.manage',
   notificationsView: 'notifications.view',
   notificationsSend: 'notifications.send',
+  adminsUpdate: 'admins.update',
+  applicationsView: 'applications.view',
+  applicationsManage: 'applications.manage',
+  notificationTemplatesView: 'notifications.templates.view',
+  notificationTemplatesManage: 'notifications.templates.manage',
 } as const

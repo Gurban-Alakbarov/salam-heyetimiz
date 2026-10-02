@@ -20,6 +20,8 @@ use App\Domain\Payments\Events\OrderPaid;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Support\OrderPricing;
 use App\Domain\Payments\Support\PaymentSettings;
+use App\Domain\Subscriptions\Models\Subscription;
+use App\Domain\Subscriptions\Support\SubscriptionPaymentAuthorizer;
 use App\Domain\Users\Models\User;
 use App\Support\Time\Clock;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +41,7 @@ final class OrderService
         private readonly OrderPricing $pricing,
         private readonly DeviceLookup $devices,
         private readonly PaymentSettings $paymentSettings,
+        private readonly SubscriptionPaymentAuthorizer $payers,
     ) {}
 
     public function create(User $payer, OrderCreationData $data, ?string $idempotencyKey): Order
@@ -57,12 +60,19 @@ final class OrderService
 
         $lines = $this->priceItems($data->items);
         $this->assertDeviceSaleItemsAreSellable($data->items);
+        $this->assertPayerMayPaySubscriptions($payer, $data->items);
 
         // MED-02 / R-PAY-11: never open a second in-flight order for the same subject.
         foreach ($data->items as $item) {
             if ($item->referencedId !== null) {
                 $inFlight = $this->findInFlightForSubject($item->itemType, $item->referencedId);
                 if ($inFlight !== null) {
+                    // B7: another payer's open checkout is never handed out (payer ≠ beneficiary is allowed,
+                    // but each order — and its checkout URL — belongs to whoever started it).
+                    if ((int) $inFlight->payer_user_id !== (int) $payer->getKey()) {
+                        throw ValidationException::withMessages(['items' => 'Bu abunəlik üçün ödəniş artıq başlanıb.']);
+                    }
+
                     return $inFlight;
                 }
             }
@@ -226,7 +236,7 @@ final class OrderService
     private function priceItems(array $items): array
     {
         return array_map(function (OrderItemData $item): array {
-            $unit = $this->pricing->unitPriceMinor($item->itemType);
+            $unit = $this->pricing->unitPriceFor($item);
 
             return [
                 'item_type' => $item->itemType,
@@ -253,6 +263,26 @@ final class OrderService
                 throw ValidationException::withMessages([
                     'items' => __('errors.device_not_sellable'),
                 ]);
+            }
+        }
+    }
+
+    /**
+     * B7 payer rule (SubscriptionPaymentAuthorizer): subscription lines may only be paid by the beneficiary,
+     * their family head, or the private device owner. Device-sale lines are untouched (BR-20).
+     *
+     * @param  array<int, OrderItemData>  $items
+     */
+    private function assertPayerMayPaySubscriptions(User $payer, array $items): void
+    {
+        foreach ($items as $item) {
+            if ($item->itemType === OrderItemType::Device || $item->referencedId === null) {
+                continue;
+            }
+
+            $subscription = Subscription::query()->find($item->referencedId);
+            if ($subscription !== null) {
+                $this->payers->assertCanPay($payer, $subscription);
             }
         }
     }

@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:salam_mobile/design_system/components/app_components.dart';
 import 'package:salam_mobile/design_system/components/app_inputs.dart';
-import 'package:salam_mobile/design_system/components/data_components.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/barrier/barrier_providers.dart';
 import 'package:salam_mobile/features/barrier/presentation/widgets/barrier_open_button.dart';
@@ -13,22 +13,20 @@ import 'package:salam_mobile/features/directions/directions_launcher.dart';
 import 'package:salam_mobile/features/visitor/presentation/widgets/invite_visitor_sheet.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 
-/// A compact, self-contained barrier card:
+/// Barrier card — B17 visual redesign (reference: the "Cihazlar" mobile mock-up). The device photo fills
+/// the card under a dark gradient:
 ///
-///   ┌──────────────────────────────────────┐
-///   │ Name                     ⓘ  ● Online  │   header (name + info + status)
-///   │ ┌──────────────┐  ┌────────────────┐  │
-///   │ │ device image │  │  Invite        │  │   50% image · 50% actions
-///   │ │   (~50%)     │  │  Directions    │  │
-///   │ └──────────────┘  └────────────────┘  │
-///   │ [        Open barrier (100%)       ]  │   full-width primary
-///   └──────────────────────────────────────┘
+///   ┌────────────────────┐
+///   │ ● Online         ⋮ │   status pill · menu (Cihaz məlumatı / Ailə üzvləri)
+///   │   (device photo)   │
+///   │ Name               │
+///   │ Dəvət et │ Yol göstər │   visitor invite · directions
+///   │ [    Qapını Aç   ] │   the single open pipeline
+///   └────────────────────┘
 ///
-/// Address / IMEI / last-online moved off the card into the ⓘ info sheet. Online/
-/// offline stays display-only (the server gates `canOpen`). The open action reuses
-/// the single [BarrierActionButton] pipeline; the live status renders only on the
-/// card the user is operating ([isActive]) so the one global barrier provider never
-/// lights up every card at once. No detail page, no navigation.
+/// UI only: every action is the same as before (visitor invite sheet, directions, info sheet, the shared
+/// [BarrierActionButton] open flow gated by the server's `can_open`). The card's height follows its
+/// content, so the live command status of the active card never overflows. No detail page.
 class DeviceCard extends StatelessWidget {
   const DeviceCard({
     required this.device,
@@ -49,87 +47,223 @@ class DeviceCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final hasSignal = device.lastOnlineAt != null;
     final online = device.isOnlineAt(DateTime.now());
-
-    final tone = !hasSignal
-        ? BadgeTone.neutral
-        : (online ? BadgeTone.success : BadgeTone.neutral);
     final statusLabel = !hasSignal
         ? l.deviceUnknownStatus
         : (online ? l.deviceOnline : l.deviceOffline);
 
-    return AppCard(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Header: name (flexes) · info button · status badge ────────────
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  device.label,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(_radius),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: _minHeight),
+        child: Stack(
+          children: [
+            Positioned.fill(child: _DeviceImage(imageUrl: device.imageUrl)),
+            const Positioned.fill(child: _Scrim()),
+            Padding(
+              padding: const EdgeInsets.all(_padding),
+              // At least the card's minimum height; the name / actions / open group sits at the bottom.
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minHeight: _minHeight - 2 * _padding,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // ── Top: status pill · menu ──────────────────────────────────
+                      Row(
+                        children: [
+                          Flexible(
+                            child: _StatusPill(
+                              label: statusLabel,
+                              online: hasSignal && online,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          _MenuButton(device: device),
+                        ],
+                      ),
+                      const SizedBox(height: _photoGap),
+                      const Spacer(),
+
+                      // ── Name ─────────────────────────────────────────────────────
+                      Text(
+                        device.label,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              shadows: const [
+                                Shadow(blurRadius: 6, color: Colors.black54),
+                              ],
+                            ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+
+                      // ── Visitor invite | directions ──────────────────────────────
+                      _ActionRow(device: device),
+                      const SizedBox(height: AppSpacing.sm),
+
+                      // ── Open (the active card shows the live status) ─────────────
+                      _OpenAction(
+                        device: device,
+                        isActive: isActive,
+                        onOpenPressed: onOpenPressed,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
-              _InfoButton(device: device),
-              const SizedBox(width: AppSpacing.xs),
-              StatusBadge(label: statusLabel, tone: tone),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // ── Middle: 50% image · 50% stacked actions ───────────────────────
-          SizedBox(
-            height: _mediaHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(flex: 5, child: _DeviceImage(imageUrl: device.imageUrl)),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(flex: 5, child: _ActionColumn(device: device)),
-              ],
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // ── Bottom: full-width open (active card shows the live status) ────
-          _OpenAction(
-            device: device,
-            isActive: isActive,
-            onOpenPressed: onOpenPressed,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  /// Height of the image / action row — keeps the two stacked action buttons a
-  /// comfortable tap size while staying compact on small screens.
-  static const double _mediaHeight = 116;
+  static const double _radius = 22;
+  static const double _minHeight = 290;
+  static const double _padding = AppSpacing.sm + 2;
+
+  /// Minimum space between the top row and the name — leaves the photo visible.
+  static const double _photoGap = 72;
 }
 
-/// Circular "ⓘ" button in the header — opens a compact sheet with the details that
-/// used to clutter the card (address, IMEI, last-online). Reads existing device
-/// data only; no new API.
-class _InfoButton extends StatelessWidget {
-  const _InfoButton({required this.device});
+/// Bottom-heavy dark gradient so the white text and actions stay legible on any photo.
+class _Scrim extends StatelessWidget {
+  const _Scrim();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 0.35, 1],
+          colors: [Color(0x55000000), Color(0x22000000), Color(0xE6101010)],
+        ),
+      ),
+    );
+  }
+}
+
+/// "● Online" pill (display only — the server gates opening through `can_open`).
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.label, required this.online});
+
+  final String label;
+  final bool online;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm + 2,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xB3141414),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 9,
+              height: 9,
+              decoration: BoxDecoration(
+                color: online ? AppColors.success : AppColors.n400,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "⋮" — the card menu: the existing device info sheet and (B17) this device's family screen. Whether the
+/// caller heads a family on the device is the server's call; the family screen explains a refusal.
+class _MenuButton extends StatelessWidget {
+  const _MenuButton({required this.device});
 
   final Device device;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return IconButton(
-      onPressed: () => _showDeviceInfo(context, device, l),
-      icon: const Icon(Icons.info_outline, color: AppColors.brand),
-      iconSize: 24,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-      tooltip: l.deviceInfoTitle,
+    return Material(
+      color: const Color(0xB3141414),
+      shape: const CircleBorder(),
+      child: InkWell(
+        key: Key('device-menu-${device.id}'),
+        customBorder: const CircleBorder(),
+        onTap: () => _showMenu(context, l),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Icon(
+            Icons.more_vert,
+            color: Colors.white,
+            size: 20,
+            semanticLabel: l.deviceInfoTitle,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showMenu(BuildContext context, AppLocalizations l) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              key: const Key('device-menu-info'),
+              leading: const Icon(Icons.info_outline, color: AppColors.brand),
+              title: Text(l.deviceInfoTitle),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                _showDeviceInfo(context, device, l);
+              },
+            ),
+            ListTile(
+              key: const Key('device-menu-family'),
+              leading: const Icon(
+                Icons.family_restroom,
+                color: AppColors.brand,
+              ),
+              title: Text(l.famTitle),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                GoRouter.of(context).push('/family?device=${device.id}');
+              },
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -157,7 +291,10 @@ void _showDeviceInfo(BuildContext context, Device device, AppLocalizations l) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l.deviceInfoTitle, style: Theme.of(sheetContext).textTheme.titleMedium),
+            Text(
+              l.deviceInfoTitle,
+              style: Theme.of(sheetContext).textTheme.titleMedium,
+            ),
             const SizedBox(height: AppSpacing.md),
             _InfoRow(
               icon: Icons.location_on_outlined,
@@ -166,8 +303,16 @@ void _showDeviceInfo(BuildContext context, Device device, AppLocalizations l) {
               value: address,
             ),
             if (device.serial != null)
-              _InfoRow(icon: Icons.tag, label: l.deviceImei, value: device.serial!),
-            _InfoRow(icon: Icons.schedule, label: l.deviceLastOnlineLabel, value: lastOnline),
+              _InfoRow(
+                icon: Icons.tag,
+                label: l.deviceImei,
+                value: device.serial!,
+              ),
+            _InfoRow(
+              icon: Icons.schedule,
+              label: l.deviceLastOnlineLabel,
+              value: lastOnline,
+            ),
           ],
         ),
       ),
@@ -222,39 +367,48 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// The 40% column: "Invite Visitor" over "Directions" (both permanent, independent
-/// actions). Buttons flex to share the media height, so they never overflow.
-class _ActionColumn extends StatelessWidget {
-  const _ActionColumn({required this.device});
+/// "Dəvət et | Yol göstər" — the existing visitor-invite sheet and directions, as white text actions.
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({required this.device});
 
   final Device device;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: AppSecondaryButton(
-            label: l.inviteVisitor,
-            icon: Icons.person_add_alt_1_outlined,
-            onPressed: () => InviteVisitorSheet.show(
-              context,
-              deviceId: device.id,
-              barrierLabel: device.label,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _CardAction(
+              key: Key('device-invite-${device.id}'),
+              icon: Icons.person_add_alt_1_outlined,
+              label: l.inviteVisitor,
+              onTap: () => InviteVisitorSheet.show(
+                context,
+                deviceId: device.id,
+                barrierLabel: device.label,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Expanded(
-          child: AppSecondaryButton(
-            label: l.directions,
-            icon: Icons.directions_outlined,
-            onPressed: () => _directions(context, l),
+          const VerticalDivider(
+            width: 1,
+            thickness: 1,
+            color: Color(0x55FFFFFF),
+            indent: 6,
+            endIndent: 6,
           ),
-        ),
-      ],
+          Expanded(
+            child: _CardAction(
+              key: Key('device-directions-${device.id}'),
+              icon: Icons.directions_outlined,
+              label: l.directions,
+              onTap: () => _directions(context, l),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -268,6 +422,55 @@ class _ActionColumn extends StatelessWidget {
       lat: device.latitude!,
       lng: device.longitude!,
       label: device.label,
+    );
+  }
+}
+
+class _CardAction extends StatelessWidget {
+  const _CardAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    super.key,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppRadius.brMd,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.sm,
+          horizontal: 2,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 17),
+            const SizedBox(width: 3),
+            // Scales down instead of truncating ("Yol göstər" must stay readable on a half-width card).
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -295,13 +498,21 @@ class _OpenAction extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
 
-    // Active card: reuse the shared open button (owns the live command status).
+    // Active card: reuse the shared open button (owns the live command status), on a light panel so the
+    // coloured status line stays legible over the photo.
     if (isActive) {
-      return BarrierActionButton(
-        deviceId: device.id,
-        canDo: device.canOpen,
-        direction: BarrierDirection.open,
-        geofenceEnabled: device.geofenceEnabled,
+      return Container(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.94),
+          borderRadius: AppRadius.brMd,
+        ),
+        child: BarrierActionButton(
+          deviceId: device.id,
+          canDo: device.canOpen,
+          direction: BarrierDirection.open,
+          geofenceEnabled: device.geofenceEnabled,
+        ),
       );
     }
 
@@ -319,19 +530,19 @@ class _OpenAction extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         button,
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.xs),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.info_outline, size: 15, color: AppColors.textSecondary),
+            const Icon(Icons.info_outline, size: 14, color: Colors.white70),
             const SizedBox(width: AppSpacing.xs),
             Flexible(
               child: Text(
                 _openBlockedReason(l, device.suspensionReason),
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.white),
               ),
             ),
           ],
@@ -352,8 +563,8 @@ String _openBlockedReason(AppLocalizations l, String reason) {
   return l.errAccessDenied;
 }
 
-/// The 60% media tile — the barrier photo (cached, rounded) or a branded green
-/// placeholder while loading / when absent / on error. Fills its parent height.
+/// The card background — the barrier photo (cached) or a branded green placeholder while loading / when
+/// absent / on error. Fills the card.
 class _DeviceImage extends StatelessWidget {
   const _DeviceImage({this.imageUrl});
 
@@ -362,19 +573,17 @@ class _DeviceImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = imageUrl?.trim();
-    return ClipRRect(
-      borderRadius: AppRadius.brMd,
-      child: SizedBox.expand(
-        child: (url == null || url.isEmpty)
-            ? const _ImagePlaceholder()
-            : CachedNetworkImage(
-                imageUrl: url,
-                fit: BoxFit.cover,
-                fadeInDuration: AppDurations.base,
-                placeholder: (context, _) => const _ImagePlaceholder(loading: true),
-                errorWidget: (context, _, _) => const _ImagePlaceholder(),
-              ),
-      ),
+    return SizedBox.expand(
+      child: (url == null || url.isEmpty)
+          ? const _ImagePlaceholder()
+          : CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              fadeInDuration: AppDurations.base,
+              placeholder: (context, _) =>
+                  const _ImagePlaceholder(loading: true),
+              errorWidget: (context, _, _) => const _ImagePlaceholder(),
+            ),
     );
   }
 }
@@ -396,35 +605,30 @@ class _ImagePlaceholder extends StatelessWidget {
           colors: [AppColors.brand, AppColors.brandDark],
         ),
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            right: -10,
-            bottom: -14,
-            child: Icon(
-              Icons.sensor_door_rounded,
-              size: 96,
-              color: AppColors.onBrand.withValues(alpha: 0.14),
-            ),
-          ),
-          Center(
-            child: loading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.2,
-                      color: AppColors.onBrand,
-                    ),
-                  )
-                : const Icon(
+      // No corner watermark: on the full-card layout it would sit behind the open button.
+      child: Center(
+        child: loading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  color: AppColors.onBrand,
+                ),
+              )
+            // Pinned inside the photo gap (below the status row, above the name) so a taller
+            // active card never pushes the name onto the icon.
+            : const Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 66),
+                  child: Icon(
                     Icons.sensor_door_rounded,
-                    size: 36,
+                    size: 40,
                     color: AppColors.onBrand,
                   ),
-          ),
-        ],
+                ),
+              ),
       ),
     );
   }

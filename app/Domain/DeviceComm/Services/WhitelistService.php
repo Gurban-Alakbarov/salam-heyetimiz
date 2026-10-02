@@ -7,8 +7,11 @@ use App\Domain\Devices\Models\Device;
 use App\Domain\DeviceComm\Enums\WhitelistAction;
 use App\Domain\DeviceComm\Enums\WhitelistChangeStatus;
 use App\Domain\DeviceComm\Models\WhitelistChange;
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Models\DeviceUser;
+use App\Domain\Subscriptions\Enums\SubscriptionStatus;
+use App\Domain\Subscriptions\Models\Subscription;
 
 /**
  * Whitelist outbox (R-GSM-07): roster/ownership changes enqueue `whitelist_changes` rows; the
@@ -69,6 +72,9 @@ final class WhitelistService
         DeviceUser::query()
             ->where('device_id', $device->getKey())
             ->where('status', DeviceUserStatus::Active->value)
+            // B7: on complex-mode devices only residents with an active subscription are whitelisted.
+            ->when($device->ownership_mode === DeviceOwnershipMode::Complex, fn ($q) => $q->whereIn('id', Subscription::query()
+                ->select('device_user_id')->where('status', SubscriptionStatus::Active->value)->where('ends_at', '>', now())))
             ->with('user:id,phone')
             ->get()
             ->each(function (DeviceUser $deviceUser) use ($device, $adminId, &$count): void {

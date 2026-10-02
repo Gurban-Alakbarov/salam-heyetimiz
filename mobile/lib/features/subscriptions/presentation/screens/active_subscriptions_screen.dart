@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:salam_mobile/core/error/failure.dart';
 import 'package:salam_mobile/design_system/components/app_components.dart';
@@ -7,6 +8,7 @@ import 'package:salam_mobile/design_system/components/data_components.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/devices/devices_providers.dart';
 import 'package:salam_mobile/features/devices/domain/entity/device_entities.dart';
+import 'package:salam_mobile/features/payments/payments_providers.dart';
 import 'package:salam_mobile/features/subscriptions/domain/entity/subscription_entities.dart';
 import 'package:salam_mobile/features/subscriptions/subscriptions_providers.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
@@ -212,6 +214,8 @@ class _SubscriptionCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: AppSpacing.md),
+          _RenewButton(subscriptionId: s.id),
         ],
       ),
     );
@@ -227,6 +231,46 @@ class _SubscriptionCard extends StatelessWidget {
     if (days == null) return '—';
     if (days <= 0) return l.subscriptionExpiresToday;
     return l.subscriptionDaysLeft(days);
+  }
+}
+
+/// B13: user-initiated renewal → order (POST /v1/subscriptions/{id}/renew, server-priced 12 AZN / 30 days,
+/// B2) → hosted checkout. The server decides eligibility; a refusal is shown, never retried silently.
+class _RenewButton extends ConsumerStatefulWidget {
+  const _RenewButton({required this.subscriptionId});
+
+  final int subscriptionId;
+
+  @override
+  ConsumerState<_RenewButton> createState() => _RenewButtonState();
+}
+
+class _RenewButtonState extends ConsumerState<_RenewButton> {
+  bool _busy = false;
+
+  Future<void> _renew() async {
+    final l = AppLocalizations.of(context);
+    setState(() => _busy = true);
+    final result = await ref.read(paymentsRepositoryProvider).renewSubscription(widget.subscriptionId);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    result.fold(
+      (failure) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(failure is ConflictFailure ? l.subscriptionRenewNotEligible : deviceFailureMessage(l, failure))),
+      ),
+      (order) => context.push('/checkout/${order.id}'),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return SizedBox(
+      width: double.infinity,
+      child: _busy
+          ? const Center(child: Padding(padding: EdgeInsets.all(AppSpacing.xs), child: CircularProgressIndicator()))
+          : AppSecondaryButton(label: l.subscriptionRenew, icon: Icons.autorenew, onPressed: _renew),
+    );
   }
 }
 

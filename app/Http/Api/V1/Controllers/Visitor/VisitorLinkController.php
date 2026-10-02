@@ -4,6 +4,8 @@ namespace App\Http\Api\V1\Controllers\Visitor;
 
 use App\Domain\DeviceComm\Exceptions\OpenNotPermittedException;
 use App\Domain\Devices\Models\Device;
+use App\Domain\Roster\Enums\DeviceUserStatus;
+use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Subscriptions\Enums\SuspensionReason;
 use App\Domain\Subscriptions\Queries\SubscriptionStatusQuery;
 use App\Domain\Visitor\Models\VisitorLink;
@@ -92,6 +94,14 @@ class VisitorLinkController
     /** You can only share access you hold — mirror the open-command permission check exactly. */
     private function assertCanShare(int $userId, int $deviceId): void
     {
+        // BR-19 (B8): access granted through a family link never extends to visitor links. Legacy roster
+        // users (family_link_id NULL) are unaffected.
+        $viaFamily = DeviceUser::query()->where('device_id', $deviceId)->where('user_id', $userId)
+            ->where('status', DeviceUserStatus::Active->value)->whereNotNull('family_link_id')->exists();
+        if ($viaFamily) {
+            throw OpenNotPermittedException::familyMemberCannotShare($deviceId);
+        }
+
         $result = $this->access->for($userId, $deviceId);
         if ($result->canOpen) {
             return;

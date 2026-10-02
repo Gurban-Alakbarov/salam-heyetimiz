@@ -29,7 +29,7 @@
 	<!-- GEOFENCE-3 — foreground (When-In-Use) location only, read once at open time for the
 	     geofence gate. No "Always"/background location key is declared. -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Şlaqbaumu açmaq üçün yaxınlıqda olduğunuzu təsdiqləməyə məkanınız istifadə olunur.</string>
+	<string>Məkanınız şlaqbaumu açarkən yaxınlıqda olduğunuzu təsdiqləmək və müraciətdə ünvanınızı xəritədə seçmək üçün istifadə olunur.</string>
 	<!-- map_launcher: navigation apps the "Directions" action can detect/hand off to. -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
@@ -79,5 +79,22 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- B13: payment return salam://payment/return (custom scheme — no signing impact). -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.salamheyetimiz.salamMobile.payment</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>salam</string>
+			</array>
+		</dict>
+	</array>
+	<!-- B13: links are handled once, by app_links (not Flutter's built-in deep linking). -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 </dict>
 </plist>

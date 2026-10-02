@@ -46,17 +46,20 @@ final class ExpirySweep
         $now = $this->clock->now();
         $horizon = $now->addDays(30);
         $sent = 0;
+        // Only the configured thresholds fire (monthly term → D-7 / D-1; B2). Skipped thresholds are not
+        // recorded, so the progression stays intact for the next enabled one.
+        $enabled = array_map('intval', (array) config('domain.subscriptions.reminder_days', [30, 15, 7, 1]));
 
         Subscription::query()
             ->where('status', SubscriptionStatus::Active->value)
             ->whereBetween('ends_at', [$now, $horizon])
             ->orderBy('id')
-            ->chunkById(500, function ($subscriptions) use ($now, &$sent): void {
+            ->chunkById(500, function ($subscriptions) use ($now, &$sent, $enabled): void {
                 foreach ($subscriptions as $subscription) {
                     $daysRemaining = (int) ceil(($subscription->ends_at->getTimestamp() - $now->getTimestamp()) / 86400);
                     $kind = ReminderKind::forDaysRemaining($daysRemaining);
 
-                    if ($kind === null) {
+                    if ($kind === null || ! in_array($kind->thresholdDays(), $enabled, true)) {
                         continue;
                     }
 

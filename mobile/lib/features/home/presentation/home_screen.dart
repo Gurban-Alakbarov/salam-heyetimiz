@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:salam_mobile/core/error/failure.dart';
 import 'package:salam_mobile/design_system/components/app_components.dart';
 import 'package:salam_mobile/design_system/components/data_components.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
+import 'package:salam_mobile/features/auth/session_roles_provider.dart';
+import 'package:salam_mobile/features/complex/complex_providers.dart';
 import 'package:salam_mobile/features/home/domain/home_data.dart';
 import 'package:salam_mobile/features/home/home_providers.dart';
 import 'package:salam_mobile/features/invitations/presentation/screens/invitations_screen.dart';
@@ -22,7 +25,12 @@ class HomeScreen extends ConsumerWidget {
     final async = ref.watch(homeProvider);
 
     return RefreshIndicator(
-      onRefresh: () => ref.refresh(homeProvider.future),
+      // B18: the "Ödəniş gözləyənlər" card has its own provider — refresh it too, so a subscription created
+      // elsewhere (e.g. the head granting a device to a member) shows up on pull-to-refresh.
+      onRefresh: () {
+        ref.invalidate(pendingSubscriptionsProvider);
+        return ref.refresh(homeProvider.future);
+      },
       child: async.when(
         loading: () => ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -60,11 +68,9 @@ class HomeScreen extends ConsumerWidget {
               builder: (_) => const ActiveSubscriptionsScreen(),
             ),
           ),
-          onInvitationsTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const InvitationsScreen(),
-            ),
-          ),
+          onInvitationsTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const InvitationsScreen())),
         ),
       ),
     );
@@ -143,7 +149,161 @@ class _HomeView extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: AppSpacing.md),
+        // B16: pending invitation · resident complex · own subscriptions awaiting payment.
+        const _ResidentEntries(),
+        // B15: Komendant entry — only for a mobile user linked to an active complex_manager.
+        const _KomendantEntry(),
+        // B14: registration applications (physical / legal) — status + new application.
+        AppCard(
+          child: InkWell(
+            key: const Key('home-applications'),
+            onTap: () => GoRouter.of(context).push('/applications'),
+            child: Row(
+              children: [
+                const Icon(Icons.assignment_outlined, color: AppColors.brand),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    l.appMineTitle,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+          ),
+        ),
       ],
+    );
+  }
+}
+
+/// B16 Home entries (§21 HomeShell): an invitation waiting on this device, "Kompleksim" for an active
+/// resident (straight to the complex when there is one), and the caller's own subscriptions awaiting
+/// payment. Each shows only when it applies; the server re-checks everything behind them.
+class _ResidentEntries extends ConsumerWidget {
+  const _ResidentEntries();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final roles = ref.watch(sessionRolesProvider).value;
+    final hasInvite = ref.watch(hasPendingInviteProvider).value ?? false;
+    final pending = ref.watch(pendingSubscriptionsProvider).value?.length ?? 0;
+    final complexIds = roles?.complexIds ?? const <int>[];
+
+    Widget card({
+      required Key key,
+      required IconData icon,
+      required String title,
+      String? subtitle,
+      required VoidCallback onTap,
+    }) => Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: AppCard(
+        child: InkWell(
+          key: key,
+          onTap: onTap,
+          child: Row(
+            children: [
+              Icon(icon, color: AppColors.brand),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    if (subtitle != null)
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return Column(
+      children: [
+        if (hasInvite)
+          card(
+            key: const Key('home-invite'),
+            icon: Icons.mark_email_unread_outlined,
+            title: l.invPendingCard,
+            subtitle: l.invPendingCardBody,
+            onTap: () => GoRouter.of(context).push('/invite'),
+          ),
+        if (complexIds.isNotEmpty)
+          card(
+            key: const Key('home-complex'),
+            icon: Icons.apartment_outlined,
+            title: l.cxTitle,
+            subtitle: l.cxEntrySubtitle,
+            onTap: () => GoRouter.of(context).push(
+              complexIds.length == 1
+                  ? '/complex/${complexIds.first}'
+                  : '/complexes',
+            ),
+          ),
+        if (pending > 0)
+          card(
+            key: const Key('home-pending-payments'),
+            icon: Icons.payment,
+            title: l.payPendingCard(pending),
+            onTap: () => GoRouter.of(context).push('/payments/pending'),
+          ),
+      ],
+    );
+  }
+}
+
+/// "Kompleksim (Komendant)" card (§21 HomeShell). Hidden unless /v1/me reports the komendant role; the
+/// server still authorises every /v1/komendant call.
+class _KomendantEntry extends ConsumerWidget {
+  const _KomendantEntry();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final roles = ref.watch(sessionRolesProvider).value;
+    if (roles == null || !roles.isKomendant) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: AppCard(
+        child: InkWell(
+          key: const Key('home-komendant'),
+          onTap: () => GoRouter.of(context).push('/komendant'),
+          child: Row(
+            children: [
+              const Icon(Icons.apartment_outlined, color: AppColors.brand),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.kmTitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if (roles.komendantComplexName != null)
+                      Text(
+                        roles.komendantComplexName!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

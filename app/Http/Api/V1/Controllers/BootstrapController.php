@@ -2,7 +2,10 @@
 
 namespace App\Http\Api\V1\Controllers;
 
+use App\Domain\Admin\Models\Complex;
+use App\Domain\Admin\Services\KomendantContext;
 use App\Domain\Admin\Services\SettingsService;
+use App\Domain\Roster\Services\ComplexMembershipService;
 use App\Domain\Notifications\Queries\NotificationQuery;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
 use App\Domain\Users\Models\User;
@@ -30,6 +33,8 @@ class BootstrapController
         private readonly SettingsService $settings,
         private readonly SubscriptionQuery $subscriptions,
         private readonly NotificationQuery $notifications,
+        private readonly KomendantContext $komendant,
+        private readonly ComplexMembershipService $memberships,
     ) {}
 
     /** GET /v1/bootstrap — guest app configuration (public). */
@@ -80,9 +85,32 @@ class BootstrapController
             'active_invitations_count' => $this->activeInvitationsCount((int) $user->getKey()),
             'user_devices' => $this->userDevices($user),
             'active_subscriptions' => $this->activeSubscriptions((int) $user->getKey()),
-            // Future sections (apartments, vehicles, devices, complexes, notifications, invitations,
-            // visitor_passes, family_members, payments) are added here as new keys — no contract change.
-        ], 'Profil hazırdır.');
+        ] + $this->roleBlock($user), 'Profil hazırdır.');
+    }
+
+    /**
+     * B5 (additive): `roles` (resident / komendant), the linked Komendant's complex, and the complexes the user
+     * is a resident of. Derived server-side every call — the client never decides its own role.
+     *
+     * @return array<string, mixed>
+     */
+    private function roleBlock(User $user): array
+    {
+        $manager = $this->komendant->managerFor($user);
+        $complexIds = $this->memberships->complexIdsFor((int) $user->getKey());
+        $complexes = $complexIds === [] ? [] : Complex::query()->whereIn('id', $complexIds)->orderBy('name')->get(['id', 'name'])
+            ->map(fn (Complex $c): array => ['id' => (int) $c->id, 'name' => $c->name])->all();
+
+        $roles = ['resident'];
+        if ($manager !== null) {
+            $roles[] = 'komendant';
+        }
+
+        return [
+            'roles' => $roles,
+            'komendant' => $manager !== null ? ['complex' => ['id' => (int) $manager->complex_id, 'name' => $manager->complex?->name]] : null,
+            'complexes' => $complexes,
+        ];
     }
 
     /** @return array<string, mixed> */

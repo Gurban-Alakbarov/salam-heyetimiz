@@ -3,7 +3,9 @@
 namespace App\Domain\DeviceComm\Listeners;
 
 use App\Domain\DeviceComm\Enums\WhitelistAction;
+use App\Domain\DeviceComm\Services\ComplexWhitelistReconciler;
 use App\Domain\DeviceComm\Services\WhitelistService;
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Events\RosterUserAdded;
 use App\Domain\Roster\Models\DeviceUser;
@@ -16,10 +18,23 @@ use App\Domain\Users\Models\User;
  */
 class AddUserToWhitelistOnRosterUserAdded
 {
-    public function __construct(private readonly WhitelistService $whitelist) {}
+    public function __construct(
+        private readonly WhitelistService $whitelist,
+        private readonly ComplexWhitelistReconciler $complex,
+    ) {}
 
     public function handle(RosterUserAdded $event): void
     {
+        // B7: complex-mode access is granted by a paid subscription, never by the roster row alone.
+        if ($event->device->ownership_mode === DeviceOwnershipMode::Complex) {
+            $row = DeviceUser::query()->where('device_id', $event->device->getKey())->where('user_id', $event->userId)->first();
+            if ($row !== null) {
+                $this->complex->reconcile($row);
+            }
+
+            return;
+        }
+
         $phone = User::query()->whereKey($event->userId)->value('phone');
         if ($phone === null) {
             return;

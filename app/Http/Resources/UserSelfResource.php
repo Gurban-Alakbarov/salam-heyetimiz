@@ -27,6 +27,7 @@ class UserSelfResource extends JsonResource
             'email_verified_at' => optional($this->email_verified_at)->toIso8601String(),
             'preferred_language' => $this->preferred_language->value,
             'status' => $this->status->value,
+            'account_type' => $this->resource->getAttributes()['account_type'] ?? null, // B9: physical | legal | null (legacy)
             'created_at' => optional($this->created_at)->toIso8601String(),
             'last_login_at' => optional($this->last_login_at)->toIso8601String(),
             'has_active_subscription' => (bool) ($this->has_active_subscription ?? false),

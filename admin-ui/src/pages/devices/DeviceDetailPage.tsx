@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatDateTime, signalLabel } from '@/lib/format'
 import type { DeviceAdminDetail } from '@/types/api'
 import { DeviceActions } from './DeviceActions'
+import { DeviceOwnershipCard } from './DeviceOwnershipCard'
 import { RosterSection } from './RosterSection'
 import { CommandsTab } from './tabs/CommandsTab'
 import { DiagnosticsTab } from './tabs/DiagnosticsTab'
@@ -93,6 +94,7 @@ export function DeviceDetailPage() {
           </div>
 
           <Overview device={device} />
+          <DeviceOwnershipCard device={device} />
           <RosterSection device={device} />
 
           <Tabs defaultValue={defaultTab}>

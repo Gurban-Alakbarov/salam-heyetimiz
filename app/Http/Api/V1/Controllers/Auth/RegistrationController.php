@@ -9,7 +9,11 @@ use App\Domain\Auth\Actions\VerifyEmailAndIssueTokens;
 use App\Domain\Auth\Exceptions\OtpVerificationException;
 use App\Domain\Auth\Exceptions\RegistrationException;
 use App\Domain\Auth\Support\AuthTokens;
+use App\Domain\Roster\Actions\ClaimInvitation;
+use App\Domain\Roster\Exceptions\InvitationException;
+use App\Domain\Roster\Services\InvitationService;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
+use App\Domain\Users\Enums\AccountType;
 use App\Http\Api\V1\Requests\Auth\EmailLoginRequest;
 use App\Http\Api\V1\Requests\Auth\RegisterRequest;
 use App\Http\Api\V1\Requests\Auth\ResendOtpRequest;
@@ -27,11 +31,26 @@ class RegistrationController
 {
     use RespondsWithEnvelope;
 
-    public function __construct(private readonly SubscriptionQuery $subscriptions) {}
+    public function __construct(
+        private readonly SubscriptionQuery $subscriptions,
+        private readonly InvitationService $invitations,
+        private readonly ClaimInvitation $claim,
+    ) {}
 
     /** POST /v1/auth/register — create/resume an unverified account + send email OTP. */
     public function register(RegisterRequest $request, RegisterUser $action): JsonResponse
     {
+        // B6: an optional invitation token must be live and addressed to THIS email before anything is created.
+        $invitationToken = (string) $request->input('invitation_token', '');
+        if ($invitationToken !== '') {
+            try {
+                $invitation = $this->invitations->findLive($invitationToken) ?? throw InvitationException::notClaimable();
+                $this->claim->assertClaimableBy($invitation, (string) $request->input('email'));
+            } catch (InvitationException $e) {
+                return $this->failure($e->getMessage(), ['code' => $e->errorCode], $e->status);
+            }
+        }
+
         try {
             $timing = $action->handle(
                 firstName: (string) $request->input('first_name'),
@@ -40,6 +59,7 @@ class RegistrationController
                 email: (string) $request->input('email'),
                 ip: (string) $request->ip(),
                 locale: app()->getLocale(),
+                accountType: $request->input('account_type') !== null ? AccountType::from((string) $request->input('account_type')) : null,
             );
         } catch (RegistrationException $e) {
             return $this->failure($e->getMessage(), $e->payload(), $e->statusCode);
@@ -66,6 +86,7 @@ class RegistrationController
         return $this->tokenEnvelope(
             $result->tokens,
             $result->wasRegistration ? 'Qeydiyyat tamamlandı.' : 'Giriş uğurla tamamlandı.',
+            $this->claimAfterVerify((string) $request->input('invitation_token', ''), $result->tokens),
         );
     }
 
@@ -85,7 +106,29 @@ class RegistrationController
         return $this->success(null, 'Giriş kodu email ünvanınıza göndərildi.', $timing, 202);
     }
 
-    private function tokenEnvelope(AuthTokens $tokens, string $message): JsonResponse
+    /**
+     * B6: claim the invitation once the email is verified. Non-fatal — the account and the session stand even
+     * when the invitation is no longer claimable; the outcome is reported under `invitation`.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function claimAfterVerify(string $token, AuthTokens $tokens): ?array
+    {
+        if ($token === '') {
+            return null;
+        }
+
+        try {
+            $invitation = $this->invitations->findLive($token) ?? throw InvitationException::notClaimable();
+
+            return ['claimed' => true] + $this->claim->handle($invitation, $tokens->user);
+        } catch (InvitationException $e) {
+            return ['claimed' => false, 'code' => $e->errorCode];
+        }
+    }
+
+    /** @param  array<string, mixed>|null  $invitation */
+    private function tokenEnvelope(AuthTokens $tokens, string $message, ?array $invitation = null): JsonResponse
     {
         $user = $tokens->user;
         $user->has_active_subscription = $this->subscriptions->hasActiveForUser((int) $user->getKey());
@@ -97,7 +140,7 @@ class RegistrationController
             'expires_in' => $tokens->expiresIn,
             'refresh_expires_in' => $tokens->refreshExpiresIn,
             'user' => (new UserSelfResource($user))->toArray(request()),
-        ], $message);
+        ] + ($invitation !== null ? ['invitation' => $invitation] : []), $message);
     }
 
     private function otpMessage(string $code): string

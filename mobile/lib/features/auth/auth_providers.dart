@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
 import '../../core/error/failure.dart';
+import '../../core/error/retry_policy.dart';
 import '../../core/services/app_version.dart';
 import '../door_widget/door_widget_providers.dart';
 import '../notifications/notifications_providers.dart';
@@ -171,6 +172,7 @@ class BootstrapController extends AsyncNotifier<BootstrapEntity> {
 final bootstrapControllerProvider =
     AsyncNotifierProvider<BootstrapController, BootstrapEntity>(
       BootstrapController.new,
+      retry: retryTransientFailures,
     );
 
 /// The authenticated user for profile UI. Reuses the existing GET /v1/me call

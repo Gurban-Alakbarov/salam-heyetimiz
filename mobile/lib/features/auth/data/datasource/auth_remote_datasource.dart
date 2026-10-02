@@ -25,6 +25,8 @@ class AuthRemoteDataSource {
     required String lastName,
     required String phone,
     required String email,
+    String? accountType,
+    String? invitationToken,
   }) async {
     final res = await _api.post(
       '/v1/auth/register',
@@ -33,6 +35,11 @@ class AuthRemoteDataSource {
         'last_name': lastName,
         'phone': phone,
         'email': email,
+        // B14 (additive, B9 contract): 'physical' | 'legal'; omitted = legacy behaviour.
+        'account_type': ?accountType,
+        // B16 (additive, B6 contract): pre-flight only — the server checks the invitation is live and
+        // addressed to this email before creating anything; the claim itself happens on accept.
+        'invitation_token': ?invitationToken,
       },
     );
     return Envelope.meta(res.data);

@@ -624,4 +624,621 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invitationDefaultTitle => 'Invitation';
+
+  @override
+  String get checkoutTitle => 'Payment';
+
+  @override
+  String get paymentTestBanner => 'TEST PAYMENT';
+
+  @override
+  String get paymentResultTitle => 'Payment result';
+
+  @override
+  String get paymentSuccess => 'Payment successful';
+
+  @override
+  String get paymentFailed => 'Payment failed';
+
+  @override
+  String get paymentCancelled => 'Payment cancelled';
+
+  @override
+  String get paymentExpired => 'Payment time expired';
+
+  @override
+  String get paymentPending => 'Payment is being processed';
+
+  @override
+  String get paymentChecking => 'Confirming with the bank…';
+
+  @override
+  String get paymentRecheck => 'Check again';
+
+  @override
+  String get paymentDone => 'Back to home';
+
+  @override
+  String get paymentOrderNotFound => 'Order not found';
+
+  @override
+  String get subscriptionRenew => 'Renew (12 AZN / 30 days)';
+
+  @override
+  String get subscriptionRenewNotEligible =>
+      'This subscription cannot be renewed right now.';
+
+  @override
+  String get regTypeTitle => 'Registration type';
+
+  @override
+  String get regTypePhysical => 'Individual';
+
+  @override
+  String get regTypePhysicalBody =>
+      'I want a barrier device for my own private yard.';
+
+  @override
+  String get regTypeLegal => 'Legal entity';
+
+  @override
+  String get regTypeLegalBody => 'Residential complex, building or company.';
+
+  @override
+  String get appMineTitle => 'My applications';
+
+  @override
+  String get appNone => 'You have no applications yet';
+
+  @override
+  String get appNewPhysical => 'New application (individual)';
+
+  @override
+  String get appNewLegal => 'New application (legal entity)';
+
+  @override
+  String get appSectionPhysical => 'Individual';
+
+  @override
+  String get appSectionLegal => 'Legal entity';
+
+  @override
+  String get appPhysicalTitle => 'Individual application';
+
+  @override
+  String get appPhysicalIntro =>
+      'Tell us where your yard is — our team will contact you about installation.';
+
+  @override
+  String get appLegalTitle => 'Legal entity application';
+
+  @override
+  String get appLegalIntro =>
+      'Complex details and location. An administrator reviews the application.';
+
+  @override
+  String get appFullName => 'Full name';
+
+  @override
+  String get appPhone => 'Phone';
+
+  @override
+  String get appEmail => 'Email';
+
+  @override
+  String get appAddress => 'Address';
+
+  @override
+  String get appNote => 'Note (optional)';
+
+  @override
+  String get appComplexName => 'Complex name';
+
+  @override
+  String get appLegalName => 'Legal name';
+
+  @override
+  String get appVoen => 'TIN (VÖEN)';
+
+  @override
+  String get appLegalAddress => 'Legal address';
+
+  @override
+  String get appContactName => 'Contact person';
+
+  @override
+  String get appComplexAddress => 'Complex address';
+
+  @override
+  String get appApartments => 'Number of apartments (optional)';
+
+  @override
+  String get appLocationLabel => 'Location on the map';
+
+  @override
+  String get appLocationHint => 'Tap the map to place the pin';
+
+  @override
+  String get appUseMyLocation => 'My location';
+
+  @override
+  String get appLocationRequired => 'Choose the location on the map';
+
+  @override
+  String get appLocationOutside => 'The location must be inside Azerbaijan';
+
+  @override
+  String get appVoenInvalid => 'TIN must be 10 digits';
+
+  @override
+  String get appApartmentsInvalid => 'Enter a valid number';
+
+  @override
+  String get appSubmit => 'Submit application';
+
+  @override
+  String get appLater => 'I will fill it in later';
+
+  @override
+  String get appSubmitted => 'Application submitted';
+
+  @override
+  String get appStatusNew => 'New';
+
+  @override
+  String get appStatusContacted => 'Contacted';
+
+  @override
+  String get appStatusInProgress => 'In progress';
+
+  @override
+  String get appStatusInstalled => 'Installed';
+
+  @override
+  String get appStatusPending => 'Under review';
+
+  @override
+  String get appStatusApproved => 'Approved';
+
+  @override
+  String get appStatusRejected => 'Rejected';
+
+  @override
+  String get appRejectReason => 'Reason';
+
+  @override
+  String get appErrTypeMismatch =>
+      'Your account type does not match this application type.';
+
+  @override
+  String get appErrAlreadyOpen => 'You already have an open application.';
+
+  @override
+  String get appErrDuplicateVoen =>
+      'An application with this TIN is already under review.';
+
+  @override
+  String get kmTitle => 'My complex (Komendant)';
+
+  @override
+  String get kmEntrySubtitle => 'Residents, invitations and devices';
+
+  @override
+  String get kmStatDevices => 'Devices';
+
+  @override
+  String get kmStatResidents => 'Residents';
+
+  @override
+  String get kmStatPending => 'Pending invites';
+
+  @override
+  String get kmDevicesTitle => 'Complex devices';
+
+  @override
+  String get kmNoDevices => 'No devices are linked to the complex yet.';
+
+  @override
+  String get kmOnline => 'Online';
+
+  @override
+  String get kmOffline => 'Offline';
+
+  @override
+  String kmDevicePrice(String price, int days) {
+    return 'Subscription: $price / $days days';
+  }
+
+  @override
+  String get kmInvite => 'Invite resident';
+
+  @override
+  String get kmInviteIntro =>
+      'The resident will receive an invitation link by email, valid for 7 days.';
+
+  @override
+  String get kmFirstName => 'First name';
+
+  @override
+  String get kmLastName => 'Last name';
+
+  @override
+  String get kmEmail => 'Email';
+
+  @override
+  String get kmInviteSend => 'Send invitation';
+
+  @override
+  String get kmInviteSent => 'Invitation sent.';
+
+  @override
+  String get kmInvitations => 'Invitations';
+
+  @override
+  String get kmTabPending => 'Pending';
+
+  @override
+  String get kmTabAccepted => 'Accepted';
+
+  @override
+  String get kmTabExpired => 'Expired';
+
+  @override
+  String get kmTabClosed => 'Cancelled';
+
+  @override
+  String get kmStatusDeclined => 'Declined';
+
+  @override
+  String get kmNoInvitations => 'No invitations here.';
+
+  @override
+  String kmExpiresAt(String date) {
+    return 'Expires: $date';
+  }
+
+  @override
+  String kmAcceptedAt(String date) {
+    return 'Accepted: $date';
+  }
+
+  @override
+  String kmSendCount(int count) {
+    return 'Sent $count times';
+  }
+
+  @override
+  String get kmResend => 'Resend';
+
+  @override
+  String get kmRevoke => 'Revoke';
+
+  @override
+  String get kmResent => 'Invitation resent.';
+
+  @override
+  String get kmRevoked => 'Invitation revoked.';
+
+  @override
+  String get kmRevokeTitle => 'Revoke invitation?';
+
+  @override
+  String get kmRevokeBody => 'The invitation link will stop working.';
+
+  @override
+  String get kmResidentsTitle => 'Residents';
+
+  @override
+  String get kmNoResidents => 'The complex has no residents yet.';
+
+  @override
+  String kmActiveSubs(int count) {
+    return 'Active subscriptions: $count';
+  }
+
+  @override
+  String get kmNoActiveSub => 'No active subscription';
+
+  @override
+  String kmJoinedAt(String date) {
+    return 'Joined: $date';
+  }
+
+  @override
+  String get kmRemove => 'Remove';
+
+  @override
+  String get kmRemoveTitle => 'Remove resident from complex';
+
+  @override
+  String kmRemoveBody(String name) {
+    return '$name will be removed from the complex. Access to the complex devices stops immediately and active subscriptions are cancelled. No automatic refund is made.';
+  }
+
+  @override
+  String get kmRemoved => 'Resident removed from the complex.';
+
+  @override
+  String get kmErrNotKomendant =>
+      'This section is only for the complex manager.';
+
+  @override
+  String get kmErrForbidden => 'You are not allowed to do this.';
+
+  @override
+  String get kmErrAlreadyResident =>
+      'This email already belongs to a resident of the complex.';
+
+  @override
+  String get kmErrAlreadyPending =>
+      'An active invitation already exists for this email.';
+
+  @override
+  String get kmErrNotResendable => 'This invitation cannot be resent.';
+
+  @override
+  String get kmErrNotRevocable => 'This invitation cannot be revoked.';
+
+  @override
+  String get kmErrRateLimited =>
+      'Sent too often. Please try again a little later.';
+
+  @override
+  String get kmErrNotFound => 'Not found. The list has been refreshed.';
+
+  @override
+  String get invTitle => 'Invitation';
+
+  @override
+  String get invComplexKind => 'Residential complex invitation';
+
+  @override
+  String get invFamilyKind => 'Family member invitation';
+
+  @override
+  String invComplexBody(String complex) {
+    return 'You are invited to $complex as a resident. After accepting you can pick a device and subscribe.';
+  }
+
+  @override
+  String invFamilyBody(String inviter) {
+    return '$inviter invited you as a family member to use a device. Access activates once your own subscription is paid.';
+  }
+
+  @override
+  String invFor(String name) {
+    return 'Invitee: $name';
+  }
+
+  @override
+  String invSentTo(String email) {
+    return 'The invitation was sent to $email. Continue with that email.';
+  }
+
+  @override
+  String invExpires(String date) {
+    return 'Valid until $date';
+  }
+
+  @override
+  String get invRegister => 'Create account';
+
+  @override
+  String get invLogin => 'I have an account — log in';
+
+  @override
+  String get invAccept => 'Accept invitation';
+
+  @override
+  String get invDecline => 'Decline';
+
+  @override
+  String get invDeclineTitle => 'Decline the invitation?';
+
+  @override
+  String get invDeclineBody => 'This invitation link will stop working.';
+
+  @override
+  String get invDeclined => 'Invitation declined.';
+
+  @override
+  String invAcceptedComplex(String complex) {
+    return 'Invitation accepted. Welcome to $complex!';
+  }
+
+  @override
+  String get invAcceptedFamily =>
+      'Invitation accepted. Pay the subscription to activate access.';
+
+  @override
+  String get invGoneTitle => 'Invitation is not valid';
+
+  @override
+  String get invGoneBody =>
+      'This invitation link has expired, been revoked or already used. Ask the sender for a new invitation.';
+
+  @override
+  String get invClose => 'Close';
+
+  @override
+  String get invErrEmailMismatch =>
+      'This invitation is for another email address. Sign in with the invited email.';
+
+  @override
+  String get invErrAlreadyHasAccess =>
+      'You already have access to this device.';
+
+  @override
+  String get invErrInvalidTarget => 'You cannot accept your own invitation.';
+
+  @override
+  String get invErrUnsupported => 'This invitation type is not supported.';
+
+  @override
+  String get invRegisterHint =>
+      'Register with the invited email; the invitation is accepted once your account is verified.';
+
+  @override
+  String get invPendingCard => 'You have an invitation';
+
+  @override
+  String get invPendingCardBody => 'Open and accept it.';
+
+  @override
+  String get cxTitle => 'My complex';
+
+  @override
+  String get cxMyComplexes => 'My complexes';
+
+  @override
+  String get cxEntrySubtitle => 'Pick a device and subscribe';
+
+  @override
+  String get cxNoComplexes => 'You are not a resident of any complex yet.';
+
+  @override
+  String get cxDevicesTitle => 'Complex devices';
+
+  @override
+  String get cxNoDevices => 'The complex has no devices yet.';
+
+  @override
+  String get cxStatusNone => 'Not subscribed';
+
+  @override
+  String get cxStatusPending => 'Awaiting payment';
+
+  @override
+  String get cxStatusActive => 'Active';
+
+  @override
+  String get cxStatusExpired => 'Expired';
+
+  @override
+  String cxPrice(String price, int days) {
+    return '$price / $days days';
+  }
+
+  @override
+  String get cxPriceNote =>
+      'A subscription activates your access to this device.';
+
+  @override
+  String get cxSubscriptionBlock => 'Monthly subscription';
+
+  @override
+  String get cxSubscribe => 'Subscribe';
+
+  @override
+  String get cxFinishPayment => 'Complete payment';
+
+  @override
+  String get cxRenew => 'Renew';
+
+  @override
+  String get cxOpenInDevices => 'Open in Devices';
+
+  @override
+  String get cxDeviceTitle => 'Device';
+
+  @override
+  String get cxErrAlreadyActive =>
+      'Your subscription for this device is already active.';
+
+  @override
+  String get payPendingTitle => 'Awaiting payment';
+
+  @override
+  String payPendingCard(int count) {
+    return 'Subscriptions awaiting payment: $count';
+  }
+
+  @override
+  String get payPendingNone => 'Nothing is awaiting payment.';
+
+  @override
+  String get payPendingMain => 'Resident subscription';
+
+  @override
+  String get payPendingAdditional => 'Family member subscription';
+
+  @override
+  String get payNow => 'Pay';
+
+  @override
+  String payDeviceFallback(int id) {
+    return 'Device #$id';
+  }
+
+  @override
+  String get payErrForbidden => 'You are not allowed to do this.';
+
+  @override
+  String get famTitle => 'Family members';
+
+  @override
+  String get famEntrySubtitle => 'Invitations, access and payments';
+
+  @override
+  String get famTabMembers => 'Members';
+
+  @override
+  String get famTabInvitations => 'Invitations';
+
+  @override
+  String get famInvite => 'Invite a family member';
+
+  @override
+  String get famNotHead =>
+      'To invite family members you need active access of your own on a device. This is not available on devices you were added to as a family member.';
+
+  @override
+  String get famErrNotHead =>
+      'You cannot manage family members on this device.';
+
+  @override
+  String get famErrInvalidTarget =>
+      'This person cannot be invited (yourself or someone already on this device).';
+
+  @override
+  String get famNoMembers => 'No family members yet.';
+
+  @override
+  String get famNoInvitations => 'No family invitations yet.';
+
+  @override
+  String get famDeviceLabel => 'Device';
+
+  @override
+  String get famInviteIntro =>
+      'An invitation valid for 7 days will be emailed for the selected device. Each family member has their own monthly subscription, paid by you or by the member.';
+
+  @override
+  String get famGranted =>
+      'Access to this device was granted to the family member. The subscription awaits payment.';
+
+  @override
+  String get famSubNone => 'No subscription';
+
+  @override
+  String famSubActiveUntil(String date) {
+    return 'Active until $date';
+  }
+
+  @override
+  String get famPayFor => 'Pay for member';
+
+  @override
+  String get famRemove => 'Remove';
+
+  @override
+  String get famRemoveTitle => 'Remove family member';
+
+  @override
+  String famRemoveBody(String name) {
+    return '$name will be removed from your family. Access to the devices you granted stops immediately and their subscriptions are cancelled. No automatic refund is made.';
+  }
+
+  @override
+  String get famRemoved => 'Family member removed.';
 }

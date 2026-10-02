@@ -52,9 +52,18 @@ final class TemplatedMailer
         return $value === null ? true : (bool) $value;
     }
 
-    /** @param array<string, mixed> $data */
+    /**
+     * Plain-text fallback. Data-driven: a type may pass its own `lines` (e.g. invitations); otherwise the
+     * original OTP text is built — the "do not share this code" warning only appears when there IS a code.
+     *
+     * @param  array<string, mixed>  $data
+     */
     private function text(array $data): string
     {
+        if (isset($data['lines']) && is_array($data['lines'])) {
+            return implode("\n", array_map('strval', $data['lines']));
+        }
+
         $lines = [];
         if (! empty($data['intro'])) {
             $lines[] = (string) $data['intro'];
@@ -65,7 +74,9 @@ final class TemplatedMailer
         if (isset($data['ttlMinutes'])) {
             $lines[] = 'Kod '.$data['ttlMinutes'].' dəqiqə ərzində etibarlıdır.';
         }
-        $lines[] = 'Bu kodu heç kimlə paylaşmayın.';
+        if (isset($data['code'])) {
+            $lines[] = 'Bu kodu heç kimlə paylaşmayın.';
+        }
 
         return implode("\n", $lines);
     }

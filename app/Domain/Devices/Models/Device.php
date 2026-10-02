@@ -6,6 +6,7 @@ use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Catalog\Models\DeviceModel;
 use App\Domain\Catalog\Models\Region;
 use App\Domain\Catalog\Models\SimOperator;
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Enums\DriverType;
 use App\Domain\Devices\Enums\SimStatus;
@@ -32,6 +33,10 @@ class Device extends Model
         return [
             'driver_type' => DriverType::class,
             'status' => DeviceStatus::class,
+            'ownership_mode' => DeviceOwnershipMode::class,
+            // One-off device SALE price (admin record only; never a subscription price — BR-20).
+            'sale_price_minor' => 'integer',
+            'sale_recorded_at' => 'datetime',
             'sim_status' => SimStatus::class,
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',

@@ -66,6 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verify.birpay' => \App\Http\Middleware\VerifyBirPaySignature::class,
             'admin.tfa' => \App\Http\Middleware\RequireAdminTfaVerified::class,
             'docs.access' => \App\Http\Middleware\DocsAccess::class,
+            'komendant' => \App\Http\Middleware\EnsureKomendant::class,
         ]);
 
         // Webhook stack. CaptureRawBody runs FIRST so HMAC verifiers hash the exact raw bytes

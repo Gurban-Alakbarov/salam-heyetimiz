@@ -60,9 +60,11 @@ it('renews an already-active subscription when a further order is paid', functio
     OrderPaid::dispatch($order);
 
     $sub->refresh();
-    // Renewed within term: new ends_at = old ends_at + 365 days.
+    // Renewed within term: a paid renewal applies today's commercial terms (B2) — 30 days, 12 AZN.
     expect($sub->status)->toBe(SubscriptionStatus::Active)
-        ->and((int) round($oldEndsAt->diffInDays($sub->ends_at)))->toBe(365)
+        ->and((int) round($oldEndsAt->diffInDays($sub->ends_at)))->toBe(30)
+        ->and($sub->term_days)->toBe(30)
+        ->and($sub->price_minor)->toBe(1200)
         ->and($sub->periods()->where('kind', SubscriptionPeriodKind::Renewal->value)->count())->toBe(1);
 
     Event::assertDispatched(SubscriptionRenewed::class);

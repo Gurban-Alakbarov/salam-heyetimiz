@@ -2,6 +2,7 @@
 
 namespace App\Domain\Devices\Services;
 
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Models\Device;
 
@@ -27,6 +28,14 @@ final class DeviceLookup
         $value = Device::query()->whereKey($deviceId)->value('status');
 
         return $value instanceof DeviceStatus ? $value : null;
+    }
+
+    /** private | complex (B4). An absent device reads as private (callers check existence separately). */
+    public function ownershipMode(int $deviceId): DeviceOwnershipMode
+    {
+        $value = Device::query()->whereKey($deviceId)->value('ownership_mode');
+
+        return $value instanceof DeviceOwnershipMode ? $value : DeviceOwnershipMode::Private;
     }
 
     /** The device's owner user id, or null when the device is unowned or absent. */

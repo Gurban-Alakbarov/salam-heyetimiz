@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, LogIn, Plus, UserMinus } from 'lucide-react'
-import { useAdmins, useComplexes, useCreateAdmin, useDeactivateAdmin, type CreatedAdmin } from '@/api/admins'
+import { Link2, Loader2, LogIn, Plus, Smartphone, UserMinus } from 'lucide-react'
+import { useAdmins, useComplexes, useCreateAdmin, useDeactivateAdmin, useLinkMobileUser, useUnlinkMobileUser, type CreatedAdmin } from '@/api/admins'
 import { useAuth } from '@/auth/useAuth'
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
@@ -35,6 +35,10 @@ export function AdminsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<AdminUser | null>(null)
   const [impersonatingId, setImpersonatingId] = useState<number | null>(null)
+  const [linkTarget, setLinkTarget] = useState<AdminUser | null>(null)
+  const [unlinkTarget, setUnlinkTarget] = useState<AdminUser | null>(null)
+  const unlink = useUnlinkMobileUser()
+  const canLink = hasPermission(PERM.adminsUpdate)
 
   const notifyError = (err: unknown) =>
     toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined })
@@ -80,6 +84,7 @@ export function AdminsPage() {
                   <TableHead>Ad</TableHead>
                   <TableHead>Rol</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Mobil hesab</TableHead>
                   <TableHead className="w-0" />
                 </TableRow>
               </TableHeader>
@@ -91,6 +96,16 @@ export function AdminsPage() {
                     <TableCell>{roleLabels[a.role] ?? a.role}</TableCell>
                     <TableCell>
                       <Badge variant={a.status === 'active' ? 'success' : 'muted'}>{a.status}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      {a.role !== 'complex_manager' ? <span className="text-muted-foreground">—</span> : a.mobile_user ? (
+                        <span className="inline-flex items-center gap-1 text-sm">
+                          <Smartphone className="h-4 w-4 text-emerald-600" />{a.mobile_user.email}
+                          {canLink && <Button size="sm" variant="ghost" className="h-7 text-destructive" onClick={() => setUnlinkTarget(a)}>Ayır</Button>}
+                        </span>
+                      ) : canLink ? (
+                        <Button size="sm" variant="outline" onClick={() => setLinkTarget(a)}><Link2 className="h-4 w-4" /> Bağla</Button>
+                      ) : <Badge variant="muted">Bağlı deyil</Badge>}
                     </TableCell>
                     <TableCell className="space-x-1 pr-4 text-right">
                       {hasPermission(PERM.adminsImpersonate) && a.id !== me?.id && a.status === 'active' && (
@@ -116,6 +131,24 @@ export function AdminsPage() {
       </Card>
 
       <CreateAdminDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <LinkMobileDialog admin={linkTarget} onClose={() => setLinkTarget(null)} />
+
+      <ConfirmDialog
+        open={unlinkTarget !== null}
+        onOpenChange={(n) => { if (!n) setUnlinkTarget(null) }}
+        title="Mobil hesabı ayır"
+        description={`${unlinkTarget?.email ?? ''} — Komendant mobil tətbiqdən daxil ola bilməyəcək.`}
+        confirmLabel="Ayır"
+        confirmVariant="destructive"
+        loading={unlink.isPending}
+        onConfirm={() => {
+          if (!unlinkTarget) return
+          unlink.mutate(unlinkTarget.id, {
+            onSuccess: () => { toast({ variant: 'success', title: 'Mobil hesab ayrıldı' }); setUnlinkTarget(null) },
+            onError: notifyError,
+          })
+        }}
+      />
 
       <ConfirmDialog
         open={removeTarget !== null}
@@ -134,6 +167,41 @@ export function AdminsPage() {
         }}
       />
     </div>
+  )
+}
+
+/** Link a complex_manager to an EXISTING, verified, active mobile account by email (BR-22). */
+function LinkMobileDialog({ admin, onClose }: { admin: AdminUser | null; onClose: () => void }) {
+  const { toast } = useToast()
+  const link = useLinkMobileUser()
+  const [email, setEmail] = useState('')
+  const close = () => { setEmail(''); link.reset(); onClose() }
+  const fieldError = link.error instanceof ApiError ? (link.error.fieldError('email') ?? link.error.message) : undefined
+
+  return (
+    <Dialog open={admin !== null} onOpenChange={(n) => { if (!n && !link.isPending) close() }}>
+      <DialogContent>
+        <form onSubmit={(e) => {
+          e.preventDefault()
+          if (!admin) return
+          link.mutate({ adminId: admin.id, email: email.trim() }, { onSuccess: () => { toast({ variant: 'success', title: 'Mobil hesab bağlandı' }); close() } })
+        }}>
+          <DialogHeader>
+            <DialogTitle>Komendant mobil hesabı</DialogTitle>
+            <DialogDescription>{admin?.name} ({admin?.email}) mobil tətbiqə bu hesabla daxil olacaq. Hesab artıq qeydiyyatdan keçmiş, e-poçtu təsdiqlənmiş və aktiv olmalıdır.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            <Label htmlFor="m-email">Mobil hesabın e-poçtu</Label>
+            <Input id="m-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={close} disabled={link.isPending}>İmtina</Button>
+            <Button type="submit" disabled={link.isPending || !email.trim()}>{link.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Bağla</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

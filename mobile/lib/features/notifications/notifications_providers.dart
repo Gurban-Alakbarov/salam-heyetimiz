@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
+import '../../core/error/retry_policy.dart';
 import 'data/datasource/notification_remote_datasource.dart';
 import 'data/push_messaging_service.dart';
 import 'data/push_token_datasource.dart';
@@ -36,6 +37,7 @@ final notificationRepositoryProvider = Provider<NotificationRepository>(
 final notificationInboxProvider =
     AsyncNotifierProvider<NotificationInboxNotifier, NotificationInboxState>(
       NotificationInboxNotifier.new,
+      retry: retryTransientFailures,
     );
 
 class NotificationInboxNotifier extends AsyncNotifier<NotificationInboxState> {

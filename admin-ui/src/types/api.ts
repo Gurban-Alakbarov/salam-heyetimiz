@@ -45,6 +45,9 @@ export interface AdminUser {
   impersonator_admin_id: number | null
   last_login_at: string | null
   created_at: string | null
+  /** B11 (admin list only): the mobile account a Komendant signs in with. */
+  user_id?: number | null
+  mobile_user?: { id: number; email: string | null; full_name: string | null } | null
 }
 export interface LoginChallenge {
   challenge_token: string
@@ -145,7 +148,13 @@ export interface DeviceAdmin {
   last_signal_strength: number | null
   whitelist_capacity_used: number
   created_at: string | null
+  // B11: access model + complex binding + one-off sale price (admin record only — paid outside the app)
+  ownership_mode?: OwnershipMode
+  complex_id?: number | null
+  sale_price_minor?: number | null
+  sale_recorded_at?: string | null
 }
+export type OwnershipMode = 'private' | 'complex'
 export interface DeviceUser {
   id: number
   /**
@@ -214,6 +223,8 @@ export interface Order {
   refunded_minor?: number
   refundable_minor?: number
   items?: OrderItem[]
+  /** B1: fake-gateway order ("TEST ÖDƏNİŞ"). */
+  is_test?: boolean
 }
 export interface Refund {
   id: number
@@ -292,6 +303,8 @@ export type UpdateDeviceInput = Partial<Omit<CreateDeviceInput, 'serial' | 'devi
   // GEOFENCE-2 (admin-only, edit flow) — sent to PATCH /admin/v1/devices/{id}. radius is null when off.
   geofence_enabled?: boolean
   geofence_radius_m?: number | null
+  // B11 — one-off sale price in minor units (admin record only; null clears it)
+  sale_price_minor?: number | null
 }
 export interface TransferInput {
   new_owner_phone: string

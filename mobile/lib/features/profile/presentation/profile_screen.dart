@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/design_system/components/app_list.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
 import 'package:salam_mobile/features/auth/domain/entity/auth_entities.dart';
+import 'package:salam_mobile/features/auth/session_roles_provider.dart';
 import 'package:salam_mobile/features/door_widget/presentation/door_widget_management_screen.dart';
 import 'package:salam_mobile/features/notifications/presentation/notification_screen.dart';
 import 'package:salam_mobile/features/profile/presentation/help_screen.dart';
@@ -29,6 +31,9 @@ class ProfileScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final user = ref.watch(currentUserProvider).value?.user;
     final version = ref.watch(appVersionProvider);
+    final roles = ref.watch(sessionRolesProvider).value;
+    final isKomendant = roles?.isKomendant ?? false;
+    final complexIds = roles?.complexIds ?? const <int>[];
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -58,6 +63,36 @@ class ProfileScreen extends ConsumerWidget {
               chevron: true,
               onTap: () => _push(context, const ResidenceScreen()),
             ),
+            // B16: resident complex (active membership only) — devices + own subscription.
+            if (complexIds.isNotEmpty)
+              AppListTile(
+                key: const Key('profile-complex'),
+                icon: Icons.domain_outlined,
+                title: l.cxTitle,
+                subtitle: l.cxEntrySubtitle,
+                chevron: true,
+                onTap: () => GoRouter.of(context).push(complexIds.length == 1 ? '/complex/${complexIds.first}' : '/complexes'),
+              ),
+            // B17: family members — invite / status / pay / remove. Shown to every signed-in user: the server
+            // decides on which devices the caller heads a family (the screen explains when nowhere).
+            AppListTile(
+              key: const Key('profile-family'),
+              icon: Icons.family_restroom,
+              title: l.famTitle,
+              subtitle: l.famEntrySubtitle,
+              chevron: true,
+              onTap: () => GoRouter.of(context).push('/family'),
+            ),
+            // B15: Komendant area — only for a linked complex manager (server re-checks every call).
+            if (isKomendant)
+              AppListTile(
+                key: const Key('profile-komendant'),
+                icon: Icons.admin_panel_settings_outlined,
+                title: l.kmTitle,
+                subtitle: l.kmEntrySubtitle,
+                chevron: true,
+                onTap: () => GoRouter.of(context).push('/komendant'),
+              ),
           ],
         ),
         const SizedBox(height: AppSpacing.lg),

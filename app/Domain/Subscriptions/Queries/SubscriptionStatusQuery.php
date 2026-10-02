@@ -2,6 +2,7 @@
 
 namespace App\Domain\Subscriptions\Queries;
 
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Services\DeviceLookup;
 use App\Domain\Roster\Enums\DeviceUserRole;
@@ -51,6 +52,12 @@ final class SubscriptionStatusQuery
 
         if ($this->hasActiveSubscription($callerDeviceUser->getKey())) {
             return new DeviceAccessResult(true, SuspensionReason::None);
+        }
+
+        // Complex device (B4): no owner and no shared entitlement — every resident/family member stands on
+        // their own subscription only. No active one ⇒ "subscription required", regardless of others.
+        if ($this->devices->ownershipMode($deviceId) === DeviceOwnershipMode::Complex) {
+            return new DeviceAccessResult(false, SuspensionReason::SubscriptionExpired);
         }
 
         $othersActive = $this->anyOtherActiveSubscription($deviceId, (int) $callerDeviceUser->getKey());

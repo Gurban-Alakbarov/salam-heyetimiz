@@ -62,6 +62,26 @@ export function useCreateAdmin() {
   })
 }
 
+/** B5 link from the admin panel: a complex_manager ↔ an existing, verified mobile account (by email). */
+export function useLinkMobileUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ adminId, email }: { adminId: number; email: string }) =>
+      (await api.post(`/admin/v1/admins/${adminId}/mobile-user`, { email })).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admins'] }),
+  })
+}
+
+export function useUnlinkMobileUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (adminId: number) => {
+      await api.delete(`/admin/v1/admins/${adminId}/mobile-user`)
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admins'] }),
+  })
+}
+
 export function useDeactivateAdmin() {
   const qc = useQueryClient()
   return useMutation({

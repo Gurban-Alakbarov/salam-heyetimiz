@@ -6,6 +6,7 @@
 return [
     'unauthenticated' => 'Giriş tələb olunur.',
     'forbidden' => 'Bu əməliyyata icazəniz yoxdur.',
+    'family_member_cannot_share' => 'Ailə üzvü qonaq linki yarada bilməz.',
     'not_found' => 'Tapılmadı.',
     'bad_request' => 'Sorğu yanlışdır.',
     'validation_failed' => 'Daxil edilən məlumat yanlışdır.',

@@ -8,7 +8,7 @@ it('prices each item type from the settings defaults (minor units)', function ()
 
     expect($pricing->unitPriceMinor(OrderItemType::Device))->toBe(13500)
         ->and($pricing->unitPriceMinor(OrderItemType::SubMain))->toBe(1200)
-        ->and($pricing->unitPriceMinor(OrderItemType::SubAdditional))->toBe(600)
+        ->and($pricing->unitPriceMinor(OrderItemType::SubAdditional))->toBe(1200) // B2: family member = 12 AZN, same as resident
         ->and($pricing->unitPriceMinor(OrderItemType::SubRenewal))->toBe(1200);
 });
 

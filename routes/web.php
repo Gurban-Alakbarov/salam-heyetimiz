@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Web\Invitations\InvitePageController;
+use App\Http\Web\Invitations\WellKnownController;
 use App\Http\Web\Visitor\VisitorPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +23,13 @@ Route::get('/', static fn () => response()->json([
 Route::get('/'.config('domain.visitor.path', 'v').'/{token}', [VisitorPageController::class, 'show'])
     ->where('token', '[A-Za-z0-9_-]+')
     ->name('visitorPage');
+
+// Invitation link landing (B6) — opened when the app does not intercept the universal / app link.
+Route::get('/invite/{token}', [InvitePageController::class, 'show'])
+    ->where('token', '[A-Za-z0-9_-]+')
+    ->middleware('throttle:public')
+    ->name('invitePage');
+
+// App-link association files (B6) — 404 until the platform identity is configured (config/domain/app_links.php).
+Route::get('/.well-known/assetlinks.json', [WellKnownController::class, 'assetLinks'])->name('wellKnownAssetLinks');
+Route::get('/.well-known/apple-app-site-association', [WellKnownController::class, 'appleAppSiteAssociation'])->name('wellKnownAasa');

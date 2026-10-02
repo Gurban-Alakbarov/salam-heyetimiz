@@ -11,6 +11,8 @@ abstract class AuthRepository {
     required String lastName,
     required String phone,
     required String email,
+    String? accountType,
+    String? invitationToken,
   });
 
   Future<Result<OtpDispatch>> login({required String email});

@@ -18,6 +18,8 @@ class RegisterController extends Notifier<AsyncValue<OtpDispatch?>> {
     required String lastName,
     required String phone,
     required String email,
+    String? accountType,
+    String? invitationToken,
   }) async {
     state = const AsyncLoading();
     final result = await ref
@@ -27,6 +29,8 @@ class RegisterController extends Notifier<AsyncValue<OtpDispatch?>> {
           lastName: lastName,
           phone: phone,
           email: email,
+          accountType: accountType,
+          invitationToken: invitationToken,
         );
     return result.fold(
       (failure) {

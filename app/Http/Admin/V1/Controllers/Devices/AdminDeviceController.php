@@ -150,6 +150,20 @@ class AdminDeviceController
             $device = $geofence->handle($device, $enabled, $radius);
         }
 
+        // B11: the sale price is an admin record (who / when, audited) — it never feeds an order (BR-20).
+        if (array_key_exists('sale_price_minor', $request->validated())) {
+            $price = $request->validated()['sale_price_minor'];
+            $previous = $device->sale_price_minor;
+            $device->forceFill([
+                'sale_price_minor' => $price,
+                'sale_recorded_at' => $price !== null ? now() : null,
+                'sale_recorded_by_admin_id' => $price !== null ? $request->user()->getKey() : null,
+            ])->save();
+            app(\App\Domain\Audit\Services\AuditLogger::class)->record('device.sale_price_recorded', [
+                'device_id' => (int) $device->id, 'previous_minor' => $previous, 'sale_price_minor' => $price,
+            ], Device::class, (int) $device->id);
+        }
+
         return $this->adminDevice($device)->response()->setStatusCode(200);
     }
 

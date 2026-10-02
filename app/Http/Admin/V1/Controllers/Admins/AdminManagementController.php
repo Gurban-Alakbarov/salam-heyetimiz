@@ -30,9 +30,19 @@ class AdminManagementController
 
         $admins = AdminUser::query()->orderBy('id')->limit(200)->get();
 
-        return response()->json([
-            'data' => AdminUserResource::collection($admins),
-        ]);
+        // B11 (additive): the mobile account a Komendant signs in with (B5 link), so the UI shows its state.
+        $mobile = \App\Domain\Users\Models\User::query()->whereIn('id', $admins->pluck('user_id')->filter())->get(['id', 'email', 'full_name'])->keyBy('id');
+        $data = collect(AdminUserResource::collection($admins)->resolve($request))->map(function (array $row, int $i) use ($admins, $mobile): array {
+            $userId = $admins[$i]->user_id;
+            $user = $userId !== null ? $mobile->get($userId) : null;
+
+            return $row + [
+                'user_id' => $userId !== null ? (int) $userId : null,
+                'mobile_user' => $user !== null ? ['id' => (int) $user->id, 'email' => $user->email, 'full_name' => $user->full_name] : null,
+            ];
+        })->all();
+
+        return response()->json(['data' => $data]);
     }
 
     /** POST /admin/v1/admins — adminCreateAdmin (admins.create). Returns the 2FA bootstrap secret once. */

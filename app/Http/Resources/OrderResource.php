@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Enums\PaymentStatus;
 use App\Domain\Payments\Enums\PaymentType;
 use App\Domain\Payments\Models\Order;
@@ -30,6 +31,8 @@ class OrderResource extends JsonResource
             'currency' => $this->currency,
             'bank_order_id' => $this->bank_order_id,
             'bank_redirect_url' => $this->bank_redirect_url,
+            // Simulated (fake-gateway) order — clients must label it "TEST ÖDƏNİŞ" (B1). Additive field.
+            'is_test' => FakeKapitalGateway::isFakeBankOrderId($this->bank_order_id),
             'expires_at' => optional($this->expires_at)->toIso8601String(),
             'paid_at' => optional($this->paid_at)->toIso8601String(),
             'failed_at' => optional($this->failed_at)->toIso8601String(),

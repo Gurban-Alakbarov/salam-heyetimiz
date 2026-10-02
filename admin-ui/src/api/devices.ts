@@ -113,6 +113,20 @@ export function useUpdateDevice(id: number) {
   })
 }
 
+/** B11 — switch the access model (private ↔ complex); the server enforces the B4 invariants (409). */
+export function useChangeOwnershipMode(id: number) {
+  const invalidate = useDeviceInvalidation()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (mode: 'private' | 'complex') =>
+      (await api.post<DeviceAdmin>(`/admin/v1/devices/${id}/ownership-mode`, { ownership_mode: mode })).data,
+    onSuccess: () => {
+      invalidate(id)
+      qc.invalidateQueries({ queryKey: ['complex'] })
+    },
+  })
+}
+
 // Upload a barrier photo (multipart). The server optimises + stores it and returns the device with
 // the new `image_url`. axios sets the multipart boundary automatically for a FormData body.
 export function useUploadDeviceImage(id: number) {

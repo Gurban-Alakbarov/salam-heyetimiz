@@ -1,4 +1,4 @@
-import { Bell, Building2, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, ReceiptText, RotateCcw, Satellite, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
+import { Bell, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, ReceiptText, RotateCcw, Satellite, ScrollText, Settings, UserRound, UsersRound, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PERM } from '@/auth/permissions'
 import type { Permission } from '@/types/api'
@@ -16,8 +16,10 @@ export interface NavItem {
 // then administration (admins → access), then platform (traccar → audit → settings).
 export const navItems: NavItem[] = [
   { to: '/', label: 'İdarə paneli', icon: LayoutDashboard, end: true, permission: PERM.dashboardView },
+  { to: '/applications', label: 'Müraciətlər', icon: ClipboardList, permission: PERM.applicationsView },
   { to: '/complexes', label: 'Komplekslər', icon: Building2, permission: PERM.complexesView },
   { to: '/residents', label: 'Sakinlər', icon: UsersRound, permission: PERM.residentsView },
+  { to: '/users', label: 'İstifadəçilər', icon: UserRound, permission: PERM.residentsView },
   { to: '/devices', label: 'Cihazlar', icon: HardDrive, permission: PERM.devicesView },
   { to: '/subscriptions', label: 'Abunəliklər', icon: CreditCard, permission: PERM.subscriptionsView },
   { to: '/orders', label: 'Sifarişlər', icon: ReceiptText, permission: PERM.ordersView },

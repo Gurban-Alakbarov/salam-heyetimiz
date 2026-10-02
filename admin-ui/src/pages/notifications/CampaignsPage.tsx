@@ -14,6 +14,7 @@ import { Select } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDateTime } from '@/lib/format'
 import { useCursor } from '@/lib/useCursor'
+import { NotificationsTabs } from './NotificationsTabs'
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Bütün statuslar' },
@@ -44,6 +45,7 @@ export function CampaignsPage() {
 
   return (
     <div className="space-y-5">
+      <NotificationsTabs />
       <PageHeader
         title="Bildirişlər"
         description="Sistem bildiriş kampaniyaları (push + tətbiqdaxili)"

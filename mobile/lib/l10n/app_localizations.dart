@@ -1257,6 +1257,1122 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invitation'**
   String get invitationDefaultTitle;
+
+  /// No description provided for @checkoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get checkoutTitle;
+
+  /// No description provided for @paymentTestBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'TEST PAYMENT'**
+  String get paymentTestBanner;
+
+  /// No description provided for @paymentResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment result'**
+  String get paymentResultTitle;
+
+  /// No description provided for @paymentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment successful'**
+  String get paymentSuccess;
+
+  /// No description provided for @paymentFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed'**
+  String get paymentFailed;
+
+  /// No description provided for @paymentCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled'**
+  String get paymentCancelled;
+
+  /// No description provided for @paymentExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment time expired'**
+  String get paymentExpired;
+
+  /// No description provided for @paymentPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is being processed'**
+  String get paymentPending;
+
+  /// No description provided for @paymentChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirming with the bank…'**
+  String get paymentChecking;
+
+  /// No description provided for @paymentRecheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get paymentRecheck;
+
+  /// No description provided for @paymentDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get paymentDone;
+
+  /// No description provided for @paymentOrderNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found'**
+  String get paymentOrderNotFound;
+
+  /// No description provided for @subscriptionRenew.
+  ///
+  /// In en, this message translates to:
+  /// **'Renew (12 AZN / 30 days)'**
+  String get subscriptionRenew;
+
+  /// No description provided for @subscriptionRenewNotEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'This subscription cannot be renewed right now.'**
+  String get subscriptionRenewNotEligible;
+
+  /// No description provided for @regTypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration type'**
+  String get regTypeTitle;
+
+  /// No description provided for @regTypePhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual'**
+  String get regTypePhysical;
+
+  /// No description provided for @regTypePhysicalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'I want a barrier device for my own private yard.'**
+  String get regTypePhysicalBody;
+
+  /// No description provided for @regTypeLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal entity'**
+  String get regTypeLegal;
+
+  /// No description provided for @regTypeLegalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Residential complex, building or company.'**
+  String get regTypeLegalBody;
+
+  /// No description provided for @appMineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My applications'**
+  String get appMineTitle;
+
+  /// No description provided for @appNone.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no applications yet'**
+  String get appNone;
+
+  /// No description provided for @appNewPhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'New application (individual)'**
+  String get appNewPhysical;
+
+  /// No description provided for @appNewLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'New application (legal entity)'**
+  String get appNewLegal;
+
+  /// No description provided for @appSectionPhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual'**
+  String get appSectionPhysical;
+
+  /// No description provided for @appSectionLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal entity'**
+  String get appSectionLegal;
+
+  /// No description provided for @appPhysicalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual application'**
+  String get appPhysicalTitle;
+
+  /// No description provided for @appPhysicalIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us where your yard is — our team will contact you about installation.'**
+  String get appPhysicalIntro;
+
+  /// No description provided for @appLegalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal entity application'**
+  String get appLegalTitle;
+
+  /// No description provided for @appLegalIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Complex details and location. An administrator reviews the application.'**
+  String get appLegalIntro;
+
+  /// No description provided for @appFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get appFullName;
+
+  /// No description provided for @appPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get appPhone;
+
+  /// No description provided for @appEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get appEmail;
+
+  /// No description provided for @appAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get appAddress;
+
+  /// No description provided for @appNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get appNote;
+
+  /// No description provided for @appComplexName.
+  ///
+  /// In en, this message translates to:
+  /// **'Complex name'**
+  String get appComplexName;
+
+  /// No description provided for @appLegalName.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal name'**
+  String get appLegalName;
+
+  /// No description provided for @appVoen.
+  ///
+  /// In en, this message translates to:
+  /// **'TIN (VÖEN)'**
+  String get appVoen;
+
+  /// No description provided for @appLegalAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal address'**
+  String get appLegalAddress;
+
+  /// No description provided for @appContactName.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact person'**
+  String get appContactName;
+
+  /// No description provided for @appComplexAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Complex address'**
+  String get appComplexAddress;
+
+  /// No description provided for @appApartments.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of apartments (optional)'**
+  String get appApartments;
+
+  /// No description provided for @appLocationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Location on the map'**
+  String get appLocationLabel;
+
+  /// No description provided for @appLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to place the pin'**
+  String get appLocationHint;
+
+  /// No description provided for @appUseMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'My location'**
+  String get appUseMyLocation;
+
+  /// No description provided for @appLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the location on the map'**
+  String get appLocationRequired;
+
+  /// No description provided for @appLocationOutside.
+  ///
+  /// In en, this message translates to:
+  /// **'The location must be inside Azerbaijan'**
+  String get appLocationOutside;
+
+  /// No description provided for @appVoenInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'TIN must be 10 digits'**
+  String get appVoenInvalid;
+
+  /// No description provided for @appApartmentsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get appApartmentsInvalid;
+
+  /// No description provided for @appSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit application'**
+  String get appSubmit;
+
+  /// No description provided for @appLater.
+  ///
+  /// In en, this message translates to:
+  /// **'I will fill it in later'**
+  String get appLater;
+
+  /// No description provided for @appSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Application submitted'**
+  String get appSubmitted;
+
+  /// No description provided for @appStatusNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get appStatusNew;
+
+  /// No description provided for @appStatusContacted.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacted'**
+  String get appStatusContacted;
+
+  /// No description provided for @appStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get appStatusInProgress;
+
+  /// No description provided for @appStatusInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get appStatusInstalled;
+
+  /// No description provided for @appStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Under review'**
+  String get appStatusPending;
+
+  /// No description provided for @appStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get appStatusApproved;
+
+  /// No description provided for @appStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get appStatusRejected;
+
+  /// No description provided for @appRejectReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get appRejectReason;
+
+  /// No description provided for @appErrTypeMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account type does not match this application type.'**
+  String get appErrTypeMismatch;
+
+  /// No description provided for @appErrAlreadyOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have an open application.'**
+  String get appErrAlreadyOpen;
+
+  /// No description provided for @appErrDuplicateVoen.
+  ///
+  /// In en, this message translates to:
+  /// **'An application with this TIN is already under review.'**
+  String get appErrDuplicateVoen;
+
+  /// No description provided for @kmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My complex (Komendant)'**
+  String get kmTitle;
+
+  /// No description provided for @kmEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Residents, invitations and devices'**
+  String get kmEntrySubtitle;
+
+  /// No description provided for @kmStatDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get kmStatDevices;
+
+  /// No description provided for @kmStatResidents.
+  ///
+  /// In en, this message translates to:
+  /// **'Residents'**
+  String get kmStatResidents;
+
+  /// No description provided for @kmStatPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending invites'**
+  String get kmStatPending;
+
+  /// No description provided for @kmDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complex devices'**
+  String get kmDevicesTitle;
+
+  /// No description provided for @kmNoDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'No devices are linked to the complex yet.'**
+  String get kmNoDevices;
+
+  /// No description provided for @kmOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get kmOnline;
+
+  /// No description provided for @kmOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get kmOffline;
+
+  /// No description provided for @kmDevicePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription: {price} / {days} days'**
+  String kmDevicePrice(String price, int days);
+
+  /// No description provided for @kmInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite resident'**
+  String get kmInvite;
+
+  /// No description provided for @kmInviteIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The resident will receive an invitation link by email, valid for 7 days.'**
+  String get kmInviteIntro;
+
+  /// No description provided for @kmFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get kmFirstName;
+
+  /// No description provided for @kmLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get kmLastName;
+
+  /// No description provided for @kmEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get kmEmail;
+
+  /// No description provided for @kmInviteSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send invitation'**
+  String get kmInviteSend;
+
+  /// No description provided for @kmInviteSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent.'**
+  String get kmInviteSent;
+
+  /// No description provided for @kmInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations'**
+  String get kmInvitations;
+
+  /// No description provided for @kmTabPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get kmTabPending;
+
+  /// No description provided for @kmTabAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get kmTabAccepted;
+
+  /// No description provided for @kmTabExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get kmTabExpired;
+
+  /// No description provided for @kmTabClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get kmTabClosed;
+
+  /// No description provided for @kmStatusDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get kmStatusDeclined;
+
+  /// No description provided for @kmNoInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'No invitations here.'**
+  String get kmNoInvitations;
+
+  /// No description provided for @kmExpiresAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires: {date}'**
+  String kmExpiresAt(String date);
+
+  /// No description provided for @kmAcceptedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted: {date}'**
+  String kmAcceptedAt(String date);
+
+  /// No description provided for @kmSendCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {count} times'**
+  String kmSendCount(int count);
+
+  /// No description provided for @kmResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend'**
+  String get kmResend;
+
+  /// No description provided for @kmRevoke.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get kmRevoke;
+
+  /// No description provided for @kmResent.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation resent.'**
+  String get kmResent;
+
+  /// No description provided for @kmRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation revoked.'**
+  String get kmRevoked;
+
+  /// No description provided for @kmRevokeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke invitation?'**
+  String get kmRevokeTitle;
+
+  /// No description provided for @kmRevokeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The invitation link will stop working.'**
+  String get kmRevokeBody;
+
+  /// No description provided for @kmResidentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Residents'**
+  String get kmResidentsTitle;
+
+  /// No description provided for @kmNoResidents.
+  ///
+  /// In en, this message translates to:
+  /// **'The complex has no residents yet.'**
+  String get kmNoResidents;
+
+  /// No description provided for @kmActiveSubs.
+  ///
+  /// In en, this message translates to:
+  /// **'Active subscriptions: {count}'**
+  String kmActiveSubs(int count);
+
+  /// No description provided for @kmNoActiveSub.
+  ///
+  /// In en, this message translates to:
+  /// **'No active subscription'**
+  String get kmNoActiveSub;
+
+  /// No description provided for @kmJoinedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined: {date}'**
+  String kmJoinedAt(String date);
+
+  /// No description provided for @kmRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get kmRemove;
+
+  /// No description provided for @kmRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove resident from complex'**
+  String get kmRemoveTitle;
+
+  /// No description provided for @kmRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be removed from the complex. Access to the complex devices stops immediately and active subscriptions are cancelled. No automatic refund is made.'**
+  String kmRemoveBody(String name);
+
+  /// No description provided for @kmRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resident removed from the complex.'**
+  String get kmRemoved;
+
+  /// No description provided for @kmErrNotKomendant.
+  ///
+  /// In en, this message translates to:
+  /// **'This section is only for the complex manager.'**
+  String get kmErrNotKomendant;
+
+  /// No description provided for @kmErrForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not allowed to do this.'**
+  String get kmErrForbidden;
+
+  /// No description provided for @kmErrAlreadyResident.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already belongs to a resident of the complex.'**
+  String get kmErrAlreadyResident;
+
+  /// No description provided for @kmErrAlreadyPending.
+  ///
+  /// In en, this message translates to:
+  /// **'An active invitation already exists for this email.'**
+  String get kmErrAlreadyPending;
+
+  /// No description provided for @kmErrNotResendable.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation cannot be resent.'**
+  String get kmErrNotResendable;
+
+  /// No description provided for @kmErrNotRevocable.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation cannot be revoked.'**
+  String get kmErrNotRevocable;
+
+  /// No description provided for @kmErrRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent too often. Please try again a little later.'**
+  String get kmErrRateLimited;
+
+  /// No description provided for @kmErrNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not found. The list has been refreshed.'**
+  String get kmErrNotFound;
+
+  /// No description provided for @invTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation'**
+  String get invTitle;
+
+  /// No description provided for @invComplexKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Residential complex invitation'**
+  String get invComplexKind;
+
+  /// No description provided for @invFamilyKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member invitation'**
+  String get invFamilyKind;
+
+  /// No description provided for @invComplexBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You are invited to {complex} as a resident. After accepting you can pick a device and subscribe.'**
+  String invComplexBody(String complex);
+
+  /// No description provided for @invFamilyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{inviter} invited you as a family member to use a device. Access activates once your own subscription is paid.'**
+  String invFamilyBody(String inviter);
+
+  /// No description provided for @invFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitee: {name}'**
+  String invFor(String name);
+
+  /// No description provided for @invSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'The invitation was sent to {email}. Continue with that email.'**
+  String invSentTo(String email);
+
+  /// No description provided for @invExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until {date}'**
+  String invExpires(String date);
+
+  /// No description provided for @invRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get invRegister;
+
+  /// No description provided for @invLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'I have an account — log in'**
+  String get invLogin;
+
+  /// No description provided for @invAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept invitation'**
+  String get invAccept;
+
+  /// No description provided for @invDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get invDecline;
+
+  /// No description provided for @invDeclineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline the invitation?'**
+  String get invDeclineTitle;
+
+  /// No description provided for @invDeclineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation link will stop working.'**
+  String get invDeclineBody;
+
+  /// No description provided for @invDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation declined.'**
+  String get invDeclined;
+
+  /// No description provided for @invAcceptedComplex.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation accepted. Welcome to {complex}!'**
+  String invAcceptedComplex(String complex);
+
+  /// No description provided for @invAcceptedFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation accepted. Pay the subscription to activate access.'**
+  String get invAcceptedFamily;
+
+  /// No description provided for @invGoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation is not valid'**
+  String get invGoneTitle;
+
+  /// No description provided for @invGoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation link has expired, been revoked or already used. Ask the sender for a new invitation.'**
+  String get invGoneBody;
+
+  /// No description provided for @invClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get invClose;
+
+  /// No description provided for @invErrEmailMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation is for another email address. Sign in with the invited email.'**
+  String get invErrEmailMismatch;
+
+  /// No description provided for @invErrAlreadyHasAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have access to this device.'**
+  String get invErrAlreadyHasAccess;
+
+  /// No description provided for @invErrInvalidTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot accept your own invitation.'**
+  String get invErrInvalidTarget;
+
+  /// No description provided for @invErrUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation type is not supported.'**
+  String get invErrUnsupported;
+
+  /// No description provided for @invRegisterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Register with the invited email; the invitation is accepted once your account is verified.'**
+  String get invRegisterHint;
+
+  /// No description provided for @invPendingCard.
+  ///
+  /// In en, this message translates to:
+  /// **'You have an invitation'**
+  String get invPendingCard;
+
+  /// No description provided for @invPendingCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open and accept it.'**
+  String get invPendingCardBody;
+
+  /// No description provided for @cxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My complex'**
+  String get cxTitle;
+
+  /// No description provided for @cxMyComplexes.
+  ///
+  /// In en, this message translates to:
+  /// **'My complexes'**
+  String get cxMyComplexes;
+
+  /// No description provided for @cxEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a device and subscribe'**
+  String get cxEntrySubtitle;
+
+  /// No description provided for @cxNoComplexes.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not a resident of any complex yet.'**
+  String get cxNoComplexes;
+
+  /// No description provided for @cxDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complex devices'**
+  String get cxDevicesTitle;
+
+  /// No description provided for @cxNoDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'The complex has no devices yet.'**
+  String get cxNoDevices;
+
+  /// No description provided for @cxStatusNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not subscribed'**
+  String get cxStatusNone;
+
+  /// No description provided for @cxStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment'**
+  String get cxStatusPending;
+
+  /// No description provided for @cxStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get cxStatusActive;
+
+  /// No description provided for @cxStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get cxStatusExpired;
+
+  /// No description provided for @cxPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / {days} days'**
+  String cxPrice(String price, int days);
+
+  /// No description provided for @cxPriceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A subscription activates your access to this device.'**
+  String get cxPriceNote;
+
+  /// No description provided for @cxSubscriptionBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly subscription'**
+  String get cxSubscriptionBlock;
+
+  /// No description provided for @cxSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get cxSubscribe;
+
+  /// No description provided for @cxFinishPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete payment'**
+  String get cxFinishPayment;
+
+  /// No description provided for @cxRenew.
+  ///
+  /// In en, this message translates to:
+  /// **'Renew'**
+  String get cxRenew;
+
+  /// No description provided for @cxOpenInDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Devices'**
+  String get cxOpenInDevices;
+
+  /// No description provided for @cxDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get cxDeviceTitle;
+
+  /// No description provided for @cxErrAlreadyActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription for this device is already active.'**
+  String get cxErrAlreadyActive;
+
+  /// No description provided for @payPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment'**
+  String get payPendingTitle;
+
+  /// No description provided for @payPendingCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions awaiting payment: {count}'**
+  String payPendingCard(int count);
+
+  /// No description provided for @payPendingNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is awaiting payment.'**
+  String get payPendingNone;
+
+  /// No description provided for @payPendingMain.
+  ///
+  /// In en, this message translates to:
+  /// **'Resident subscription'**
+  String get payPendingMain;
+
+  /// No description provided for @payPendingAdditional.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member subscription'**
+  String get payPendingAdditional;
+
+  /// No description provided for @payNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get payNow;
+
+  /// No description provided for @payDeviceFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Device #{id}'**
+  String payDeviceFallback(int id);
+
+  /// No description provided for @payErrForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not allowed to do this.'**
+  String get payErrForbidden;
+
+  /// No description provided for @famTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family members'**
+  String get famTitle;
+
+  /// No description provided for @famEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations, access and payments'**
+  String get famEntrySubtitle;
+
+  /// No description provided for @famTabMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get famTabMembers;
+
+  /// No description provided for @famTabInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations'**
+  String get famTabInvitations;
+
+  /// No description provided for @famInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite a family member'**
+  String get famInvite;
+
+  /// No description provided for @famNotHead.
+  ///
+  /// In en, this message translates to:
+  /// **'To invite family members you need active access of your own on a device. This is not available on devices you were added to as a family member.'**
+  String get famNotHead;
+
+  /// No description provided for @famErrNotHead.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot manage family members on this device.'**
+  String get famErrNotHead;
+
+  /// No description provided for @famErrInvalidTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'This person cannot be invited (yourself or someone already on this device).'**
+  String get famErrInvalidTarget;
+
+  /// No description provided for @famNoMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'No family members yet.'**
+  String get famNoMembers;
+
+  /// No description provided for @famNoInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'No family invitations yet.'**
+  String get famNoInvitations;
+
+  /// No description provided for @famDeviceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get famDeviceLabel;
+
+  /// No description provided for @famInviteIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'An invitation valid for 7 days will be emailed for the selected device. Each family member has their own monthly subscription, paid by you or by the member.'**
+  String get famInviteIntro;
+
+  /// No description provided for @famGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Access to this device was granted to the family member. The subscription awaits payment.'**
+  String get famGranted;
+
+  /// No description provided for @famSubNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No subscription'**
+  String get famSubNone;
+
+  /// No description provided for @famSubActiveUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Active until {date}'**
+  String famSubActiveUntil(String date);
+
+  /// No description provided for @famPayFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay for member'**
+  String get famPayFor;
+
+  /// No description provided for @famRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get famRemove;
+
+  /// No description provided for @famRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove family member'**
+  String get famRemoveTitle;
+
+  /// No description provided for @famRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be removed from your family. Access to the devices you granted stops immediately and their subscriptions are cancelled. No automatic refund is made.'**
+  String famRemoveBody(String name);
+
+  /// No description provided for @famRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member removed.'**
+  String get famRemoved;
 }
 
 class _AppLocalizationsDelegate

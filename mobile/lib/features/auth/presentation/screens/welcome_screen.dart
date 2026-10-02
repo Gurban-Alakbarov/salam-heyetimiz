@@ -5,6 +5,7 @@ import 'package:salam_mobile/design_system/components/app_components.dart';
 import 'package:salam_mobile/design_system/components/app_inputs.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
+import 'package:salam_mobile/features/complex/complex_providers.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 
 class WelcomeScreen extends ConsumerWidget {
@@ -38,10 +39,20 @@ class WelcomeScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const Spacer(),
+              // B16: an invitation opened earlier on this device is one tap away.
+              if (ref.watch(hasPendingInviteProvider).value ?? false) ...[
+                AppSecondaryButton(
+                  key: const Key('welcome-invite'),
+                  label: l.invPendingCard,
+                  icon: Icons.mark_email_unread_outlined,
+                  onPressed: () => context.push('/invite'),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
               if (registrationEnabled)
                 AppButton(
                   label: l.registerSubmit,
-                  onPressed: () => context.go('/auth/register'),
+                  onPressed: () => context.push('/auth/register/type'),
                 ),
               const SizedBox(height: AppSpacing.sm),
               AppTextButton(

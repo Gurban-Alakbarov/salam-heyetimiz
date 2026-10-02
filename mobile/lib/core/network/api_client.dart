@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../config/app_config.dart';
 import '../logger/app_logger.dart';
@@ -187,16 +188,23 @@ class LoggingInterceptor extends Interceptor {
 
   final AppLogger _logger;
 
+  static final RegExp _inviteToken = RegExp(r'(/invites/)[^/?#]+');
+
+  /// Paths can carry credentials (B16: the invitation token in `/v1/invites/{token}[/accept|/decline]`);
+  /// they are redacted before logging.
+  @visibleForTesting
+  static String redactPath(String path) => path.replaceAllMapped(_inviteToken, (m) => '${m[1]}<redacted>');
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     // Redacted: method + path only — never headers/body (tokens, OTP, PII).
-    _logger.d('→ ${options.method} ${options.path}');
+    _logger.d('→ ${options.method} ${redactPath(options.path)}');
     handler.next(options);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _logger.w('✗ ${err.requestOptions.path} [${err.response?.statusCode}]');
+    _logger.w('✗ ${redactPath(err.requestOptions.path)} [${err.response?.statusCode}]');
     handler.next(err);
   }
 }

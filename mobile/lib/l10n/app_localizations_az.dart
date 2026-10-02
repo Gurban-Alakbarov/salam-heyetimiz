@@ -623,4 +623,617 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get invitationDefaultTitle => 'Dəvət';
+
+  @override
+  String get checkoutTitle => 'Ödəniş';
+
+  @override
+  String get paymentTestBanner => 'TEST ÖDƏNİŞ';
+
+  @override
+  String get paymentResultTitle => 'Ödənişin nəticəsi';
+
+  @override
+  String get paymentSuccess => 'Ödəniş uğurlu oldu';
+
+  @override
+  String get paymentFailed => 'Ödəniş uğursuz oldu';
+
+  @override
+  String get paymentCancelled => 'Ödəniş ləğv edildi';
+
+  @override
+  String get paymentExpired => 'Ödəniş vaxtı bitdi';
+
+  @override
+  String get paymentPending => 'Ödəniş emal olunur';
+
+  @override
+  String get paymentChecking => 'Bankla təsdiqlənir…';
+
+  @override
+  String get paymentRecheck => 'Yenidən yoxla';
+
+  @override
+  String get paymentDone => 'Ana səhifəyə qayıt';
+
+  @override
+  String get paymentOrderNotFound => 'Sifariş tapılmadı';
+
+  @override
+  String get subscriptionRenew => 'Yenilə (12 AZN / 30 gün)';
+
+  @override
+  String get subscriptionRenewNotEligible =>
+      'Bu abunəlik hazırda yenilənə bilməz.';
+
+  @override
+  String get regTypeTitle => 'Qeydiyyat növü';
+
+  @override
+  String get regTypePhysical => 'Fiziki şəxs';
+
+  @override
+  String get regTypePhysicalBody =>
+      'Öz şəxsi həyətimə cihaz qoşdurmaq istəyirəm.';
+
+  @override
+  String get regTypeLegal => 'Hüquqi şəxs';
+
+  @override
+  String get regTypeLegalBody => 'Yaşayış kompleksi, bina və ya şirkət.';
+
+  @override
+  String get appMineTitle => 'Müraciətlərim';
+
+  @override
+  String get appNone => 'Hələ müraciətiniz yoxdur';
+
+  @override
+  String get appNewPhysical => 'Yeni müraciət (fiziki şəxs)';
+
+  @override
+  String get appNewLegal => 'Yeni müraciət (hüquqi şəxs)';
+
+  @override
+  String get appSectionPhysical => 'Fiziki şəxs';
+
+  @override
+  String get appSectionLegal => 'Hüquqi şəxs';
+
+  @override
+  String get appPhysicalTitle => 'Fiziki şəxs müraciəti';
+
+  @override
+  String get appPhysicalIntro =>
+      'Həyətinizin yerini göstərin — komandamız quraşdırma üçün sizinlə əlaqə saxlayacaq.';
+
+  @override
+  String get appLegalTitle => 'Hüquqi şəxs müraciəti';
+
+  @override
+  String get appLegalIntro =>
+      'Kompleks məlumatları və lokasiya. Müraciətə admin baxır.';
+
+  @override
+  String get appFullName => 'Ad, soyad';
+
+  @override
+  String get appPhone => 'Telefon';
+
+  @override
+  String get appEmail => 'Email';
+
+  @override
+  String get appAddress => 'Ünvan';
+
+  @override
+  String get appNote => 'Qeyd (istəyə bağlı)';
+
+  @override
+  String get appComplexName => 'Kompleksin adı';
+
+  @override
+  String get appLegalName => 'Hüquqi ad';
+
+  @override
+  String get appVoen => 'VÖEN';
+
+  @override
+  String get appLegalAddress => 'Hüquqi ünvan';
+
+  @override
+  String get appContactName => 'Əlaqə şəxsi';
+
+  @override
+  String get appComplexAddress => 'Kompleksin ünvanı';
+
+  @override
+  String get appApartments => 'Mənzil sayı (istəyə bağlı)';
+
+  @override
+  String get appLocationLabel => 'Xəritədə lokasiya';
+
+  @override
+  String get appLocationHint => 'Pin qoymaq üçün xəritəyə toxunun';
+
+  @override
+  String get appUseMyLocation => 'Mövqeyim';
+
+  @override
+  String get appLocationRequired => 'Xəritədə lokasiyanı seçin';
+
+  @override
+  String get appLocationOutside => 'Lokasiya Azərbaycan ərazisində olmalıdır';
+
+  @override
+  String get appVoenInvalid => 'VÖEN 10 rəqəm olmalıdır';
+
+  @override
+  String get appApartmentsInvalid => 'Düzgün say daxil edin';
+
+  @override
+  String get appSubmit => 'Müraciəti göndər';
+
+  @override
+  String get appLater => 'Sonra dolduraram';
+
+  @override
+  String get appSubmitted => 'Müraciət göndərildi';
+
+  @override
+  String get appStatusNew => 'Yeni';
+
+  @override
+  String get appStatusContacted => 'Əlaqə saxlanılıb';
+
+  @override
+  String get appStatusInProgress => 'İcradadır';
+
+  @override
+  String get appStatusInstalled => 'Quraşdırılıb';
+
+  @override
+  String get appStatusPending => 'Baxılır';
+
+  @override
+  String get appStatusApproved => 'Təsdiqlənib';
+
+  @override
+  String get appStatusRejected => 'Rədd edilib';
+
+  @override
+  String get appRejectReason => 'Səbəb';
+
+  @override
+  String get appErrTypeMismatch =>
+      'Hesab növünüz bu müraciət növünə uyğun deyil.';
+
+  @override
+  String get appErrAlreadyOpen => 'Sizin artıq açıq müraciətiniz var.';
+
+  @override
+  String get appErrDuplicateVoen => 'Bu VÖEN ilə müraciət artıq baxılır.';
+
+  @override
+  String get kmTitle => 'Kompleksim (Komendant)';
+
+  @override
+  String get kmEntrySubtitle => 'Sakinlər, dəvətlər və cihazlar';
+
+  @override
+  String get kmStatDevices => 'Cihazlar';
+
+  @override
+  String get kmStatResidents => 'Sakinlər';
+
+  @override
+  String get kmStatPending => 'Gözləyən dəvət';
+
+  @override
+  String get kmDevicesTitle => 'Kompleks cihazları';
+
+  @override
+  String get kmNoDevices => 'Kompleksə hələ cihaz bağlanmayıb.';
+
+  @override
+  String get kmOnline => 'Onlayn';
+
+  @override
+  String get kmOffline => 'Oflayn';
+
+  @override
+  String kmDevicePrice(String price, int days) {
+    return 'Abunəlik: $price / $days gün';
+  }
+
+  @override
+  String get kmInvite => 'Sakin dəvət et';
+
+  @override
+  String get kmInviteIntro =>
+      'Sakinə email ilə 7 gün etibarlı dəvət linki göndəriləcək.';
+
+  @override
+  String get kmFirstName => 'Ad';
+
+  @override
+  String get kmLastName => 'Soyad';
+
+  @override
+  String get kmEmail => 'Email';
+
+  @override
+  String get kmInviteSend => 'Dəvət göndər';
+
+  @override
+  String get kmInviteSent => 'Dəvət göndərildi.';
+
+  @override
+  String get kmInvitations => 'Dəvətlər';
+
+  @override
+  String get kmTabPending => 'Gözləyən';
+
+  @override
+  String get kmTabAccepted => 'Qəbul edilib';
+
+  @override
+  String get kmTabExpired => 'Vaxtı bitib';
+
+  @override
+  String get kmTabClosed => 'Ləğv edilib';
+
+  @override
+  String get kmStatusDeclined => 'İmtina edilib';
+
+  @override
+  String get kmNoInvitations => 'Bu bölmədə dəvət yoxdur.';
+
+  @override
+  String kmExpiresAt(String date) {
+    return 'Bitmə vaxtı: $date';
+  }
+
+  @override
+  String kmAcceptedAt(String date) {
+    return 'Qəbul edilib: $date';
+  }
+
+  @override
+  String kmSendCount(int count) {
+    return 'Göndərilib: $count dəfə';
+  }
+
+  @override
+  String get kmResend => 'Yenidən göndər';
+
+  @override
+  String get kmRevoke => 'Ləğv et';
+
+  @override
+  String get kmResent => 'Dəvət yenidən göndərildi.';
+
+  @override
+  String get kmRevoked => 'Dəvət ləğv edildi.';
+
+  @override
+  String get kmRevokeTitle => 'Dəvət ləğv edilsin?';
+
+  @override
+  String get kmRevokeBody => 'Dəvət linki artıq işləməyəcək.';
+
+  @override
+  String get kmResidentsTitle => 'Sakinlər';
+
+  @override
+  String get kmNoResidents => 'Kompleksdə hələ sakin yoxdur.';
+
+  @override
+  String kmActiveSubs(int count) {
+    return 'Aktiv abunəlik: $count';
+  }
+
+  @override
+  String get kmNoActiveSub => 'Aktiv abunəlik yoxdur';
+
+  @override
+  String kmJoinedAt(String date) {
+    return 'Qoşulub: $date';
+  }
+
+  @override
+  String get kmRemove => 'Çıxar';
+
+  @override
+  String get kmRemoveTitle => 'Sakini kompleksdən çıxar';
+
+  @override
+  String kmRemoveBody(String name) {
+    return '$name kompleksdən çıxarılacaq. Kompleks cihazlarına girişi dərhal dayanacaq, aktiv abunəlikləri ləğv ediləcək. Avtomatik geri ödəniş edilmir.';
+  }
+
+  @override
+  String get kmRemoved => 'Sakin kompleksdən çıxarıldı.';
+
+  @override
+  String get kmErrNotKomendant =>
+      'Bu bölmə yalnız kompleks komendantı üçündür.';
+
+  @override
+  String get kmErrForbidden => 'Bu əməliyyat üçün icazəniz yoxdur.';
+
+  @override
+  String get kmErrAlreadyResident => 'Bu email artıq kompleksin sakinidir.';
+
+  @override
+  String get kmErrAlreadyPending =>
+      'Bu email üçün aktiv dəvət artıq mövcuddur.';
+
+  @override
+  String get kmErrNotResendable => 'Bu dəvət yenidən göndərilə bilməz.';
+
+  @override
+  String get kmErrNotRevocable => 'Bu dəvət ləğv edilə bilməz.';
+
+  @override
+  String get kmErrRateLimited =>
+      'Çox tez-tez göndərilir. Bir az sonra yenidən cəhd edin.';
+
+  @override
+  String get kmErrNotFound => 'Qeyd tapılmadı. Siyahı yeniləndi.';
+
+  @override
+  String get invTitle => 'Dəvət';
+
+  @override
+  String get invComplexKind => 'Yaşayış kompleksinə dəvət';
+
+  @override
+  String get invFamilyKind => 'Ailə üzvü dəvəti';
+
+  @override
+  String invComplexBody(String complex) {
+    return '$complex kompleksinə sakin kimi dəvət olunmusunuz. Qəbul etdikdən sonra cihaz seçib abunə ola bilərsiniz.';
+  }
+
+  @override
+  String invFamilyBody(String inviter) {
+    return '$inviter sizi ailə üzvü kimi cihaza giriş üçün dəvət edib. Giriş öz abunəliyiniz ödənildikdən sonra aktivləşir.';
+  }
+
+  @override
+  String invFor(String name) {
+    return 'Dəvət olunan: $name';
+  }
+
+  @override
+  String invSentTo(String email) {
+    return 'Dəvət $email ünvanına göndərilib. Həmin email ilə davam edin.';
+  }
+
+  @override
+  String invExpires(String date) {
+    return 'Etibarlıdır: $date tarixinədək';
+  }
+
+  @override
+  String get invRegister => 'Qeydiyyatdan keç';
+
+  @override
+  String get invLogin => 'Hesabım var — daxil ol';
+
+  @override
+  String get invAccept => 'Dəvəti qəbul et';
+
+  @override
+  String get invDecline => 'İmtina et';
+
+  @override
+  String get invDeclineTitle => 'Dəvətdən imtina edilsin?';
+
+  @override
+  String get invDeclineBody => 'Bu dəvət linki artıq işləməyəcək.';
+
+  @override
+  String get invDeclined => 'Dəvətdən imtina edildi.';
+
+  @override
+  String invAcceptedComplex(String complex) {
+    return 'Dəvət qəbul edildi. $complex kompleksinə xoş gəldiniz!';
+  }
+
+  @override
+  String get invAcceptedFamily =>
+      'Dəvət qəbul edildi. Girişi aktivləşdirmək üçün abunəliyi ödəyin.';
+
+  @override
+  String get invGoneTitle => 'Dəvət etibarsızdır';
+
+  @override
+  String get invGoneBody =>
+      'Bu dəvət linkinin vaxtı bitib, ləğv edilib və ya artıq istifadə olunub. Yeni dəvət üçün dəvət edən şəxsə müraciət edin.';
+
+  @override
+  String get invClose => 'Bağla';
+
+  @override
+  String get invErrEmailMismatch =>
+      'Bu dəvət başqa email ünvanı üçündür. Dəvət göndərilən email ilə daxil olun.';
+
+  @override
+  String get invErrAlreadyHasAccess => 'Bu cihaza artıq girişiniz var.';
+
+  @override
+  String get invErrInvalidTarget =>
+      'Öz göndərdiyiniz dəvəti qəbul edə bilməzsiniz.';
+
+  @override
+  String get invErrUnsupported => 'Bu dəvət növü dəstəklənmir.';
+
+  @override
+  String get invRegisterHint =>
+      'Qeydiyyatı dəvət göndərilən email ilə tamamlayın; dəvət hesab təsdiqləndikdən sonra qəbul ediləcək.';
+
+  @override
+  String get invPendingCard => 'Sizə dəvət var';
+
+  @override
+  String get invPendingCardBody => 'Dəvəti açıb qəbul edin.';
+
+  @override
+  String get cxTitle => 'Kompleksim';
+
+  @override
+  String get cxMyComplexes => 'Komplekslərim';
+
+  @override
+  String get cxEntrySubtitle => 'Cihaz seçin və abunə olun';
+
+  @override
+  String get cxNoComplexes => 'Hələ heç bir kompleksin sakini deyilsiniz.';
+
+  @override
+  String get cxDevicesTitle => 'Kompleks cihazları';
+
+  @override
+  String get cxNoDevices => 'Kompleksdə hələ cihaz yoxdur.';
+
+  @override
+  String get cxStatusNone => 'Abunə deyil';
+
+  @override
+  String get cxStatusPending => 'Ödəniş gözləyir';
+
+  @override
+  String get cxStatusActive => 'Aktiv';
+
+  @override
+  String get cxStatusExpired => 'Bitib';
+
+  @override
+  String cxPrice(String price, int days) {
+    return '$price / $days gün';
+  }
+
+  @override
+  String get cxPriceNote => 'Abunəlik bu cihaza girişinizi aktivləşdirir.';
+
+  @override
+  String get cxSubscriptionBlock => 'Aylıq abunəlik';
+
+  @override
+  String get cxSubscribe => 'Abunə ol';
+
+  @override
+  String get cxFinishPayment => 'Ödənişi tamamla';
+
+  @override
+  String get cxRenew => 'Yenilə';
+
+  @override
+  String get cxOpenInDevices => 'Cihazlar bölməsində aç';
+
+  @override
+  String get cxDeviceTitle => 'Cihaz';
+
+  @override
+  String get cxErrAlreadyActive => 'Bu cihaz üçün abunəliyiniz artıq aktivdir.';
+
+  @override
+  String get payPendingTitle => 'Ödəniş gözləyənlər';
+
+  @override
+  String payPendingCard(int count) {
+    return 'Ödəniş gözləyən abunəlik: $count';
+  }
+
+  @override
+  String get payPendingNone => 'Ödəniş gözləyən abunəliyiniz yoxdur.';
+
+  @override
+  String get payPendingMain => 'Sakin abunəliyi';
+
+  @override
+  String get payPendingAdditional => 'Ailə üzvü abunəliyi';
+
+  @override
+  String get payNow => 'Ödə';
+
+  @override
+  String payDeviceFallback(int id) {
+    return 'Cihaz #$id';
+  }
+
+  @override
+  String get payErrForbidden => 'Bu əməliyyat üçün icazəniz yoxdur.';
+
+  @override
+  String get famTitle => 'Ailə üzvləri';
+
+  @override
+  String get famEntrySubtitle => 'Dəvət, giriş və ödənişlər';
+
+  @override
+  String get famTabMembers => 'Üzvlər';
+
+  @override
+  String get famTabInvitations => 'Dəvətlər';
+
+  @override
+  String get famInvite => 'Ailə üzvü dəvət et';
+
+  @override
+  String get famNotHead =>
+      'Ailə üzvü dəvət etmək üçün öz cihazınızda aktiv girişiniz olmalıdır. Ailə üzvü kimi əlavə olunduğunuz cihazlarda bu bölmə əlçatan deyil.';
+
+  @override
+  String get famErrNotHead =>
+      'Bu cihazda ailə üzvlərini idarə etmək hüququnuz yoxdur.';
+
+  @override
+  String get famErrInvalidTarget =>
+      'Bu şəxsə dəvət göndərmək olmaz (özünüz və ya artıq bu cihazda olan şəxs).';
+
+  @override
+  String get famNoMembers => 'Hələ ailə üzvünüz yoxdur.';
+
+  @override
+  String get famNoInvitations => 'Hələ ailə dəvəti yoxdur.';
+
+  @override
+  String get famDeviceLabel => 'Cihaz';
+
+  @override
+  String get famInviteIntro =>
+      'Seçdiyiniz cihaz üçün email ilə 7 gün etibarlı dəvət göndəriləcək. Hər ailə üzvünün öz aylıq abunəliyi olur; onu siz və ya üzvün özü ödəyə bilər.';
+
+  @override
+  String get famGranted =>
+      'Ailə üzvünə bu cihaz üçün giriş verildi. Abunəlik ödənişi gözləyir.';
+
+  @override
+  String get famSubNone => 'Abunəlik yoxdur';
+
+  @override
+  String famSubActiveUntil(String date) {
+    return 'Aktiv: $date tarixinədək';
+  }
+
+  @override
+  String get famPayFor => 'Üzv üçün ödə';
+
+  @override
+  String get famRemove => 'Çıxar';
+
+  @override
+  String get famRemoveTitle => 'Ailə üzvünü çıxar';
+
+  @override
+  String famRemoveBody(String name) {
+    return '$name ailə üzvlərindən çıxarılacaq. Verdiyiniz cihazlara girişi dərhal dayanacaq, abunəlikləri ləğv ediləcək. Avtomatik geri ödəniş edilmir.';
+  }
+
+  @override
+  String get famRemoved => 'Ailə üzvü çıxarıldı.';
 }

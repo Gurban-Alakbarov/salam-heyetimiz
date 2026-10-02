@@ -38,6 +38,8 @@ class UpdateDeviceRequest extends FormRequest
             // is enforced by SetDeviceGeofence, so admin + owner share one implementation.
             'geofence_enabled' => ['sometimes', 'boolean'],
             'geofence_radius_m' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:65535'],
+            // B11: one-off device sale price (minor units) — an admin record only; never an order amount (BR-20).
+            'sale_price_minor' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:100000000'],
         ];
     }
 
@@ -49,7 +51,7 @@ class UpdateDeviceRequest extends FormRequest
      */
     public function toUpdateArray(): array
     {
-        return Arr::except($this->validated(), ['geofence_enabled', 'geofence_radius_m']);
+        return Arr::except($this->validated(), ['geofence_enabled', 'geofence_radius_m', 'sale_price_minor']);
     }
 
     /** Whether this request changes any geofence setting (→ route it through SetDeviceGeofence). */

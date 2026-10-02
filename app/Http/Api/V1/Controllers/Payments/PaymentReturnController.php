@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\V1\Controllers\Payments;
 
+use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Enums\OrderStatus;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Services\PaymentVerifierService;
@@ -39,12 +40,14 @@ class PaymentReturnController
             default => 'pending',
         };
 
-        $deepLink = 'salam://payment/return?status='.$outcome.'&order='.rawurlencode((string) ($order?->reference ?? ''));
+        // A simulated (fake-gateway) order is always flagged as a test payment — banner + additive deep-link flag.
+        $isTest = FakeKapitalGateway::isFakeBankOrderId($order?->bank_order_id);
+        $deepLink = 'salam://payment/return?status='.$outcome.'&order='.rawurlencode((string) ($order?->reference ?? '')).($isTest ? '&test=1' : '');
 
-        return new Response($this->page($outcome, $order?->reference, $deepLink), 200, ['Content-Type' => 'text/html; charset=utf-8']);
+        return new Response($this->page($outcome, $order?->reference, $deepLink, $isTest), 200, ['Content-Type' => 'text/html; charset=utf-8']);
     }
 
-    private function page(string $outcome, ?string $reference, string $deepLink): string
+    private function page(string $outcome, ?string $reference, string $deepLink, bool $isTest = false): string
     {
         [$title, $color, $icon] = match ($outcome) {
             'success' => ['Ödəniş uğurlu', '#16a34a', '✓'],
@@ -54,6 +57,9 @@ class PaymentReturnController
         };
         $ref = $reference !== null ? htmlspecialchars($reference, ENT_QUOTES) : '';
         $link = htmlspecialchars($deepLink, ENT_QUOTES);
+        $banner = $isTest
+            ? '<div class="test">TEST ÖDƏNİŞ<small>Simulyasiya — real pul köçürülməyib</small></div>'
+            : '';
 
         return <<<HTML
 <!doctype html><html lang="az"><head><meta charset="utf-8">
@@ -61,9 +67,10 @@ class PaymentReturnController
 <title>{$title}</title>
 <style>body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center}
 .card{background:#fff;border-radius:16px;padding:32px;max-width:360px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.test{position:fixed;top:0;left:0;right:0;background:#b91c1c;color:#fff;text-align:center;font-weight:800;letter-spacing:.08em;padding:12px}.test small{display:block;font-weight:500;letter-spacing:0;font-size:12px}
 .icon{width:64px;height:64px;border-radius:50%;background:{$color};color:#fff;font-size:32px;line-height:64px;margin:0 auto 16px}
 h1{font-size:20px;margin:0 0 8px;color:#0f172a}p{color:#64748b;margin:4px 0}a.btn{display:inline-block;margin-top:20px;background:{$color};color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:600}</style>
-</head><body><div class="card"><div class="icon">{$icon}</div>
+</head><body>{$banner}<div class="card"><div class="icon">{$icon}</div>
 <h1>{$title}</h1><p>Sifariş: {$ref}</p><p>Tətbiqə qayıdırsınız…</p>
 <a class="btn" href="{$link}">Tətbiqə qayıt</a></div>
 <script>setTimeout(function(){location.href="{$link}"},800)</script>

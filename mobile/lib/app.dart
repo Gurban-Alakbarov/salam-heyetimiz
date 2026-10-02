@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:salam_mobile/core/deeplinks/deep_link.dart';
 import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/design_system/theme/app_theme.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
+import 'package:salam_mobile/features/auth/session_roles_provider.dart';
+import 'package:salam_mobile/features/complex/complex_providers.dart';
 import 'package:salam_mobile/features/notifications/notifications_providers.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 import 'package:salam_mobile/routing/app_router.dart';
@@ -30,6 +33,13 @@ class _SalamAppState extends ConsumerState<SalamApp> {
   /// [_maybeHandleWidgetForegroundOpen] instead.
   StreamSubscription<Uri?>? _widgetClickSub;
 
+  /// B13: OS-delivered app links / custom-scheme links (app_links).
+  StreamSubscription<DeepLink>? _deepLinkSub;
+  DeepLink? _pendingRouteLink;
+
+  /// B16: an invitation link arrived before the session state was known → open the landing once it is.
+  bool _inviteRoutePending = false;
+
   @override
   void initState() {
     super.initState();
@@ -48,11 +58,75 @@ class _SalamAppState extends ConsumerState<SalamApp> {
     } catch (_) {
       // No home_widget channel (non-Android / tests) → nothing to listen to.
     }
+    _listenForDeepLinks();
+  }
+
+  /// B13: cold-start + warm links. Best-effort (no plugin channel in tests) — never breaks app start.
+  Future<void> _listenForDeepLinks() async {
+    final service = ref.read(deepLinkServiceProvider);
+    try {
+      _deepLinkSub = service.links.listen(_handleDeepLink, onError: (_) {});
+      final initial = await service.initial();
+      if (initial != null) _handleDeepLink(initial);
+    } catch (_) {
+      // No app_links channel → nothing to handle.
+    }
+  }
+
+  /// Invitations are stored as pending (claimed by the invite flow); payment returns route to the
+  /// server-confirmed result once a session exists. Links are never logged.
+  void _handleDeepLink(DeepLink link) {
+    if (!mounted) return;
+    if (link is InviteLink) {
+      ref.read(pendingInviteStoreProvider).save(link.token).then((_) {
+        if (!mounted) return;
+        ref.invalidate(hasPendingInviteProvider);
+        _routeInvite();
+      });
+      return;
+    }
+    if (DeepLinkParser.routeFor(link) == null) return;
+    if (ref.read(authStateProvider) == AuthState.authenticated) {
+      _routeLink(link);
+    } else {
+      _pendingRouteLink = link; // routed after the session is restored
+    }
+  }
+
+  /// Opens the invitation landing (guest or signed in — `/invite` is open to both). The token is not in the
+  /// route: the landing reads it from PendingInviteStore. Waits for the splash redirect to settle first.
+  void _routeInvite() {
+    if (!mounted) return;
+    if (ref.read(authStateProvider) == AuthState.unknown) {
+      _inviteRoutePending = true;
+      return;
+    }
+    _pushWhenSettled('/invite');
+  }
+
+  void _pushWhenSettled(String location, [int attempt = 0]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final router = ref.read(routerProvider);
+      final current = router.routerDelegate.currentConfiguration.uri.path;
+      if (current == location) return;
+      if (current == '/' && attempt < 20) {
+        _pushWhenSettled(location, attempt + 1);
+        return;
+      }
+      router.push(location);
+    });
+  }
+
+  void _routeLink(DeepLink link) {
+    final route = DeepLinkParser.routeFor(link);
+    if (route != null) ref.read(routerProvider).push(route);
   }
 
   @override
   void dispose() {
     _widgetClickSub?.cancel();
+    _deepLinkSub?.cancel();
     super.dispose();
   }
 
@@ -116,12 +190,19 @@ class _SalamAppState extends ConsumerState<SalamApp> {
     // Register the FCM token the moment the session becomes authenticated (login,
     // or a restored session resolving unknown → authenticated).
     ref.listen<AuthState>(authStateProvider, (previous, next) {
+      if (next != AuthState.unknown && _inviteRoutePending) {
+        _inviteRoutePending = false;
+        _routeInvite();
+      }
       if (next == AuthState.authenticated) {
         ref.read(pushMessagingServiceProvider).registerToken();
         // Session is ready → route any pending widget launch (configure, or a
         // GEOFENCE-4 `location_required` open) now that the device list is reachable.
         _maybeHandleWidgetConfigure();
         _maybeHandleWidgetForegroundOpen();
+        final pending = _pendingRouteLink;
+        _pendingRouteLink = null;
+        if (pending != null) _routeLink(pending);
       }
     });
 

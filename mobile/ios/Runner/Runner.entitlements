@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  B13 — PREPARED, NOT YET WIRED. Universal links for https://salamheyetimiz.com/invite/*.
+  Intentionally NOT referenced by CODE_SIGN_ENTITLEMENTS yet: enabling it requires the Associated Domains
+  capability on the App ID + a regenerated provisioning profile, and the AASA file needs the Apple Team ID
+  (APP_LINKS_IOS_APP_ID, B6). It is wired at the TestFlight GO step (decision 2026-10-02).
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:salamheyetimiz.com</string>
+	</array>
+</dict>
+</plist>

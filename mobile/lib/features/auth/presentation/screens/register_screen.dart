@@ -8,11 +8,23 @@ import 'package:salam_mobile/design_system/components/app_inputs.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/auth/presentation/failure_l10n.dart';
 import 'package:salam_mobile/features/auth/presentation/providers/auth_controllers.dart';
+import 'package:salam_mobile/features/auth/session_roles_provider.dart';
+import 'package:salam_mobile/features/complex/domain/complex_entities.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 import 'package:salam_mobile/shared/validators/auth_validators.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({this.accountType, this.invite = false, this.invitePreview, super.key});
+
+  /// B14: 'physical' | 'legal' chosen on RegisterTypeScreen; null keeps the legacy behaviour.
+  final String? accountType;
+
+  /// B16: registering to claim the invitation pending on this device. The token is read from
+  /// PendingInviteStore at submit time (server pre-flight: live + addressed to this email); no account type.
+  final bool invite;
+
+  /// Names shown on the invitation, used only to prefill (the email stays the user's to type — it is masked).
+  final InvitePreview? invitePreview;
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -28,6 +40,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String? _lastNameError;
   String? _phoneError;
   String? _emailError;
+
+  @override
+  void initState() {
+    super.initState();
+    final p = widget.invitePreview;
+    if (widget.invite && p != null) {
+      _firstName.text = p.firstName ?? '';
+      _lastName.text = p.lastName ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -59,6 +81,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l = AppLocalizations.of(context);
     if (!_validate(l)) return;
     final email = _email.text.trim();
+    final invitationToken = widget.invite ? await ref.read(pendingInviteStoreProvider).read() : null;
+    if (!mounted) return;
 
     final otp = await ref
         .read(registerControllerProvider.notifier)
@@ -67,12 +91,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           lastName: _lastName.text.trim(),
           phone: _phone.text.trim(),
           email: email,
+          accountType: widget.accountType,
+          invitationToken: invitationToken,
         );
     if (!mounted) return;
 
     if (otp != null) {
+      final type = widget.accountType == null ? '' : '&type=${widget.accountType}';
+      final invite = invitationToken != null ? '&invite=1' : '';
       context.go(
-        '/auth/verify?email=${Uri.encodeComponent(email)}&flow=register',
+        '/auth/verify?email=${Uri.encodeComponent(email)}&flow=register$type$invite',
       );
       return;
     }
@@ -103,6 +131,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (widget.invite) ...[
+                Text(l.invRegisterHint, key: const Key('reg-invite-hint'), style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: AppSpacing.md),
+              ],
               AppTextField(
                 label: l.firstName,
                 controller: _firstName,

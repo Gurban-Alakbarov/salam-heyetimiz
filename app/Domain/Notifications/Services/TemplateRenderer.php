@@ -42,8 +42,8 @@ final class TemplateRenderer
         ];
     }
 
-    /** Replace `{name}` tokens from $variables; unknown tokens are left intact. */
-    private function interpolate(string $text, array $variables): string
+    /** Replace `{name}` tokens from $variables; unknown tokens are left intact. Public for the editor preview (B10). */
+    public function interpolate(string $text, array $variables): string
     {
         return preg_replace_callback(
             '/\{(\w+)\}/',

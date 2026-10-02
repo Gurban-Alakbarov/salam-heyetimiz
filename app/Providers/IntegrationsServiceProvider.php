@@ -17,6 +17,9 @@ use App\Domain\DeviceComm\Contracts\TraccarClient;
 use App\Domain\Payments\Adapters\BirPay\BirPayGateway;
 use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Adapters\PaymentGateway;
+use App\Domain\Payments\Adapters\UnavailablePaymentGateway;
+use App\Domain\Payments\Enums\BankStatus;
+use App\Domain\Payments\Support\PaymentGatewayMode;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -29,11 +32,20 @@ class IntegrationsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // PaymentGateway (R-PAY): real BirPay gateway in all environments except testing, where the
-        // in-memory FakeKapitalGateway is a singleton so tests can drive the bank's responses.
+        // PaymentGateway (R-PAY, IMPLEMENTATION_PLAN B1): selected by PaymentGatewayMode.
+        //  - testing  → in-memory FakeKapitalGateway singleton (tests drive the bank; default APPROVED)
+        //  - fake     → FakeKapitalGateway simulated hosted checkout (default PENDING; flags required)
+        //  - disabled → fake requested but not permitted: always-unavailable (never the real bank)
+        //  - birpay   → real BirPay gateway (default; unchanged behaviour)
+        $mode = PaymentGatewayMode::current();
         if ($this->app->environment('testing')) {
             $this->app->singleton(FakeKapitalGateway::class);
             $this->app->alias(FakeKapitalGateway::class, PaymentGateway::class);
+        } elseif ($mode === PaymentGatewayMode::FAKE) {
+            $this->app->singleton(FakeKapitalGateway::class, static fn (): FakeKapitalGateway => new FakeKapitalGateway(BankStatus::Pending));
+            $this->app->alias(FakeKapitalGateway::class, PaymentGateway::class);
+        } elseif ($mode === PaymentGatewayMode::DISABLED) {
+            $this->app->singleton(PaymentGateway::class, UnavailablePaymentGateway::class);
         } else {
             $this->app->singleton(PaymentGateway::class, BirPayGateway::class);
         }

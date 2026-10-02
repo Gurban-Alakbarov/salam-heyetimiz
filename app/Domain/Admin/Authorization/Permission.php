@@ -49,6 +49,11 @@ final class Permission
 
     public const COMPLEXES_MANAGE = 'complexes.manage';
 
+    // registration applications (physical / legal — B9)
+    public const APPLICATIONS_VIEW = 'applications.view';
+
+    public const APPLICATIONS_MANAGE = 'applications.manage';
+
     // devices / barriers
     public const DEVICES_VIEW = 'devices.view';
 
@@ -131,6 +136,11 @@ final class Permission
 
     public const NOTIFICATIONS_SEND = 'notifications.send';
 
+    // notification template editor (B10)
+    public const NOTIFICATION_TEMPLATES_VIEW = 'notifications.templates.view';
+
+    public const NOTIFICATION_TEMPLATES_MANAGE = 'notifications.templates.manage';
+
     /**
      * Full catalog as [key => [group, label]]. Order is display order within the group.
      *
@@ -159,6 +169,8 @@ final class Permission
 
             self::COMPLEXES_VIEW => ['group' => 'complexes', 'label' => 'Kompleksləri gör'],
             self::COMPLEXES_MANAGE => ['group' => 'complexes', 'label' => 'Kompleksləri idarə et'],
+            self::APPLICATIONS_VIEW => ['group' => 'applications', 'label' => 'Müraciətləri gör'],
+            self::APPLICATIONS_MANAGE => ['group' => 'applications', 'label' => 'Müraciətləri idarə et (status, təsdiq/rədd)'],
 
             self::DEVICES_VIEW => ['group' => 'devices', 'label' => 'Cihazları gör'],
             self::DEVICES_CREATE => ['group' => 'devices', 'label' => 'Cihaz yarat'],
@@ -205,6 +217,8 @@ final class Permission
 
             self::NOTIFICATIONS_VIEW => ['group' => 'notifications', 'label' => 'Bildiriş kampaniyalarını gör'],
             self::NOTIFICATIONS_SEND => ['group' => 'notifications', 'label' => 'Sistem bildirişi göndər'],
+            self::NOTIFICATION_TEMPLATES_VIEW => ['group' => 'notifications', 'label' => 'Bildiriş şablonlarını gör'],
+            self::NOTIFICATION_TEMPLATES_MANAGE => ['group' => 'notifications', 'label' => 'Bildiriş şablonlarını redaktə et'],
         ];
     }
 

@@ -171,6 +171,10 @@ class ComplexManagementController
         $deviceIds = Device::query()->where('complex_id', $c->id)->pluck('id');
 
         return $this->summary($c) + [
+            // B11 (additive): OSM pin + originating legal-entity application (B4/B9)
+            'latitude' => $c->latitude !== null ? (float) $c->latitude : null,
+            'longitude' => $c->longitude !== null ? (float) $c->longitude : null,
+            'legal_entity_application_id' => $c->legal_entity_application_id !== null ? (int) $c->legal_entity_application_id : null,
             'managers' => AdminUser::query()->where('complex_id', $c->id)->get()
                 ->map(fn (AdminUser $a): array => ['id' => (int) $a->id, 'name' => $a->name, 'email' => $a->email, 'role' => $a->role->value])->all(),
             'devices' => Device::query()->where('complex_id', $c->id)->with('owner')->orderBy('id')->limit(200)->get()
@@ -181,6 +185,7 @@ class ComplexManagementController
                     'location_label' => $d->location_label,
                     'online' => $d->last_online_at !== null && $d->last_online_at->greaterThan(now()->subMinutes((int) config('domain.devices.offline_threshold_minutes', 15))),
                     'owner' => $d->owner !== null ? \App\Support\Phone\PhoneNumber::tryFromInput($d->owner->phone)?->masked() : null,
+                    'ownership_mode' => $d->ownership_mode->value, // B11 (additive)
                 ])->all(),
         ];
     }

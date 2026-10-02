@@ -20,13 +20,18 @@ import { DeviceDetailPage } from '@/pages/devices/DeviceDetailPage'
 import { DeviceFormPage } from '@/pages/devices/DeviceFormPage'
 import { DevicesPage } from '@/pages/devices/DevicesPage'
 import { CampaignDetailPage } from '@/pages/notifications/CampaignDetailPage'
+import { TemplateDetailPage } from '@/pages/notifications/TemplateDetailPage'
+import { TemplatesPage } from '@/pages/notifications/TemplatesPage'
 import { CampaignsPage } from '@/pages/notifications/CampaignsPage'
 import { CreateCampaignPage } from '@/pages/notifications/CreateCampaignPage'
 import { OrderDetailPage } from '@/pages/orders/OrderDetailPage'
 import { OrdersPage } from '@/pages/orders/OrdersPage'
 import { PaymentLogsPage } from '@/pages/payments/PaymentLogsPage'
 import { RefundsPage } from '@/pages/refunds/RefundsPage'
+import { SubscriptionDetailPage } from '@/pages/subscriptions/SubscriptionDetailPage'
 import { SubscriptionsPage } from '@/pages/subscriptions/SubscriptionsPage'
+import { ApplicationsPage } from '@/pages/applications/ApplicationsPage'
+import { UsersPage } from '@/pages/users/UsersPage'
 
 export function App() {
   return (
@@ -48,12 +53,17 @@ export function App() {
           <Route path="/devices/:id" element={<RequirePermission anyOf={[PERM.devicesView]}><DeviceDetailPage /></RequirePermission>} />
           <Route path="/devices/:id/edit" element={<RequirePermission anyOf={[PERM.devicesUpdate]}><DeviceFormPage /></RequirePermission>} />
           <Route path="/subscriptions" element={<RequirePermission anyOf={[PERM.subscriptionsView]}><SubscriptionsPage /></RequirePermission>} />
+          <Route path="/subscriptions/:id" element={<RequirePermission anyOf={[PERM.subscriptionsView]}><SubscriptionDetailPage /></RequirePermission>} />
+          <Route path="/applications" element={<RequirePermission anyOf={[PERM.applicationsView]}><ApplicationsPage /></RequirePermission>} />
+          <Route path="/users" element={<RequirePermission anyOf={[PERM.residentsView]}><UsersPage /></RequirePermission>} />
           <Route path="/orders" element={<RequirePermission anyOf={[PERM.ordersView]}><OrdersPage /></RequirePermission>} />
           <Route path="/orders/:id" element={<RequirePermission anyOf={[PERM.ordersView]}><OrderDetailPage /></RequirePermission>} />
           <Route path="/payment-logs" element={<RequirePermission anyOf={[PERM.ordersView]}><PaymentLogsPage /></RequirePermission>} />
           <Route path="/refunds" element={<RequirePermission anyOf={[PERM.refundsView]}><RefundsPage /></RequirePermission>} />
           <Route path="/notifications" element={<RequirePermission anyOf={[PERM.notificationsView]}><CampaignsPage /></RequirePermission>} />
           <Route path="/notifications/new" element={<RequirePermission anyOf={[PERM.notificationsSend]}><CreateCampaignPage /></RequirePermission>} />
+          <Route path="/notifications/templates" element={<RequirePermission anyOf={[PERM.notificationTemplatesView]}><TemplatesPage /></RequirePermission>} />
+          <Route path="/notifications/templates/:id" element={<RequirePermission anyOf={[PERM.notificationTemplatesView]}><TemplateDetailPage /></RequirePermission>} />
           <Route path="/notifications/:id" element={<RequirePermission anyOf={[PERM.notificationsView]}><CampaignDetailPage /></RequirePermission>} />
           <Route path="/admins" element={<RequirePermission anyOf={[PERM.adminsView]}><AdminsPage /></RequirePermission>} />
           <Route path="/audit" element={<RequirePermission anyOf={[PERM.auditView]}><AuditPage /></RequirePermission>} />

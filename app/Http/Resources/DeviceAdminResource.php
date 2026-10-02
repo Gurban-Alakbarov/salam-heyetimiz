@@ -48,6 +48,11 @@ class DeviceAdminResource extends JsonResource
             'online' => $this->isOnline(),
             'last_signal_strength' => $this->last_signal_strength !== null ? (int) $this->last_signal_strength : null,
             'whitelist_capacity_used' => (int) ($this->whitelist_used ?? 0),
+            // B11 (additive): access model + complex binding + the one-off sale price (admin record only, BR-20)
+            'ownership_mode' => $this->resource->getAttributes()['ownership_mode'] ?? 'private',
+            'complex_id' => isset($this->resource->getAttributes()['complex_id']) ? (int) $this->resource->getAttributes()['complex_id'] : null,
+            'sale_price_minor' => isset($this->resource->getAttributes()['sale_price_minor']) ? (int) $this->resource->getAttributes()['sale_price_minor'] : null,
+            'sale_recorded_at' => optional($this->sale_recorded_at)->toIso8601String(),
             'created_at' => optional($this->created_at)->toIso8601String(),
         ];
     }

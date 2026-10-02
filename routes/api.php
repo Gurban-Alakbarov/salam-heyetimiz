@@ -1,17 +1,23 @@
 <?php
 
+use App\Http\Api\V1\Controllers\Applications\ApplicationController;
 use App\Http\Api\V1\Controllers\Auth\AuthController;
 use App\Http\Api\V1\Controllers\Auth\BiometricController;
 use App\Http\Api\V1\Controllers\Commands\OpenCommandController;
+use App\Http\Api\V1\Controllers\Complexes\ComplexController;
 use App\Http\Api\V1\Controllers\Devices\DeviceController;
 use App\Http\Api\V1\Controllers\Devices\DeviceStatsController;
 use App\Http\Api\V1\Controllers\Devices\TechDeviceController;
+use App\Http\Api\V1\Controllers\Family\FamilyController;
 use App\Http\Api\V1\Controllers\Auth\RegistrationController;
 use App\Http\Api\V1\Controllers\BootstrapController;
 use App\Http\Api\V1\Controllers\Health\HealthController;
+use App\Http\Api\V1\Controllers\Invitations\InviteController;
+use App\Http\Api\V1\Controllers\Komendant\KomendantController;
 use App\Http\Api\V1\Controllers\Notifications\NotificationController;
 use App\Http\Api\V1\Controllers\Notifications\PushTokenController;
 use App\Http\Api\V1\Controllers\Orders\OrderController;
+use App\Http\Api\V1\Controllers\Payments\FakeCheckoutController;
 use App\Http\Api\V1\Controllers\Payments\PaymentReturnController;
 use App\Http\Api\V1\Controllers\Subscriptions\SubscriptionController;
 use App\Http\Api\V1\Controllers\Visitor\VisitorAccessController;
@@ -36,6 +42,13 @@ Route::get('bootstrap', [BootstrapController::class, 'guest'])->middleware('thro
 // Payment return (browser redirect-back from the BirPay hosted page) — public; verifies via getOrderStatus.
 Route::get('payments/return', PaymentReturnController::class)->name('paymentReturn');
 
+// Simulated hosted payment page ("TEST ÖDƏNİŞ") — only while the fake gateway is active (404 otherwise);
+// signed links minted by FakeKapitalGateway. Feeds the same callback → verify → return pipeline (B1).
+Route::middleware(['signed:relative', 'throttle:public'])->prefix('payments/fake-checkout')->group(function (): void {
+    Route::get('{reference}', [FakeCheckoutController::class, 'show'])->name('fakeCheckout');
+    Route::post('{reference}/{action}', [FakeCheckoutController::class, 'act'])->whereIn('action', ['pay', 'decline', 'cancel', 'pending'])->name('fakeCheckoutAction');
+});
+
 // ---- Public visitor access (no guard; the path token is the credential) — used by the /v/{token} page ----
 // The barrier is opened through the SAME relay pipeline as the mobile app; opens are rate-limited per token+IP.
 Route::prefix('visit')->group(function (): void {
@@ -43,6 +56,9 @@ Route::prefix('visit')->group(function (): void {
     Route::post('{token}/open', [VisitorAccessController::class, 'open'])->middleware('throttle:visitor-open')->name('visitorLinkOpen');
     Route::get('{token}/command/{commandId}', [VisitorAccessController::class, 'command'])->whereNumber('commandId')->middleware('throttle:public')->name('visitorLinkCommand');
 })->where('token', '[A-Za-z0-9_-]+');
+
+// ---- Invitation lookup (B6) — public; the token is the credential; non-live tokens all answer one 410 ----
+Route::get('invites/{token}', [InviteController::class, 'show'])->where('token', '[A-Za-z0-9_-]+')->middleware('throttle:public')->name('getInvitation');
 
 // ---- Public auth (batch 07) — no guard; rate-limited per R-SEC-16 ----
 Route::post('auth/otp/request', [AuthController::class, 'requestOtp'])->middleware('throttle:otp-request')->name('requestOtp');
@@ -108,6 +124,20 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
         // Visitor links — a resident shares access they hold (create/list own links for this device).
         Route::post('/{deviceId}/visitor-links', [VisitorLinkController::class, 'store'])->whereNumber('deviceId')->name('createVisitorLink');
         Route::get('/{deviceId}/visitor-links', [VisitorLinkController::class, 'index'])->whereNumber('deviceId')->name('listVisitorLinks');
+
+        // Family invitations for one device (B8) — family head only (DevicePolicy::manageFamily).
+        Route::post('/{deviceId}/invitations', [FamilyController::class, 'inviteForDevice'])->whereNumber('deviceId')->name('createDeviceFamilyInvitation');
+        Route::get('/{deviceId}/invitations', [FamilyController::class, 'deviceInvitations'])->whereNumber('deviceId')->name('listDeviceFamilyInvitations');
+    });
+
+    // Family head surface (B8) — scoped to the caller as head; members see nothing of other members.
+    Route::prefix('family')->group(function (): void {
+        Route::get('members', [FamilyController::class, 'members'])->name('listFamilyMembers');
+        Route::post('members', [FamilyController::class, 'inviteMember'])->name('inviteFamilyMember');
+        Route::delete('members/{userId}', [FamilyController::class, 'removeMember'])->whereNumber('userId')->name('removeFamilyMember');
+        Route::get('subscriptions', [FamilyController::class, 'subscriptions'])->name('listFamilySubscriptions');
+        Route::post('invitations/{id}/resend', [FamilyController::class, 'resend'])->whereNumber('id')->name('resendFamilyInvitation');
+        Route::post('invitations/{id}/revoke', [FamilyController::class, 'revoke'])->whereNumber('id')->name('revokeFamilyInvitation');
     });
 
     // The caller's own visitor links across all their devices ("Dəvətlərim" / My invitations).
@@ -116,9 +146,44 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
     // Revoke one of the caller's own visitor links.
     Route::post('visitor-links/{id}/revoke', [VisitorLinkController::class, 'revoke'])->whereNumber('id')->name('revokeVisitorLink');
 
+    // Registration applications (B9) — physical / legal kept apart; the caller's own only.
+    Route::prefix('applications')->group(function (): void {
+        Route::get('mine', [ApplicationController::class, 'mine'])->name('listMyApplications');
+        Route::post('individual', [ApplicationController::class, 'storeIndividual'])->name('createIndividualApplication');
+        Route::put('individual/{id}', [ApplicationController::class, 'updateIndividual'])->whereNumber('id')->name('updateIndividualApplication');
+        Route::post('legal', [ApplicationController::class, 'storeLegal'])->name('createLegalApplication');
+        Route::put('legal/{id}', [ApplicationController::class, 'updateLegal'])->whereNumber('id')->name('updateLegalApplication');
+    });
+
+    // Resident complex browse + subscribe (B7) — members only (others 404); subscribe needs Idempotency-Key.
+    Route::prefix('complexes')->group(function (): void {
+        Route::get('/', [ComplexController::class, 'index'])->name('listMyComplexes');
+        Route::get('/{complexId}', [ComplexController::class, 'show'])->whereNumber('complexId')->name('getComplex');
+        Route::get('/{complexId}/devices', [ComplexController::class, 'devices'])->whereNumber('complexId')->name('listComplexDevices');
+        Route::post('/{complexId}/devices/{deviceId}/subscribe', [ComplexController::class, 'subscribe'])
+            ->whereNumber(['complexId', 'deviceId'])->name('subscribeComplexDevice');
+    });
+
+    // Invitation accept / decline by the signed-in invitee (B6) — verified email must match the invitation.
+    Route::post('invites/{token}/accept', [InviteController::class, 'accept'])->where('token', '[A-Za-z0-9_-]+')->name('acceptInvitation');
+    Route::post('invites/{token}/decline', [InviteController::class, 'decline'])->where('token', '[A-Za-z0-9_-]+')->name('declineInvitation');
+
     // Open commands — status polling + actuation feedback (batch 09-A)
     Route::get('commands/{commandId}', [OpenCommandController::class, 'show'])->whereNumber('commandId')->name('getCommand');
     Route::post('commands/{commandId}/feedback', [OpenCommandController::class, 'feedback'])->whereNumber('commandId')->name('submitOpenFeedback');
+});
+
+// ---- Komendant (complex manager) — a mobile user linked to an active complex_manager (B5). Scoped to that
+// complex server-side; each action also checks the manager's RBAC permission. ----
+Route::middleware(['auth:user', 'komendant', 'throttle:mobile'])->prefix('komendant')->group(function (): void {
+    Route::get('complex', [KomendantController::class, 'complex'])->name('komendantComplex');
+    Route::get('devices', [KomendantController::class, 'devices'])->name('komendantDevices');
+    Route::get('residents', [KomendantController::class, 'residents'])->name('komendantResidents');
+    Route::delete('residents/{userId}', [KomendantController::class, 'removeResident'])->whereNumber('userId')->name('komendantRemoveResident');
+    Route::get('invitations', [KomendantController::class, 'invitations'])->name('komendantListInvitations');
+    Route::post('invitations', [KomendantController::class, 'invite'])->name('komendantCreateInvitation');
+    Route::post('invitations/{id}/resend', [KomendantController::class, 'resend'])->whereNumber('id')->name('komendantResendInvitation');
+    Route::post('invitations/{id}/revoke', [KomendantController::class, 'revoke'])->whereNumber('id')->name('komendantRevokeInvitation');
 });
 
 // ---- Technical mobile mode (admin JWT on the mobile host) — Devices (batch 08) ----

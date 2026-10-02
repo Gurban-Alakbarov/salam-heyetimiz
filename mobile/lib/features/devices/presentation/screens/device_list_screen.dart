@@ -61,7 +61,9 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
       if (next is! BarrierSuccess) return;
       Future.delayed(const Duration(seconds: 3), () {
         if (!mounted) return;
-        if (ref.read(barrierOpenProvider) is! BarrierSuccess) return; // a newer command started
+        if (ref.read(barrierOpenProvider) is! BarrierSuccess) {
+          return; // a newer command started
+        }
         ref.read(barrierOpenProvider.notifier).reset();
         setState(() => _activeDeviceId = null);
       });
@@ -106,16 +108,36 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
               ],
             );
           }
+          // B17 redesign: two cards per row (heights follow content, so the active card's live
+          // status never clips); a lone last card keeps half the width.
+          final devices = page.devices;
+          final rows = (devices.length + 1) ~/ 2;
+          Widget card(int i) => AppAppear(
+            child: DeviceCard(
+              device: devices[i],
+              isActive: _activeDeviceId == devices[i].id,
+              onOpenPressed: _open,
+            ),
+          );
           return ListView.builder(
             padding: const EdgeInsets.all(AppSpacing.md),
-            itemCount: page.devices.length,
-            itemBuilder: (context, index) {
-              final device = page.devices[index];
-              return AppAppear(
-                child: DeviceCard(
-                  device: device,
-                  isActive: _activeDeviceId == device.id,
-                  onOpenPressed: _open,
+            itemCount: rows,
+            itemBuilder: (context, row) {
+              final left = row * 2;
+              final right = left + 1;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: card(left)),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: right < devices.length
+                          ? card(right)
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
                 ),
               );
             },

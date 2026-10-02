@@ -30,10 +30,41 @@ export interface ComplexDevice {
   location_label: string | null
   online: boolean
   owner: string | null
+  ownership_mode?: 'private' | 'complex'
 }
 export interface ComplexDetail extends ComplexSummary {
   managers: ComplexManager[]
   devices: ComplexDevice[]
+  // B11: OSM pin + originating legal-entity application
+  latitude?: number | null
+  longitude?: number | null
+  legal_entity_application_id?: number | null
+}
+export interface ComplexMemberRow {
+  user_id: number
+  full_name: string | null
+  email: string | null
+  phone: string | null
+  status: 'active' | 'removed'
+  joined_at: string | null
+  removed_at: string | null
+  active_subscriptions: number
+}
+export interface InvitationRow {
+  id: number
+  kind: 'complex_resident' | 'family_member'
+  status: 'pending' | 'accepted' | 'declined' | 'expired' | 'cancelled'
+  complex_id: number | null
+  device_id: number | null
+  first_name: string | null
+  last_name: string | null
+  email: string | null
+  invited_by_admin_id: number | null
+  invited_by_user_id: number | null
+  send_count: number
+  expires_at: string | null
+  accepted_at: string | null
+  created_at: string | null
 }
 export interface ComplexInput {
   name: string
@@ -75,6 +106,37 @@ export function useDeleteComplex() {
 export function useAssignManager(complexId: number) {
   const invalidate = useComplexInvalidation()
   return useMutation({ mutationFn: async (adminId: number) => (await api.post(`/admin/v1/complexes/${complexId}/managers`, { admin_id: adminId })).data, onSuccess: () => invalidate(complexId) })
+}
+export function useComplexMembers(complexId: number) {
+  return useQuery({
+    queryKey: ['complex-members', complexId],
+    queryFn: async () => (await api.get<{ data: ComplexMemberRow[] }>(`/admin/v1/complexes/${complexId}/members`)).data.data,
+    enabled: Number.isFinite(complexId) && complexId > 0,
+  })
+}
+export function useComplexInvitations(complexId: number, status: string) {
+  return useQuery({
+    queryKey: ['complex-invitations', complexId, status],
+    queryFn: async () =>
+      (await api.get<{ data: InvitationRow[] }>('/admin/v1/invitations', { params: { complex_id: complexId, ...(status ? { status } : {}) } })).data.data,
+    enabled: Number.isFinite(complexId) && complexId > 0,
+  })
+}
+/** Bind (POST) / unbind (DELETE) a device to this complex — complexes.manage (B11). */
+export function useComplexDeviceBinding() {
+  const invalidate = useComplexInvalidation()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ complexId, deviceId, bind }: { complexId: number; deviceId: number; bind: boolean }) => {
+      if (bind) await api.post(`/admin/v1/complexes/${complexId}/devices/${deviceId}`)
+      else await api.delete(`/admin/v1/complexes/${complexId}/devices/${deviceId}`)
+    },
+    onSuccess: (_d, v) => {
+      invalidate(v.complexId)
+      qc.invalidateQueries({ queryKey: ['device', v.deviceId] })
+      qc.invalidateQueries({ queryKey: ['devices'] })
+    },
+  })
 }
 export function useUnassignManager(complexId: number) {
   const invalidate = useComplexInvalidation()

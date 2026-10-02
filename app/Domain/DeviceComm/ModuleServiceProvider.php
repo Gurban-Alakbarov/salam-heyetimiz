@@ -14,10 +14,16 @@ use App\Domain\DeviceComm\Listeners\ClearWhitelistOnDeviceDecommissioned;
 use App\Domain\DeviceComm\Listeners\RegisterDeviceInTraccar;
 use App\Domain\DeviceComm\Listeners\RemoveUserFromWhitelistOnRosterUserRemoved;
 use App\Domain\DeviceComm\Listeners\ReprogramWhitelistOnDeviceTransferred;
+use App\Domain\DeviceComm\Listeners\SyncComplexWhitelistOnSubscriptionChange;
 use App\Domain\DeviceComm\Models\OpenCommand;
 use App\Domain\DeviceComm\Policies\OpenCommandPolicy;
 use App\Domain\Roster\Events\RosterUserAdded;
 use App\Domain\Roster\Events\RosterUserRemoved;
+use App\Domain\Subscriptions\Events\SubscriptionActivated;
+use App\Domain\Subscriptions\Events\SubscriptionCancelled;
+use App\Domain\Subscriptions\Events\SubscriptionExpired;
+use App\Domain\Subscriptions\Events\SubscriptionRefunded;
+use App\Domain\Subscriptions\Events\SubscriptionRenewed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -53,5 +59,7 @@ class ModuleServiceProvider extends ServiceProvider
         Event::listen(DeviceDecommissioned::class, ClearWhitelistOnDeviceDecommissioned::class);
         Event::listen(RosterUserAdded::class, AddUserToWhitelistOnRosterUserAdded::class);
         Event::listen(RosterUserRemoved::class, RemoveUserFromWhitelistOnRosterUserRemoved::class);
+        // B7: complex-mode whitelist follows the resident's own subscription (private devices unaffected).
+        Event::listen([SubscriptionActivated::class, SubscriptionRenewed::class, SubscriptionExpired::class, SubscriptionCancelled::class, SubscriptionRefunded::class], SyncComplexWhitelistOnSubscriptionChange::class);
     }
 }

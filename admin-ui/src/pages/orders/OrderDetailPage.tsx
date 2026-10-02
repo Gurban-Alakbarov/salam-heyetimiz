@@ -169,7 +169,11 @@ export function OrderDetailPage() {
       ) : (
         <>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="text-2xl font-semibold tracking-tight">{order.reference}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">{order.reference}</h1>
+              {/* B1: fake-gateway order — never real money */}
+              {order.is_test && <span className="rounded-md bg-red-600 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">TEST ÖDƏNİŞ</span>}
+            </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={onRecheck} disabled={recheck.isPending}>
                 {recheck.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}

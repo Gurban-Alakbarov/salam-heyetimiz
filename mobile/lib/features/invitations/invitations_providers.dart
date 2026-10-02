@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
+import '../../core/error/retry_policy.dart';
 import 'data/datasource/invitation_remote_datasource.dart';
 import 'data/repository_impl.dart';
 import 'domain/entity/invitation_entities.dart';
@@ -48,4 +49,4 @@ final invitationsProvider = FutureProvider.autoDispose
           .watch(invitationRepositoryProvider)
           .list(status: filter.query);
       return result.fold((failure) => throw failure, (list) => list);
-    });
+    }, retry: retryTransientFailures);

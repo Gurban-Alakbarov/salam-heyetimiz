@@ -35,6 +35,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String lastName,
     required String phone,
     required String email,
+    String? accountType,
+    String? invitationToken,
   }) => _guard(
     () async => _otpFromMeta(
       await _remote.register(
@@ -42,6 +44,8 @@ class AuthRepositoryImpl implements AuthRepository {
         lastName: lastName,
         phone: phone,
         email: email,
+        accountType: accountType,
+        invitationToken: invitationToken,
       ),
     ),
   );

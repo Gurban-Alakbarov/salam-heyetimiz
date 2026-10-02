@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
+import '../../core/error/retry_policy.dart';
 import 'data/datasource/device_remote_datasource.dart';
 import 'data/repository_impl.dart';
 import 'domain/entity/device_entities.dart';
@@ -23,4 +24,4 @@ final deviceRepositoryProvider = Provider<DeviceRepository>(
 final deviceListProvider = FutureProvider.autoDispose<DevicePage>((ref) async {
   final result = await ref.watch(deviceRepositoryProvider).list(limit: 25);
   return result.fold((failure) => throw failure, (page) => page);
-});
+}, retry: retryTransientFailures);

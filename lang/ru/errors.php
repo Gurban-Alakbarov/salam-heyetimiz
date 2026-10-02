@@ -3,6 +3,7 @@
 return [
     'unauthenticated' => 'Требуется вход.',
     'forbidden' => 'У вас нет доступа к этому действию.',
+    'family_member_cannot_share' => 'Член семьи не может создавать гостевые ссылки.',
     'not_found' => 'Не найдено.',
     'bad_request' => 'Некорректный запрос.',
     'validation_failed' => 'Введённые данные некорректны.',

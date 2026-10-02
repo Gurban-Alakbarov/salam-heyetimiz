@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
+import '../../core/error/retry_policy.dart';
 import '../devices/devices_providers.dart';
 import 'data/home_repository_impl.dart';
 import 'domain/home_data.dart';
@@ -16,7 +17,7 @@ final homeRepositoryProvider = Provider<HomeRepository>(
 final homeProvider = FutureProvider.autoDispose<HomeData>((ref) async {
   final result = await ref.watch(homeRepositoryProvider).load();
   return result.fold((failure) => throw failure, (data) => data);
-});
+}, retry: retryTransientFailures);
 
 /// The selected [HomeShell] bottom-nav tab (0=Home · 1=Devices · 2=Profile).
 /// Held in a provider so in-tab widgets (e.g. the Home "Active devices" card) can

@@ -2,6 +2,10 @@
 
 use App\Http\Admin\V1\Controllers\Access\AccessControlController;
 use App\Http\Admin\V1\Controllers\Admins\AdminManagementController;
+use App\Http\Admin\V1\Controllers\Admins\AdminMobileUserController;
+use App\Http\Admin\V1\Controllers\Applications\AdminApplicationController;
+use App\Http\Admin\V1\Controllers\Complexes\AdminComplexDeviceController;
+use App\Http\Admin\V1\Controllers\Complexes\AdminComplexPeopleController;
 use App\Http\Admin\V1\Controllers\Admins\ImpersonationController;
 use App\Http\Admin\V1\Controllers\Audit\AuditController;
 use App\Http\Admin\V1\Controllers\Auth\AdminAuthController;
@@ -10,6 +14,7 @@ use App\Http\Admin\V1\Controllers\Devices\AdminDeviceCommController;
 use App\Http\Admin\V1\Controllers\Devices\AdminDeviceController;
 use App\Http\Admin\V1\Controllers\Devices\AdminDeviceRosterController;
 use App\Http\Admin\V1\Controllers\Notifications\AdminNotificationCampaignController;
+use App\Http\Admin\V1\Controllers\Notifications\NotificationTemplateAdminController;
 use App\Http\Admin\V1\Controllers\Orders\AdminOrderController;
 use App\Http\Admin\V1\Controllers\Payments\AdminPaymentLogController;
 use App\Http\Admin\V1\Controllers\Refunds\AdminRefundController;
@@ -51,6 +56,9 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('admins', [AdminManagementController::class, 'store'])->name('adminCreateAdmin');
     Route::patch('admins/{adminId}', [AdminManagementController::class, 'update'])->whereNumber('adminId')->name('adminUpdateAdmin');
     Route::delete('admins/{adminId}', [AdminManagementController::class, 'destroy'])->whereNumber('adminId')->name('adminDeactivateAdmin');
+    // Komendant ↔ mobile account link (B5) — the complex_manager signs into the mobile app with this account.
+    Route::post('admins/{adminId}/mobile-user', [AdminMobileUserController::class, 'link'])->whereNumber('adminId')->name('adminLinkMobileUser');
+    Route::delete('admins/{adminId}/mobile-user', [AdminMobileUserController::class, 'unlink'])->whereNumber('adminId')->name('adminUnlinkMobileUser');
     Route::post('admins/{adminId}/impersonate', [ImpersonationController::class, 'start'])->whereNumber('adminId')->name('adminImpersonate');
     Route::get('audit', [AuditController::class, 'index'])->name('adminListAudit');
 
@@ -64,6 +72,22 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('admins/{adminId}/permissions/reset', [AccessControlController::class, 'reset'])->whereNumber('adminId')->name('adminResetPermissions');
 
     // Residential complexes — the root entity (complexes.view / complexes.manage)
+    // Registration applications (B9) — physical and legal are separate tabs / endpoints.
+    Route::get('applications/individual', [AdminApplicationController::class, 'individualIndex'])->name('adminListIndividualApplications');
+    Route::get('applications/individual/{id}', [AdminApplicationController::class, 'individualShow'])->whereNumber('id')->name('adminGetIndividualApplication');
+    Route::patch('applications/individual/{id}', [AdminApplicationController::class, 'individualUpdate'])->whereNumber('id')->name('adminUpdateIndividualApplication');
+    Route::get('applications/legal', [AdminApplicationController::class, 'legalIndex'])->name('adminListLegalApplications');
+    Route::get('applications/legal/{id}', [AdminApplicationController::class, 'legalShow'])->whereNumber('id')->name('adminGetLegalApplication');
+    Route::post('applications/legal/{id}/approve', [AdminApplicationController::class, 'legalApprove'])->whereNumber('id')->name('adminApproveLegalApplication');
+    Route::post('applications/legal/{id}/reject', [AdminApplicationController::class, 'legalReject'])->whereNumber('id')->name('adminRejectLegalApplication');
+
+    // B11 — complex ↔ device binding, residents / invitations / users read models (additive).
+    Route::post('complexes/{complexId}/devices/{deviceId}', [AdminComplexDeviceController::class, 'bind'])->whereNumber(['complexId', 'deviceId'])->name('adminBindComplexDevice');
+    Route::delete('complexes/{complexId}/devices/{deviceId}', [AdminComplexDeviceController::class, 'unbind'])->whereNumber(['complexId', 'deviceId'])->name('adminUnbindComplexDevice');
+    Route::get('complexes/{complexId}/members', [AdminComplexPeopleController::class, 'members'])->whereNumber('complexId')->name('adminListComplexMembers');
+    Route::get('invitations', [AdminComplexPeopleController::class, 'invitations'])->name('adminListInvitations');
+    Route::get('users', [AdminComplexPeopleController::class, 'users'])->name('adminListUsers');
+
     Route::get('complexes', [ComplexManagementController::class, 'index'])->name('adminListComplexes');
     Route::post('complexes', [ComplexManagementController::class, 'store'])->name('adminCreateComplex');
     Route::get('complexes/{complexId}', [ComplexManagementController::class, 'show'])->whereNumber('complexId')->name('adminGetComplex');
@@ -102,6 +126,7 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
 
     // Subscriptions (batch 06)
     Route::get('subscriptions', [AdminSubscriptionController::class, 'index'])->name('adminListSubscriptions');
+    Route::get('subscriptions/{id}', [AdminSubscriptionController::class, 'show'])->whereNumber('id')->name('adminGetSubscription');
 
     // Residents directory (residents.view; complex_manager scoped) + account removal (residents.delete)
     Route::get('residents', [AdminResidentController::class, 'index'])->name('adminListResidents');
@@ -109,6 +134,12 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
 
     // Notification campaigns (batch 11 — notifications.view / notifications.send; complex_manager scoped).
     // audience/preview before {campaignId} so the static path is not captured by the numeric param.
+    // Notification template editor (B10) — subject/body per locale for the existing templates.
+    Route::get('notification-templates', [NotificationTemplateAdminController::class, 'index'])->name('adminListNotificationTemplates');
+    Route::get('notification-templates/{id}', [NotificationTemplateAdminController::class, 'show'])->whereNumber('id')->name('adminGetNotificationTemplate');
+    Route::put('notification-templates/{id}/locales/{locale}', [NotificationTemplateAdminController::class, 'updateLocale'])->whereNumber('id')->where('locale', '[a-z]{2}')->name('adminUpdateNotificationTemplateLocale');
+    Route::post('notification-templates/{id}/preview', [NotificationTemplateAdminController::class, 'preview'])->whereNumber('id')->name('adminPreviewNotificationTemplate');
+
     Route::get('notifications', [AdminNotificationCampaignController::class, 'index'])->name('adminListNotificationCampaigns');
     Route::post('notifications', [AdminNotificationCampaignController::class, 'send'])->name('adminSendNotification');
     Route::post('notifications/audience/preview', [AdminNotificationCampaignController::class, 'previewAudience'])->name('adminPreviewNotificationAudience');
@@ -120,6 +151,7 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('devices/reconcile', [AdminDeviceController::class, 'reconcile'])->name('adminReconcileDevice');
     Route::get('devices/{deviceId}', [AdminDeviceController::class, 'show'])->whereNumber('deviceId')->name('adminGetDevice');
     Route::patch('devices/{deviceId}', [AdminDeviceController::class, 'update'])->whereNumber('deviceId')->name('adminUpdateDevice');
+    Route::post('devices/{deviceId}/ownership-mode', [AdminComplexDeviceController::class, 'changeMode'])->whereNumber('deviceId')->name('adminChangeDeviceOwnershipMode');
     Route::post('devices/{deviceId}/image', [AdminDeviceController::class, 'uploadImage'])->whereNumber('deviceId')->name('adminUploadDeviceImage');
     Route::delete('devices/{deviceId}/image', [AdminDeviceController::class, 'deleteImage'])->whereNumber('deviceId')->name('adminDeleteDeviceImage');
     Route::delete('devices/{deviceId}', [AdminDeviceController::class, 'decommission'])->whereNumber('deviceId')->name('adminDecommissionDevice');

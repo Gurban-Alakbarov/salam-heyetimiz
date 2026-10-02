@@ -25,6 +25,18 @@ enum ReminderKind: string
         };
     }
 
+    /** The day threshold this reminder stands for (matched against config subscriptions.reminder_days). */
+    public function thresholdDays(): int
+    {
+        return match ($this) {
+            self::D30 => 30,
+            self::D15 => 15,
+            self::D7 => 7,
+            self::D1 => 1,
+            self::Expired => 0,
+        };
+    }
+
     /** The reminder threshold for a given days-remaining value, or null if > 30 days out. */
     public static function forDaysRemaining(int $daysRemaining): ?self
     {

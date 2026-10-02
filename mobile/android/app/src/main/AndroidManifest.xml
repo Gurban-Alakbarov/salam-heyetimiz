@@ -34,6 +34,24 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- B13: links are handled once, by app_links (not Flutter's built-in router deep linking). -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
+            <!-- B13: invitation App Link https://salamheyetimiz.com/invite/{token} (B6 web landing). autoVerify
+                 succeeds once /.well-known/assetlinks.json carries the release signing fingerprint (B6). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="salamheyetimiz.com" android:pathPrefix="/invite/" />
+            </intent-filter>
+            <!-- B13: hosted-checkout return salam://payment/return?status=&order=&test= (B1 PaymentReturnController).
+                 Inside the in-app WebView it is intercepted; this filter covers an external-browser return. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="salam" android:host="payment" android:path="/return" />
+            </intent-filter>
         </activity>
 
         <!-- GEOFENCE-4: transparent confirmation dialog shown before a home-screen widget open

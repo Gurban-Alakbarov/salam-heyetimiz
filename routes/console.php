@@ -3,6 +3,8 @@
 use App\Domain\DeviceComm\Jobs\ExpireStaleOpenCommandsJob;
 use App\Domain\DeviceComm\Jobs\WhitelistSyncJob;
 use App\Domain\Payments\Jobs\PaymentLogsScannerJob;
+use App\Domain\Roster\Jobs\ExpireInvitationsJob;
+use App\Domain\Subscriptions\Jobs\SweepAbandonedSubscriptionIntentsJob;
 use Illuminate\Support\Facades\Schedule;
 
 $scheduleTimezone = config('app.schedule_timezone', 'Asia/Baku');
@@ -47,6 +49,18 @@ Schedule::job(new ExpireStaleOpenCommandsJob())
 // DeviceComm (batch 09-B) — drain the whitelist/provisioning outbox via the resolved driver (R-GSM-07)
 Schedule::job(new WhitelistSyncJob())
     ->everyMinute()
+    ->withoutOverlapping()
+    ->onOneServer();
+
+// Invitations: pending links past their 7-day window → expired (IMPLEMENTATION_PLAN B3).
+Schedule::job(new ExpireInvitationsJob())
+    ->hourly()
+    ->withoutOverlapping()
+    ->onOneServer();
+
+// Complex subscribe intents never paid → subscription cancelled + roster row revoked (IMPLEMENTATION_PLAN B7).
+Schedule::job(new SweepAbandonedSubscriptionIntentsJob())
+    ->hourly()
     ->withoutOverlapping()
     ->onOneServer();
 

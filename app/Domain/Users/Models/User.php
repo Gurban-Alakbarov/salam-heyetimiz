@@ -6,6 +6,7 @@ use App\Domain\Auth\Models\UserDevice;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Privacy\Models\UserConsent;
 use App\Domain\Roster\Models\DeviceUser;
+use App\Domain\Users\Enums\AccountType;
 use App\Domain\Users\Enums\UserStatus;
 use App\Support\Enums\Locale;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,6 +34,7 @@ class User extends Authenticatable
         return [
             'preferred_language' => Locale::class,
             'status' => UserStatus::class,
+            'account_type' => AccountType::class,
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];

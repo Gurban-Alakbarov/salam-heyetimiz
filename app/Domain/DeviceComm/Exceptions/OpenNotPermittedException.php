@@ -33,6 +33,12 @@ class OpenNotPermittedException extends DomainException
         return new self('forbidden');
     }
 
+    /** A family member may open but never share access as a visitor link (BR-19 / B8). */
+    public static function familyMemberCannotShare(int $deviceId): self
+    {
+        return new self('family_member_cannot_share', ['device_id' => $deviceId]);
+    }
+
     /** Geofence is enabled for the device but the caller sent no location (GEOFENCE-1). */
     public static function locationRequired(int $deviceId): self
     {

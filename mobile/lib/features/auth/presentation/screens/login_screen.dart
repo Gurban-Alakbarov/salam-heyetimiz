@@ -101,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: AppSpacing.sm),
               AppTextButton(
                 label: l.dontHaveAccount,
-                onPressed: () => context.go('/auth/register'),
+                onPressed: () => context.push('/auth/register/type'),
               ),
             ],
           ),

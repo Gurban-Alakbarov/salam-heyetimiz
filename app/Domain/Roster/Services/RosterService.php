@@ -2,6 +2,7 @@
 
 namespace App\Domain\Roster\Services;
 
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Enums\DeviceUserRole;
 use App\Domain\Roster\Enums\DeviceUserStatus;
@@ -30,15 +31,22 @@ final class RosterService
 
     /**
      * Add (or re-activate) a resident on an assigned device. Idempotent: an already-active member is
-     * returned unchanged. Throws if the device has no owner — you cannot roster a barrier nobody owns.
+     * returned unchanged. A PRIVATE device must have an owner — you cannot roster a barrier nobody owns
+     * (unchanged). A COMPLEX device (IMPLEMENTATION_PLAN B4) has no individual owner by design: it accepts
+     * `user` rows only, and only while it belongs to a complex. $familyLinkId marks a row granted through a
+     * family link (B8); null = own access.
      */
-    public function addMember(Device $device, User $user, DeviceUserRole $role, ActorKind $actorKind, ?int $actorId): DeviceUser
+    public function addMember(Device $device, User $user, DeviceUserRole $role, ActorKind $actorKind, ?int $actorId, ?int $familyLinkId = null): DeviceUser
     {
-        if ($device->owner_user_id === null) {
+        if ($device->ownership_mode === DeviceOwnershipMode::Complex) {
+            if ($device->complex_id === null || $role !== DeviceUserRole::User) {
+                throw new DeviceNotAssignedException();
+            }
+        } elseif ($device->owner_user_id === null) {
             throw new DeviceNotAssignedException();
         }
 
-        return DB::transaction(function () use ($device, $user, $role, $actorKind, $actorId): DeviceUser {
+        return DB::transaction(function () use ($device, $user, $role, $actorKind, $actorId, $familyLinkId): DeviceUser {
             /** @var DeviceUser|null $active */
             $active = DeviceUser::query()
                 ->where('device_id', $device->getKey())
@@ -67,6 +75,7 @@ final class RosterService
                     'revoked_by_user_id' => null,
                     'added_by_admin_id' => $actorKind === ActorKind::Admin ? $actorId : null,
                     'added_by_user_id' => $actorKind === ActorKind::User ? $actorId : null,
+                    'family_link_id' => $familyLinkId,
                 ])->save();
                 $row = $revoked;
                 $this->logHistory($device, $user, RosterEventType::ReAdded, null, $role, $actorKind, $actorId);
@@ -79,6 +88,7 @@ final class RosterService
                     'status' => DeviceUserStatus::Active->value,
                     'added_by_admin_id' => $actorKind === ActorKind::Admin ? $actorId : null,
                     'added_by_user_id' => $actorKind === ActorKind::User ? $actorId : null,
+                    'family_link_id' => $familyLinkId,
                 ]);
                 $this->logHistory($device, $user, RosterEventType::Added, null, $role, $actorKind, $actorId);
             }

@@ -54,6 +54,9 @@ final class RolePermissionMatrix
                 Permission::VISITOR_LINKS_MANAGE,
                 Permission::NOTIFICATIONS_VIEW,
                 Permission::NOTIFICATIONS_SEND,
+                Permission::APPLICATIONS_VIEW,
+                Permission::APPLICATIONS_MANAGE,
+                Permission::NOTIFICATION_TEMPLATES_VIEW,
             ],
 
             AdminRole::Finance->value => [
@@ -78,6 +81,8 @@ final class RolePermissionMatrix
                 Permission::SUPPORT_OTP_RESEND,
                 Permission::VISITOR_LINKS_VIEW,
                 Permission::NOTIFICATIONS_VIEW,
+                Permission::APPLICATIONS_VIEW,
+                Permission::NOTIFICATION_TEMPLATES_VIEW,
             ],
 
             AdminRole::ComplexManager->value => [

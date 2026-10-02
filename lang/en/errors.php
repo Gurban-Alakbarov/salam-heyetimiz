@@ -3,6 +3,7 @@
 return [
     'unauthenticated' => 'Authentication is required.',
     'forbidden' => 'You are not allowed to perform this action.',
+    'family_member_cannot_share' => 'Family members cannot create visitor links.',
     'not_found' => 'Not found.',
     'bad_request' => 'The request is invalid.',
     'validation_failed' => 'The submitted data is invalid.',

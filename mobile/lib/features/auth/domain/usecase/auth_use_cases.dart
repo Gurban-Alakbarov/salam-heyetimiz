@@ -32,6 +32,8 @@ class RegisterUseCase {
     required String lastName,
     required String phone,
     required String email,
+    String? accountType,
+    String? invitationToken,
   }) async {
     _analytics.logEvent(AuthEvents.registerStarted);
     _crash.log('auth: register_attempt');
@@ -40,6 +42,8 @@ class RegisterUseCase {
       lastName: lastName,
       phone: phone,
       email: email,
+      accountType: accountType,
+      invitationToken: invitationToken,
     );
     if (result.isSuccess) {
       _analytics.logEvent(

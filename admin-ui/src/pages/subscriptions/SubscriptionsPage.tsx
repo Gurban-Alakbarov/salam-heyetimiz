@@ -79,7 +79,7 @@ export function SubscriptionsPage() {
               <TableBody>
                 {rows.map((s) => (
                   <TableRow key={s.id}>
-                    <TableCell className="font-medium">#{s.id}</TableCell>
+                    <TableCell className="font-medium"><Link to={`/subscriptions/${s.id}`} className="hover:underline">#{s.id}</Link></TableCell>
                     <TableCell>{tierLabels[s.tier] ?? s.tier}</TableCell>
                     <TableCell>
                       <StatusBadge kind="subscription" value={s.status} />

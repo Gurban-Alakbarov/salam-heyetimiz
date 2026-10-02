@@ -11,13 +11,26 @@ import 'package:salam_mobile/features/auth/auth_providers.dart';
 import 'package:salam_mobile/features/auth/domain/usecase/auth_use_cases.dart';
 import 'package:salam_mobile/features/auth/presentation/failure_l10n.dart';
 import 'package:salam_mobile/features/auth/presentation/providers/auth_controllers.dart';
+import 'package:salam_mobile/features/auth/session_roles_provider.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 
 class VerifyOtpScreen extends ConsumerStatefulWidget {
-  const VerifyOtpScreen({required this.email, required this.flow, super.key});
+  const VerifyOtpScreen({
+    required this.email,
+    required this.flow,
+    this.accountType,
+    this.invite = false,
+    super.key,
+  });
 
   final String email;
   final AuthFlow flow;
+
+  /// B14: account type chosen at registration ('physical' | 'legal'); routes to its application form.
+  final String? accountType;
+
+  /// B16: registration started from an invitation → claim it right after verification.
+  final bool invite;
 
   @override
   ConsumerState<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
@@ -60,11 +73,34 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
   Future<void> _verify(String code) async {
     final l = AppLocalizations.of(context);
     setState(() => _otpError = null);
+    // B16: read before verifying — once the session exists the router may already leave this screen.
+    final resumeInvite =
+        widget.flow == AuthFlow.login &&
+        !widget.invite &&
+        await ref.read(pendingInviteStoreProvider).read() != null;
+    if (!mounted) return;
     final user = await ref
         .read(verifyControllerProvider.notifier)
         .submit(email: widget.email, code: code, flow: widget.flow);
     if (!mounted) return;
     if (user != null) {
+      // B16: an invitation-driven registration claims the invitation at once; a login with an invitation
+      // still pending on this device returns to it (explicit accept).
+      if (widget.invite) {
+        context.go('/invite?accept=1');
+        return;
+      }
+      if (resumeInvite) {
+        context.go('/invite');
+        return;
+      }
+      // B14: a typed new registration continues to its application form (skippable — "later").
+      final type = widget.accountType;
+      if (widget.flow == AuthFlow.register &&
+          (type == 'physical' || type == 'legal')) {
+        context.go('/applications/new/$type?onboarding=1');
+        return;
+      }
       context.go('/home');
       return;
     }

@@ -17,6 +17,7 @@ class VerifyEmailRequest extends RegistrationRequest
         return [
             'email' => ['required', 'string', 'email:rfc', 'max:160'],
             'code' => ['required', 'string', 'regex:/^\d{6}$/'],
+            'invitation_token' => ['sometimes', 'nullable', 'string', 'max:128'], // B6 — claim after verification
             'device' => ['required', 'array'],
             'device.install_uuid' => ['required', 'uuid'],
             'device.platform' => ['required', 'string', 'in:ios,android'],

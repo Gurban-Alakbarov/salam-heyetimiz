@@ -7,6 +7,7 @@ use App\Domain\Auth\Events\EmailOtpRequested;
 use App\Domain\Auth\Exceptions\RegistrationException;
 use App\Domain\Auth\Services\OtpService;
 use App\Domain\Auth\Support\EmailMask;
+use App\Domain\Users\Enums\AccountType;
 use App\Domain\Users\Enums\UserStatus;
 use App\Domain\Users\Models\User;
 
@@ -20,7 +21,7 @@ final class RegisterUser
 {
     public function __construct(private readonly OtpService $otp) {}
 
-    public function handle(string $firstName, string $lastName, string $phone, string $email, string $ip, string $locale): array
+    public function handle(string $firstName, string $lastName, string $phone, string $email, string $ip, string $locale, ?AccountType $accountType = null): array
     {
         $email = mb_strtolower(trim($email));
         $byEmail = User::query()->where('email', $email)->first();
@@ -46,6 +47,10 @@ final class RegisterUser
         if ($target !== null) {
             // §4 — reuse the unverified account; refresh the profile (also upgrades an old phone-only row).
             $target->forceFill(['full_name' => $fullName, 'phone' => $phone, 'email' => $email])->save();
+            // B9: an unverified account may still pick its type; an already-typed one is never re-typed here.
+            if ($accountType !== null) {
+                User::query()->whereKey($target->getKey())->whereNull('account_type')->update(['account_type' => $accountType->value]);
+            }
             $user = $target;
         } else {
             $user = User::query()->create([
@@ -55,6 +60,7 @@ final class RegisterUser
                 'email' => $email,
                 'preferred_language' => 'az',
                 'status' => UserStatus::Active->value,
+                'account_type' => $accountType?->value, // B9 — NULL keeps the legacy behaviour
             ]);
         }
 

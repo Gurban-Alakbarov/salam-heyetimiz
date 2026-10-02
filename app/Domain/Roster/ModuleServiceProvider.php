@@ -2,6 +2,9 @@
 
 namespace App\Domain\Roster;
 
+use App\Domain\Admin\Models\Complex;
+use App\Domain\Roster\Policies\ComplexPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -17,6 +20,6 @@ class ModuleServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        Gate::policy(Complex::class, ComplexPolicy::class);
     }
 }

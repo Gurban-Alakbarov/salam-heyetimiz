@@ -625,4 +625,621 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get invitationDefaultTitle => 'Приглашение';
+
+  @override
+  String get checkoutTitle => 'Оплата';
+
+  @override
+  String get paymentTestBanner => 'ТЕСТОВАЯ ОПЛАТА';
+
+  @override
+  String get paymentResultTitle => 'Результат оплаты';
+
+  @override
+  String get paymentSuccess => 'Оплата прошла успешно';
+
+  @override
+  String get paymentFailed => 'Оплата не прошла';
+
+  @override
+  String get paymentCancelled => 'Оплата отменена';
+
+  @override
+  String get paymentExpired => 'Время оплаты истекло';
+
+  @override
+  String get paymentPending => 'Оплата обрабатывается';
+
+  @override
+  String get paymentChecking => 'Подтверждаем в банке…';
+
+  @override
+  String get paymentRecheck => 'Проверить снова';
+
+  @override
+  String get paymentDone => 'На главную';
+
+  @override
+  String get paymentOrderNotFound => 'Заказ не найден';
+
+  @override
+  String get subscriptionRenew => 'Продлить (12 AZN / 30 дней)';
+
+  @override
+  String get subscriptionRenewNotEligible =>
+      'Эту подписку сейчас нельзя продлить.';
+
+  @override
+  String get regTypeTitle => 'Тип регистрации';
+
+  @override
+  String get regTypePhysical => 'Физическое лицо';
+
+  @override
+  String get regTypePhysicalBody =>
+      'Хочу подключить устройство для своего частного двора.';
+
+  @override
+  String get regTypeLegal => 'Юридическое лицо';
+
+  @override
+  String get regTypeLegalBody => 'Жилой комплекс, здание или компания.';
+
+  @override
+  String get appMineTitle => 'Мои заявки';
+
+  @override
+  String get appNone => 'У вас пока нет заявок';
+
+  @override
+  String get appNewPhysical => 'Новая заявка (физ. лицо)';
+
+  @override
+  String get appNewLegal => 'Новая заявка (юр. лицо)';
+
+  @override
+  String get appSectionPhysical => 'Физическое лицо';
+
+  @override
+  String get appSectionLegal => 'Юридическое лицо';
+
+  @override
+  String get appPhysicalTitle => 'Заявка физического лица';
+
+  @override
+  String get appPhysicalIntro =>
+      'Укажите, где находится ваш двор — мы свяжемся с вами по установке.';
+
+  @override
+  String get appLegalTitle => 'Заявка юридического лица';
+
+  @override
+  String get appLegalIntro =>
+      'Данные комплекса и местоположение. Заявку рассматривает администратор.';
+
+  @override
+  String get appFullName => 'Имя и фамилия';
+
+  @override
+  String get appPhone => 'Телефон';
+
+  @override
+  String get appEmail => 'Email';
+
+  @override
+  String get appAddress => 'Адрес';
+
+  @override
+  String get appNote => 'Примечание (необязательно)';
+
+  @override
+  String get appComplexName => 'Название комплекса';
+
+  @override
+  String get appLegalName => 'Юридическое название';
+
+  @override
+  String get appVoen => 'ИНН (VÖEN)';
+
+  @override
+  String get appLegalAddress => 'Юридический адрес';
+
+  @override
+  String get appContactName => 'Контактное лицо';
+
+  @override
+  String get appComplexAddress => 'Адрес комплекса';
+
+  @override
+  String get appApartments => 'Количество квартир (необязательно)';
+
+  @override
+  String get appLocationLabel => 'Местоположение на карте';
+
+  @override
+  String get appLocationHint => 'Коснитесь карты, чтобы поставить метку';
+
+  @override
+  String get appUseMyLocation => 'Моё местоположение';
+
+  @override
+  String get appLocationRequired => 'Выберите местоположение на карте';
+
+  @override
+  String get appLocationOutside =>
+      'Местоположение должно быть на территории Азербайджана';
+
+  @override
+  String get appVoenInvalid => 'ИНН должен состоять из 10 цифр';
+
+  @override
+  String get appApartmentsInvalid => 'Введите корректное число';
+
+  @override
+  String get appSubmit => 'Отправить заявку';
+
+  @override
+  String get appLater => 'Заполню позже';
+
+  @override
+  String get appSubmitted => 'Заявка отправлена';
+
+  @override
+  String get appStatusNew => 'Новая';
+
+  @override
+  String get appStatusContacted => 'Связались';
+
+  @override
+  String get appStatusInProgress => 'В работе';
+
+  @override
+  String get appStatusInstalled => 'Установлено';
+
+  @override
+  String get appStatusPending => 'На рассмотрении';
+
+  @override
+  String get appStatusApproved => 'Одобрена';
+
+  @override
+  String get appStatusRejected => 'Отклонена';
+
+  @override
+  String get appRejectReason => 'Причина';
+
+  @override
+  String get appErrTypeMismatch =>
+      'Тип вашего аккаунта не соответствует типу заявки.';
+
+  @override
+  String get appErrAlreadyOpen => 'У вас уже есть открытая заявка.';
+
+  @override
+  String get appErrDuplicateVoen => 'Заявка с этим ИНН уже рассматривается.';
+
+  @override
+  String get kmTitle => 'Мой комплекс (Комендант)';
+
+  @override
+  String get kmEntrySubtitle => 'Жильцы, приглашения и устройства';
+
+  @override
+  String get kmStatDevices => 'Устройства';
+
+  @override
+  String get kmStatResidents => 'Жильцы';
+
+  @override
+  String get kmStatPending => 'Ожидающие';
+
+  @override
+  String get kmDevicesTitle => 'Устройства комплекса';
+
+  @override
+  String get kmNoDevices => 'К комплексу ещё не привязаны устройства.';
+
+  @override
+  String get kmOnline => 'Онлайн';
+
+  @override
+  String get kmOffline => 'Офлайн';
+
+  @override
+  String kmDevicePrice(String price, int days) {
+    return 'Подписка: $price / $days дн.';
+  }
+
+  @override
+  String get kmInvite => 'Пригласить жильца';
+
+  @override
+  String get kmInviteIntro =>
+      'Жилец получит по email ссылку-приглашение, действующую 7 дней.';
+
+  @override
+  String get kmFirstName => 'Имя';
+
+  @override
+  String get kmLastName => 'Фамилия';
+
+  @override
+  String get kmEmail => 'Email';
+
+  @override
+  String get kmInviteSend => 'Отправить приглашение';
+
+  @override
+  String get kmInviteSent => 'Приглашение отправлено.';
+
+  @override
+  String get kmInvitations => 'Приглашения';
+
+  @override
+  String get kmTabPending => 'Ожидают';
+
+  @override
+  String get kmTabAccepted => 'Приняты';
+
+  @override
+  String get kmTabExpired => 'Истекли';
+
+  @override
+  String get kmTabClosed => 'Отменены';
+
+  @override
+  String get kmStatusDeclined => 'Отклонено';
+
+  @override
+  String get kmNoInvitations => 'Здесь нет приглашений.';
+
+  @override
+  String kmExpiresAt(String date) {
+    return 'Истекает: $date';
+  }
+
+  @override
+  String kmAcceptedAt(String date) {
+    return 'Принято: $date';
+  }
+
+  @override
+  String kmSendCount(int count) {
+    return 'Отправлено: $count раз';
+  }
+
+  @override
+  String get kmResend => 'Отправить снова';
+
+  @override
+  String get kmRevoke => 'Отменить';
+
+  @override
+  String get kmResent => 'Приглашение отправлено повторно.';
+
+  @override
+  String get kmRevoked => 'Приглашение отменено.';
+
+  @override
+  String get kmRevokeTitle => 'Отменить приглашение?';
+
+  @override
+  String get kmRevokeBody => 'Ссылка-приглашение перестанет работать.';
+
+  @override
+  String get kmResidentsTitle => 'Жильцы';
+
+  @override
+  String get kmNoResidents => 'В комплексе пока нет жильцов.';
+
+  @override
+  String kmActiveSubs(int count) {
+    return 'Активные подписки: $count';
+  }
+
+  @override
+  String get kmNoActiveSub => 'Нет активной подписки';
+
+  @override
+  String kmJoinedAt(String date) {
+    return 'Присоединился: $date';
+  }
+
+  @override
+  String get kmRemove => 'Удалить';
+
+  @override
+  String get kmRemoveTitle => 'Удалить жильца из комплекса';
+
+  @override
+  String kmRemoveBody(String name) {
+    return '$name будет удалён(а) из комплекса. Доступ к устройствам комплекса сразу прекратится, активные подписки будут отменены. Автоматический возврат средств не производится.';
+  }
+
+  @override
+  String get kmRemoved => 'Жилец удалён из комплекса.';
+
+  @override
+  String get kmErrNotKomendant =>
+      'Этот раздел только для коменданта комплекса.';
+
+  @override
+  String get kmErrForbidden => 'У вас нет прав на это действие.';
+
+  @override
+  String get kmErrAlreadyResident =>
+      'Этот email уже принадлежит жильцу комплекса.';
+
+  @override
+  String get kmErrAlreadyPending =>
+      'Для этого email уже есть активное приглашение.';
+
+  @override
+  String get kmErrNotResendable => 'Это приглашение нельзя отправить повторно.';
+
+  @override
+  String get kmErrNotRevocable => 'Это приглашение нельзя отменить.';
+
+  @override
+  String get kmErrRateLimited => 'Слишком часто. Попробуйте чуть позже.';
+
+  @override
+  String get kmErrNotFound => 'Не найдено. Список обновлён.';
+
+  @override
+  String get invTitle => 'Приглашение';
+
+  @override
+  String get invComplexKind => 'Приглашение в жилой комплекс';
+
+  @override
+  String get invFamilyKind => 'Приглашение члена семьи';
+
+  @override
+  String invComplexBody(String complex) {
+    return 'Вас пригласили в $complex как жильца. После принятия вы сможете выбрать устройство и оформить подписку.';
+  }
+
+  @override
+  String invFamilyBody(String inviter) {
+    return '$inviter пригласил(а) вас как члена семьи для доступа к устройству. Доступ активируется после оплаты вашей подписки.';
+  }
+
+  @override
+  String invFor(String name) {
+    return 'Приглашённый: $name';
+  }
+
+  @override
+  String invSentTo(String email) {
+    return 'Приглашение отправлено на $email. Продолжайте с этим email.';
+  }
+
+  @override
+  String invExpires(String date) {
+    return 'Действительно до $date';
+  }
+
+  @override
+  String get invRegister => 'Зарегистрироваться';
+
+  @override
+  String get invLogin => 'У меня есть аккаунт — войти';
+
+  @override
+  String get invAccept => 'Принять приглашение';
+
+  @override
+  String get invDecline => 'Отклонить';
+
+  @override
+  String get invDeclineTitle => 'Отклонить приглашение?';
+
+  @override
+  String get invDeclineBody => 'Эта ссылка-приглашение перестанет работать.';
+
+  @override
+  String get invDeclined => 'Приглашение отклонено.';
+
+  @override
+  String invAcceptedComplex(String complex) {
+    return 'Приглашение принято. Добро пожаловать в $complex!';
+  }
+
+  @override
+  String get invAcceptedFamily =>
+      'Приглашение принято. Оплатите подписку, чтобы активировать доступ.';
+
+  @override
+  String get invGoneTitle => 'Приглашение недействительно';
+
+  @override
+  String get invGoneBody =>
+      'Срок действия ссылки истёк, она отозвана или уже использована. Попросите отправителя о новом приглашении.';
+
+  @override
+  String get invClose => 'Закрыть';
+
+  @override
+  String get invErrEmailMismatch =>
+      'Это приглашение для другого email. Войдите с приглашённым email.';
+
+  @override
+  String get invErrAlreadyHasAccess =>
+      'У вас уже есть доступ к этому устройству.';
+
+  @override
+  String get invErrInvalidTarget => 'Нельзя принять собственное приглашение.';
+
+  @override
+  String get invErrUnsupported => 'Этот тип приглашения не поддерживается.';
+
+  @override
+  String get invRegisterHint =>
+      'Зарегистрируйтесь с приглашённым email; приглашение будет принято после подтверждения аккаунта.';
+
+  @override
+  String get invPendingCard => 'У вас есть приглашение';
+
+  @override
+  String get invPendingCardBody => 'Откройте и примите его.';
+
+  @override
+  String get cxTitle => 'Мой комплекс';
+
+  @override
+  String get cxMyComplexes => 'Мои комплексы';
+
+  @override
+  String get cxEntrySubtitle => 'Выберите устройство и оформите подписку';
+
+  @override
+  String get cxNoComplexes =>
+      'Вы пока не являетесь жильцом ни одного комплекса.';
+
+  @override
+  String get cxDevicesTitle => 'Устройства комплекса';
+
+  @override
+  String get cxNoDevices => 'В комплексе пока нет устройств.';
+
+  @override
+  String get cxStatusNone => 'Нет подписки';
+
+  @override
+  String get cxStatusPending => 'Ожидает оплаты';
+
+  @override
+  String get cxStatusActive => 'Активна';
+
+  @override
+  String get cxStatusExpired => 'Истекла';
+
+  @override
+  String cxPrice(String price, int days) {
+    return '$price / $days дн.';
+  }
+
+  @override
+  String get cxPriceNote =>
+      'Подписка активирует ваш доступ к этому устройству.';
+
+  @override
+  String get cxSubscriptionBlock => 'Ежемесячная подписка';
+
+  @override
+  String get cxSubscribe => 'Оформить подписку';
+
+  @override
+  String get cxFinishPayment => 'Завершить оплату';
+
+  @override
+  String get cxRenew => 'Продлить';
+
+  @override
+  String get cxOpenInDevices => 'Открыть в разделе «Устройства»';
+
+  @override
+  String get cxDeviceTitle => 'Устройство';
+
+  @override
+  String get cxErrAlreadyActive =>
+      'Ваша подписка на это устройство уже активна.';
+
+  @override
+  String get payPendingTitle => 'Ожидают оплаты';
+
+  @override
+  String payPendingCard(int count) {
+    return 'Подписок ожидают оплаты: $count';
+  }
+
+  @override
+  String get payPendingNone => 'Нет подписок, ожидающих оплаты.';
+
+  @override
+  String get payPendingMain => 'Подписка жильца';
+
+  @override
+  String get payPendingAdditional => 'Подписка члена семьи';
+
+  @override
+  String get payNow => 'Оплатить';
+
+  @override
+  String payDeviceFallback(int id) {
+    return 'Устройство #$id';
+  }
+
+  @override
+  String get payErrForbidden => 'У вас нет прав на это действие.';
+
+  @override
+  String get famTitle => 'Члены семьи';
+
+  @override
+  String get famEntrySubtitle => 'Приглашения, доступ и оплаты';
+
+  @override
+  String get famTabMembers => 'Участники';
+
+  @override
+  String get famTabInvitations => 'Приглашения';
+
+  @override
+  String get famInvite => 'Пригласить члена семьи';
+
+  @override
+  String get famNotHead =>
+      'Чтобы приглашать членов семьи, нужен собственный активный доступ к устройству. На устройствах, куда вас добавили как члена семьи, это недоступно.';
+
+  @override
+  String get famErrNotHead =>
+      'Вы не можете управлять членами семьи на этом устройстве.';
+
+  @override
+  String get famErrInvalidTarget =>
+      'Этого человека нельзя пригласить (вы сами или он уже есть на устройстве).';
+
+  @override
+  String get famNoMembers => 'Пока нет членов семьи.';
+
+  @override
+  String get famNoInvitations => 'Пока нет семейных приглашений.';
+
+  @override
+  String get famDeviceLabel => 'Устройство';
+
+  @override
+  String get famInviteIntro =>
+      'Для выбранного устройства будет отправлено приглашение на 7 дней. У каждого члена семьи своя ежемесячная подписка — её оплачиваете вы или сам участник.';
+
+  @override
+  String get famGranted =>
+      'Члену семьи выдан доступ к устройству. Подписка ожидает оплаты.';
+
+  @override
+  String get famSubNone => 'Нет подписки';
+
+  @override
+  String famSubActiveUntil(String date) {
+    return 'Активна до $date';
+  }
+
+  @override
+  String get famPayFor => 'Оплатить за участника';
+
+  @override
+  String get famRemove => 'Удалить';
+
+  @override
+  String get famRemoveTitle => 'Удалить члена семьи';
+
+  @override
+  String famRemoveBody(String name) {
+    return '$name будет удалён(а) из семьи. Доступ к выданным устройствам сразу прекратится, подписки будут отменены. Автоматический возврат не производится.';
+  }
+
+  @override
+  String get famRemoved => 'Член семьи удалён.';
 }

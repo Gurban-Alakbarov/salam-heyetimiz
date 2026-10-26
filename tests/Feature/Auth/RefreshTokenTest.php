@@ -56,3 +56,21 @@ it('rejects an unknown refresh token', function () {
         ->assertStatus(401)
         ->assertJsonPath('error.code', 'invalid_refresh_token');
 });
+
+it('issues no new tokens to an account that is no longer active, and revokes what it still holds', function (string $how) {
+    $tokens = authenticatedTokens('+994502220009');
+    $user = User::query()->where('phone', '+994502220009')->firstOrFail();
+
+    match ($how) {
+        'blocked' => $user->forceFill(['status' => 'blocked'])->save(),
+        'soft_deleted' => $user->delete(),
+    };
+
+    $this->postJson('/v1/auth/refresh', ['refresh_token' => $tokens['refresh_token']])
+        ->assertStatus(401)
+        ->assertJsonPath('error.code', 'invalid_refresh_token');
+
+    expect(RefreshToken::query()->where('user_id', $user->id)->whereNull('revoked_at')->count())->toBe(0)
+        ->and(RefreshToken::query()->where('user_id', $user->id)->latest('id')->first()->revocation_reason)
+        ->toBe(RefreshTokenRevocationReason::Admin);
+})->with(['blocked', 'soft_deleted']);

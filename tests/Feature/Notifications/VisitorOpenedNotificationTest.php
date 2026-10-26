@@ -187,3 +187,18 @@ it('fans the push out to every active install via the bound PushClient', functio
         ->and(Notification::query()->where('user_id', $resident->id)->where('channel', 'push')->first()->status)
         ->toBe(NotificationStatus::Sent);
 });
+
+it('notifies the creating admin\'s linked mobile account on a complex device (no owner)', function () {
+    Bus::fake();
+    $complex = makeComplex('CX-VN', 'VN Complex');
+    $device = makeActiveDevice('VN-CX', '+994700600090');
+    $device->forceFill(['complex_id' => $complex->id, 'ownership_mode' => 'complex'])->save();
+    $komendantUser = makeUser('+994506000090');
+    $komendant = makeAdminRole('complex_manager', $complex->id);
+    $komendant->forceFill(['user_id' => $komendantUser->id])->save();
+    [$link] = mintVisitorLink($device, $komendant, VisitorAccessType::TimeLimited, 60, 'Kuryer');
+
+    fireVisitorOpen($device, (int) $link->id);
+
+    expect(Notification::query()->where('user_id', $komendantUser->id)->count())->toBe(2);
+});

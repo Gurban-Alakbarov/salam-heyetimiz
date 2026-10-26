@@ -3,6 +3,7 @@
 namespace App\Domain\Visitor\Services;
 
 use App\Domain\Admin\Models\AdminUser;
+use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Users\Models\User;
 use App\Domain\Visitor\DTOs\CreateVisitorLinkData;
@@ -20,7 +21,10 @@ use Illuminate\Support\Carbon;
  */
 final class VisitorLinkService
 {
-    public function __construct(private readonly Clock $clock) {}
+    public function __construct(
+        private readonly Clock $clock,
+        private readonly AuditLogger $audit,
+    ) {}
 
     /**
      * Create a link for a device on behalf of a resident (User) or an admin. Returns the model plus the
@@ -52,13 +56,23 @@ final class VisitorLinkService
             'usage_count' => 0,
         ]);
 
+        // O11 — who handed out access, to which device and for how long (never the token itself, only its prefix).
+        $this->audit->record('visitor_link.created', [
+            'device_id' => (int) $device->getKey(),
+            'access_type' => $data->accessType->value,
+            'purpose' => $data->purpose?->value,
+            'expires_at' => $expiresAt?->toIso8601String(),
+            'max_usage' => $maxUsage,
+            'token_prefix' => $token['prefix'],
+        ], VisitorLink::class, (int) $link->getKey());
+
         return ['link' => $link, 'token' => $token['plain'], 'url' => $this->url($token['plain'])];
     }
 
     /**
-     * Anti-abuse: cap the number of *active* links per device (all creators) and per resident creator.
-     * A cap of <= 0 disables that check. Admin creators are exempt from the per-creator cap (they manage on
-     * residents' behalf) but the per-device cap still applies to every creator.
+     * Anti-abuse: cap the number of *active* links per device (all creators), per resident creator and per
+     * admin creator. A cap of <= 0 disables that check. Admins manage links on residents' behalf, so their own
+     * cap (max_active_per_admin) is higher than a resident's (O12).
      */
     private function assertWithinActiveLimits(Device $device, User|AdminUser $creator, Carbon $now): void
     {
@@ -77,6 +91,14 @@ final class VisitorLinkService
                 throw new VisitorLinkLimitException('creator', $perCreator);
             }
         }
+
+        $perAdmin = (int) config('domain.visitor.max_active_per_admin');
+        if ($perAdmin > 0 && $creator instanceof AdminUser) {
+            $count = VisitorLink::query()->where('created_by_admin_id', $creator->getKey())->active($now)->count();
+            if ($count >= $perAdmin) {
+                throw new VisitorLinkLimitException('creator', $perAdmin);
+            }
+        }
     }
 
     public function revoke(VisitorLink $link, User|AdminUser $actor): VisitorLink
@@ -90,6 +112,11 @@ final class VisitorLinkService
             'revoked_by_user_id' => $actor instanceof User ? $actor->getKey() : null,
             'revoked_by_admin_id' => $actor instanceof AdminUser ? $actor->getKey() : null,
         ])->save();
+
+        $this->audit->record('visitor_link.revoked', [
+            'device_id' => (int) $link->device_id,
+            'token_prefix' => $link->token_prefix,
+        ], VisitorLink::class, (int) $link->getKey());
 
         return $link;
     }

@@ -4,6 +4,7 @@ namespace App\Http\Admin\V1\Controllers\Admins;
 
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Admin\Enums\AdminRole;
+use App\Domain\Admin\Enums\AdminStatus;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Auth\Support\RecoveryCodes;
@@ -97,6 +98,14 @@ class AdminManagementController
             $this->guardLastSuperAdmin($admin); // demoting the last super_admin is blocked
         }
 
+        // O9 — suspending / offboarding through PATCH has the same guards as DELETE.
+        if (array_key_exists('status', $v) && $v['status'] !== AdminStatus::Active->value) {
+            if ((int) $admin->getKey() === (int) $actor->getKey()) {
+                throw ValidationException::withMessages(['status' => 'Öz hesabınızı bloklaya bilməzsiniz.']);
+            }
+            $this->guardLastSuperAdmin($admin);
+        }
+
         $changes = array_intersect_key($v, array_flip(['name', 'role', 'complex_id', 'status']));
         $admin->forceFill(array_merge($changes, ['updated_by_admin_id' => $actor->getKey()]))->save();
 
@@ -125,16 +134,18 @@ class AdminManagementController
         return response()->json(null, 204);
     }
 
+    /** At least one OTHER active super_admin must remain, whatever the target's own current status is. */
     private function guardLastSuperAdmin(AdminUser $admin): void
     {
         if ($admin->role !== AdminRole::SuperAdmin) {
             return;
         }
-        $activeSupers = AdminUser::query()
+        $otherActiveSupers = AdminUser::query()
             ->where('role', AdminRole::SuperAdmin->value)
-            ->where('status', 'active')
+            ->where('status', AdminStatus::Active->value)
+            ->whereKeyNot($admin->getKey())
             ->count();
-        if ($activeSupers <= 1) {
+        if ($otherActiveSupers === 0) {
             throw ValidationException::withMessages(['admin' => 'Son aktiv super admini dəyişmək/deaktiv etmək olmaz.']);
         }
     }

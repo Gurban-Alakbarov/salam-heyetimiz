@@ -3,7 +3,13 @@
 namespace App\Http\Admin\V1\Controllers\Visitor;
 
 use App\Domain\Admin\Authorization\Permission;
+use App\Domain\DeviceComm\Exceptions\OpenNotPermittedException;
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
+use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Models\Device;
+use App\Domain\Roster\Enums\DeviceUserStatus;
+use App\Domain\Roster\Models\DeviceUser;
+use App\Domain\Subscriptions\Queries\SubscriptionStatusQuery;
 use App\Domain\Visitor\Models\VisitorLink;
 use App\Domain\Visitor\Models\VisitorLinkUsage;
 use App\Domain\Visitor\Queries\VisitorLinkListFilters;
@@ -25,6 +31,8 @@ use Illuminate\Http\Request;
 class AdminVisitorLinkController
 {
     use AuthorizesAdmin;
+
+    public function __construct(private readonly SubscriptionStatusQuery $access) {}
 
     /** GET /admin/v1/visitor-links — directory with server-side filters (visitor_links.view; complex-scoped). */
     public function index(Request $request, VisitorLinkQuery $query): JsonResponse
@@ -93,6 +101,7 @@ class AdminVisitorLinkController
 
         $device = Device::query()->findOrFail($deviceId);
         $this->assertDeviceInScope($request, $device);
+        $this->assertShareable($device);
 
         $result = $service->create($device, $request->user(), $request->toData());
 
@@ -114,5 +123,31 @@ class AdminVisitorLinkController
         $service->revoke($link, $request->user());
 
         return response()->json(['data' => new VisitorLinkAdminResource($link->refresh()->load(['device', 'createdByUser', 'createdByAdmin']))]);
+    }
+
+    /**
+     * O12 — an admin link must be one that can open: the device is active, and a private device still has
+     * someone on its roster who can open it (an admin link never stands in for an unpaid subscription). A
+     * complex device has no owner; its links rest on the admin's (Komendant's) own authority.
+     */
+    private function assertShareable(Device $device): void
+    {
+        $deviceId = (int) $device->getKey();
+        if ($device->status !== DeviceStatus::Active) {
+            throw OpenNotPermittedException::deviceDisabled($deviceId);
+        }
+        if ($device->ownership_mode === DeviceOwnershipMode::Complex) {
+            return;
+        }
+
+        $rosterUserIds = DeviceUser::query()->where('device_id', $deviceId)
+            ->where('status', DeviceUserStatus::Active->value)->pluck('user_id');
+        foreach ($rosterUserIds as $userId) {
+            if ($this->access->for((int) $userId, $deviceId)->canOpen) {
+                return;
+            }
+        }
+
+        throw OpenNotPermittedException::subscriptionRequired($deviceId);
     }
 }

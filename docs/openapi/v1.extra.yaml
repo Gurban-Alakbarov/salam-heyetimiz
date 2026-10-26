@@ -1756,7 +1756,12 @@ paths:
       description: |
         Requires `visitor_links.manage`. Complex-scoped. Same rules as the resident flow (shared service). The
         plaintext `token` / `url` are returned **only here** — only the hash is stored.
-        **409** `visitor_link_limit_reached` (`details.scope` = `creator` | `device`, `details.limit`).
+        The link must be able to open: **403** `device_disabled` when the device is not `active`; on a private
+        device **403** `subscription_required` when nobody on its roster can open it. Complex devices need no
+        subscription.
+        **409** `visitor_link_limit_reached` (`details.scope` = `creator` | `device`, `details.limit`); an admin's
+        own cap is `max_active_per_admin` (default 50).
+        Creating and revoking a link is recorded in the audit log (`visitor_link.created` / `visitor_link.revoked`).
       parameters: [{ $ref: '#/components/parameters/DeviceId' }]
       requestBody:
         required: true

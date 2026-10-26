@@ -84,6 +84,10 @@ class RouteServiceProvider extends ServiceProvider
             ];
         });
 
+        // Public visitor page /v/{token} (O11): 60/IP/min. Its own bucket, so a real visitor's page loads never
+        // eat into the /v1/visit API calls the page then makes, while scanning tokens from one address is capped.
+        RateLimiter::for('visitor-page', fn (Request $request) => Limit::perMinute(60)->by('visitor-page-ip:'.$request->ip()));
+
         // Authenticated mobile generic: 120/min/user.
         RateLimiter::for('mobile', fn (Request $request) => Limit::perMinute(120)
             ->by(optional($request->user())->getAuthIdentifier() ?? $request->ip()));

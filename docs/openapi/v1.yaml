@@ -361,7 +361,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AuthSuccess' }
         '401':
-          description: Refresh token invalid, revoked, or replayed
+          description: |
+            Refresh token invalid, revoked, or replayed — or the account is no longer active (blocked / deleted);
+            then all of its refresh tokens are revoked as well.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -1726,6 +1728,8 @@ paths:
         K4 — setting `role: complex_manager` needs a complex (`complex_id` in the body, or the admin's current one),
         exactly as on create: otherwise **422** on `complex_id`. Clearing `complex_id` of a complex_manager leaves it
         scoped to no complex at all — never global.
+        O9 — `status: suspended | offboarded` has the same guards as DELETE: **422** on `status` for your own
+        account, **422** on `admin` when it would leave no other active super_admin (also for a role change).
       security:
         - adminBearerAuth: []
       x-authorization: super_admin

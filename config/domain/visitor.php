@@ -20,7 +20,9 @@ return [
     'default_duration_minutes' => (int) env('VISITOR_DEFAULT_DURATION_MINUTES', 30),
 
     // Anti-abuse: how many *active* (live) links may exist at once. Counted on creation; <= 0 disables the
-    // check. per_creator bounds one resident; per_device bounds a single barrier across all creators.
+    // check. per_creator bounds one resident; per_admin one admin account (it manages residents' links, so
+    // higher); per_device bounds a single barrier across all creators.
     'max_active_per_creator' => (int) env('VISITOR_MAX_ACTIVE_PER_CREATOR', 5),
+    'max_active_per_admin' => (int) env('VISITOR_MAX_ACTIVE_PER_ADMIN', 50),
     'max_active_per_device' => (int) env('VISITOR_MAX_ACTIVE_PER_DEVICE', 20),
 ];

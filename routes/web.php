@@ -22,6 +22,7 @@ Route::get('/', static fn () => response()->json([
 // is the credential; all actions run through the /v1/visit JSON API. Config key visitor.path (default "v").
 Route::get('/'.config('domain.visitor.path', 'v').'/{token}', [VisitorPageController::class, 'show'])
     ->where('token', '[A-Za-z0-9_-]+')
+    ->middleware('throttle:visitor-page')
     ->name('visitorPage');
 
 // Invitation link landing (B6) — opened when the app does not intercept the universal / app link.

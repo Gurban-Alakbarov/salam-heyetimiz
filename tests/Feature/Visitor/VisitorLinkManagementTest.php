@@ -134,9 +134,9 @@ it('caps the number of active links per device across creators', function () {
     config(['domain.visitor.max_active_per_device' => 2]);
     $admin = makeSuperAdmin();
     $owner = makeUser('+994509100035');
-    $device = makeOwnedDevice($owner, 'VL-CR3g', '+994700910035');
+    $device = makeOpenableDevice($owner, 'VL-CR3g', '+994700910035');
 
-    // Admins are exempt from the per-creator cap, so this isolates the per-device cap.
+    // An admin's own cap (max_active_per_admin) is far above 2, so this isolates the per-device cap.
     $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", ['access_type' => 'one_time'])->assertStatus(201);
     $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", ['access_type' => 'one_time'])->assertStatus(201);
 
@@ -209,7 +209,7 @@ it('does not let a resident revoke another residents link', function () {
 it('lets an admin create, list and revoke a link for any device', function () {
     $admin = makeSuperAdmin();
     $owner = makeUser('+994509100020');
-    $device = makeOwnedDevice($owner, 'VL-AD1', '+994700910020');
+    $device = makeOpenableDevice($owner, 'VL-AD1', '+994700910020');
 
     $create = $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", [
         'access_type' => 'time_limited',
@@ -234,7 +234,7 @@ it('lets an admin create, list and revoke a link for any device', function () {
 it('filters the admin directory by status', function () {
     $admin = makeSuperAdmin();
     $owner = makeUser('+994509100021');
-    $device = makeOwnedDevice($owner, 'VL-AD2', '+994700910021');
+    $device = makeOpenableDevice($owner, 'VL-AD2', '+994700910021');
 
     $active = $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", ['access_type' => 'time_limited', 'duration_minutes' => 60])->json('link.id');
     $revokedId = $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", ['access_type' => 'time_limited', 'duration_minutes' => 60])->json('link.id');
@@ -250,7 +250,7 @@ it('filters the admin directory by status', function () {
 it('filters the admin directory by purpose, access_type and visitor name', function () {
     $admin = makeSuperAdmin();
     $owner = makeUser('+994509100040');
-    $device = makeOwnedDevice($owner, 'VL-FLT1', '+994700910040');
+    $device = makeOpenableDevice($owner, 'VL-FLT1', '+994700910040');
 
     $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", ['access_type' => 'one_time', 'purpose' => 'courier', 'visitor_name' => 'Anar Kuryer'])->assertStatus(201);
     $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/visitor-links", ['access_type' => 'time_limited', 'duration_minutes' => 60, 'purpose' => 'delivery', 'visitor_name' => 'Wolt'])->assertStatus(201);

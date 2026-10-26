@@ -6,6 +6,7 @@ use App\Domain\Auth\Enums\RefreshTokenRevocationReason;
 use App\Domain\Auth\Events\RefreshTokenReuseDetected;
 use App\Domain\Auth\Models\RefreshToken;
 use App\Domain\Auth\Models\UserDevice;
+use App\Domain\Users\Enums\UserStatus;
 use App\Domain\Users\Models\User;
 use App\Support\Time\Clock;
 use Illuminate\Support\Facades\DB;
@@ -84,8 +85,17 @@ final class RefreshTokenService
                 return ['status' => 'invalid'];
             }
 
-            /** @var User $user */
-            $user = $current->user()->firstOrFail();
+            // A12 — a blocked, self-deleted or removed account gets no new tokens; its remaining ones die here.
+            /** @var User|null $user */
+            $user = $current->user()->first();
+            if ($user === null || $user->status !== UserStatus::Active) {
+                RefreshToken::query()->where('user_id', $current->user_id)->whereNull('revoked_at')->update([
+                    'revoked_at' => $now,
+                    'revocation_reason' => RefreshTokenRevocationReason::Admin->value,
+                ]);
+
+                return ['status' => 'invalid'];
+            }
             /** @var UserDevice $device */
             $device = $current->userDevice()->firstOrFail();
 

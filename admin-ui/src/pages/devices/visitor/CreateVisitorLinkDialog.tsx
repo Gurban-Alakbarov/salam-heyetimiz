@@ -18,6 +18,13 @@ import { useToast } from '@/components/ui/toast'
 import type { CreateVisitorLinkResponse, VisitorAccessType, VisitorPurpose } from '@/types/api'
 import { ACCESS_TYPE_OPTIONS, DURATION_OPTIONS, PURPOSE_OPTIONS } from './labels'
 
+// The server's messages for these codes are worded for a resident ("your subscription…"); say it for an admin.
+const ADMIN_CREATE_ERRORS: Record<string, string> = {
+  device_disabled: 'Cihaz aktiv deyil — qonaq linki yalnız aktiv cihaz üçün yaradılır.',
+  subscription_required: 'Bu cihazda qapını aça bilən (aktiv abunəli) sakin yoxdur — link yaradıla bilməz.',
+  visitor_link_limit_reached: 'Aktiv link limitinə çatılıb. Köhnə linklərdən birini ləğv edin və ya bitməsini gözləyin.',
+}
+
 export function CreateVisitorLinkDialog({
   deviceId,
   deviceLabel,
@@ -59,7 +66,11 @@ export function CreateVisitorLinkDialog({
       {
         onSuccess: (res) => setCreated(res),
         onError: (err) =>
-          toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
+          toast({
+            variant: 'destructive',
+            title: 'Xəta',
+            description: err instanceof ApiError ? (ADMIN_CREATE_ERRORS[err.code] ?? err.message) : undefined,
+          }),
       },
     )
   }

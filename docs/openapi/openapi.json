@@ -358,7 +358,7 @@
             }
           },
           "401": {
-            "description": "Refresh token invalid, revoked, or replayed",
+            "description": "Refresh token invalid, revoked, or replayed — or the account is no longer active (blocked / deleted);\nthen all of its refresh tokens are revoked as well.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2956,7 +2956,7 @@
         ],
         "summary": "Update an admin",
         "operationId": "adminUpdateAdmin",
-        "description": "K4 — setting `role: complex_manager` needs a complex (`complex_id` in the body, or the admin's current one),\nexactly as on create: otherwise **422** on `complex_id`. Clearing `complex_id` of a complex_manager leaves it\nscoped to no complex at all — never global.\n",
+        "description": "K4 — setting `role: complex_manager` needs a complex (`complex_id` in the body, or the admin's current one),\nexactly as on create: otherwise **422** on `complex_id`. Clearing `complex_id` of a complex_manager leaves it\nscoped to no complex at all — never global.\nO9 — `status: suspended | offboarded` has the same guards as DELETE: **422** on `status` for your own\naccount, **422** on `admin` when it would leave no other active super_admin (also for a role change).\n",
         "security": [
           {
             "adminBearerAuth": []
@@ -8955,7 +8955,7 @@
             "adminBearerAuth": []
           }
         ],
-        "description": "Requires `visitor_links.manage`. Complex-scoped. Same rules as the resident flow (shared service). The\nplaintext `token` / `url` are returned **only here** — only the hash is stored.\n**409** `visitor_link_limit_reached` (`details.scope` = `creator` | `device`, `details.limit`).\n",
+        "description": "Requires `visitor_links.manage`. Complex-scoped. Same rules as the resident flow (shared service). The\nplaintext `token` / `url` are returned **only here** — only the hash is stored.\nThe link must be able to open: **403** `device_disabled` when the device is not `active`; on a private\ndevice **403** `subscription_required` when nobody on its roster can open it. Complex devices need no\nsubscription.\n**409** `visitor_link_limit_reached` (`details.scope` = `creator` | `device`, `details.limit`); an admin's\nown cap is `max_active_per_admin` (default 50).\nCreating and revoking a link is recorded in the audit log (`visitor_link.created` / `visitor_link.revoked`).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/DeviceId"

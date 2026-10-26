@@ -2,6 +2,7 @@
 
 namespace App\Domain\Notifications\Listeners;
 
+use App\Domain\Admin\Models\AdminUser;
 use App\Domain\DeviceComm\Enums\OpenCommandSource;
 use App\Domain\DeviceComm\Enums\OpenCommandState;
 use App\Domain\DeviceComm\Events\OpenCommandCompleted;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Log;
  * link's owning resident. Consumes the shared [OpenCommandCompleted] — the SAME signal the Visitor
  * usage listener uses — and fires ONLY on a Visitor-source command that reached `Opened` (observed
  * actuation, R-GSM-03; never on `dispatched`). Recipient = the link creator, falling back to the device
- * owner; with neither it is a safe no-op. Renders `device.opened` from DB templates in the recipient's
+ * owner, then to the creating admin's linked mobile account; with none it is a safe no-op. Renders `device.opened` from DB templates in the recipient's
  * locale and dispatches push + inapp via [NotificationDispatcher] (dedupe `visitor_opened:{command_id}`).
  * Synchronous, mirroring IncrementVisitorUsageOnOpenCompleted; the push itself is queued downstream.
  * Reads cross-module context via [DeviceLookup] (R-ARCH-06) plus the trigger VisitorLink + the recipient
@@ -55,7 +56,13 @@ final class SendVisitorOpenedNotification
         }
 
         $deviceId = (int) $command->device_id;
-        $recipientId = $link->created_by_user_id ?? $this->devices->ownerUserId($deviceId);
+        // O12 — a complex device has no owner: an admin-created link then notifies the admin's own mobile
+        // account (a Komendant's B5 link), if it has one.
+        $recipientId = $link->created_by_user_id
+            ?? $this->devices->ownerUserId($deviceId)
+            ?? ($link->created_by_admin_id !== null
+                ? AdminUser::query()->whereKey($link->created_by_admin_id)->value('user_id')
+                : null);
         if ($recipientId === null) {
             Log::info('visitor-opened notification skipped: no recipient', ['command_id' => $command->getKey()]);
 

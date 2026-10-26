@@ -17,4 +17,8 @@ enum NotificationType: string
     case SubscriptionActivated = 'subscription_activated';
     case SubscriptionRenewed = 'subscription_renewed';
     case SystemAnnouncement = 'system_announcement';
+    /** O7 — the Komendant removed a family member from the complex (to the member and the head). */
+    case FamilyMemberRemoved = 'family_member_removed';
+    /** O7 — the Komendant handed a family to another member (to the whole family). */
+    case FamilyHeadChanged = 'family_head_changed';
 }

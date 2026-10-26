@@ -189,6 +189,8 @@ Route::middleware(['auth:user', 'komendant', 'throttle:mobile'])->prefix('komend
     Route::get('devices', [KomendantController::class, 'devices'])->name('komendantDevices');
     Route::get('residents', [KomendantController::class, 'residents'])->name('komendantResidents');
     Route::delete('residents/{userId}', [KomendantController::class, 'removeResident'])->whereNumber('userId')->name('komendantRemoveResident');
+    // O7 — hand a family to one of its members
+    Route::post('families/{headUserId}/head', [KomendantController::class, 'changeFamilyHead'])->whereNumber('headUserId')->name('komendantChangeFamilyHead');
     Route::get('invitations', [KomendantController::class, 'invitations'])->name('komendantListInvitations');
     Route::post('invitations', [KomendantController::class, 'invite'])->name('komendantCreateInvitation');
     Route::post('invitations/{id}/resend', [KomendantController::class, 'resend'])->whereNumber('id')->name('komendantResendInvitation');

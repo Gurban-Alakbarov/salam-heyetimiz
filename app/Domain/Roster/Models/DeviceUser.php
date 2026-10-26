@@ -42,4 +42,10 @@ class DeviceUser extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    /** The family link this row was granted through (B8); null = the user's own access. */
+    public function familyLink(): BelongsTo
+    {
+        return $this->belongsTo(FamilyLink::class, 'family_link_id');
+    }
 }

@@ -32,6 +32,18 @@ class NotificationTemplatesSeeder extends Seeder
             $this->seedTemplate($key, NotificationCategory::Billing, $locales);
         }
 
+        // O7 — the Komendant changed a family. Operational, forced (it is about the person's own access).
+        $this->seedTemplate('family.member_removed', NotificationCategory::Operational, [
+            'az' => ['subject' => 'Ailə üzvü kompleksdən çıxarıldı', 'body' => '{member_name} {complex_name} kompleksində ailədən çıxarıldı. Qapıya girişi bağlandı.'],
+            'ru' => ['subject' => 'Член семьи удалён из комплекса', 'body' => '{member_name} удалён(а) из семьи в комплексе {complex_name}. Доступ к воротам закрыт.'],
+            'en' => ['subject' => 'Family member removed', 'body' => '{member_name} was removed from the family at {complex_name}. Gate access has ended.'],
+        ]);
+        $this->seedTemplate('family.head_changed', NotificationCategory::Operational, [
+            'az' => ['subject' => 'Ailə başçısı dəyişdi', 'body' => '{complex_name} kompleksində ailənizin yeni başçısı: {head_name}.'],
+            'ru' => ['subject' => 'Глава семьи изменён', 'body' => 'Новый глава вашей семьи в комплексе {complex_name}: {head_name}.'],
+            'en' => ['subject' => 'Family head changed', 'body' => 'The new head of your family at {complex_name} is {head_name}.'],
+        ]);
+
         // system.admin_campaign — admin free-text broadcast (INVENTORY §2; system_announcement type).
         // Category operational; fixed push + inapp via the mask (R-NOT-04). No locale rows: the copy is
         // supplied per-campaign in the admin's single chosen language and delivered as-is (no translation).

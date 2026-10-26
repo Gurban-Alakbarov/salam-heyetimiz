@@ -6,11 +6,13 @@ use App\Domain\DeviceComm\Events\OpenCommandCompleted;
 use App\Domain\Notifications\Adapters\FakePushClient;
 use App\Domain\Notifications\Adapters\FcmPushClient;
 use App\Domain\Notifications\Contracts\PushClient;
+use App\Domain\Notifications\Listeners\SendComplexFamilyNotification;
 use App\Domain\Notifications\Listeners\SendSubscriptionActivatedNotification;
 use App\Domain\Notifications\Listeners\SendSubscriptionExpiredNotification;
 use App\Domain\Notifications\Listeners\SendSubscriptionExpiringNotification;
 use App\Domain\Notifications\Listeners\SendSubscriptionRenewedNotification;
 use App\Domain\Notifications\Listeners\SendVisitorOpenedNotification;
+use App\Domain\Roster\Events\ComplexFamilyChanged;
 use App\Domain\Subscriptions\Events\SubscriptionActivated;
 use App\Domain\Subscriptions\Events\SubscriptionExpired;
 use App\Domain\Subscriptions\Events\SubscriptionExpiringSoon;
@@ -62,6 +64,9 @@ class ModuleServiceProvider extends ServiceProvider
         Event::listen(SubscriptionExpired::class, SendSubscriptionExpiredNotification::class);
         Event::listen(SubscriptionActivated::class, SendSubscriptionActivatedNotification::class);
         Event::listen(SubscriptionRenewed::class, SendSubscriptionRenewedNotification::class);
+
+        // O7 — the Komendant changed a family (member removed / head changed): the people concerned are told.
+        Event::listen(ComplexFamilyChanged::class, SendComplexFamilyNotification::class);
     }
 
     /** Absolute path to the service-account JSON, or null when unset/missing (→ FakePushClient). */

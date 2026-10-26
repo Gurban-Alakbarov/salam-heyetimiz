@@ -40,6 +40,10 @@ return [
     'subscription_not_renewable' => 'Abonelik hazırkı vəziyyətində yenilənə bilməz.',
     'auto_renew_unavailable' => 'Avtomatik yenilənmə hələ əlçatan deyil.',
     'signature_invalid' => 'İmza yanlışdır və ya yoxdur.',
+    'family_decision_required' => 'Sakin ailə başçısıdır: ailə üzvlərindən birini yeni başçı seçin və ya bütün ailəni çıxarın.',
+    'not_family_head' => 'Bu sakin bu kompleksdə ailə başçısı deyil.',
+    'not_family_member' => 'Seçilən şəxs bu ailənin üzvü deyil.',
+    'family_action_invalid' => 'Ailə üçün seçim düzgün deyil.',
     'notification_not_mutable' => 'Bu bildirişi söndürmək olmur.',
     'idempotency_key_required' => 'Idempotency-Key başlığı tələb olunur.',
     // Visitor links

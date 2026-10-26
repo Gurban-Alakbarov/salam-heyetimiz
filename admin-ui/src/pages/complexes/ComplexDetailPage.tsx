@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, Link2, Unlink, UserPlus, X } from 'lucide-react'
+import { ChevronLeft, CornerDownRight, Crown, Link2, Trash2, Unlink, UserPlus, X } from 'lucide-react'
 import { useAdmins } from '@/api/admins'
 import {
-  useAssignManager, useComplex, useComplexDeviceBinding, useComplexInvitations, useComplexMembers, useUnassignManager,
+  type ComplexFamilyMember, type ComplexMemberRow,
+  useAssignManager, useChangeFamilyHead, useComplex, useComplexDeviceBinding, useComplexInvitations, useComplexMembers,
+  useRemoveComplexMember, useUnassignManager,
 } from '@/api/complexes'
 import { useDevices } from '@/api/devices'
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
 import { formatDate, formatDateTime } from '@/lib/format'
 import { OsmMap } from '@/components/OsmMap'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { PermissionGate } from '@/components/PermissionGate'
 import { StatusBadge } from '@/components/StatusBadge'
 import { EmptyState, ErrorState, LoadingState } from '@/components/states'
@@ -19,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/toast'
+import { FamilyHeadDialog, personName } from './ComplexFamilyDialogs'
 
 export function ComplexDetailPage() {
   const { id } = useParams()
@@ -174,29 +178,127 @@ function BindDevice({ complexId }: { complexId: number }) {
   )
 }
 
+/**
+ * Residents of the complex, each head with its family under it (O7). Actions (same as the Komendant app):
+ * remove a resident or a family member from the complex, hand a family to a member, and — when removing a
+ * head — decide what happens to the family.
+ */
 function MembersCard({ complexId }: { complexId: number }) {
   const { data, isLoading, isError, error, refetch } = useComplexMembers(complexId)
+  const remove = useRemoveComplexMember(complexId)
+  const changeHead = useChangeFamilyHead(complexId)
+  const { toast } = useToast()
+  const [plainTarget, setPlainTarget] = useState<{ user_id: number; full_name: string | null; email: string | null; member: boolean } | null>(null)
+  const [headTarget, setHeadTarget] = useState<{ row: ComplexMemberRow; removeMode: boolean } | null>(null)
+  const active = (data ?? []).filter((m) => m.status === 'active')
+  const fail = (e: unknown) => toast({ variant: 'destructive', title: 'Xəta', description: e instanceof ApiError ? e.message : undefined })
+
+  const askRemove = (m: ComplexMemberRow) =>
+    m.is_family_head && (m.family?.length ?? 0) > 0
+      ? setHeadTarget({ row: m, removeMode: true })
+      : setPlainTarget({ user_id: m.user_id, full_name: m.full_name, email: m.email, member: false })
+  const askRemoveMember = (f: ComplexFamilyMember) => setPlainTarget({ user_id: f.user_id, full_name: f.full_name, email: f.email, member: true })
+
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="pb-2"><CardTitle className="text-base">Sakinlər ({data?.length ?? 0})</CardTitle></CardHeader>
+      <CardHeader className="pb-2"><CardTitle className="text-base">Sakinlər ({active.length})</CardTitle></CardHeader>
       <CardContent className="px-0 pb-0">
-        {isLoading ? <LoadingState /> : isError ? <ErrorState error={error} onRetry={() => refetch()} /> : !data || data.length === 0 ? <EmptyState title="Sakin yoxdur" /> : (
+        {isLoading ? <LoadingState /> : isError ? <ErrorState error={error} onRetry={() => refetch()} /> : active.length === 0 ? <EmptyState title="Sakin yoxdur" /> : (
           <Table>
-            <TableHeader><TableRow><TableHead>Ad</TableHead><TableHead>E-poçt</TableHead><TableHead>Telefon</TableHead><TableHead>Aktiv abunəlik</TableHead><TableHead>Qoşulub</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Ad</TableHead><TableHead>E-poçt</TableHead><TableHead>Telefon</TableHead><TableHead>Aktiv abunəlik</TableHead><TableHead>Qoşulub</TableHead><TableHead className="w-0" /></TableRow></TableHeader>
             <TableBody>
-              {data.map((m) => (
+              {active.flatMap((m) => [
                 <TableRow key={m.user_id}>
-                  <TableCell className="font-medium">{m.full_name ?? '—'}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="inline-flex items-center gap-1.5">
+                      {m.full_name ?? '—'}
+                      {m.is_family_head && (m.family?.length ?? 0) > 0 && <Badge variant="outline" className="gap-1"><Crown className="h-3 w-3" /> Ailə başçısı</Badge>}
+                    </span>
+                  </TableCell>
                   <TableCell>{m.email ?? '—'}</TableCell>
                   <TableCell className="text-muted-foreground">{m.phone ?? '—'}</TableCell>
                   <TableCell>{m.active_subscriptions > 0 ? <Badge variant="success">{m.active_subscriptions}</Badge> : <Badge variant="muted">0</Badge>}</TableCell>
                   <TableCell className="text-muted-foreground">{formatDate(m.joined_at)}</TableCell>
-                </TableRow>
-              ))}
+                  <TableCell className="whitespace-nowrap pr-4 text-right">
+                    {m.is_family_head && (m.family?.length ?? 0) > 0 && (
+                      <PermissionGate anyOf={[PERM.residentsUpdate]}>
+                        <Button size="sm" variant="ghost" onClick={() => setHeadTarget({ row: m, removeMode: false })}>Başçını dəyiş</Button>
+                      </PermissionGate>
+                    )}
+                    <PermissionGate anyOf={[PERM.residentsDelete]}>
+                      <Button size="icon" variant="ghost" aria-label="Kompleksdən çıxar" title="Kompleksdən çıxar" onClick={() => askRemove(m)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </PermissionGate>
+                  </TableCell>
+                </TableRow>,
+                ...(m.family ?? []).map((f) => (
+                  <TableRow key={`${m.user_id}-${f.user_id}`} className="bg-muted/30">
+                    <TableCell className="pl-8 text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5"><CornerDownRight className="h-3.5 w-3.5" /> {f.full_name ?? '—'} <Badge variant="muted">ailə üzvü</Badge></span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{f.email ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">{f.phone ?? '—'}</TableCell>
+                    <TableCell>{f.active_subscriptions > 0 ? <Badge variant="success">{f.active_subscriptions}</Badge> : <Badge variant="muted">0</Badge>}</TableCell>
+                    <TableCell />
+                    <TableCell className="pr-4 text-right">
+                      <PermissionGate anyOf={[PERM.residentsDelete]}>
+                        <Button size="icon" variant="ghost" aria-label="Ailə üzvünü kompleksdən çıxar" title="Kompleksdən çıxar" onClick={() => askRemoveMember(f)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </PermissionGate>
+                    </TableCell>
+                  </TableRow>
+                )),
+              ])}
             </TableBody>
           </Table>
         )}
       </CardContent>
+
+      <ConfirmDialog
+        open={plainTarget !== null}
+        onOpenChange={(open) => !open && setPlainTarget(null)}
+        title={plainTarget?.member ? 'Ailə üzvünü kompleksdən çıxar' : 'Sakini kompleksdən çıxar'}
+        description={
+          `${plainTarget ? personName(plainTarget) : ''} kompleksdən çıxarılacaq: kompleks cihazlarına girişi bağlanacaq və abunəlikləri ` +
+          'ləğv ediləcək (avtomatik geri ödəniş yoxdur). Hesabı sistemdə qalır.'
+        }
+        confirmLabel="Kompleksdən çıxar"
+        confirmVariant="destructive"
+        loading={remove.isPending}
+        onConfirm={() => {
+          if (!plainTarget) return
+          remove.mutate({ userId: plainTarget.user_id }, {
+            onSuccess: () => { toast({ variant: 'success', title: 'Kompleksdən çıxarıldı' }); setPlainTarget(null) },
+            onError: fail,
+          })
+        }}
+      />
+
+      <FamilyHeadDialog
+        head={headTarget?.row ?? null}
+        removeMode={headTarget?.removeMode ?? false}
+        loading={remove.isPending || changeHead.isPending}
+        onClose={() => setHeadTarget(null)}
+        onConfirm={(d) => {
+          if (!headTarget) return
+          const headUserId = headTarget.row.user_id
+          if (headTarget.removeMode) {
+            remove.mutate(
+              d.newHeadUserId === null
+                ? { userId: headUserId, familyAction: 'remove_family' }
+                : { userId: headUserId, familyAction: 'new_head', newHeadUserId: d.newHeadUserId },
+              { onSuccess: () => { toast({ variant: 'success', title: 'Kompleksdən çıxarıldı' }); setHeadTarget(null) }, onError: fail },
+            )
+          } else if (d.newHeadUserId !== null) {
+            changeHead.mutate(
+              { headUserId, newHeadUserId: d.newHeadUserId, removeOldHead: d.removeOldHead },
+              { onSuccess: () => { toast({ variant: 'success', title: 'Ailə başçısı dəyişdi' }); setHeadTarget(null) }, onError: fail },
+            )
+          }
+        }}
+      />
     </Card>
   )
 }

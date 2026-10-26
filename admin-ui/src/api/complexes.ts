@@ -49,7 +49,19 @@ export interface ComplexMemberRow {
   joined_at: string | null
   removed_at: string | null
   active_subscriptions: number
+  /** O7 — this resident heads a family on the complex's gates; `family` are its members. */
+  is_family_head?: boolean
+  family?: ComplexFamilyMember[]
 }
+/** O7 — a member of a resident's family (joined through the family, not the complex). */
+export interface ComplexFamilyMember {
+  user_id: number
+  full_name: string | null
+  email: string | null
+  phone: string | null
+  active_subscriptions: number
+}
+export type FamilyAction = 'new_head' | 'remove_family'
 export interface InvitationRow {
   id: number
   kind: 'complex_resident' | 'family_member'
@@ -141,4 +153,39 @@ export function useComplexDeviceBinding() {
 export function useUnassignManager(complexId: number) {
   const invalidate = useComplexInvalidation()
   return useMutation({ mutationFn: async (adminId: number) => { await api.delete(`/admin/v1/complexes/${complexId}/managers/${adminId}`) }, onSuccess: () => invalidate(complexId) })
+}
+
+/**
+ * O7 — remove a resident or a family member from the complex (the account stays). A family head needs
+ * `family_action` (+ `new_head_user_id` for new_head) — otherwise 409 family_decision_required.
+ */
+export function useRemoveComplexMember(complexId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { userId: number; familyAction?: FamilyAction; newHeadUserId?: number }) =>
+      (await api.delete(`/admin/v1/complexes/${complexId}/members/${input.userId}`, {
+        data: input.familyAction ? { family_action: input.familyAction, new_head_user_id: input.newHeadUserId } : undefined,
+      })).data,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['complex-members', complexId] })
+      void qc.invalidateQueries({ queryKey: ['complex', complexId] })
+      void qc.invalidateQueries({ queryKey: ['residents'] })
+    },
+  })
+}
+
+/** O7 — a member takes the family over at once; the old head stays a member unless `removeOldHead`. */
+export function useChangeFamilyHead(complexId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { headUserId: number; newHeadUserId: number; removeOldHead: boolean }) =>
+      (await api.post(`/admin/v1/complexes/${complexId}/families/${input.headUserId}/head`, {
+        new_head_user_id: input.newHeadUserId,
+        old_head: input.removeOldHead ? 'remove' : 'member',
+      })).data,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['complex-members', complexId] })
+      void qc.invalidateQueries({ queryKey: ['residents'] })
+    },
+  })
 }

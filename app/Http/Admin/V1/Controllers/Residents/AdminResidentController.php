@@ -100,7 +100,16 @@ class AdminResidentController
             $manager = $request->user();
             $linkedUserId = AdminUser::query()->whereKey($manager->getKey())->value('user_id'); // B5 mobile link, if any
             $byUser = $linkedUserId !== null ? User::query()->find($linkedUserId) : null;
-            $result = $removeFromComplex->handle($scopeComplexId, $user, $byUser, $manager);
+            // O7 — a family head needs a decision about the family (409 family_decision_required otherwise).
+            $choice = $request->validate([
+                'family_action' => ['sometimes', 'nullable', 'string', 'in:new_head,remove_family'],
+                'new_head_user_id' => ['required_if:family_action,new_head', 'nullable', 'integer'],
+            ]);
+            $result = $removeFromComplex->handle(
+                $scopeComplexId, $user, $byUser, $manager,
+                $choice['family_action'] ?? null,
+                isset($choice['new_head_user_id']) ? (int) $choice['new_head_user_id'] : null,
+            );
             abort_if($result === null, 404);
 
             return response()->json(['data' => ['removed_from' => 'complex', 'complex_id' => $scopeComplexId] + $result]);

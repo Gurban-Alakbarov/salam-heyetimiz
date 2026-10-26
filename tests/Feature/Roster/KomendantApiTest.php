@@ -158,7 +158,7 @@ it('exposes no free-subscription or pricing path to a Komendant', function () {
         ->filter(fn ($r) => str_starts_with($r->uri(), 'v1/komendant'))
         ->map(fn ($r) => implode('|', $r->methods()).' '.$r->uri())->values()->all();
 
-    expect($paths)->toHaveCount(8);
+    expect($paths)->toHaveCount(9); // + O7 families/{headUserId}/head
     foreach ($paths as $p) {
         expect($p)->not->toContain('subscription')->not->toContain('price')->not->toContain('grant');
     }

@@ -5,6 +5,7 @@ use App\Http\Admin\V1\Controllers\Admins\AdminManagementController;
 use App\Http\Admin\V1\Controllers\Admins\AdminMobileUserController;
 use App\Http\Admin\V1\Controllers\Applications\AdminApplicationController;
 use App\Http\Admin\V1\Controllers\Complexes\AdminComplexDeviceController;
+use App\Http\Admin\V1\Controllers\Complexes\AdminComplexFamilyController;
 use App\Http\Admin\V1\Controllers\Complexes\AdminComplexPeopleController;
 use App\Http\Admin\V1\Controllers\Admins\ImpersonationController;
 use App\Http\Admin\V1\Controllers\Audit\AuditController;
@@ -86,6 +87,9 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('complexes/{complexId}/devices/{deviceId}', [AdminComplexDeviceController::class, 'bind'])->whereNumber(['complexId', 'deviceId'])->name('adminBindComplexDevice');
     Route::delete('complexes/{complexId}/devices/{deviceId}', [AdminComplexDeviceController::class, 'unbind'])->whereNumber(['complexId', 'deviceId'])->name('adminUnbindComplexDevice');
     Route::get('complexes/{complexId}/members', [AdminComplexPeopleController::class, 'members'])->whereNumber('complexId')->name('adminListComplexMembers');
+    // O7 — remove a resident / family member from a complex; hand a family to one of its members
+    Route::delete('complexes/{complexId}/members/{userId}', [AdminComplexFamilyController::class, 'remove'])->whereNumber('complexId')->whereNumber('userId')->name('adminRemoveComplexMember');
+    Route::post('complexes/{complexId}/families/{headUserId}/head', [AdminComplexFamilyController::class, 'changeHead'])->whereNumber('complexId')->whereNumber('headUserId')->name('adminChangeFamilyHead');
     Route::get('invitations', [AdminComplexPeopleController::class, 'invitations'])->name('adminListInvitations');
     Route::get('users', [AdminComplexPeopleController::class, 'users'])->name('adminListUsers');
 

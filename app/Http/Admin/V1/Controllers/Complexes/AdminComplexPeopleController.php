@@ -13,6 +13,7 @@ use App\Domain\Roster\Enums\InvitationKind;
 use App\Domain\Roster\Enums\InvitationStatus;
 use App\Domain\Roster\Models\ComplexMember;
 use App\Domain\Roster\Models\Invitation;
+use App\Domain\Roster\Services\ComplexFamilyService;
 use App\Domain\Subscriptions\Enums\SubscriptionStatus;
 use App\Domain\Subscriptions\Models\Subscription;
 use App\Domain\Users\Models\User;
@@ -31,7 +32,7 @@ class AdminComplexPeopleController
     use AuthorizesAdmin;
 
     /** GET /admin/v1/complexes/{complexId}/members?status=active|removed */
-    public function members(Request $request, int $complexId): JsonResponse
+    public function members(Request $request, int $complexId, ComplexFamilyService $family): JsonResponse
     {
         $this->requirePermission($request, Permission::RESIDENTS_VIEW);
         $scope = $this->complexScopeId($request);
@@ -52,6 +53,9 @@ class AdminComplexPeopleController
             ->where('subscriptions.status', SubscriptionStatus::Active->value)->where('subscriptions.ends_at', '>', now())
             ->selectRaw('du.user_id, count(*) as c')->groupBy('du.user_id')->pluck('c', 'user_id');
 
+        // O7 — each head's family on the complex's gates (members joined through the family, not the complex).
+        $families = $family->familiesByHead($complexId);
+
         return response()->json(['data' => $members->map(fn (ComplexMember $m): array => [
             'user_id' => (int) $m->user_id,
             'full_name' => $m->user?->full_name,
@@ -61,6 +65,14 @@ class AdminComplexPeopleController
             'joined_at' => optional($m->joined_at)->toIso8601String(),
             'removed_at' => optional($m->removed_at)->toIso8601String(),
             'active_subscriptions' => (int) ($active[$m->user_id] ?? 0),
+            'is_family_head' => $m->status === ComplexMemberStatus::Active && isset($families[(int) $m->user_id]),
+            'family' => $m->status === ComplexMemberStatus::Active ? array_map(fn (array $f): array => [
+                'user_id' => (int) $f['user']->id,
+                'full_name' => $f['user']->full_name,
+                'email' => $f['user']->email,
+                'phone' => $this->phone($request, $f['user']->phone),
+                'active_subscriptions' => $f['active_subscriptions'],
+            ], $families[(int) $m->user_id] ?? []) : [],
         ])->all()]);
     }
 

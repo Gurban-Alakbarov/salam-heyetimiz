@@ -1458,7 +1458,8 @@ paths:
       description: |
         Requires `residents.view`. Up to 500 rows, newest first. `active_subscriptions` counts the member's live
         subscriptions on the complex's shared (complex-mode) devices. Phone is returned in full for global roles and
-        **masked** for a complex-scoped manager (who gets **404** for any other complex).
+        **masked** for a complex-scoped manager (who gets **404** for any other complex). O7 — each active
+        resident carries `is_family_head` and its `family` (members on the complex's gates).
       parameters:
         - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
         - { in: query, name: status, schema: { type: string, enum: [active, removed], default: active } }
@@ -1474,6 +1475,81 @@ paths:
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+
+  /admin/complexes/{complexId}/members/{userId}:
+    delete:
+      tags: [Admin / Complexes]
+      summary: Remove a resident or a family member from the complex (O7)
+      operationId: adminRemoveComplexMember
+      security: [{ adminBearerAuth: [] }]
+      description: |
+        Requires `residents.delete`. The same action as the Komendant app's removal; the account stays. A
+        complex_manager is locked to its own complex (**404** otherwise).
+      parameters:
+        - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+        - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: false
+        description: |
+          O7 — only for a family head: what happens to the family. `new_head` — that member takes the family over
+          (their rows become their own access, the other members move under them, nobody pays again), then the
+          head leaves; `remove_family` — the family leaves with the head and its links end.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                family_action: { type: string, enum: [new_head, remove_family] }
+                new_head_user_id: { type: integer, format: int64, description: Required with new_head }
+      responses:
+        '200':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/AccessRemovalResult' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`family_decision_required` — the user heads a family here; `details.members` lists it'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422':
+          description: '`not_family_member` (new head not in the family) / `family_action_invalid` / validation'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  /admin/complexes/{complexId}/families/{headUserId}/head:
+    post:
+      tags: [Admin / Complexes]
+      summary: Hand a family to one of its members (O7)
+      operationId: adminChangeFamilyHead
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `residents.update`. Same as `komendantChangeFamilyHead`; complex_manager → own complex only.
+      parameters:
+        - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+        - { in: path, name: headUserId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FamilyHeadChange' }
+      responses:
+        '200':
+          description: Changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/FamilyHeadChangeResult' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422':
+          description: '`not_family_head` / `not_family_member` / validation'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   # ===========================================================================
   # Admin / Residents — invitations read model + account removal
@@ -2611,9 +2687,26 @@ paths:
       summary: Remove a resident from the complex
       operationId: komendantRemoveResident
       security: [{ bearerAuth: [] }]
-      description: Requires `residents.delete`. Access on the complex's devices revoked, subscriptions cancelled (no refund). Not a resident of this complex → **404**.
+      description: |
+        Requires `residents.delete`. Access on the complex's devices revoked, subscriptions cancelled (no refund).
+        O7 — also removes a FAMILY member (who joined through a head, not the complex): their family rows on the
+        complex's gates end and a family link left without access ends (`removed_as: family_member`). A family
+        head needs the family decision (body). Neither a resident nor a family member here → **404**.
       parameters:
         - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: false
+        description: |
+          O7 — only for a family head: what happens to the family. `new_head` — that member takes the family over
+          (their rows become their own access, the other members move under them, nobody pays again), then the
+          head leaves; `remove_family` — the family leaves with the head and its links end.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                family_action: { type: string, enum: [new_head, remove_family] }
+                new_head_user_id: { type: integer, format: int64, description: Required with new_head }
       responses:
         '200':
           description: Removed
@@ -2628,6 +2721,49 @@ paths:
           description: '`not_komendant`, or the manager lacks the permission'
           content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
         '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`family_decision_required` — the user heads a family here; `details.members` lists it'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422':
+          description: '`not_family_member` (new head not in the family) / `family_action_invalid` / validation'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  /komendant/families/{headUserId}/head:
+    post:
+      tags: [Komendant]
+      summary: Hand a family to one of its members (O7)
+      operationId: komendantChangeFamilyHead
+      security: [{ bearerAuth: [] }]
+      description: |
+        Requires `residents.update`. Immediate (no consent step); everyone concerned gets a `family_head_changed`
+        notification. The new head's rows on the complex's gates become their own access (tier main — same price)
+        and they become a resident of the complex; the other members move under them with their access and paid
+        days unchanged. The old head stays as a member of the new head's family (`old_head: member`, default) or
+        leaves the complex (`remove`). Only the complex's complex-mode gates are touched.
+      parameters:
+        - { in: path, name: headUserId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FamilyHeadChange' }
+      responses:
+        '200':
+          description: Changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/FamilyHeadChangeResult' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403':
+          description: '`not_komendant`, or the manager lacks the permission'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422':
+          description: '`not_family_head` / `not_family_member` / validation'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   /komendant/invitations:
     get:
@@ -3420,6 +3556,33 @@ components:
         joined_at: { type: string, format: date-time, nullable: true }
         removed_at: { type: string, format: date-time, nullable: true }
         active_subscriptions: { type: integer }
+        is_family_head: { type: boolean, description: O7 — heads a family on the complex's gates }
+        family:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id: { type: integer, format: int64 }
+              full_name: { type: string, nullable: true }
+              email: { type: string, nullable: true }
+              phone: { type: string, nullable: true }
+              active_subscriptions: { type: integer }
+
+    FamilyHeadChange:
+      type: object
+      required: [new_head_user_id]
+      properties:
+        new_head_user_id: { type: integer, format: int64, description: A member of this head's family }
+        old_head: { type: string, enum: [member, remove], default: member }
+
+    FamilyHeadChangeResult:
+      type: object
+      properties:
+        new_head_user_id: { type: integer, format: int64 }
+        members_moved: { type: integer }
+        old_head: { type: string, enum: [member, removed] }
+        revoked_rows: { type: integer }
+        cancelled_subscriptions: { type: integer }
 
     AdminInvitationRow:
       type: object
@@ -3746,6 +3909,8 @@ components:
       properties:
         revoked_rows: { type: integer, description: Roster rows revoked }
         cancelled_subscriptions: { type: integer, description: Subscriptions cancelled (no refund) }
+        removed_as: { type: string, enum: [resident, family_member], description: O7 }
+        new_head_user_id: { type: integer, format: int64, description: O7 — when the family was handed over }
 
     # ----- Invitations (B6, unified envelope) -------------------------------
     InvitePublicView:
@@ -3845,6 +4010,17 @@ components:
         phone_masked: { type: string, nullable: true }
         joined_at: { type: string, format: date-time, nullable: true }
         active_subscriptions: { type: integer }
+        is_family_head: { type: boolean, description: O7 — heads a family on the complex's gates }
+        family:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id: { type: integer, format: int64 }
+              full_name: { type: string, nullable: true }
+              email: { type: string, nullable: true }
+              phone_masked: { type: string, nullable: true }
+              active_subscriptions: { type: integer }
 
     KomendantInvitation:
       type: object

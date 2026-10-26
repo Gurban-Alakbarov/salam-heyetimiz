@@ -37,6 +37,10 @@ return [
     'subscription_not_renewable' => 'The subscription cannot be renewed in its current state.',
     'auto_renew_unavailable' => 'Auto-renew is not available yet.',
     'signature_invalid' => 'The signature is invalid or missing.',
+    'family_decision_required' => 'This resident heads a family: choose a member as the new head or remove the whole family.',
+    'not_family_head' => 'This resident does not head a family in this complex.',
+    'not_family_member' => 'The chosen person is not a member of this family.',
+    'family_action_invalid' => 'The family choice is not valid.',
     'notification_not_mutable' => 'This notification cannot be switched off.',
     'idempotency_key_required' => 'The Idempotency-Key header is required.',
     // Visitor links

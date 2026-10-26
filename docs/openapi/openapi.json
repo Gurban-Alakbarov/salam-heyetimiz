@@ -8326,7 +8326,7 @@
             "adminBearerAuth": []
           }
         ],
-        "description": "Requires `residents.view`. Up to 500 rows, newest first. `active_subscriptions` counts the member's live\nsubscriptions on the complex's shared (complex-mode) devices. Phone is returned in full for global roles and\n**masked** for a complex-scoped manager (who gets **404** for any other complex).\n",
+        "description": "Requires `residents.view`. Up to 500 rows, newest first. `active_subscriptions` counts the member's live\nsubscriptions on the complex's shared (complex-mode) devices. Phone is returned in full for global roles and\n**masked** for a complex-scoped manager (who gets **404** for any other complex). O7 — each active\nresident carries `is_family_head` and its `family` (members on the complex's gates).\n",
         "parameters": [
           {
             "in": "path",
@@ -8378,6 +8378,197 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/admin/v1/complexes/{complexId}/members/{userId}": {
+      "delete": {
+        "tags": [
+          "Admin / Complexes"
+        ],
+        "summary": "Remove a resident or a family member from the complex (O7)",
+        "operationId": "adminRemoveComplexMember",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Requires `residents.delete`. The same action as the Komendant app's removal; the account stays. A\ncomplex_manager is locked to its own complex (**404** otherwise).\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "complexId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "O7 — only for a family head: what happens to the family. `new_head` — that member takes the family over\n(their rows become their own access, the other members move under them, nobody pays again), then the\nhead leaves; `remove_family` — the family leaves with the head and its links end.\n",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "family_action": {
+                    "type": "string",
+                    "enum": [
+                      "new_head",
+                      "remove_family"
+                    ]
+                  },
+                  "new_head_user_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Required with new_head"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AccessRemovalResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "`family_decision_required` — the user heads a family here; `details.members` lists it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`not_family_member` (new head not in the family) / `family_action_invalid` / validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/v1/complexes/{complexId}/families/{headUserId}/head": {
+      "post": {
+        "tags": [
+          "Admin / Complexes"
+        ],
+        "summary": "Hand a family to one of its members (O7)",
+        "operationId": "adminChangeFamilyHead",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Requires `residents.update`. Same as `komendantChangeFamilyHead`; complex_manager → own complex only.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "complexId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "path",
+            "name": "headUserId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FamilyHeadChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FamilyHeadChangeResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "description": "`not_family_head` / `not_family_member` / validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -10953,7 +11144,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "Requires `residents.delete`. Access on the complex's devices revoked, subscriptions cancelled (no refund). Not a resident of this complex → **404**.",
+        "description": "Requires `residents.delete`. Access on the complex's devices revoked, subscriptions cancelled (no refund).\nO7 — also removes a FAMILY member (who joined through a head, not the complex): their family rows on the\ncomplex's gates end and a family link left without access ends (`removed_as: family_member`). A family\nhead needs the family decision (body). Neither a resident nor a family member here → **404**.\n",
         "parameters": [
           {
             "in": "path",
@@ -10966,6 +11157,31 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "description": "O7 — only for a family head: what happens to the family. `new_head` — that member takes the family over\n(their rows become their own access, the other members move under them, nobody pays again), then the\nhead leaves; `remove_family` — the family leaves with the head and its links end.\n",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "family_action": {
+                    "type": "string",
+                    "enum": [
+                      "new_head",
+                      "remove_family"
+                    ]
+                  },
+                  "new_head_user_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Required with new_head"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Removed",
@@ -10997,6 +11213,106 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "`family_decision_required` — the user heads a family here; `details.members` lists it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`not_family_member` (new head not in the family) / `family_action_invalid` / validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/komendant/families/{headUserId}/head": {
+      "post": {
+        "tags": [
+          "Komendant"
+        ],
+        "summary": "Hand a family to one of its members (O7)",
+        "operationId": "komendantChangeFamilyHead",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Requires `residents.update`. Immediate (no consent step); everyone concerned gets a `family_head_changed`\nnotification. The new head's rows on the complex's gates become their own access (tier main — same price)\nand they become a resident of the complex; the other members move under them with their access and paid\ndays unchanged. The old head stays as a member of the new head's family (`old_head: member`, default) or\nleaves the complex (`remove`). Only the complex's complex-mode gates are touched.\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "headUserId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FamilyHeadChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FamilyHeadChangeResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "`not_komendant`, or the manager lacks the permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "description": "`not_family_head` / `not_family_member` / validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -16815,6 +17131,83 @@
           },
           "active_subscriptions": {
             "type": "integer"
+          },
+          "is_family_head": {
+            "type": "boolean",
+            "description": "O7 — heads a family on the complex's gates"
+          },
+          "family": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "full_name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "active_subscriptions": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "FamilyHeadChange": {
+        "type": "object",
+        "required": [
+          "new_head_user_id"
+        ],
+        "properties": {
+          "new_head_user_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "A member of this head's family"
+          },
+          "old_head": {
+            "type": "string",
+            "enum": [
+              "member",
+              "remove"
+            ],
+            "default": "member"
+          }
+        }
+      },
+      "FamilyHeadChangeResult": {
+        "type": "object",
+        "properties": {
+          "new_head_user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "members_moved": {
+            "type": "integer"
+          },
+          "old_head": {
+            "type": "string",
+            "enum": [
+              "member",
+              "removed"
+            ]
+          },
+          "revoked_rows": {
+            "type": "integer"
+          },
+          "cancelled_subscriptions": {
+            "type": "integer"
           }
         }
       },
@@ -17819,6 +18212,19 @@
           "cancelled_subscriptions": {
             "type": "integer",
             "description": "Subscriptions cancelled (no refund)"
+          },
+          "removed_as": {
+            "type": "string",
+            "enum": [
+              "resident",
+              "family_member"
+            ],
+            "description": "O7"
+          },
+          "new_head_user_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "O7 — when the family was handed over"
           }
         }
       },
@@ -18105,6 +18511,37 @@
           },
           "active_subscriptions": {
             "type": "integer"
+          },
+          "is_family_head": {
+            "type": "boolean",
+            "description": "O7 — heads a family on the complex's gates"
+          },
+          "family": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "full_name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone_masked": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "active_subscriptions": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         }
       },

@@ -26,7 +26,8 @@ class ApiExceptionRenderer
             'error' => [
                 'code' => $e->errorCode(),
                 'message_key' => $e->messageKey(),
-                'message' => __($e->messageKey(), $details ?? []),
+                // Only scalar details can fill `:placeholders`; structured ones (lists) stay in `details` only.
+                'message' => __($e->messageKey(), array_filter($details ?? [], 'is_scalar')),
                 'details' => $details,
                 'request_id' => $this->requestId(),
             ],

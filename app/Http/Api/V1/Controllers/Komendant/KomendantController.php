@@ -13,6 +13,7 @@ use App\Domain\Roster\Enums\InvitationStatus;
 use App\Domain\Roster\Exceptions\InvitationException;
 use App\Domain\Roster\Models\ComplexMember;
 use App\Domain\Roster\Models\Invitation;
+use App\Domain\Roster\Services\ComplexFamilyService;
 use App\Domain\Roster\Services\ComplexMembershipService;
 use App\Domain\Roster\Services\InvitationService;
 use App\Domain\Subscriptions\Enums\SubscriptionStatus;
@@ -32,12 +33,15 @@ use Illuminate\Support\Facades\Context;
  * requires the manager's existing RBAC permission (residents.view/create/delete, devices.view,
  * complexes.view). Out-of-scope ids answer 404. Deliberately absent (BR-11): granting a free subscription,
  * changing prices, binding devices — a Komendant only invites, views and removes residents.
+ * O7 — and manages the families in the complex: sees each head's members, removes a member, hands a family to
+ * another member (ComplexFamilyService).
  */
 class KomendantController
 {
     public function __construct(
         private readonly InvitationService $invitations,
         private readonly ComplexMembershipService $memberships,
+        private readonly ComplexFamilyService $family,
     ) {}
 
     /** GET /v1/komendant/complex */
@@ -107,25 +111,67 @@ class KomendantController
             ->groupBy('du.user_id')
             ->pluck('c', 'user_id');
 
+        // O7 — each head's family on the complex's gates (members joined through the family, not the complex).
+        $families = $this->family->familiesByHead($complexId);
+        $masked = fn (?User $u): ?string => PhoneNumber::tryFromInput((string) $u?->phone)?->masked() ?? $u?->phone;
+
         $data = $members->map(fn (ComplexMember $m): array => [
             'user_id' => (int) $m->user_id,
             'full_name' => $m->user?->full_name,
             'email' => $m->user?->email,
-            'phone_masked' => PhoneNumber::tryFromInput((string) $m->user?->phone)?->masked() ?? $m->user?->phone,
+            'phone_masked' => $masked($m->user),
             'joined_at' => optional($m->joined_at)->toIso8601String(),
             'active_subscriptions' => (int) ($activeByUser[$m->user_id] ?? 0),
+            'is_family_head' => isset($families[(int) $m->user_id]),
+            'family' => array_map(fn (array $f): array => [
+                'user_id' => (int) $f['user']->id,
+                'full_name' => $f['user']->full_name,
+                'email' => $f['user']->email,
+                'phone_masked' => $masked($f['user']),
+                'active_subscriptions' => $f['active_subscriptions'],
+            ], $families[(int) $m->user_id] ?? []),
         ])->all();
 
         return response()->json(['data' => $data]);
     }
 
-    /** DELETE /v1/komendant/residents/{userId} — remove from the complex; access revoked, subscriptions cancelled (no refund). */
+    /**
+     * DELETE /v1/komendant/residents/{userId} — remove from the complex; access revoked, subscriptions cancelled (no
+     * refund). O7: works for a family member too; a family head needs `family_action` = `new_head` (+
+     * `new_head_user_id`) or `remove_family`, else 409 family_decision_required listing the members.
+     */
     public function removeResident(Request $request, int $userId, RemoveComplexResident $action): JsonResponse
     {
         $manager = $this->manager($request, Permission::RESIDENTS_DELETE);
+        $choice = $request->validate([
+            'family_action' => ['sometimes', 'nullable', 'string', 'in:new_head,remove_family'],
+            'new_head_user_id' => ['required_if:family_action,new_head', 'nullable', 'integer'],
+        ]);
         $resident = User::query()->find($userId);
-        $result = $resident !== null ? $action->handle((int) $manager->complex_id, $resident, $request->user(), $manager) : null;
+        $result = $resident !== null
+            ? $action->handle((int) $manager->complex_id, $resident, $request->user(), $manager, $choice['family_action'] ?? null, isset($choice['new_head_user_id']) ? (int) $choice['new_head_user_id'] : null)
+            : null;
         abort_if($result === null, 404);
+
+        return response()->json(['data' => $result]);
+    }
+
+    /**
+     * POST /v1/komendant/families/{headUserId}/head {new_head_user_id, old_head?: member|remove} — O7: a member takes
+     * the family over at once; the old head stays as a member (default) or leaves the complex.
+     */
+    public function changeFamilyHead(Request $request, int $headUserId): JsonResponse
+    {
+        $manager = $this->manager($request, Permission::RESIDENTS_UPDATE);
+        $data = $request->validate([
+            'new_head_user_id' => ['required', 'integer'],
+            'old_head' => ['sometimes', 'string', 'in:member,remove'],
+        ]);
+        $head = User::query()->find($headUserId);
+        $newHead = User::query()->find((int) $data['new_head_user_id']);
+        abort_if($head === null || $newHead === null, 404);
+
+        $result = $this->family->changeHead((int) $manager->complex_id, $head, $newHead, ($data['old_head'] ?? 'member') === 'remove', $manager, $request->user());
 
         return response()->json(['data' => $result]);
     }

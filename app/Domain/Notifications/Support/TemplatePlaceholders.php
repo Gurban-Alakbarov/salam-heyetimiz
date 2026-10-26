@@ -13,6 +13,8 @@ final class TemplatePlaceholders
     /** template_key => [placeholder => sample value used by preview] */
     private const MAP = [
         'device.opened' => ['visitor_name' => 'Kuryer', 'device_label' => 'Əsas darvaza'],
+        'family.member_removed' => ['member_name' => 'Aysel Məmmədova', 'complex_name' => 'Gənclik Park'],
+        'family.head_changed' => ['head_name' => 'Rəşad Məmmədov', 'complex_name' => 'Gənclik Park'],
     ];
 
     private const READ_ONLY = ['system.admin_campaign'];

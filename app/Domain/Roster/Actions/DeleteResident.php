@@ -5,6 +5,7 @@ namespace App\Domain\Roster\Actions;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Auth\Models\RefreshToken;
+use App\Domain\Auth\Models\WidgetToken;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Enums\FamilyLinkStatus;
@@ -143,11 +144,15 @@ final class DeleteResident
                 }
             }
 
-            // Kill live sessions — a soft-deleted account must not be able to refresh back in.
+            // Kill live sessions — a soft-deleted account must not be able to refresh back in (nor open from a widget).
             RefreshToken::query()
                 ->where('user_id', $user->getKey())
                 ->whereNull('revoked_at')
                 ->update(['revoked_at' => $this->clock->now()]);
+            WidgetToken::query()
+                ->where('user_id', $user->getKey())
+                ->whereNull('revoked_at')
+                ->update(['revoked_at' => $this->clock->now(), 'revocation_reason' => 'account_deleted']);
 
             // A Komendant's mobile link: the admin account stays, it just no longer has this mobile login.
             $unlinked = AdminUser::query()->where('user_id', $user->getKey())->pluck('id')->all();

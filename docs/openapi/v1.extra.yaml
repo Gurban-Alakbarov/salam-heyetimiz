@@ -196,6 +196,31 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/GuestBootstrapEnvelope' }
 
+  /me/widget-token:
+    post:
+      tags: [Auth]
+      summary: Issue the home-screen widget token for this install
+      operationId: issueWidgetToken
+      security: [{ bearerAuth: [] }]
+      description: |
+        A normal app session (access token) gets a fresh widget token for its install; the previous one is revoked.
+        See `widgetTokenAuth`. The app stores it in secure storage for the widget's background isolate and asks
+        again while it is used (weekly), so an active user's widget never says "session expired".
+      responses:
+        '201':
+          description: Issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token: { type: string, example: 'wgt_…' }
+                      expires_at: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
   /me:
     get:
       tags: [App / Bootstrap]
@@ -1818,7 +1843,9 @@ paths:
       security: [{ adminBearerAuth: [] }]
       description: |
         Requires `subscriptions.manage`. Activates (or extends) the active roster member's entitlement — no order,
-        no money. Defaults: `tier=additional`, `term_days` = configured term (365). Returns the refreshed roster row.
+        no money. A3 — without `tier` a new subscription takes the row's tier (own access → `main`, family grant →
+        `additional`) and an existing one keeps its tier; `term_days` defaults to the configured term (30). The grant
+        is recorded (`comp_grant` on adminGetSubscription), so it is not shown as a legacy comp.
         **404** `roster_member_not_found` when the user has no active row on the device.
       parameters:
         - { $ref: '#/components/parameters/DeviceId' }
@@ -3637,7 +3664,13 @@ components:
           properties:
             cancelled_at: { type: string, format: date-time, nullable: true }
             cancellation_reason: { type: string, nullable: true }
-            is_legacy_comp: { type: boolean, description: 'Zero-price with no paid period (legacy complimentary)' }
+            is_legacy_comp: { type: boolean, description: 'Zero-price, no paid period and no admin grant record (legacy complimentary)' }
+            comp_grant:
+              type: [object, 'null']
+              description: A3 — set when an admin granted time for free
+              properties:
+                granted_at: { type: string, format: date-time }
+                by_admin_id: { type: [integer, 'null'] }
             device:
               type: object
               nullable: true

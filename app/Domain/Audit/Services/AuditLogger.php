@@ -57,7 +57,8 @@ final class AuditLogger
             return ['admin', (int) $admin->getKey(), $admin->email];
         }
 
-        $user = Auth::guard('user')->user();
+        // The home-screen widget opens with its own token (guard `widget`) — still that user.
+        $user = Auth::guard('user')->user() ?? (Auth::guard('widget')->check() ? Auth::guard('widget')->user() : null);
         if ($user instanceof User) {
             return ['user', (int) $user->getKey(), $user->phone];
         }

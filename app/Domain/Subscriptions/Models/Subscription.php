@@ -33,6 +33,7 @@ class Subscription extends Model
             'last_reminder_kind' => ReminderKind::class,
             'last_reminder_sent_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'comp_granted_at' => 'datetime',
         ];
     }
 

@@ -53,7 +53,13 @@ class AdminSubscriptionController
         return response()->json(['data' => (new SubscriptionResource($sub))->toArray($request) + [
             'cancelled_at' => optional($sub->cancelled_at)->toIso8601String(),
             'cancellation_reason' => $sub->cancellation_reason,
-            'is_legacy_comp' => (int) $sub->price_minor === 0 && ! $periods->contains(fn ($p) => (int) $p->amount_minor > 0),
+            // A3 — an admin's free grant is recorded, so it is no longer mistaken for a legacy comp.
+            'is_legacy_comp' => (int) $sub->price_minor === 0 && $sub->comp_granted_at === null
+                && ! $periods->contains(fn ($p) => (int) $p->amount_minor > 0),
+            'comp_grant' => $sub->comp_granted_at !== null ? [
+                'granted_at' => $sub->comp_granted_at->toIso8601String(),
+                'by_admin_id' => $sub->comp_granted_by_admin_id !== null ? (int) $sub->comp_granted_by_admin_id : null,
+            ] : null,
             'device' => $device === null ? null : [
                 'id' => (int) $device->id, 'serial' => $device->serial, 'location_label' => $device->location_label,
                 'ownership_mode' => $device->ownership_mode->value, 'complex_id' => $device->complex_id !== null ? (int) $device->complex_id : null,

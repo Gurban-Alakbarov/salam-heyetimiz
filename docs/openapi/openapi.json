@@ -691,7 +691,15 @@
         ],
         "summary": "Issue an open command",
         "operationId": "openDevice",
-        "description": "Idempotent. The `Idempotency-Key` is also persisted as `open_commands.idempotency_key`\n— replays return the cached command without dispatching again.\n\nAuthorization: user must be on the device roster, subscription must be `active`,\ndevice must not be `disabled`.\n",
+        "description": "Idempotent. The `Idempotency-Key` is also persisted as `open_commands.idempotency_key`\n— replays return the cached command without dispatching again.\n\nAuthorization: user must be on the device roster, subscription must be `active`,\ndevice must not be `disabled`.\n\nAlso accepts the home-screen **widget token** (`widgetTokenAuth`, `POST /v1/me/widget-token`) — the\nwidget opens with it long after the app's 15-minute access token expired.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "widgetTokenAuth": []
+          }
+        ],
         "x-authorization": "user; must be on roster with active subscription",
         "x-rate-limit": "12/user/min, 4/device/min",
         "parameters": [
@@ -877,6 +885,14 @@
         ],
         "summary": "Get a single open command (terminal state polling)",
         "operationId": "getCommand",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "widgetTokenAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "ok",
@@ -5460,6 +5476,51 @@
         }
       }
     },
+    "/v1/me/widget-token": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Issue the home-screen widget token for this install",
+        "operationId": "issueWidgetToken",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "A normal app session (access token) gets a fresh widget token for its install; the previous one is revoked.\nSee `widgetTokenAuth`. The app stores it in secure storage for the widget's background isolate and asks\nagain while it is used (weekly), so an active user's widget never says \"session expired\".\n",
+        "responses": {
+          "201": {
+            "description": "Issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "example": "wgt_…"
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      }
+    },
     "/admin/v1/admins/{adminId}/impersonate": {
       "post": {
         "tags": [
@@ -9178,7 +9239,7 @@
             "adminBearerAuth": []
           }
         ],
-        "description": "Requires `subscriptions.manage`. Activates (or extends) the active roster member's entitlement — no order,\nno money. Defaults: `tier=additional`, `term_days` = configured term (365). Returns the refreshed roster row.\n**404** `roster_member_not_found` when the user has no active row on the device.\n",
+        "description": "Requires `subscriptions.manage`. Activates (or extends) the active roster member's entitlement — no order,\nno money. A3 — without `tier` a new subscription takes the row's tier (own access → `main`, family grant →\n`additional`) and an existing one keeps its tier; `term_days` defaults to the configured term (30). The grant\nis recorded (`comp_grant` on adminGetSubscription), so it is not shown as a legacy comp.\n**404** `roster_member_not_found` when the user has no active row on the device.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/DeviceId"
@@ -11780,6 +11841,12 @@
         "scheme": "bearer",
         "bearerFormat": "JWT",
         "description": "Mobile JWT issued by `/auth/otp/verify` or `/auth/refresh`.\nAlgorithm RS256, 15-minute TTL. Subject is `user.{id}`.\n"
+      },
+      "widgetTokenAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "opaque (wgt_…)",
+        "description": "Home-screen widget token from `POST /v1/me/widget-token`: opaque, bound to the install, 90 days, re-issued\nby the app while it is used. Accepted ONLY by `openDevice` and `getCommand` (everything else → 401).\nRevoked on logout of that install, account deletion and refresh-token reuse; a blocked account is refused.\n"
       },
       "adminBearerAuth": {
         "type": "http",
@@ -17406,7 +17473,26 @@
               },
               "is_legacy_comp": {
                 "type": "boolean",
-                "description": "Zero-price with no paid period (legacy complimentary)"
+                "description": "Zero-price, no paid period and no admin grant record (legacy complimentary)"
+              },
+              "comp_grant": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "description": "A3 — set when an admin granted time for free",
+                "properties": {
+                  "granted_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "by_admin_id": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  }
+                }
               },
               "device": {
                 "type": "object",

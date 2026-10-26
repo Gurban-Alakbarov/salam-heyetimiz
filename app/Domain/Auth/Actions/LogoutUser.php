@@ -6,6 +6,7 @@ use App\Domain\Auth\Enums\RefreshTokenRevocationReason;
 use App\Domain\Auth\Events\UserLoggedOut;
 use App\Domain\Auth\Services\RefreshTokenService;
 use App\Domain\Auth\Services\UserDeviceService;
+use App\Domain\Auth\Services\WidgetTokenService;
 use App\Domain\Users\Models\User;
 
 /**
@@ -17,6 +18,7 @@ final class LogoutUser
     public function __construct(
         private readonly UserDeviceService $devices,
         private readonly RefreshTokenService $refreshTokens,
+        private readonly WidgetTokenService $widgetTokens,
     ) {}
 
     public function handle(User $user, ?string $fingerprint): void
@@ -32,6 +34,7 @@ final class LogoutUser
             (int) $device->getKey(),
             RefreshTokenRevocationReason::Logout,
         );
+        $this->widgetTokens->revokeForDevice((int) $user->getKey(), (int) $device->getKey(), 'logout');
 
         UserLoggedOut::dispatch((int) $user->getKey(), (int) $device->getKey());
     }

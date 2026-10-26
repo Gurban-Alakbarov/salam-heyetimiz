@@ -49,7 +49,10 @@ function PermissionsTab() {
           <CardContent className="space-y-1">
             {g.permissions.map((p) => (
               <div key={p.key} className="flex items-center justify-between text-sm">
-                <span>{p.label}</span>
+                <span className={p.in_use === false ? 'flex items-center gap-2 text-muted-foreground' : undefined}>
+                  {p.label}
+                  {p.in_use === false && <Badge variant="muted" className="text-[10px]" title="Bu icazəni hələ heç bir funksiya yoxlamır — vermək və ya almaq indi heç nəyi dəyişmir">istifadə olunmur</Badge>}
+                </span>
                 <code className="rounded bg-muted px-1 text-xs text-muted-foreground">{p.key}</code>
               </div>
             ))}
@@ -105,6 +108,7 @@ function RolesTab() {
                         <label key={p.key} className="flex items-center gap-1.5 rounded border px-2 py-1 text-xs">
                           <input type="checkbox" checked={selected.has(p.key)} onChange={() => toggle(p.key)} />
                           {p.key}
+                          {p.in_use === false && <Badge variant="muted" className="text-[10px]" title="Bu icazəni hələ heç bir funksiya yoxlamır — vermək və ya almaq indi heç nəyi dəyişmir">istifadə olunmur</Badge>}
                         </label>
                       ))}
                     </div>
@@ -182,6 +186,7 @@ function UserPermissionsTab() {
                         {state === 'granted' && <Badge variant="success" className="text-[10px]">+ verilib</Badge>}
                         {state === 'revoked' && <Badge variant="destructive" className="text-[10px]">− alınıb</Badge>}
                         {state === 'inherited' && <Badge variant="muted" className="text-[10px]">rol</Badge>}
+                        {p.in_use === false && <Badge variant="muted" className="text-[10px]" title="Bu icazəni hələ heç bir funksiya yoxlamır — vermək və ya almaq indi heç nəyi dəyişmir">istifadə olunmur</Badge>}
                       </span>
                       <span className="flex gap-1">
                         {!isEff && <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" disabled={grant.isPending}

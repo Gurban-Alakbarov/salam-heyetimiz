@@ -31,9 +31,12 @@ class GrantSubscriptionRequest extends FormRequest
         ];
     }
 
-    public function tier(): SubscriptionTier
+    /** A3 — null when not sent: the tier then follows the roster row (own access → main, family → additional). */
+    public function tier(): ?SubscriptionTier
     {
-        return SubscriptionTier::from((string) ($this->validated()['tier'] ?? SubscriptionTier::Additional->value));
+        $tier = $this->validated()['tier'] ?? null;
+
+        return $tier !== null ? SubscriptionTier::from((string) $tier) : null;
     }
 
     public function termDays(): int

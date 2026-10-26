@@ -6,6 +6,7 @@ use App\Domain\Admin\Enums\AdminStatus;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Admin\Services\SettingsService;
 use App\Domain\Auth\Services\JwtService;
+use App\Domain\Auth\Services\WidgetTokenService;
 use App\Domain\Users\Enums\UserStatus;
 use App\Domain\Users\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -43,6 +44,33 @@ final class JwtRequestGuard
         }
 
         $request->attributes->set('jwt_fp', $claims['fp']);
+
+        return $user;
+    }
+
+    /**
+     * Guard `widget` — the home-screen widget's open-only token (WidgetTokenService). Only routes declared
+     * `auth:user,widget` accept it; an access JWT never parses as one and vice versa.
+     */
+    public function resolveWidgetUser(Request $request): ?Authenticatable
+    {
+        $bearer = $request->bearerToken();
+        if ($bearer === null || ! str_starts_with($bearer, WidgetTokenService::PREFIX)) {
+            return null;
+        }
+
+        $token = app(WidgetTokenService::class)->resolve($bearer);
+        if ($token === null) {
+            return null;
+        }
+
+        /** @var User|null $user */
+        $user = User::query()->find($token->user_id);
+        if ($user === null || $user->status !== UserStatus::Active) {
+            return null;
+        }
+
+        $request->attributes->set('widget_token_id', (int) $token->getKey());
 
         return $user;
     }

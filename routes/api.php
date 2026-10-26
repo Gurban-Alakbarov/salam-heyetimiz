@@ -2,6 +2,7 @@
 
 use App\Http\Api\V1\Controllers\Applications\ApplicationController;
 use App\Http\Api\V1\Controllers\Auth\AccountDeletionController;
+use App\Http\Api\V1\Controllers\Auth\WidgetTokenController;
 use App\Http\Api\V1\Controllers\Auth\AuthController;
 use App\Http\Api\V1\Controllers\Auth\BiometricController;
 use App\Http\Api\V1\Controllers\Commands\OpenCommandController;
@@ -82,6 +83,8 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
 
     // Current user + authed bootstrap (one-shot — user, devices, subscriptions, app config, flags).
     Route::get('me', [BootstrapController::class, 'me'])->name('currentUser');
+    // Home-screen widget token for this install (open-only, long-lived — WidgetTokenService)
+    Route::post('me/widget-token', [WidgetTokenController::class, 'issue'])->name('issueWidgetToken');
     // Y7 — delete my own account (store requirement); confirm:true, 409 successor_required for device owners.
     Route::delete('me', [AccountDeletionController::class, 'destroy'])->name('deleteMyAccount');
 
@@ -126,7 +129,6 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
         Route::patch('/{deviceId}/geofence', [DeviceController::class, 'updateGeofence'])->whereNumber('deviceId')->name('updateDeviceGeofence');
 
         // DeviceComm core (batch 09-A)
-        Route::post('/{deviceId}/open', [OpenCommandController::class, 'open'])->whereNumber('deviceId')->middleware('throttle:open')->name('openDevice');
         Route::get('/{deviceId}/commands', [OpenCommandController::class, 'index'])->whereNumber('deviceId')->name('listDeviceCommands');
         Route::get('/{deviceId}/stats', [DeviceStatsController::class, 'show'])->whereNumber('deviceId')->name('getDeviceStats');
 
@@ -178,8 +180,14 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
     Route::post('invites/{token}/decline', [InviteController::class, 'decline'])->where('token', '[A-Za-z0-9_-]+')->name('declineInvitation');
 
     // Open commands — status polling + actuation feedback (batch 09-A)
-    Route::get('commands/{commandId}', [OpenCommandController::class, 'show'])->whereNumber('commandId')->name('getCommand');
     Route::post('commands/{commandId}/feedback', [OpenCommandController::class, 'feedback'])->whereNumber('commandId')->name('submitOpenFeedback');
+});
+
+// ---- Door open + command status: the app session OR the home-screen widget's open-only token (guard
+// `widget`, WidgetTokenService) — so the widget keeps opening after the app's 15-minute access token expired. ----
+Route::middleware(['auth:user,widget', 'throttle:mobile'])->group(function (): void {
+    Route::post('devices/{deviceId}/open', [OpenCommandController::class, 'open'])->whereNumber('deviceId')->middleware('throttle:open')->name('openDevice');
+    Route::get('commands/{commandId}', [OpenCommandController::class, 'show'])->whereNumber('commandId')->name('getCommand');
 });
 
 // ---- Komendant (complex manager) — a mobile user linked to an active complex_manager (B5). Scoped to that

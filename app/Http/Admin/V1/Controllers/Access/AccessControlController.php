@@ -60,8 +60,10 @@ class AccessControlController
         $this->requirePermission($request, Catalog::ACCESS_MANAGE);
 
         $groups = [];
+        $notInUse = Catalog::notInUse();
         foreach (Catalog::definitions() as $key => $def) {
-            $groups[$def['group']][] = ['key' => $key, 'label' => $def['label']];
+            // A11 — `in_use: false` = no endpoint checks it yet (granting it changes nothing today).
+            $groups[$def['group']][] = ['key' => $key, 'label' => $def['label'], 'in_use' => ! in_array($key, $notInUse, true)];
         }
 
         return response()->json([

@@ -13,7 +13,8 @@ export interface RoleInfo {
 }
 export interface PermissionGroup {
   group: string
-  permissions: { key: Permission; label: string }[]
+  /** A11 — in_use false: no endpoint checks it yet; granting it changes nothing today. */
+  permissions: { key: Permission; label: string; in_use?: boolean }[]
 }
 export interface UserPermissions {
   admin: { id: number; email: string; name: string; role: AdminRole }

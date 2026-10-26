@@ -119,6 +119,7 @@ final class RefreshTokenService
 
         if ($outcome['status'] === 'reuse') {
             $this->revokeActiveForDevice($outcome['user_id'], $outcome['user_device_id'], RefreshTokenRevocationReason::Security);
+            app(WidgetTokenService::class)->revokeForDevice($outcome['user_id'], $outcome['user_device_id'], 'security');
             RefreshTokenReuseDetected::dispatch($outcome['user_id'], $outcome['user_device_id']);
 
             throw new \App\Domain\Auth\Exceptions\InvalidRefreshTokenException();

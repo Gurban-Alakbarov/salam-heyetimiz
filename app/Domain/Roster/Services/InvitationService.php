@@ -70,8 +70,15 @@ final class InvitationService
             throw InvitationException::alreadyPending();
         }
 
-        $this->hitLimit('invitation:send:inv:'.$invitation->getKey(), (int) config('domain.invitations.resend_max_per_day', 5));
-        $this->hitLimit('invitation:send:inviter:'.$this->inviterKey($invitation), (int) config('domain.invitations.inviter_max_per_day', 30));
+        // A9 — both limits are checked first and counted only after the resend went through, so a refused or
+        // failed attempt never eats the inviter's quota.
+        $limits = [
+            ['invitation:send:inv:'.$invitation->getKey(), (int) config('domain.invitations.resend_max_per_day', 5)],
+            ['invitation:send:inviter:'.$this->inviterKey($invitation), (int) config('domain.invitations.inviter_max_per_day', 30)],
+        ];
+        foreach ($limits as [$key, $max]) {
+            $this->assertUnderLimit($key, $max);
+        }
 
         $token = $this->tokens->generate();
 
@@ -93,6 +100,9 @@ final class InvitationService
             throw $e;
         }
 
+        foreach ($limits as [$key]) {
+            $this->countLimit($key);
+        }
         SendInvitationEmailJob::dispatch((int) $invitation->getKey(), $token['plaintext'])->afterCommit();
 
         return $token['plaintext'];
@@ -152,7 +162,8 @@ final class InvitationService
         }
 
         $now = $this->clock->now();
-        $scope = fn ($q) => $q->where('kind', $kind->value)->where('invitee_email', $email)->where(array_intersect_key($target, ['complex_id' => 1, 'invited_by_user_id' => 1]));
+        // A9 — a family invite is unique per (head, person, DEVICE): inviting the same person to a second gate is fine.
+        $scope = fn ($q) => $q->where('kind', $kind->value)->where('invitee_email', $email)->where(array_intersect_key($target, ['complex_id' => 1, 'invited_by_user_id' => 1, 'device_id' => 1]));
 
         // A stale pending row (past expiry, not yet swept) must not block a fresh invite.
         Invitation::query()->where($scope)->where('status', InvitationStatus::Pending->value)
@@ -162,7 +173,9 @@ final class InvitationService
             throw InvitationException::alreadyPending();
         }
 
-        $this->hitLimit('invitation:send:inviter:'.$inviterKey, (int) config('domain.invitations.inviter_max_per_day', 30));
+        // A9 — check the daily limit up front, count it only once the invitation really exists.
+        $inviterLimit = ['invitation:send:inviter:'.$inviterKey, (int) config('domain.invitations.inviter_max_per_day', 30)];
+        $this->assertUnderLimit(...$inviterLimit);
 
         $token = $this->tokens->generate();
 
@@ -187,6 +200,7 @@ final class InvitationService
             throw $e;
         }
 
+        $this->countLimit($inviterLimit[0]);
         SendInvitationEmailJob::dispatch((int) $invitation->getKey(), $token['plaintext'])->afterCommit();
 
         return ['invitation' => $invitation, 'token' => $token['plaintext']];
@@ -204,6 +218,7 @@ final class InvitationService
             ->where('invitee_email', $invitation->invitee_email)
             ->when($invitation->complex_id !== null, fn ($q) => $q->where('complex_id', $invitation->complex_id))
             ->when($invitation->invited_by_user_id !== null, fn ($q) => $q->where('invited_by_user_id', $invitation->invited_by_user_id))
+            ->when($invitation->invited_by_user_id !== null && $invitation->device_id !== null, fn ($q) => $q->where('device_id', $invitation->device_id))
             ->where('status', InvitationStatus::Pending->value);
 
         $siblings()->where('expires_at', '<=', $now)->update(['status' => InvitationStatus::Expired->value, 'updated_at' => $now]);
@@ -211,11 +226,15 @@ final class InvitationService
         return $siblings()->exists();
     }
 
-    private function hitLimit(string $key, int $max): void
+    private function assertUnderLimit(string $key, int $max): void
     {
         if (RateLimiter::tooManyAttempts($key, $max)) {
             throw InvitationException::rateLimited(RateLimiter::availableIn($key));
         }
+    }
+
+    private function countLimit(string $key): void
+    {
         RateLimiter::hit($key, 86400);
     }
 

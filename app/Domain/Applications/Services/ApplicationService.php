@@ -39,7 +39,11 @@ final class ApplicationService
     /** @param  array<string, mixed>  $data  validated */
     public function submitIndividual(User $user, array $data): IndividualApplication
     {
-        $this->assertAccountType($user, AccountType::Physical);
+        // A legal-entity account may ALSO file for a private home of its own (decided 2026-10-27, e.g. the
+        // person's own garden); it stays a legal account. A physical account still cannot file legal.
+        if (($user->getAttributes()['account_type'] ?? null) !== AccountType::Legal->value) {
+            $this->assertAccountType($user, AccountType::Physical);
+        }
         if (IndividualApplication::query()->where('user_id', $user->getKey())->whereNotNull('is_open')->exists()) {
             throw ApplicationException::alreadyOpen();
         }

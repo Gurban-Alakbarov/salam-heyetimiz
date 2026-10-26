@@ -37,6 +37,7 @@ export function SubscriptionDetailPage() {
             <h1 className="text-2xl font-semibold tracking-tight">Abunəlik #{s.id}</h1>
             <StatusBadge kind="subscription" value={s.status} />
             {s.is_legacy_comp && <Badge variant="secondary" title="Köhnə pulsuz (comp) abunəlik — avtomatik ödənişə çevrilmir (BR-17)">Legacy comp</Badge>}
+            {s.comp_grant && <Badge variant="outline" title={`Admin tərəfindən pulsuz verilib: ${formatDateTime(s.comp_grant.granted_at)}`}>Admin pulsuz verib</Badge>}
             {s.family_link_id !== null && <Badge variant="outline">Ailə üzvü</Badge>}
           </div>
 

@@ -29,6 +29,8 @@ class ModuleServiceProvider extends ServiceProvider
         // Disjoint mobile/admin JWT guards. viaRequest keeps actingAs() working in tests.
         Auth::viaRequest('salam-jwt-user', static fn (Request $request) => app(JwtRequestGuard::class)->resolveUser($request));
         Auth::viaRequest('salam-jwt-admin', static fn (Request $request) => app(JwtRequestGuard::class)->resolveAdmin($request));
+        // Home-screen widget: open-only, install-bound, long-lived (WidgetTokenService).
+        Auth::viaRequest('salam-widget', static fn (Request $request) => app(JwtRequestGuard::class)->resolveWidgetUser($request));
 
         Event::listen(UserAuthenticated::class, RecordSuccessfulUserLogin::class);
         Event::listen(AdminAuthenticated::class, RecordAdminLogin::class);

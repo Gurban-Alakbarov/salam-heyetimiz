@@ -231,4 +231,21 @@ final class Permission
     {
         return array_keys(self::definitions());
     }
+
+    /**
+     * A11 — capabilities defined for features that have no endpoint yet (apartments, vehicles, invoices, OTP
+     * resend by support). Kept in the catalog (role templates, future features) but shown to admins as "not in
+     * use yet" so granting or revoking them is not mistaken for a real change.
+     *
+     * @return list<string>
+     */
+    public static function notInUse(): array
+    {
+        return [
+            self::APARTMENTS_VIEW, self::APARTMENTS_MANAGE,
+            self::VEHICLES_VIEW, self::VEHICLES_MANAGE,
+            self::INVOICES_VIEW,
+            self::SUPPORT_OTP_RESEND,
+        ];
+    }
 }

@@ -30,6 +30,11 @@ return [
             'driver' => 'salam-jwt-admin',
             'provider' => 'admins',
         ],
+        // Home-screen widget token — accepted only by `auth:user,widget` routes (open + command status).
+        'widget' => [
+            'driver' => 'salam-widget',
+            'provider' => 'users',
+        ],
     ],
 
     'providers' => [

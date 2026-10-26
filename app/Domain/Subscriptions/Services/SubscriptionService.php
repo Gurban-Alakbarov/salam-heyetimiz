@@ -106,11 +106,16 @@ final class SubscriptionService
      * (no lost time); on a pending/expired/cancelled one it starts a fresh term from now. Emits
      * SubscriptionActivated so DeviceComm whitelists the user exactly as a paid activation would.
      */
-    public function grantManual(DeviceUser $deviceUser, SubscriptionTier $tier, int $termDays): Subscription
+    /**
+     * A3 — a free grant is recorded (comp_granted_at / _by_admin_id). $tier null: a new subscription takes the
+     * row's tier — own access (owner, or a resident's own row) is main, a family grant is additional; an existing
+     * subscription keeps its tier.
+     */
+    public function grantManual(DeviceUser $deviceUser, ?SubscriptionTier $tier, int $termDays, ?int $adminId = null): Subscription
     {
         $now = $this->clock->now();
 
-        return DB::transaction(function () use ($deviceUser, $tier, $termDays, $now): Subscription {
+        return DB::transaction(function () use ($deviceUser, $tier, $termDays, $now, $adminId): Subscription {
             /** @var Subscription|null $subscription */
             $subscription = Subscription::query()->where('device_user_id', $deviceUser->getKey())->first();
 
@@ -118,8 +123,10 @@ final class SubscriptionService
                 /** @var Subscription $subscription */
                 $subscription = Subscription::query()->create([
                     'device_user_id' => $deviceUser->getKey(),
-                    'tier' => $tier,
+                    'tier' => $tier ?? ($deviceUser->family_link_id === null ? SubscriptionTier::Main : SubscriptionTier::Additional),
                     'price_minor' => 0, // comp — no money changed hands
+                    'comp_granted_at' => $now,
+                    'comp_granted_by_admin_id' => $adminId,
                     'currency' => 'AZN',
                     'term_days' => $termDays,
                     'starts_at' => $now,
@@ -135,8 +142,10 @@ final class SubscriptionService
                 $start = $live ? $subscription->ends_at->toImmutable() : $now;
 
                 $subscription->forceFill([
-                    'tier' => $tier->value,
+                    'tier' => ($tier ?? $subscription->tier)->value,
                     'term_days' => $termDays,
+                    'comp_granted_at' => $now,
+                    'comp_granted_by_admin_id' => $adminId,
                     'status' => SubscriptionStatus::Active->value,
                     'starts_at' => $live ? $subscription->starts_at : $now,
                     'ends_at' => $start->addDays($termDays),

@@ -269,7 +269,7 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
             {
               userId: grantTarget.user.id,
               term_days: termDays,
-              tier: grantTarget.role === 'owner' ? 'main' : 'additional',
+              // A3 — the server picks the tier from the row (own access → main, family → additional).
             },
             {
               onSuccess: () => {

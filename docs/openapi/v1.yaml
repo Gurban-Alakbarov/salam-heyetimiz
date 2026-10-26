@@ -568,6 +568,10 @@ paths:
         Authorization: user must be on the device roster, subscription must be `active`,
         device must not be `disabled`.
 
+        Also accepts the home-screen **widget token** (`widgetTokenAuth`, `POST /v1/me/widget-token`) — the
+        widget opens with it long after the app's 15-minute access token expired.
+
+      security: [{ bearerAuth: [] }, { widgetTokenAuth: [] }]
       x-authorization: user; must be on roster with active subscription
       x-rate-limit: 12/user/min, 4/device/min
       parameters:
@@ -667,6 +671,7 @@ paths:
       tags: [Commands]
       summary: Get a single open command (terminal state polling)
       operationId: getCommand
+      security: [{ bearerAuth: [] }, { widgetTokenAuth: [] }]
       responses:
         '200':
           description: ok
@@ -2804,6 +2809,14 @@ components:
       description: |
         Mobile JWT issued by `/auth/otp/verify` or `/auth/refresh`.
         Algorithm RS256, 15-minute TTL. Subject is `user.{id}`.
+    widgetTokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque (wgt_…)
+      description: |
+        Home-screen widget token from `POST /v1/me/widget-token`: opaque, bound to the install, 90 days, re-issued
+        by the app while it is used. Accepted ONLY by `openDevice` and `getCommand` (everything else → 401).
+        Revoked on logout of that install, account deletion and refresh-token reuse; a blocked account is refused.
     adminBearerAuth:
       type: http
       scheme: bearer

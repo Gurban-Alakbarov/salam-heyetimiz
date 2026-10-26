@@ -23,6 +23,8 @@ export interface SubscriptionDetail extends Subscription {
   cancelled_at: string | null
   cancellation_reason: string | null
   is_legacy_comp: boolean
+  /** A3 — set when an admin granted time for free (not a legacy comp). */
+  comp_grant?: { granted_at: string; by_admin_id: number | null } | null
   device: { id: number; serial: string; location_label: string | null; ownership_mode: string; complex_id: number | null } | null
   beneficiary: { id: number; full_name: string | null; phone: string | null } | null
   family_link_id: number | null

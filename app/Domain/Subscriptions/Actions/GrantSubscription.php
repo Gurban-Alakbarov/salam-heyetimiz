@@ -21,7 +21,8 @@ final class GrantSubscription
 {
     public function __construct(private readonly SubscriptionService $subscriptions) {}
 
-    public function handle(Device $device, int $userId, SubscriptionTier $tier, int $termDays, ?AdminUser $admin): Subscription
+    /** A3 — $tier null: a new subscription gets the row's tier (own access → main, family grant → additional). */
+    public function handle(Device $device, int $userId, ?SubscriptionTier $tier, int $termDays, ?AdminUser $admin): Subscription
     {
         /** @var DeviceUser|null $deviceUser */
         $deviceUser = DeviceUser::query()
@@ -34,7 +35,7 @@ final class GrantSubscription
             throw new RosterMemberNotFoundException();
         }
 
-        $subscription = $this->subscriptions->grantManual($deviceUser, $tier, $termDays);
+        $subscription = $this->subscriptions->grantManual($deviceUser, $tier, $termDays, $admin !== null ? (int) $admin->getKey() : null);
 
         SubscriptionGranted::dispatch(
             $subscription,

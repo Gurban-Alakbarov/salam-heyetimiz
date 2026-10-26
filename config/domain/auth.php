@@ -48,6 +48,12 @@ return [
     ],
 
     // Opaque refresh token (SHA-256 hashed, rotated on each use — R-SEC-02).
+    // Home-screen widget token (open-only, per install). Re-issued by the app while used, so it only lapses for
+    // an install nobody opened the app on for this long.
+    'widget' => [
+        'ttl_days' => (int) env('AUTH_WIDGET_TOKEN_TTL_DAYS', 90),
+    ],
+
     'refresh' => [
         'ttl_days' => 60,
         'bytes' => 32,

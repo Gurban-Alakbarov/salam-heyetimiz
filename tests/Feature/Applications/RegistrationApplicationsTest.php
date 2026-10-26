@@ -182,3 +182,13 @@ it('legacy users (account_type NULL) keep working and can still apply', function
     $fresh->forceFill(['email' => 'legacy@example.test', 'email_verified_at' => now()])->save();
     $this->actingAs($fresh->refresh(), 'user')->postJson('/v1/applications/individual', b9Individual())->assertCreated();
 });
+
+it('lets a legal-entity account also file a physical application for its own home; it stays legal', function () {
+    $user = b9User('+994500090071', 'legal');
+
+    $this->actingAs($user, 'user')->postJson('/v1/applications/individual', b9Individual())->assertCreated();
+
+    expect($user->refresh()->getAttributes()['account_type'])->toBe('legal');
+    $this->actingAs($user, 'user')->getJson('/v1/applications/mine')->assertOk();
+    $this->actingAs($user, 'user')->postJson('/v1/applications/legal', b9Legal())->assertCreated(); // still files legal too
+});

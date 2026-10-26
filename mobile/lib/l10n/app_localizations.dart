@@ -2427,6 +2427,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save the setting. Please try again.'**
   String get notifSettingsError;
+
+  /// No description provided for @kmFamilyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get kmFamilyLabel;
+
+  /// No description provided for @kmChangeHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Change head'**
+  String get kmChangeHead;
+
+  /// No description provided for @kmChangeHeadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the family head'**
+  String get kmChangeHeadTitle;
+
+  /// No description provided for @kmChangeHeadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Who should run {name}\'s family? The new head takes over at once; the members keep their access and paid days.'**
+  String kmChangeHeadBody(String name);
+
+  /// No description provided for @kmOldHeadStays.
+  ///
+  /// In en, this message translates to:
+  /// **'The old head stays in the family as a member'**
+  String get kmOldHeadStays;
+
+  /// No description provided for @kmOldHeadLeaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the old head from the complex'**
+  String get kmOldHeadLeaves;
+
+  /// No description provided for @kmHeadChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Family head changed.'**
+  String get kmHeadChanged;
+
+  /// No description provided for @kmRemoveHeadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the family head'**
+  String get kmRemoveHeadTitle;
+
+  /// No description provided for @kmRemoveHeadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} heads a family. What happens to the family members?'**
+  String kmRemoveHeadBody(String name);
+
+  /// No description provided for @kmRemoveHeadNewHead.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the members becomes the new head'**
+  String get kmRemoveHeadNewHead;
+
+  /// No description provided for @kmRemoveHeadWholeFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the whole family'**
+  String get kmRemoveHeadWholeFamily;
+
+  /// No description provided for @kmRemoveMemberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be removed from the complex: the access they got through the family ends and their subscription is cancelled. No automatic refund is made.'**
+  String kmRemoveMemberBody(String name);
+
+  /// No description provided for @kmNewHead.
+  ///
+  /// In en, this message translates to:
+  /// **'New head'**
+  String get kmNewHead;
+
+  /// No description provided for @kmErrFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'The family action failed. Refresh the list and try again.'**
+  String get kmErrFamily;
 }
 
 class _AppLocalizationsDelegate

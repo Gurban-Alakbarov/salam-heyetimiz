@@ -1266,4 +1266,53 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get notifSettingsError =>
       'Ayarı yadda saxlamaq olmadı. Yenidən cəhd edin.';
+
+  @override
+  String get kmFamilyLabel => 'Ailə';
+
+  @override
+  String get kmChangeHead => 'Başçını dəyiş';
+
+  @override
+  String get kmChangeHeadTitle => 'Ailə başçısını dəyiş';
+
+  @override
+  String kmChangeHeadBody(String name) {
+    return '$name ailəsini kim idarə etsin? Yeni başçı dərhal təyin olunur; üzvlərin girişi və ödənilmiş günləri dəyişmir.';
+  }
+
+  @override
+  String get kmOldHeadStays => 'Köhnə başçı ailədə üzv qalsın';
+
+  @override
+  String get kmOldHeadLeaves => 'Köhnə başçını kompleksdən çıxar';
+
+  @override
+  String get kmHeadChanged => 'Ailə başçısı dəyişdi.';
+
+  @override
+  String get kmRemoveHeadTitle => 'Ailə başçısını çıxar';
+
+  @override
+  String kmRemoveHeadBody(String name) {
+    return '$name ailə başçısıdır. Ailə üzvləri ilə nə olsun?';
+  }
+
+  @override
+  String get kmRemoveHeadNewHead => 'Üzvlərdən biri yeni başçı olsun';
+
+  @override
+  String get kmRemoveHeadWholeFamily => 'Bütün ailəni çıxar';
+
+  @override
+  String kmRemoveMemberBody(String name) {
+    return '$name kompleksdən çıxarılacaq: ailə vasitəsilə aldığı giriş bağlanacaq, abunəsi ləğv ediləcək. Avtomatik geri ödəniş edilmir.';
+  }
+
+  @override
+  String get kmNewHead => 'Yeni başçı';
+
+  @override
+  String get kmErrFamily =>
+      'Ailə əməliyyatı alınmadı. Siyahını yeniləyib yenidən cəhd edin.';
 }

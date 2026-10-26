@@ -1272,4 +1272,53 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get notifSettingsError =>
       'Не удалось сохранить настройку. Попробуйте ещё раз.';
+
+  @override
+  String get kmFamilyLabel => 'Семья';
+
+  @override
+  String get kmChangeHead => 'Сменить главу';
+
+  @override
+  String get kmChangeHeadTitle => 'Сменить главу семьи';
+
+  @override
+  String kmChangeHeadBody(String name) {
+    return 'Кто будет управлять семьёй $name? Новый глава назначается сразу; доступ и оплаченные дни членов семьи не меняются.';
+  }
+
+  @override
+  String get kmOldHeadStays => 'Прежний глава остаётся в семье';
+
+  @override
+  String get kmOldHeadLeaves => 'Удалить прежнего главу из комплекса';
+
+  @override
+  String get kmHeadChanged => 'Глава семьи изменён.';
+
+  @override
+  String get kmRemoveHeadTitle => 'Удалить главу семьи';
+
+  @override
+  String kmRemoveHeadBody(String name) {
+    return '$name — глава семьи. Что будет с членами семьи?';
+  }
+
+  @override
+  String get kmRemoveHeadNewHead => 'Один из членов станет новым главой';
+
+  @override
+  String get kmRemoveHeadWholeFamily => 'Удалить всю семью';
+
+  @override
+  String kmRemoveMemberBody(String name) {
+    return '$name будет удалён(а) из комплекса: доступ через семью закроется, подписка будет отменена. Автоматический возврат не производится.';
+  }
+
+  @override
+  String get kmNewHead => 'Новый глава';
+
+  @override
+  String get kmErrFamily =>
+      'Не удалось выполнить действие с семьёй. Обновите список и попробуйте снова.';
 }

@@ -1271,4 +1271,53 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifSettingsError =>
       'Could not save the setting. Please try again.';
+
+  @override
+  String get kmFamilyLabel => 'Family';
+
+  @override
+  String get kmChangeHead => 'Change head';
+
+  @override
+  String get kmChangeHeadTitle => 'Change the family head';
+
+  @override
+  String kmChangeHeadBody(String name) {
+    return 'Who should run $name\'s family? The new head takes over at once; the members keep their access and paid days.';
+  }
+
+  @override
+  String get kmOldHeadStays => 'The old head stays in the family as a member';
+
+  @override
+  String get kmOldHeadLeaves => 'Remove the old head from the complex';
+
+  @override
+  String get kmHeadChanged => 'Family head changed.';
+
+  @override
+  String get kmRemoveHeadTitle => 'Remove the family head';
+
+  @override
+  String kmRemoveHeadBody(String name) {
+    return '$name heads a family. What happens to the family members?';
+  }
+
+  @override
+  String get kmRemoveHeadNewHead => 'One of the members becomes the new head';
+
+  @override
+  String get kmRemoveHeadWholeFamily => 'Remove the whole family';
+
+  @override
+  String kmRemoveMemberBody(String name) {
+    return '$name will be removed from the complex: the access they got through the family ends and their subscription is cancelled. No automatic refund is made.';
+  }
+
+  @override
+  String get kmNewHead => 'New head';
+
+  @override
+  String get kmErrFamily =>
+      'The family action failed. Refresh the list and try again.';
 }

@@ -83,6 +83,8 @@ class KomendantResident {
     this.phoneMasked,
     this.joinedAt,
     this.activeSubscriptions = 0,
+    this.isFamilyHead = false,
+    this.family = const [],
   });
 
   final int userId;
@@ -92,6 +94,15 @@ class KomendantResident {
   final DateTime? joinedAt;
   final int activeSubscriptions;
 
+  /// O7 — this resident heads a family on the complex's gates; [family] are its members.
+  final bool isFamilyHead;
+  final List<KomendantFamilyMember> family;
+
+  String get displayName {
+    final n = fullName?.trim() ?? '';
+    return n.isNotEmpty ? n : (email ?? phoneMasked ?? '#$userId');
+  }
+
   factory KomendantResident.fromJson(Map<String, dynamic> j) =>
       KomendantResident(
         userId: _int(j['user_id']),
@@ -100,8 +111,49 @@ class KomendantResident {
         phoneMasked: j['phone_masked'] as String?,
         joinedAt: _date(j['joined_at']),
         activeSubscriptions: _int(j['active_subscriptions']),
+        isFamilyHead: j['is_family_head'] == true,
+        family: (j['family'] is List)
+            ? (j['family'] as List)
+                  .whereType<Map>()
+                  .map((m) => KomendantFamilyMember.fromJson(Map<String, dynamic>.from(m)))
+                  .toList()
+            : const [],
       );
 }
+
+/// O7 — a member of a resident's family on the complex's gates (joined through the family, not the complex).
+@immutable
+class KomendantFamilyMember {
+  const KomendantFamilyMember({
+    required this.userId,
+    this.fullName,
+    this.email,
+    this.phoneMasked,
+    this.activeSubscriptions = 0,
+  });
+
+  final int userId;
+  final String? fullName;
+  final String? email;
+  final String? phoneMasked;
+  final int activeSubscriptions;
+
+  String get displayName {
+    final n = fullName?.trim() ?? '';
+    return n.isNotEmpty ? n : (email ?? phoneMasked ?? '#$userId');
+  }
+
+  factory KomendantFamilyMember.fromJson(Map<String, dynamic> j) => KomendantFamilyMember(
+    userId: _int(j['user_id']),
+    fullName: j['full_name'] as String?,
+    email: j['email'] as String?,
+    phoneMasked: j['phone_masked'] as String?,
+    activeSubscriptions: _int(j['active_subscriptions']),
+  );
+}
+
+/// O7 — what happens to a head's family when the head is removed.
+enum FamilyRemovalChoice { newHead, removeFamily }
 
 /// Invitation tabs. `closed` groups `cancelled` (revoked) and `declined`.
 enum InvitationTab { pending, accepted, expired, closed }

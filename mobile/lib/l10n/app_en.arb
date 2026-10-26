@@ -490,5 +490,28 @@
   "notifSettingVisitorOpened": "When a guest opens the gate",
   "notifSettingAnnouncements": "Announcements",
   "notifSettingsHint": "A switched-off notification is not pushed to your phone but still appears in your notifications list. Subscription reminders always arrive.",
-  "notifSettingsError": "Could not save the setting. Please try again."
+  "notifSettingsError": "Could not save the setting. Please try again.",
+  "kmFamilyLabel": "Family",
+  "kmChangeHead": "Change head",
+  "kmChangeHeadTitle": "Change the family head",
+  "kmChangeHeadBody": "Who should run {name}'s family? The new head takes over at once; the members keep their access and paid days.",
+  "@kmChangeHeadBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "kmOldHeadStays": "The old head stays in the family as a member",
+  "kmOldHeadLeaves": "Remove the old head from the complex",
+  "kmHeadChanged": "Family head changed.",
+  "kmRemoveHeadTitle": "Remove the family head",
+  "kmRemoveHeadBody": "{name} heads a family. What happens to the family members?",
+  "@kmRemoveHeadBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "kmRemoveHeadNewHead": "One of the members becomes the new head",
+  "kmRemoveHeadWholeFamily": "Remove the whole family",
+  "kmRemoveMemberBody": "{name} will be removed from the complex: the access they got through the family ends and their subscription is cancelled. No automatic refund is made.",
+  "@kmRemoveMemberBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "kmNewHead": "New head",
+  "kmErrFamily": "The family action failed. Refresh the list and try again."
 }

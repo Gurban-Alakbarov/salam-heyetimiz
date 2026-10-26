@@ -57,11 +57,39 @@ class KomendantRepository {
     ).map(KomendantResident.fromJson).toList(),
   );
 
-  Future<Result<ResidentRemoval>> removeResident(int userId) => _guard(
+  /// Removes a resident or a family member from the complex. O7: a family head needs [familyChoice] (and the
+  /// new head for [FamilyRemovalChoice.newHead]); without one the server answers 409 family_decision_required.
+  Future<Result<ResidentRemoval>> removeResident(
+    int userId, {
+    FamilyRemovalChoice? familyChoice,
+    int? newHeadUserId,
+  }) => _guard(
     () async => ResidentRemoval.fromJson(
-      _map((await _api.delete('/v1/komendant/residents/$userId')).data),
+      _map(
+        (await _api.delete(
+          '/v1/komendant/residents/$userId',
+          data: switch (familyChoice) {
+            FamilyRemovalChoice.newHead => {'family_action': 'new_head', 'new_head_user_id': newHeadUserId},
+            FamilyRemovalChoice.removeFamily => {'family_action': 'remove_family'},
+            null => null,
+          },
+        )).data,
+      ),
     ),
   );
+
+  /// O7 — [newHeadUserId] takes [headUserId]'s family over at once; the old head stays a member unless
+  /// [removeOldHead].
+  Future<Result<void>> changeFamilyHead(
+    int headUserId, {
+    required int newHeadUserId,
+    bool removeOldHead = false,
+  }) => _guard(() async {
+    await _api.post(
+      '/v1/komendant/families/$headUserId/head',
+      data: {'new_head_user_id': newHeadUserId, 'old_head': removeOldHead ? 'remove' : 'member'},
+    );
+  });
 
   /// All of the complex's resident invitations (server caps at 200, newest first); tabs group client-side.
   Future<Result<List<KomendantInvitation>>> invitations() => _guard(

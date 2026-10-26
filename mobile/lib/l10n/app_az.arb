@@ -411,5 +411,15 @@
   "deleteAccountBody": "Hesabınız və şəxsi məlumatlarınız (ad, telefon, e-poçt) həmişəlik silinəcək. Bütün cihazlara girişiniz dayanacaq, aktiv abunəlikləriniz ləğv ediləcək (geri ödəniş edilmir), ailə üzvlərinizin sizin verdiyiniz girişi də götürüləcək. Bu əməliyyat geri qaytarıla bilməz.",
   "@deleteAccountBody": {"description": "Y7: self-service account deletion (profile)."},
   "deleteAccountConfirm": "Hesabı həmişəlik sil",
-  "@deleteAccountConfirm": {"description": "Y7: self-service account deletion (profile)."}
+  "@deleteAccountConfirm": {"description": "Y7: self-service account deletion (profile)."},
+  "notifSettingsHeader": "Bildirişlər",
+  "@notifSettingsHeader": {"description": "O13: Settings › notification switches."},
+  "notifSettingVisitorOpened": "Qonaq qapını açanda",
+  "@notifSettingVisitorOpened": {"description": "O13: Settings › notification switches."},
+  "notifSettingAnnouncements": "Elanlar",
+  "@notifSettingAnnouncements": {"description": "O13: Settings › notification switches."},
+  "notifSettingsHint": "Söndürülən bildiriş telefona gəlmir, amma bildirişlər siyahısında görünür. Abunə xəbərdarlıqları həmişə gəlir.",
+  "@notifSettingsHint": {"description": "O13: Settings › notification switches."},
+  "notifSettingsError": "Ayarı yadda saxlamaq olmadı. Yenidən cəhd edin.",
+  "@notifSettingsError": {"description": "O13: Settings › notification switches."}
 }

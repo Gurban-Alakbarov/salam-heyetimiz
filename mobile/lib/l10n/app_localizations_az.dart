@@ -1249,4 +1249,21 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get deleteAccountConfirm => 'Hesabı həmişəlik sil';
+
+  @override
+  String get notifSettingsHeader => 'Bildirişlər';
+
+  @override
+  String get notifSettingVisitorOpened => 'Qonaq qapını açanda';
+
+  @override
+  String get notifSettingAnnouncements => 'Elanlar';
+
+  @override
+  String get notifSettingsHint =>
+      'Söndürülən bildiriş telefona gəlmir, amma bildirişlər siyahısında görünür. Abunə xəbərdarlıqları həmişə gəlir.';
+
+  @override
+  String get notifSettingsError =>
+      'Ayarı yadda saxlamaq olmadı. Yenidən cəhd edin.';
 }

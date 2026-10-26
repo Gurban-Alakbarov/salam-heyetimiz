@@ -1254,4 +1254,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountConfirm => 'Delete permanently';
+
+  @override
+  String get notifSettingsHeader => 'Notifications';
+
+  @override
+  String get notifSettingVisitorOpened => 'When a guest opens the gate';
+
+  @override
+  String get notifSettingAnnouncements => 'Announcements';
+
+  @override
+  String get notifSettingsHint =>
+      'A switched-off notification is not pushed to your phone but still appears in your notifications list. Subscription reminders always arrive.';
+
+  @override
+  String get notifSettingsError =>
+      'Could not save the setting. Please try again.';
 }

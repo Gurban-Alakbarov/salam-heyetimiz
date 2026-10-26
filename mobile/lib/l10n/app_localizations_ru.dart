@@ -1255,4 +1255,21 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteAccountConfirm => 'Удалить навсегда';
+
+  @override
+  String get notifSettingsHeader => 'Уведомления';
+
+  @override
+  String get notifSettingVisitorOpened => 'Когда гость открывает ворота';
+
+  @override
+  String get notifSettingAnnouncements => 'Объявления';
+
+  @override
+  String get notifSettingsHint =>
+      'Отключённое уведомление не приходит на телефон, но видно в списке уведомлений. Напоминания о подписке приходят всегда.';
+
+  @override
+  String get notifSettingsError =>
+      'Не удалось сохранить настройку. Попробуйте ещё раз.';
 }

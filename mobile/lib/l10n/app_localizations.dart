@@ -2397,6 +2397,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete permanently'**
   String get deleteAccountConfirm;
+
+  /// No description provided for @notifSettingsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifSettingsHeader;
+
+  /// No description provided for @notifSettingVisitorOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'When a guest opens the gate'**
+  String get notifSettingVisitorOpened;
+
+  /// No description provided for @notifSettingAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements'**
+  String get notifSettingAnnouncements;
+
+  /// No description provided for @notifSettingsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A switched-off notification is not pushed to your phone but still appears in your notifications list. Subscription reminders always arrive.'**
+  String get notifSettingsHint;
+
+  /// No description provided for @notifSettingsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the setting. Please try again.'**
+  String get notifSettingsError;
 }
 
 class _AppLocalizationsDelegate

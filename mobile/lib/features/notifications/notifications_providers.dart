@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/providers.dart';
 import '../../core/error/retry_policy.dart';
 import 'data/datasource/notification_remote_datasource.dart';
+import 'data/notification_settings_datasource.dart';
 import 'data/push_messaging_service.dart';
 import 'data/push_token_datasource.dart';
 import 'data/repository_impl.dart';
@@ -114,5 +115,41 @@ class NotificationInboxNotifier extends AsyncNotifier<NotificationInboxState> {
       ),
     );
     await _repo.markAllRead();
+  }
+}
+
+// ---- O13: notification switches ---------------------------------------------
+
+final notificationSettingsDataSourceProvider = Provider<NotificationSettingsDataSource>(
+  (ref) => NotificationSettingsDataSource(ref.watch(apiClientProvider)),
+);
+
+/// The user's switchable notifications (Settings › Notifications). A toggle is applied optimistically and
+/// rolled back if the server refuses; the caller shows the error.
+final notificationSettingsProvider =
+    AsyncNotifierProvider.autoDispose<NotificationSettingsNotifier, List<NotificationSetting>>(
+      NotificationSettingsNotifier.new,
+    );
+
+class NotificationSettingsNotifier extends AsyncNotifier<List<NotificationSetting>> {
+  NotificationSettingsDataSource get _source => ref.read(notificationSettingsDataSourceProvider);
+
+  @override
+  Future<List<NotificationSetting>> build() => _source.load();
+
+  /// Returns false when the server refused (the switch is put back).
+  Future<bool> setPush(String templateKey, bool enabled) async {
+    final previous = state.value;
+    if (previous == null) return false;
+    state = AsyncValue.data([
+      for (final s in previous) s.templateKey == templateKey ? s.copyWith(pushEnabled: enabled) : s,
+    ]);
+    try {
+      state = AsyncValue.data(await _source.setPush(templateKey, enabled));
+      return true;
+    } catch (_) {
+      state = AsyncValue.data(previous);
+      return false;
+    }
   }
 }

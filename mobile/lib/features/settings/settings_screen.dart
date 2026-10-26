@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/design_system/components/app_list.dart';
+import 'package:salam_mobile/design_system/components/app_inputs.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/door_widget/door_widget_providers.dart';
+import 'package:salam_mobile/features/notifications/data/notification_settings_datasource.dart';
+import 'package:salam_mobile/features/notifications/notifications_providers.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 
 /// App settings — reached from Profile › App settings. Live theme-mode +
@@ -71,6 +74,10 @@ class SettingsScreen extends ConsumerWidget {
                 _LangTile(code: 'system', label: 'System', current: currentLang),
               ],
             ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Notifications (O13) ──────────────────────────────────────────
+            const _NotificationSwitches(),
           ],
         ),
       ),
@@ -106,6 +113,58 @@ class _LangTile extends ConsumerWidget {
             .read(doorWidgetServiceProvider)
             .setLocale(locale?.languageCode ?? 'az');
       },
+    );
+  }
+}
+
+/// O13 — the notifications a user may keep off the phone (visitor opens, announcements). Off = no push; the
+/// inbox still lists them. Hidden while loading / when the server lists none; a failed save is rolled back.
+class _NotificationSwitches extends ConsumerWidget {
+  const _NotificationSwitches();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final settings = ref.watch(notificationSettingsProvider).value ?? const <NotificationSetting>[];
+    if (settings.isEmpty) return const SizedBox.shrink();
+
+    String labelFor(String key) => switch (key) {
+      'device.opened' => l.notifSettingVisitorOpened,
+      'system.admin_campaign' => l.notifSettingAnnouncements,
+      _ => key,
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppListSection(
+          header: l.notifSettingsHeader,
+          children: [
+            for (final s in settings)
+              AppListTile(
+                icon: s.templateKey == 'device.opened'
+                    ? Icons.door_front_door_outlined
+                    : Icons.campaign_outlined,
+                title: labelFor(s.templateKey),
+                trailing: Switch(
+                  value: s.pushEnabled,
+                  onChanged: (v) async {
+                    final ok = await ref
+                        .read(notificationSettingsProvider.notifier)
+                        .setPush(s.templateKey, v);
+                    if (!ok && context.mounted) {
+                      AppSnackBar.show(context, l.notifSettingsError, isError: true);
+                    }
+                  },
+                ),
+              ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
+          child: Text(l.notifSettingsHint, style: Theme.of(context).textTheme.bodySmall),
+        ),
+      ],
     );
   }
 }

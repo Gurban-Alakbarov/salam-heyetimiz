@@ -485,5 +485,10 @@
   "deleteAccount": "Delete account",
   "deleteAccountTitle": "Delete your account?",
   "deleteAccountBody": "Your account and personal data (name, phone, email) will be permanently deleted. Your access to every device ends, active subscriptions are cancelled (no refund), and the access you gave your family members is removed. This cannot be undone.",
-  "deleteAccountConfirm": "Delete permanently"
+  "deleteAccountConfirm": "Delete permanently",
+  "notifSettingsHeader": "Notifications",
+  "notifSettingVisitorOpened": "When a guest opens the gate",
+  "notifSettingAnnouncements": "Announcements",
+  "notifSettingsHint": "A switched-off notification is not pushed to your phone but still appears in your notifications list. Subscription reminders always arrive.",
+  "notifSettingsError": "Could not save the setting. Please try again."
 }

@@ -549,6 +549,7 @@ void main() {
                     label: 'Sinam Giriş',
                     status: 'active',
                     canOpen: true,
+                    canShareVisitorLink: true,
                     lastOnlineAt: DateTime.now(),
                   ),
                 ),
@@ -590,4 +591,34 @@ void main() {
       expect(visited, ['/family?device=7']);
     },
   );
+
+  testWidgets('A4 — a family member sees no "Dəvət et" (may open, never share)', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('az'),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: DeviceCard(
+                device: Device(
+                  id: 8,
+                  label: 'Ailə Girişi',
+                  status: 'active',
+                  canOpen: true,
+                  viaFamily: true,
+                  lastOnlineAt: DateTime.now(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('device-invite-8')), findsNothing);
+    expect(find.byKey(const Key('device-directions-8')), findsOneWidget);
+  });
 }

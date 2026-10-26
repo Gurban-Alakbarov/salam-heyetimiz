@@ -20,6 +20,10 @@ abstract class Device with _$Device {
     @Default('user') String role,
     @Default(false) bool canOpen,
     @Default('none') String suspensionReason,
+    // A4 — a family member may open but never share access as a visitor link (BR-19); the server says
+    // whether this caller may create visitor links on this device.
+    @Default(false) bool viaFamily,
+    @Default(false) bool canShareVisitorLink,
     double? latitude,
     double? longitude,
     // GEOFENCE-3 — when true the app must attach the caller's GPS to /open (the

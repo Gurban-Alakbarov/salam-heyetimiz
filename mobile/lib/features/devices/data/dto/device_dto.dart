@@ -17,6 +17,9 @@ abstract class DeviceDto with _$DeviceDto {
     String? role,
     bool? canOpen,
     String? suspensionReason,
+    // A4 — access through a family head (may open, never share) / may create visitor links.
+    bool? viaFamily,
+    bool? canShareVisitorLink,
     double? latitude,
     double? longitude,
     bool? geofenceEnabled,

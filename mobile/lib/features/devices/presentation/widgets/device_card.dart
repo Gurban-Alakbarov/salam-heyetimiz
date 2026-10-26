@@ -368,6 +368,8 @@ class _InfoRow extends StatelessWidget {
 }
 
 /// "Dəvət et | Yol göstər" — the existing visitor-invite sheet and directions, as white text actions.
+/// A4 — "Dəvət et" only when the server says this caller may create visitor links here: a family member
+/// may open but never share access (BR-19), and nobody can share access they do not hold right now.
 class _ActionRow extends StatelessWidget {
   const _ActionRow({required this.device});
 
@@ -380,25 +382,27 @@ class _ActionRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: _CardAction(
-              key: Key('device-invite-${device.id}'),
-              icon: Icons.person_add_alt_1_outlined,
-              label: l.inviteVisitor,
-              onTap: () => InviteVisitorSheet.show(
-                context,
-                deviceId: device.id,
-                barrierLabel: device.label,
+          if (device.canShareVisitorLink) ...[
+            Expanded(
+              child: _CardAction(
+                key: Key('device-invite-${device.id}'),
+                icon: Icons.person_add_alt_1_outlined,
+                label: l.inviteVisitor,
+                onTap: () => InviteVisitorSheet.show(
+                  context,
+                  deviceId: device.id,
+                  barrierLabel: device.label,
+                ),
               ),
             ),
-          ),
-          const VerticalDivider(
-            width: 1,
-            thickness: 1,
-            color: Color(0x55FFFFFF),
-            indent: 6,
-            endIndent: 6,
-          ),
+            const VerticalDivider(
+              width: 1,
+              thickness: 1,
+              color: Color(0x55FFFFFF),
+              indent: 6,
+              endIndent: 6,
+            ),
+          ],
           Expanded(
             child: _CardAction(
               key: Key('device-directions-${device.id}'),

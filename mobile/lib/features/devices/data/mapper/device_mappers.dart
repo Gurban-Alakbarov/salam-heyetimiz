@@ -14,6 +14,9 @@ Device deviceDtoToEntity(DeviceDto d) => Device(
   role: d.role ?? 'user',
   canOpen: d.canOpen ?? false,
   suspensionReason: d.suspensionReason ?? 'none',
+  viaFamily: d.viaFamily ?? false,
+  // An older server sends no flag: fall back to the old behaviour (share when the caller can open).
+  canShareVisitorLink: d.canShareVisitorLink ?? ((d.canOpen ?? false) && !(d.viaFamily ?? false)),
   latitude: d.latitude,
   longitude: d.longitude,
   geofenceEnabled: d.geofenceEnabled ?? false,

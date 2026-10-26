@@ -14,10 +14,12 @@ use App\Domain\Payments\Events\OrderPartiallyRefunded;
 use App\Domain\Payments\Events\OrderRefundRequested;
 use App\Domain\Payments\Events\OrderRefunded;
 use App\Domain\Payments\Exceptions\OrderNotRefundableException;
+use App\Domain\Payments\Exceptions\RefundIdempotencyMismatchException;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Models\Refund;
 use App\Domain\Payments\Support\PaymentSettings;
 use App\Support\Time\Clock;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -35,20 +37,61 @@ final class RefundService
         private readonly AuditLogger $audit,
     ) {}
 
-    public function request(Order $order, RefundRequestData $data, AdminUser $admin): Refund
+    /**
+     * O5 — idempotent per (admin, Idempotency-Key): a retry (double click, network retry) gets back the refund
+     * the first call created (`wasRecentlyCreated` false) instead of a second one; the same key for another
+     * order or amount is a 409. The order row is locked and refunds still in flight count against what is
+     * refundable, so two different requests can never together refund more than was captured.
+     */
+    public function request(Order $order, RefundRequestData $data, AdminUser $admin, ?string $idempotencyKey = null): Refund
     {
-        $this->assertRefundable($order, $data->amountMinor);
+        try {
+            return DB::transaction(function () use ($order, $data, $admin, $idempotencyKey): Refund {
+                /** @var Order $locked */
+                $locked = Order::query()->whereKey($order->getKey())->lockForUpdate()->firstOrFail();
 
-        $refund = $order->refunds()->create([
-            'amount_minor' => $data->amountMinor,
-            'reason' => $data->reason,
-            'status' => RefundStatus::Requested,
-            'requested_by_admin_id' => $admin->getKey(),
-        ]);
+                $existing = $this->byIdempotencyKey($admin, $idempotencyKey);
+                if ($existing !== null) {
+                    return $this->replay($existing, $locked, $data);
+                }
 
-        OrderRefundRequested::dispatch($refund);
+                $this->assertRefundable($locked, $data->amountMinor, countInFlight: true);
 
-        return $refund;
+                $refund = $locked->refunds()->create([
+                    'amount_minor' => $data->amountMinor,
+                    'reason' => $data->reason,
+                    'status' => RefundStatus::Requested,
+                    'requested_by_admin_id' => $admin->getKey(),
+                    'idempotency_key' => $idempotencyKey,
+                ]);
+
+                OrderRefundRequested::dispatch($refund);
+
+                return $refund;
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            // The same key raced in for another order (that order's lock did not serialise it): replay or 409.
+            $existing = $this->byIdempotencyKey($admin, $idempotencyKey) ?? throw $e;
+
+            return $this->replay($existing, $order, $data);
+        }
+    }
+
+    private function byIdempotencyKey(AdminUser $admin, ?string $key): ?Refund
+    {
+        return $key === null ? null : Refund::query()
+            ->where('requested_by_admin_id', $admin->getKey())
+            ->where('idempotency_key', $key)
+            ->first();
+    }
+
+    private function replay(Refund $existing, Order $order, RefundRequestData $data): Refund
+    {
+        if ((int) $existing->order_id !== (int) $order->getKey() || (int) $existing->amount_minor !== $data->amountMinor) {
+            throw new RefundIdempotencyMismatchException;
+        }
+
+        return $existing;
     }
 
     public function executeApprovedRefund(Refund $refund): void
@@ -137,7 +180,8 @@ final class RefundService
         ]);
     }
 
-    private function assertRefundable(Order $order, int $amountMinor): void
+    /** @param  bool  $countInFlight  at request time, refunds not yet settled (requested / processing) are already spoken for */
+    private function assertRefundable(Order $order, int $amountMinor, bool $countInFlight = false): void
     {
         if (! $order->status->isPaidLike()) {
             throw new OrderNotRefundableException(
@@ -147,6 +191,11 @@ final class RefundService
         }
 
         $net = $order->netCapturedMinor();
+        if ($countInFlight) {
+            $net -= (int) $order->refunds()
+                ->whereIn('status', [RefundStatus::Requested->value, RefundStatus::Processing->value])
+                ->sum('amount_minor');
+        }
         if ($amountMinor > $net) {
             throw new OrderNotRefundableException(
                 'Refund amount exceeds the net captured amount.',

@@ -2174,7 +2174,13 @@ paths:
       summary: Initiate a refund against an order
       operationId: adminRefundOrder
       security: [{ adminBearerAuth: [] }]
-      x-authorization: super_admin
+      x-authorization: refunds.create (finance, super_admin)
+      description: |
+        O5 — the Idempotency-Key is enforced per admin: repeating the request with the same key returns the
+        refund the first call created (**200**, header `Idempotent-Replayed: true`) and refunds nothing again;
+        the same key for another order or amount is **409** `idempotency_mismatch`. Refunds still in flight
+        (requested / processing) count against the refundable amount, so concurrent requests cannot together
+        refund more than was captured.
       parameters: [{ $ref: '#/components/parameters/IdempotencyKeyRequired' }]
       requestBody:
         required: true
@@ -2198,8 +2204,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Refund' }
+        '200':
+          description: Idempotent replay — the refund an earlier request with this key created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Refund' }
         '409':
-          description: Order not refundable in current state
+          description: Order not refundable in current state (`order_not_refundable`), or the key was reused for another order / amount (`idempotency_mismatch`)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }

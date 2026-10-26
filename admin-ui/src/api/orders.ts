@@ -45,11 +45,15 @@ export interface RefundOrderInput {
   reason: string
 }
 
+/**
+ * O5 — one Idempotency-Key per refund dialog session: a double click or retry re-sends the same key and the
+ * server answers with the refund it already created instead of refunding twice.
+ */
 export function useRefundOrder(id: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (input: RefundOrderInput) => {
-      await api.post(`/admin/v1/orders/${id}/refund`, input)
+    mutationFn: async ({ input, idempotencyKey }: { input: RefundOrderInput; idempotencyKey: string }) => {
+      await api.post(`/admin/v1/orders/${id}/refund`, input, { headers: { 'Idempotency-Key': idempotencyKey } })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['order', id] })

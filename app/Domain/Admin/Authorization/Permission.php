@@ -101,6 +101,9 @@ final class Permission
 
     public const RESIDENTS_DELETE = 'residents.delete';
 
+    // O10 — personal data of admin-deleted residents; no role holds it by default (super_admin only).
+    public const RESIDENTS_ARCHIVE_VIEW = 'residents.archive.view';
+
     // apartments
     public const APARTMENTS_VIEW = 'apartments.view';
 
@@ -197,6 +200,7 @@ final class Permission
             self::RESIDENTS_CREATE => ['group' => 'residents', 'label' => 'Sakin yarat'],
             self::RESIDENTS_UPDATE => ['group' => 'residents', 'label' => 'Sakin redaktə et'],
             self::RESIDENTS_DELETE => ['group' => 'residents', 'label' => 'Sakin sil'],
+            self::RESIDENTS_ARCHIVE_VIEW => ['group' => 'residents', 'label' => 'Silinmiş sakinlərin arxivini gör'],
 
             self::APARTMENTS_VIEW => ['group' => 'apartments', 'label' => 'Mənzilləri gör'],
             self::APARTMENTS_MANAGE => ['group' => 'apartments', 'label' => 'Mənzilləri idarə et'],

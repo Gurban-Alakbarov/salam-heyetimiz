@@ -34,7 +34,7 @@
 | Subscription list | `GET /subscriptions` | ✅ | cursor + filters |
 | Subscription details | — | ⛔ **no detail endpoint** | only the list row data is available (shown in a detail drawer from list data) |
 | Subscription status indicators | from list `status` | ✅ | |
-| Orders list / detail / recheck / refund | `GET /orders`, `/orders/{id}`, `POST /orders/{id}/recheck`, `/refund` | ✅ | refund = super_admin |
+| Orders list / detail / recheck / refund | `GET /orders`, `/orders/{id}`, `POST /orders/{id}/recheck`, `/refund` | ✅ | refund = refunds.create (finance + super_admin) |
 | Refunds list | `GET /refunds` | ✅ | |
 | **User Management** (user list, details, device/subscription assignments, phone search) | — | ⛔ **NOT DEPLOYED** | no `adminListUsers`/`adminGetUser` endpoints exist. **Not built** (would require mock data, which is forbidden). User data is visible only via Device → roster. Tracked as a backend dependency. |
 
@@ -74,7 +74,8 @@ in `ADMIN_UI_REVIEW.md` as backend dependencies. Everything ✅ is implemented e
 | `/account` | Current admin profile + recovery codes | protected | any admin |
 | `*` | 404 Not Found | — | — |
 
-Role-gated UI: action buttons (enable/disable/transfer/decommission/refund) render only for `super_admin`;
+Role-gated UI: action buttons (enable/disable/transfer/decommission) render only for `super_admin`; refund for
+`refunds.create` (finance + super_admin, O5);
 create/edit/resync for `technical`+`super`. Routes for `/devices/new` & `/edit` redirect non-privileged users.
 
 ## 4. Screen map (screen → endpoints)

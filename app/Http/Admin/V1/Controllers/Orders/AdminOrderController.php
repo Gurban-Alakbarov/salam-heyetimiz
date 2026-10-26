@@ -55,7 +55,7 @@ class AdminOrderController
         return new OrderDetailResource($order);
     }
 
-    /** POST /admin/v1/orders/{orderId}/refund — adminRefundOrder (refunds.create, Idempotency-Key) */
+    /** POST /admin/v1/orders/{orderId}/refund — adminRefundOrder (refunds.create: finance + super_admin; Idempotency-Key) */
     public function refund(RefundOrderRequest $request, int $orderId, RequestRefund $action, \App\Domain\Audit\Services\AuditLogger $audit): JsonResponse
     {
         $this->requirePermission($request, Permission::REFUNDS_CREATE);
@@ -67,7 +67,12 @@ class AdminOrderController
 
         $order = Order::query()->findOrFail($orderId);
 
-        $refund = $action->handle($order, $request->toData(), $request->user());
+        $refund = $action->handle($order, $request->toData(), $request->user(), mb_substr($key, 0, 100));
+
+        // O5 — a retry with the same key is answered with the original refund (200), never a second one.
+        if (! $refund->wasRecentlyCreated) {
+            return (new RefundResource($refund))->response()->setStatusCode(200)->header('Idempotent-Replayed', 'true');
+        }
 
         // Rich audit of the request (actor + ip + user-agent auto-captured by AuditLogger).
         $audit->record('refund.requested', [

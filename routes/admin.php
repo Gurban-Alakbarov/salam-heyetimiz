@@ -18,6 +18,7 @@ use App\Http\Admin\V1\Controllers\Notifications\NotificationTemplateAdminControl
 use App\Http\Admin\V1\Controllers\Orders\AdminOrderController;
 use App\Http\Admin\V1\Controllers\Payments\AdminPaymentLogController;
 use App\Http\Admin\V1\Controllers\Refunds\AdminRefundController;
+use App\Http\Admin\V1\Controllers\Residents\AdminResidentArchiveController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsTestController;
@@ -128,9 +129,12 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::get('subscriptions', [AdminSubscriptionController::class, 'index'])->name('adminListSubscriptions');
     Route::get('subscriptions/{id}', [AdminSubscriptionController::class, 'show'])->whereNumber('id')->name('adminGetSubscription');
 
-    // Residents directory (residents.view; complex_manager scoped) + account removal (residents.delete)
+    // Residents directory (residents.view; complex_manager scoped) + account removal (residents.delete;
+    // O10: a complex_manager's removal = from its complex only)
     Route::get('residents', [AdminResidentController::class, 'index'])->name('adminListResidents');
     Route::delete('residents/{userId}', [AdminResidentController::class, 'destroy'])->whereNumber('userId')->name('adminDeleteResident');
+    // O10 — archive of admin-deleted residents (residents.archive.view; super_admin unless granted)
+    Route::get('resident-archive', [AdminResidentArchiveController::class, 'index'])->name('adminListResidentArchive');
     // K1 — record the owner's email on a not-yet-verified account (residents.update)
     Route::put('residents/{userId}/email', [AdminResidentController::class, 'setEmail'])->whereNumber('userId')->name('adminSetResidentEmail');
 

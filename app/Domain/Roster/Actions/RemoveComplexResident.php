@@ -16,7 +16,9 @@ use App\Support\Enums\ActorKind;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Komendant removes a resident from their complex (IMPLEMENTATION_PLAN §12 / B5, BR-11, BR-18). In ONE
+ * Komendant removes a resident from their complex (IMPLEMENTATION_PLAN §12 / B5, BR-11, BR-18) — from the mobile
+ * app (by its linked user) or from the admin panel (O10: a complex_manager's "remove" there is this same action,
+ * never an account deletion; $byUser is then the manager's linked mobile account, if any). In ONE
  * transaction: membership → removed; on every complex-mode device of THAT complex, the resident's own roster
  * row and the rows they granted to family members are revoked (whitelist sync follows via the existing
  * RosterUserRemoved event); each live subscription on those rows is cancelled with no refund; audited.
@@ -33,7 +35,7 @@ final class RemoveComplexResident
         private readonly AuditLogger $audit,
     ) {}
 
-    public function handle(int $complexId, User $resident, User $byUser, AdminUser $byManager): ?array
+    public function handle(int $complexId, User $resident, ?User $byUser, AdminUser $byManager): ?array
     {
         if (! $this->memberships->isMember($complexId, (int) $resident->getKey())) {
             return null;
@@ -57,7 +59,7 @@ final class RemoveComplexResident
                 ->with(['device', 'user'])
                 ->get();
 
-            $audit = ['complex_id' => $complexId, 'removed_user_id' => (int) $resident->getKey(), 'by_user_id' => (int) $byUser->getKey(), 'by_admin_id' => (int) $byManager->getKey()];
+            $audit = ['complex_id' => $complexId, 'removed_user_id' => (int) $resident->getKey(), 'by_user_id' => $byUser !== null ? (int) $byUser->getKey() : null, 'by_admin_id' => (int) $byManager->getKey()];
             $cancelled = 0;
 
             foreach ($rows as $row) {

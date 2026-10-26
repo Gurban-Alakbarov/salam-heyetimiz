@@ -3,7 +3,9 @@
 namespace App\Http\Admin\V1\Controllers\Residents;
 
 use App\Domain\Admin\Authorization\Permission;
+use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Roster\Actions\DeleteResident;
+use App\Domain\Roster\Actions\RemoveComplexResident;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Roster\Queries\ResidentQuery;
@@ -77,18 +79,32 @@ class AdminResidentController
     /**
      * DELETE /admin/v1/residents/{userId} — adminDeleteResident (residents.delete).
      *
-     * Removes the resident from the SYSTEM: every roster membership is revoked (each device is
-     * de-whitelisted), entitlements are cancelled, sessions killed, account soft-deleted. Refuses with
-     * 409 while the resident still owns a device. A complex_manager may only delete a resident whose
-     * active memberships all sit inside its own complex.
+     * Global admin: removes the resident from the SYSTEM — every roster membership is revoked (each device is
+     * de-whitelisted), entitlements are cancelled, sessions killed, the account is archived (O10,
+     * resident_archives) and then anonymised + soft-deleted. 204. Refuses with 409 while it still owns a device.
+     *
+     * complex_manager (O10): removes the resident from ITS complex only — exactly what the Komendant does in the
+     * app (RemoveComplexResident); the account and its other homes stay. 200 with what was revoked; 404 when
+     * the user is not a member of that complex.
      */
-    public function destroy(Request $request, int $userId, DeleteResident $action): JsonResponse
+    public function destroy(Request $request, int $userId, DeleteResident $action, RemoveComplexResident $removeFromComplex): JsonResponse
     {
         $this->requirePermission($request, Permission::RESIDENTS_DELETE);
 
         /** @var User $user */
         $user = User::query()->findOrFail($userId);
-        $this->assertResidentInScope($request, $userId);
+
+        $scopeComplexId = $this->complexScopeId($request);
+        if ($scopeComplexId !== null) {
+            /** @var AdminUser $manager */
+            $manager = $request->user();
+            $linkedUserId = AdminUser::query()->whereKey($manager->getKey())->value('user_id'); // B5 mobile link, if any
+            $byUser = $linkedUserId !== null ? User::query()->find($linkedUserId) : null;
+            $result = $removeFromComplex->handle($scopeComplexId, $user, $byUser, $manager);
+            abort_if($result === null, 404);
+
+            return response()->json(['data' => ['removed_from' => 'complex', 'complex_id' => $scopeComplexId] + $result]);
+        }
 
         $action->handle($user, $request->user());
 

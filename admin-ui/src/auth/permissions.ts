@@ -21,6 +21,7 @@ export const PERM = {
   residentsCreate: 'residents.create',
   residentsUpdate: 'residents.update',
   residentsDelete: 'residents.delete',
+  residentsArchiveView: 'residents.archive.view',
   ordersView: 'orders.view',
   paymentsView: 'payments.view',
   refundsView: 'refunds.view',

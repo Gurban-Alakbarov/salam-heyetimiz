@@ -1507,25 +1507,99 @@ paths:
   /admin/residents/{userId}:
     delete:
       tags: [Admin / Residents]
-      summary: Delete a resident account
+      summary: Delete a resident account (complex_manager — remove from its complex)
       operationId: adminDeleteResident
       security: [{ adminBearerAuth: [] }]
       description: |
-        Requires `residents.delete`. A `complex_manager` gets **403** when the resident has active roster rows on
-        devices outside its complex. **409** `resident_owns_device` when the user still owns a device.
-        Y7 — the same removal as `DELETE /v1/me` (incl. the family it heads, memberships, invitations, Komendant
-        link), and the personal data is erased at once (phone → `del:<id>`, email / name / IP / push tokens → null),
-        so the phone and email can register again.
+        Requires `residents.delete`.
+
+        **Global admin** — deletes the account from the system: **204**. **409** `resident_owns_device` when the
+        user still owns a device. Y7 — the same removal as `DELETE /v1/me` (incl. the family it heads,
+        memberships, invitations, Komendant link). O10 — the personal data and a snapshot of what the account had
+        (devices, roles, subscriptions, complexes, family) are first copied to the resident archive
+        (`GET /admin/v1/resident-archive`, kept 5 years), then the account is anonymised (phone → `del:<id>`,
+        email / name / IP / push tokens → null) so the phone and email can register again.
+
+        **complex_manager** (O10) — removes the resident from ITS complex only, exactly like the Komendant app
+        (`DELETE /v1/komendant/residents/{userId}`): complex membership ends, the resident's rows (and the family
+        rows they granted) on the complex's complex-mode devices are revoked and their subscriptions cancelled.
+        The account and its private devices stay; nothing is archived. **200** with what was revoked; **404**
+        when the user is not a member of that complex.
       parameters:
         - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
       responses:
-        '204': { description: Deleted }
+        '204': { description: Deleted from the system (global admin) }
+        '200':
+          description: Removed from the complex_manager's complex (the account stays)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      removed_from: { type: string, enum: [complex] }
+                      complex_id: { type: integer }
+                      revoked_rows: { type: integer }
+                      cancelled_subscriptions: { type: integer }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: '`resident_owns_device`'
           content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  /admin/resident-archive:
+    get:
+      tags: [Admin / Residents]
+      summary: Archive of residents an admin deleted (O10)
+      operationId: adminListResidentArchive
+      security: [{ adminBearerAuth: [] }]
+      description: |
+        Requires `residents.archive.view` (super_admin; no other role holds it by default). Each row is the
+        personal data of an account as it was when an admin deleted it, who deleted it, and a snapshot of its
+        devices (role, complex, family grant, latest subscription), complexes and family. Rows are deleted
+        automatically after 5 years (`purge_after`, daily `residents:purge-archive`). Accounts their owners
+        deleted from the app (`DELETE /v1/me`) are never archived. Newest first.
+      parameters:
+        - { in: query, name: q, schema: { type: string }, description: 'Phone, email or name (substring), or the user id' }
+        - { in: query, name: cursor, schema: { type: string } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        user_id: { type: integer }
+                        full_name: { type: [string, 'null'] }
+                        phone: { type: [string, 'null'] }
+                        email: { type: [string, 'null'] }
+                        account_type: { type: [string, 'null'] }
+                        registered_at: { type: [string, 'null'], format: date-time }
+                        last_login_at: { type: [string, 'null'], format: date-time }
+                        reason: { type: string, enum: [admin_deleted, legacy_deleted] }
+                        deleted_by:
+                          type: [object, 'null']
+                          properties:
+                            id: { type: integer }
+                            email: { type: string }
+                            name: { type: string }
+                        archived_at: { type: string, format: date-time }
+                        purge_after: { type: string, format: date-time }
+                        snapshot: { type: [object, 'null'], additionalProperties: true }
+                  page: { $ref: '#/components/schemas/PageInfo' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /admin/residents/{userId}/email:
     put:

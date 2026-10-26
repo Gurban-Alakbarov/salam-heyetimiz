@@ -17,6 +17,7 @@ use App\Domain\Roster\Models\Invitation;
 use App\Domain\Roster\Services\ComplexMembershipService;
 use App\Domain\Roster\Services\FamilyService;
 use App\Domain\Roster\Services\InvitationService;
+use App\Domain\Roster\Services\ResidentArchiver;
 use App\Domain\Roster\Services\RosterService;
 use App\Domain\Subscriptions\Enums\SubscriptionStatus;
 use App\Domain\Subscriptions\Models\Subscription;
@@ -45,6 +46,10 @@ use Illuminate\Support\Facades\DB;
  * granted through it — removed_by_family_head), its own family / complex memberships, its pending family
  * invitations, and a Komendant (admin) link.
  *
+ * O10 — an ADMIN deletion is not lost: before anything is taken away the account's personal data and what it had
+ * (devices, roles, subscriptions, complexes, family) are copied to resident_archives (ResidentArchiver), kept
+ * privacy.resident_archive_years. A self-service deletion (Y7) is NOT archived — it stays erased, as promised.
+ *
  * Refuses (409) while the account still OWNS a device: deleting it would orphan that barrier, so the device
  * is transferred or decommissioned first (admin: resident_owns_device; self-service: successor_required).
  */
@@ -57,6 +62,7 @@ final class DeleteResident
         private readonly ComplexMembershipService $memberships,
         private readonly InvitationService $invitations,
         private readonly AccountAnonymiser $anonymiser,
+        private readonly ResidentArchiver $archiver,
         private readonly AuditLogger $audit,
         private readonly Clock $clock,
     ) {}
@@ -73,6 +79,10 @@ final class DeleteResident
         $byUser = $selfService ? $user : null;
 
         DB::transaction(function () use ($user, $admin, $adminId, $byUser, $selfService): void {
+            if (! $selfService) {
+                $this->archiver->archive($user, $admin); // O10 — first, while the access it had is still in place
+            }
+
             // The family this account heads: members lose the access granted through it (cancelled, no refund).
             $headed = FamilyLink::query()->with('member')
                 ->where('head_user_id', $user->getKey())

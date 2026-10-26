@@ -55,8 +55,9 @@ export function useSetResidentEmail() {
 }
 
 /**
- * Delete a resident from the SYSTEM (residents.delete): revokes every roster membership, cancels
- * entitlements, kills sessions and soft-deletes the account. 409 while they still own a device.
+ * residents.delete — a global admin deletes the account from the SYSTEM (roster revoked, entitlements cancelled,
+ * sessions killed; archived for 5 years, then anonymised — 204; 409 while it still owns a device). A
+ * complex_manager's call only removes the resident from ITS complex (O10) — 200 with what was revoked.
  */
 export function useDeleteResident() {
   const qc = useQueryClient()
@@ -67,6 +68,48 @@ export function useDeleteResident() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['residents'] })
       void qc.invalidateQueries({ queryKey: ['devices'] })
+      void qc.invalidateQueries({ queryKey: ['resident-archive'] })
     },
+  })
+}
+
+/** O10 — a resident an admin deleted from the system, as archived (residents.archive.view). */
+export interface ResidentArchiveEntry {
+  id: number
+  user_id: number
+  full_name: string | null
+  phone: string | null
+  email: string | null
+  account_type: string | null
+  registered_at: string | null
+  last_login_at: string | null
+  reason: 'admin_deleted' | 'legacy_deleted' | string
+  deleted_by: { id: number; email: string; name: string } | null
+  archived_at: string
+  purge_after: string
+  snapshot: {
+    devices?: Array<{
+      device_id: number
+      serial: string | null
+      label: string | null
+      ownership_mode: string | null
+      complex: { id: number; name: string | null } | null
+      role: string
+      via_family: boolean
+      since: string | null
+      subscription: { id: number; tier: string; status: string; starts_at: string | null; ends_at: string | null } | null
+    }>
+    complexes?: Array<{ id: number; name: string | null }>
+    family?: { head_of_member_ids: number[]; member_of_head_ids: number[] }
+  } | null
+}
+
+export function useResidentArchive(params: { q?: string; cursor?: string | null }, enabled = true) {
+  return useQuery({
+    queryKey: ['resident-archive', params],
+    queryFn: async () =>
+      (await api.get<Paginated<ResidentArchiveEntry>>('/admin/v1/resident-archive', { params: cleanParams({ ...params }) })).data,
+    placeholderData: keepPreviousData,
+    enabled,
   })
 }

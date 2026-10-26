@@ -324,7 +324,7 @@ The deployed schema defines exactly **two** admin roles:
 
 | Role | Scope |
 |---|---|
-| `super_admin` | Full admin access — all device lifecycle actions, refunds, transfers, settings. |
+| `super_admin` | Full admin access — all device lifecycle actions, refunds, transfers, settings. Refunds are also open to `finance` (O5). |
 | `technical` | Devices module + read-only on most other resources; can create devices and resync whitelists. |
 
 > ⚠️ **`support` and `finance` roles are NOT in the deployed contract.** The `AdminUser.role` enum is `[super_admin, technical]` only. If a product spec mentions `support`/`finance`, treat those as **planned** and confirm with the backend before building UI around them. Do **not** invent role strings.
@@ -342,10 +342,10 @@ For implemented endpoints, the spec annotates these authorization requirements:
 | Create device | `POST /devices` | `technical` or `super_admin` |
 | Update device | `PATCH /devices/{id}` | `technical` or `super_admin` |
 | Resync whitelist | `POST /devices/{id}/whitelist/resync` | `technical` or `super_admin` |
-| Refund order | `POST /orders/{id}/refund` | **`super_admin`** *(spec `x-authorization`)* |
+| Refund order | `POST /orders/{id}/refund` | **`refunds.create`** — `finance` + `super_admin` (O5, 2026-10-27); Idempotency-Key enforced |
 | Recheck order (admin) | `POST /orders/{id}/recheck` | **`super_admin`** *(spec `x-authorization`)* |
 
-> **On refunds:** the prompt's product model describes refunds as "finance/super". The **deployed spec** gates `adminRefundOrder` to `super_admin`. Since `finance` is not a deployed role, treat refunds as **`super_admin`** for now — **role-gated; confirm exact role** with the backend if a `finance` role is later added.
+> **On refunds (decided 2026-10-27, O5):** refunds are gated by the `refunds.create` permission, held by **`finance`** and **`super_admin`** — finance works the "refund required" list (K3) itself. Every request carries an Idempotency-Key (one per refund dialog); a retry with the same key gets the original refund back (200) instead of a second one.
 >
 > Read-only list/detail endpoints (`GET /devices`, `GET /orders`, `GET /subscriptions`, `GET /refunds`, command/diagnostics/whitelist reads) carry no `x-authorization` restriction in the spec → available to any authenticated admin. **Confirm with backend** whether `technical` is further read-scoped in practice.
 

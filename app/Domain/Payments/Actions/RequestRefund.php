@@ -13,11 +13,14 @@ final class RequestRefund
 {
     public function __construct(private readonly RefundService $refunds) {}
 
-    public function handle(Order $order, RefundRequestData $data, AdminUser $admin): Refund
+    /** A replay of an earlier request (same admin + Idempotency-Key) returns that refund and queues nothing new. */
+    public function handle(Order $order, RefundRequestData $data, AdminUser $admin, ?string $idempotencyKey = null): Refund
     {
-        $refund = $this->refunds->request($order, $data, $admin);
+        $refund = $this->refunds->request($order, $data, $admin, $idempotencyKey);
 
-        ApplyRefundJob::dispatch($refund->id);
+        if ($refund->wasRecentlyCreated) {
+            ApplyRefundJob::dispatch($refund->id);
+        }
 
         return $refund;
     }

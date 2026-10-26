@@ -147,6 +147,7 @@ export function OrderDetailPage() {
   const recheck = useRecheckOrder(orderId)
   const refund = useRefundOrder(orderId)
   const [refundOpen, setRefundOpen] = useState(false)
+  const [refundKey, setRefundKey] = useState(() => crypto.randomUUID())
 
   const onRecheck = () => {
     recheck.mutate(undefined, {
@@ -182,7 +183,13 @@ export function OrderDetailPage() {
               </Button>
               {(order.status === 'paid' || order.status === 'partially_refunded') && (
                 <PermissionGate anyOf={[PERM.refundsCreate]}>
-                  <Button variant="destructive" onClick={() => setRefundOpen(true)}>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setRefundKey(crypto.randomUUID()) // a new refund = a new key; retries inside the dialog reuse it
+                      setRefundOpen(true)
+                    }}
+                  >
                     <Undo2 className="h-4 w-4" />
                     Geri qaytar
                   </Button>
@@ -264,7 +271,7 @@ export function OrderDetailPage() {
             loading={refund.isPending}
             error={refund.error instanceof ApiError ? refund.error.message : undefined}
             onSubmit={(payload) =>
-              refund.mutate(payload, {
+              refund.mutate({ input: payload, idempotencyKey: refundKey }, {
                 onSuccess: () => {
                   toast({ variant: 'success', title: 'Geri qaytarma sorğulandı' })
                   setRefundOpen(false)

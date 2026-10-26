@@ -3,6 +3,8 @@
 namespace App\Console\Commands\Users;
 
 use App\Domain\Audit\Services\AuditLogger;
+use App\Domain\Roster\Services\ResidentArchiver;
+use App\Domain\Users\Models\ResidentArchive;
 use App\Domain\Users\Models\User;
 use App\Domain\Users\Services\AccountAnonymiser;
 use Illuminate\Console\Command;
@@ -11,6 +13,7 @@ use Illuminate\Console\Command;
  * Y3 / Y7 backfill — accounts soft-deleted BEFORE deletion anonymised them still hold their phone / email /
  * name; the unique indexes then keep that phone and email from ever registering again (500 on register).
  * Anonymises every such row (idempotent — already anonymised rows are skipped). Run once on deploy.
+ * O10 — those were admin deletions (self-service deletion anonymises at once), so each is archived first.
  */
 class AnonymiseDeletedUsersCommand extends Command
 {
@@ -18,7 +21,7 @@ class AnonymiseDeletedUsersCommand extends Command
 
     protected $description = 'Erase personal data of soft-deleted accounts that still hold it (Y3/Y7 backfill)';
 
-    public function handle(AccountAnonymiser $anonymiser, AuditLogger $audit): int
+    public function handle(AccountAnonymiser $anonymiser, ResidentArchiver $archiver, AuditLogger $audit): int
     {
         $rows = User::onlyTrashed()
             ->where('phone', 'not like', AccountAnonymiser::PHONE_PREFIX.'%')
@@ -32,6 +35,7 @@ class AnonymiseDeletedUsersCommand extends Command
                 continue;
             }
 
+            $archiver->archive($user, null, ResidentArchive::REASON_LEGACY_DELETED);
             $hashes = $anonymiser->anonymise($user);
             $audit->record('user.anonymised_backfill', ['user_id' => (int) $user->id] + $hashes, User::class, (int) $user->id);
         }

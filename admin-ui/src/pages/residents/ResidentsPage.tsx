@@ -5,6 +5,7 @@ import { useComplexList } from '@/api/complexes'
 import { type Resident, useDeleteResident, useResidents, useSetResidentEmail } from '@/api/residents'
 import { ApiError } from '@/lib/api'
 import { PERM } from '@/auth/permissions'
+import { useAuth } from '@/auth/useAuth'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { CursorPagination } from '@/components/CursorPagination'
 import { PageHeader } from '@/components/PageHeader'
@@ -25,14 +26,41 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/components/ui/toast'
 import { formatDateTime } from '@/lib/format'
 import { useCursor } from '@/lib/useCursor'
 import type { DeviceUserRole } from '@/types/api'
+import { ResidentArchivePanel } from './ResidentArchivePanel'
 
 const roleLabels: Record<DeviceUserRole, string> = { owner: 'Sahib', user: 'İstifadəçi' }
 
 export function ResidentsPage() {
+  const { hasPermission } = useAuth()
+
+  return (
+    <div className="space-y-5">
+      <PageHeader title="Sakinlər" description="Bütün sakinlər — kompleks, cihaz statusu və abunəlik" />
+      {hasPermission(PERM.residentsArchiveView) ? (
+        <Tabs defaultValue="residents">
+          <TabsList>
+            <TabsTrigger value="residents">Sakinlər</TabsTrigger>
+            <TabsTrigger value="archive">Arxiv (silinənlər)</TabsTrigger>
+          </TabsList>
+          <TabsContent value="residents"><ResidentsDirectory /></TabsContent>
+          <TabsContent value="archive"><ResidentArchivePanel /></TabsContent>
+        </Tabs>
+      ) : (
+        <ResidentsDirectory />
+      )}
+    </div>
+  )
+}
+
+function ResidentsDirectory() {
+  const { hasRole } = useAuth()
+  // O10 — a complex_manager only removes a resident from its own complex; the account stays in the system.
+  const complexScoped = hasRole('complex_manager')
   const [q, setQ] = useState('')
   const [complexId, setComplexId] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Resident | null>(null)
@@ -51,8 +79,6 @@ export function ResidentsPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Sakinlər" description="Bütün sakinlər — kompleks, cihaz statusu və abunəlik" />
-
       <div className="flex flex-wrap gap-3">
         <div className="relative max-w-xs flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -136,8 +162,8 @@ export function ResidentsPage() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          aria-label="Sakini sistemdən sil"
-                          title="Sistemdən sil"
+                          aria-label={complexScoped ? 'Sakini kompleksdən çıxar' : 'Sakini sistemdən sil'}
+                          title={complexScoped ? 'Kompleksdən çıxar' : 'Sistemdən sil'}
                           onClick={() => setDeleteTarget(r)}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -165,20 +191,24 @@ export function ResidentsPage() {
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null)
         }}
-        title="Sakini sistemdən sil"
+        title={complexScoped ? 'Sakini kompleksdən çıxar' : 'Sakini sistemdən sil'}
         description={
-          `${deleteTarget?.email ?? deleteTarget?.phone_masked ?? ''} — hesab sistemdən silinəcək: bütün cihazlardan ` +
-          'çıxarılacaq (whitelist-dən də), abunəlikləri ləğv ediləcək və sessiyaları bağlanacaq. ' +
-          'Cihaz sahibi olan sakini silmək olmaz — əvvəlcə cihazı köçürün.'
+          complexScoped
+            ? `${deleteTarget?.email ?? deleteTarget?.phone_masked ?? ''} — sakin kompleksinizdən çıxarılacaq: ` +
+              'kompleksin cihazlarından (whitelist-dən də) çıxarılacaq və bu cihazlardakı abunəlikləri ləğv ediləcək. ' +
+              'Hesabı sistemdə qalır.'
+            : `${deleteTarget?.email ?? deleteTarget?.phone_masked ?? ''} — hesab sistemdən silinəcək: bütün cihazlardan ` +
+              'çıxarılacaq (whitelist-dən də), abunəlikləri ləğv ediləcək və sessiyaları bağlanacaq. ' +
+              'Məlumatları 5 il arxivdə saxlanılacaq. Cihaz sahibi olan sakini silmək olmaz — əvvəlcə cihazı köçürün.'
         }
-        confirmLabel="Sistemdən sil"
+        confirmLabel={complexScoped ? 'Kompleksdən çıxar' : 'Sistemdən sil'}
         confirmVariant="destructive"
         loading={deleteResident.isPending}
         onConfirm={() => {
           if (!deleteTarget) return
           deleteResident.mutate(deleteTarget.user_id, {
             onSuccess: () => {
-              toast({ variant: 'success', title: 'Sakin sistemdən silindi' })
+              toast({ variant: 'success', title: complexScoped ? 'Sakin kompleksdən çıxarıldı' : 'Sakin sistemdən silindi (arxivə köçürüldü)' })
               setDeleteTarget(null)
             },
             onError: (err) =>

@@ -11,6 +11,10 @@
 |    match a ghost by hash without the data being kept.
 | The phone and email are free to register again at once. There is no reactivation: once anonymised the
 | account cannot be restored (the reactivation window of the original spec is not implemented).
+|
+| O10 (2026-10-27) — an account an ADMIN deletes is first copied to `resident_archives` (personal data + what it
+| had: devices, roles, subscriptions, complexes, family), viewable with residents.archive.view and purged after
+| resident_archive_years by `residents:purge-archive` (daily). Self-service deletions are never archived.
 */
 return [
 
@@ -22,6 +26,9 @@ return [
 
     // Replacement for users.phone (+ the user id).
     'anonymised_prefix' => 'del:',
+
+    // O10 — how long an admin-deleted resident's archive row is kept before the daily purge removes it.
+    'resident_archive_years' => (int) env('RESIDENT_ARCHIVE_YEARS', 5),
 
     // Data-subject export link TTL (export not implemented yet).
     'export_url_ttl_hours' => 72,

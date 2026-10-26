@@ -70,3 +70,10 @@ Schedule::command('auth:prune')
     ->timezone($scheduleTimezone)
     ->withoutOverlapping()
     ->onOneServer();
+
+// O10 — archived (admin-deleted) residents past privacy.resident_archive_years are deleted.
+Schedule::command('residents:purge-archive')
+    ->dailyAt('03:30')
+    ->timezone($scheduleTimezone)
+    ->withoutOverlapping()
+    ->onOneServer();

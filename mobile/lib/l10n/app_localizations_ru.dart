@@ -1242,4 +1242,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get famRemoved => 'Член семьи удалён.';
+
+  @override
+  String get deleteAccount => 'Удалить аккаунт';
+
+  @override
+  String get deleteAccountTitle => 'Удалить аккаунт?';
+
+  @override
+  String get deleteAccountBody =>
+      'Ваш аккаунт и личные данные (имя, телефон, email) будут удалены навсегда. Доступ ко всем устройствам прекратится, активные подписки будут отменены (без возврата средств), доступ, выданный членам семьи, будет отозван. Это действие нельзя отменить.';
+
+  @override
+  String get deleteAccountConfirm => 'Удалить навсегда';
 }

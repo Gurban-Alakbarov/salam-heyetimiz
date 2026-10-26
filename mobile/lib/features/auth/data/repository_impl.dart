@@ -85,6 +85,13 @@ class AuthRepositoryImpl implements AuthRepository {
     return const Success(null);
   }
 
+  @override
+  Future<Result<void>> deleteAccount() async {
+    final result = await _guard(_remote.deleteAccount);
+    if (result.isSuccess) await _session.clear();
+    return result;
+  }
+
   OtpDispatch _otpFromMeta(Map<String, dynamic> meta) => OtpDispatch(
     expiresInSeconds: (meta['expires_in_seconds'] as num?)?.toInt() ?? 120,
     resendAvailableInSeconds:

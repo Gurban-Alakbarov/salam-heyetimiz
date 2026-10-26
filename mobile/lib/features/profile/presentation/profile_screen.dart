@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:salam_mobile/core/di/providers.dart';
+import 'package:salam_mobile/design_system/components/app_inputs.dart';
 import 'package:salam_mobile/design_system/components/app_list.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
 import 'package:salam_mobile/features/auth/domain/entity/auth_entities.dart';
+import 'package:salam_mobile/features/auth/presentation/failure_l10n.dart';
 import 'package:salam_mobile/features/auth/session_roles_provider.dart';
 import 'package:salam_mobile/features/door_widget/presentation/door_widget_management_screen.dart';
 import 'package:salam_mobile/features/notifications/presentation/notification_screen.dart';
@@ -139,6 +141,14 @@ class ProfileScreen extends ConsumerWidget {
               // authStateProvider flips to guest → the router redirects out.
               onTap: () => ref.read(logoutUseCaseProvider).call(),
             ),
+            // Y7 — account deletion must be reachable in-app (App Store / Google Play).
+            AppListTile(
+              key: const Key('profile-delete-account'),
+              icon: Icons.person_remove_outlined,
+              title: l.deleteAccount,
+              danger: true,
+              onTap: () => _confirmDeleteAccount(context, ref),
+            ),
           ],
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -156,6 +166,43 @@ class ProfileScreen extends ConsumerWidget {
 
   void _push(BuildContext context, Widget screen) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+  }
+
+  /// Y7 — explicit, irreversible: the consequences are spelled out before the
+  /// call. On success the session is cleared and the router leaves the shell; a
+  /// refusal (e.g. a device owner — `successor_required`) shows the server's
+  /// message and keeps the user signed in.
+  Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l.deleteAccountTitle),
+        content: Text(l.deleteAccountBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l.cancel),
+          ),
+          TextButton(
+            key: const Key('delete-account-confirm'),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(
+              l.deleteAccountConfirm,
+              style: const TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final result = await ref.read(deleteAccountUseCaseProvider).call();
+    if (!context.mounted) return;
+    result.fold(
+      (failure) => AppSnackBar.show(context, failureMessage(l, failure), isError: true),
+      (_) {},
+    );
   }
 }
 

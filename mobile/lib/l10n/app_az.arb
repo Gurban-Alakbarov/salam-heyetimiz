@@ -403,5 +403,13 @@
   "famRemove": "Çıxar",
   "famRemoveTitle": "Ailə üzvünü çıxar",
   "famRemoveBody": "{name} ailə üzvlərindən çıxarılacaq. Verdiyiniz cihazlara girişi dərhal dayanacaq, abunəlikləri ləğv ediləcək. Avtomatik geri ödəniş edilmir.",
-  "famRemoved": "Ailə üzvü çıxarıldı."
+  "famRemoved": "Ailə üzvü çıxarıldı.",
+  "deleteAccount": "Hesabı sil",
+  "@deleteAccount": {"description": "Y7: self-service account deletion (profile)."},
+  "deleteAccountTitle": "Hesabınız silinsin?",
+  "@deleteAccountTitle": {"description": "Y7: self-service account deletion (profile)."},
+  "deleteAccountBody": "Hesabınız və şəxsi məlumatlarınız (ad, telefon, e-poçt) həmişəlik silinəcək. Bütün cihazlara girişiniz dayanacaq, aktiv abunəlikləriniz ləğv ediləcək (geri ödəniş edilmir), ailə üzvlərinizin sizin verdiyiniz girişi də götürüləcək. Bu əməliyyat geri qaytarıla bilməz.",
+  "@deleteAccountBody": {"description": "Y7: self-service account deletion (profile)."},
+  "deleteAccountConfirm": "Hesabı həmişəlik sil",
+  "@deleteAccountConfirm": {"description": "Y7: self-service account deletion (profile)."}
 }

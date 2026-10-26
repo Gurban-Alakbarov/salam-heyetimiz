@@ -84,6 +84,16 @@ final logoutUseCaseProvider = Provider<LogoutUseCase>(
   ),
 );
 
+/// Y7 — delete my account. The server already drops every push token of the
+/// account, so only the device-local widget state is cleared afterwards.
+final deleteAccountUseCaseProvider = Provider<DeleteAccountUseCase>(
+  (ref) => DeleteAccountUseCase(
+    ref.watch(authRepositoryProvider),
+    ref.watch(analyticsProvider),
+    () => ref.read(doorWidgetServiceProvider).clearAll(),
+  ),
+);
+
 /// The auth gate. `unknown` until the splash bootstrap resolves it; thereafter
 /// derived from the [SessionManager] (login/logout/refresh-fail update it live).
 enum AuthState { unknown, guest, authenticated }

@@ -2373,6 +2373,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Family member removed.'**
   String get famRemoved;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account and personal data (name, phone, email) will be permanently deleted. Your access to every device ends, active subscriptions are cancelled (no refund), and the access you gave your family members is removed. This cannot be undone.'**
+  String get deleteAccountBody;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get deleteAccountConfirm;
 }
 
 class _AppLocalizationsDelegate

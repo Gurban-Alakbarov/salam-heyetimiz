@@ -1236,4 +1236,17 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get famRemoved => 'Ailə üzvü çıxarıldı.';
+
+  @override
+  String get deleteAccount => 'Hesabı sil';
+
+  @override
+  String get deleteAccountTitle => 'Hesabınız silinsin?';
+
+  @override
+  String get deleteAccountBody =>
+      'Hesabınız və şəxsi məlumatlarınız (ad, telefon, e-poçt) həmişəlik silinəcək. Bütün cihazlara girişiniz dayanacaq, aktiv abunəlikləriniz ləğv ediləcək (geri ödəniş edilmir), ailə üzvlərinizin sizin verdiyiniz girişi də götürüləcək. Bu əməliyyat geri qaytarıla bilməz.';
+
+  @override
+  String get deleteAccountConfirm => 'Hesabı həmişəlik sil';
 }

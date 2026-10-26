@@ -17,6 +17,7 @@ class AuthEvents {
   static const otpRequested = 'otp_requested';
   static const otpVerified = 'otp_verified';
   static const logout = 'logout';
+  static const accountDeleted = 'account_deleted';
 }
 
 /// register → dispatch OTP. Multi-concern (analytics + crash breadcrumb), hence
@@ -128,6 +129,30 @@ class LogoutUseCase {
     }
     final result = await _repo.logout();
     _analytics.logEvent(AuthEvents.logout);
+    return result;
+  }
+}
+
+/// Y7 — delete my account. The server erases it and the session is cleared, so
+/// [authStateProvider] flips to guest and the router redirects out (as on logout).
+/// Device-local leftovers (the home-screen widget's saved barrier) are cleared
+/// only after a SUCCESSFUL deletion — a refusal changes nothing on the device.
+class DeleteAccountUseCase {
+  DeleteAccountUseCase(this._repo, this._analytics, [this._onDeleted]);
+  final AuthRepository _repo;
+  final AnalyticsService _analytics;
+  final Future<void> Function()? _onDeleted;
+
+  Future<Result<void>> call() async {
+    final result = await _repo.deleteAccount();
+    if (result.isSuccess) {
+      _analytics.logEvent(AuthEvents.accountDeleted);
+      try {
+        await _onDeleted?.call();
+      } catch (_) {
+        // Best-effort local cleanup; the account is already gone.
+      }
+    }
     return result;
   }
 }

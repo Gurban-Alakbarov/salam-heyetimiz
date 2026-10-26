@@ -86,4 +86,10 @@ class AuthRemoteDataSource {
   Future<void> logout() async {
     await _api.post('/v1/auth/logout');
   }
+
+  /// Y7 — DELETE /v1/me (204): the server erases the account. A device owner
+  /// gets 409 `successor_required` (the device must be transferred first).
+  Future<void> deleteAccount() async {
+    await _api.delete('/v1/me', data: {'confirm': true});
+  }
 }

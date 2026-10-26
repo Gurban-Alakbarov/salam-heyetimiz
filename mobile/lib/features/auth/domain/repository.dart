@@ -29,4 +29,8 @@ abstract class AuthRepository {
 
   /// Best-effort server revoke + always clears the local session.
   Future<Result<void>> logout();
+
+  /// Y7 — deletes the account on the server; clears the local session ONLY on
+  /// success (a refusal — e.g. 409 for a device owner — keeps the user signed in).
+  Future<Result<void>> deleteAccount();
 }

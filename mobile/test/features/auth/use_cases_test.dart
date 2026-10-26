@@ -154,4 +154,28 @@ void main() {
 
     verify(() => analytics.logEvent(AuthEvents.logout)).called(1);
   });
+
+  test('Y7 DeleteAccountUseCase: on success emits account_deleted and clears device leftovers', () async {
+    when(() => repo.deleteAccount()).thenAnswer((_) async => const Success(null));
+    var cleaned = 0;
+
+    final result = await DeleteAccountUseCase(repo, analytics, () async => cleaned++).call();
+
+    expect(result.isSuccess, isTrue);
+    expect(cleaned, 1);
+    verify(() => analytics.logEvent(AuthEvents.accountDeleted)).called(1);
+  });
+
+  test('Y7 DeleteAccountUseCase: a refusal touches nothing on the device', () async {
+    when(() => repo.deleteAccount()).thenAnswer(
+      (_) async => const Err(ConflictFailure('successor_required')),
+    );
+    var cleaned = 0;
+
+    final result = await DeleteAccountUseCase(repo, analytics, () async => cleaned++).call();
+
+    expect(result.isSuccess, isFalse);
+    expect(cleaned, 0);
+    verifyNever(() => analytics.logEvent(AuthEvents.accountDeleted));
+  });
 }

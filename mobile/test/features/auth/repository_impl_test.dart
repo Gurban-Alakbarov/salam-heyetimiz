@@ -157,4 +157,33 @@ void main() {
     expect(result.isSuccess, isTrue);
     verify(() => session.clear()).called(1);
   });
+
+  test('Y7 deleteAccount clears the session only when the server deleted it', () async {
+    when(() => remote.deleteAccount()).thenAnswer((_) async {});
+    when(() => session.clear()).thenAnswer((_) async {});
+
+    final result = await repo.deleteAccount();
+
+    expect(result.isSuccess, isTrue);
+    verify(() => session.clear()).called(1);
+  });
+
+  test('Y7 deleteAccount refused (device owner, 409) keeps the user signed in', () async {
+    when(() => remote.deleteAccount()).thenThrow(
+      dioError(
+        status: 409,
+        body: {
+          'error': {
+            'code': 'successor_required',
+            'message': 'Hesabınıza bağlı cihaz var.',
+          },
+        },
+      ),
+    );
+
+    final result = await repo.deleteAccount();
+
+    expect((result as Err).failure, isA<ConflictFailure>());
+    verifyNever(() => session.clear());
+  });
 }

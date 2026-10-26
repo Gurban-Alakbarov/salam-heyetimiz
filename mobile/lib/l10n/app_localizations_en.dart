@@ -1241,4 +1241,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get famRemoved => 'Family member removed.';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountBody =>
+      'Your account and personal data (name, phone, email) will be permanently deleted. Your access to every device ends, active subscriptions are cancelled (no refund), and the access you gave your family members is removed. This cannot be undone.';
+
+  @override
+  String get deleteAccountConfirm => 'Delete permanently';
 }

@@ -6,6 +6,7 @@ use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Admin\Models\Complex;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Devices\Enums\DeviceOwnershipMode;
+use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Models\DeviceUser;
@@ -106,9 +107,21 @@ class AdminComplexDeviceController
                 }
             }
 
-            $device->forceFill(['ownership_mode' => $to->value])->save();
+            $device->forceFill(['ownership_mode' => $to->value]);
+            // K5: the mode decides whether an owner-less device is in service. Only the assignment-derived states
+            // follow it; disabled / suspended stay as the admin left them.
+            $statusFrom = $device->status;
+            if (in_array($statusFrom, [DeviceStatus::Active, DeviceStatus::Unassigned], true)) {
+                $statusTo = $device->assignmentStatus();
+                $device->forceFill(['status' => $statusTo->value]);
+                if ($statusTo === DeviceStatus::Active && $device->activated_at === null) {
+                    $device->forceFill(['activated_at' => now()]);
+                }
+            }
+            $device->save();
             $this->audit->record('device.ownership_mode_changed', [
                 'device_id' => (int) $device->id, 'from' => $from->value, 'to' => $to->value, 'complex_id' => $device->complex_id,
+                'status_from' => $statusFrom->value, 'status_to' => $device->status->value,
             ], Device::class, (int) $device->id);
 
             return $this->adminDevice($device->refresh())->response();

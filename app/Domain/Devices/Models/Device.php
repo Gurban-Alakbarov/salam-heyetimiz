@@ -83,4 +83,15 @@ class Device extends Model
     {
         return $this->hasMany(DeviceUser::class, 'device_id');
     }
+
+    /**
+     * The status the device's assignment implies (K5): a private device is in service once it has an owner;
+     * a complex-mode device has no owner by design (B4) and is in service as soon as it serves its complex.
+     */
+    public function assignmentStatus(): DeviceStatus
+    {
+        return $this->owner_user_id !== null || $this->ownership_mode === DeviceOwnershipMode::Complex
+            ? DeviceStatus::Active
+            : DeviceStatus::Unassigned;
+    }
 }

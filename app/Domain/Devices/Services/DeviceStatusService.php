@@ -35,8 +35,8 @@ final class DeviceStatusService
 
     public function enable(Device $device, AdminUser $admin): Device
     {
-        // Re-enable restores the device to its assignment-derived state.
-        $restored = $device->owner_user_id !== null ? DeviceStatus::Active : DeviceStatus::Unassigned;
+        // Re-enable restores the device to its assignment-derived state (a complex-mode device comes back active).
+        $restored = $device->assignmentStatus();
 
         $device->forceFill([
             'status' => $restored->value,

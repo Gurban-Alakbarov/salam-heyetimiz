@@ -25,6 +25,8 @@ abstract class DeviceDto with _$DeviceDto {
     bool? geofenceEnabled,
     int? geofenceRadiusM,
     String? lastOnlineAt,
+    // A2 — the server's online flag (one shared window for app, admin panel and Komendant).
+    bool? online,
     DeviceModelDto? deviceModel,
     int? cooldownSecondsRemaining,
     SubscriptionBriefDto? subscription,

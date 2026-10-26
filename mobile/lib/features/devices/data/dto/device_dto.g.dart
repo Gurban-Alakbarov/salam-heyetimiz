@@ -23,6 +23,7 @@ _DeviceDto _$DeviceDtoFromJson(Map<String, dynamic> json) => _DeviceDto(
   geofenceEnabled: json['geofence_enabled'] as bool?,
   geofenceRadiusM: (json['geofence_radius_m'] as num?)?.toInt(),
   lastOnlineAt: json['last_online_at'] as String?,
+  online: json['online'] as bool?,
   deviceModel: json['device_model'] == null
       ? null
       : DeviceModelDto.fromJson(json['device_model'] as Map<String, dynamic>),
@@ -53,6 +54,7 @@ Map<String, dynamic> _$DeviceDtoToJson(_DeviceDto instance) =>
       'geofence_enabled': instance.geofenceEnabled,
       'geofence_radius_m': instance.geofenceRadiusM,
       'last_online_at': instance.lastOnlineAt,
+      'online': instance.online,
       'device_model': instance.deviceModel?.toJson(),
       'cooldown_seconds_remaining': instance.cooldownSecondsRemaining,
       'subscription': instance.subscription?.toJson(),

@@ -4,7 +4,9 @@ part 'device_entities.freezed.dart';
 
 /// Display-only online threshold. Command gating is ALWAYS server-side
 /// (`canOpen`); `lastOnlineAt` only drives a presentational badge.
-const Duration kOnlineThreshold = Duration(minutes: 5);
+/// A2 — only a fallback for a server that sends no `online` flag; it matches the
+/// server's shared window (domain.devices.offline_threshold_minutes = 15).
+const Duration kOnlineThreshold = Duration(minutes: 15);
 
 @freezed
 abstract class Device with _$Device {
@@ -32,6 +34,8 @@ abstract class Device with _$Device {
     @Default(false) bool geofenceEnabled,
     int? geofenceRadiusM,
     DateTime? lastOnlineAt,
+    // A2 — the server's online flag; null when an older server did not send it.
+    bool? online,
     DeviceModel? model,
     int? cooldownSecondsRemaining,
     DeviceSubscription? subscription,
@@ -43,9 +47,11 @@ abstract class Device with _$Device {
   /// Whether the barrier has coordinates — gates the resident "Directions" action.
   bool get hasLocation => latitude != null && longitude != null;
 
-  /// Presentational online flag (display only — not for gating).
+  /// Presentational online flag (display only — not for gating). A2: the server's
+  /// flag when present, so the app and the admin panel always agree.
   bool isOnlineAt(DateTime now) =>
-      lastOnlineAt != null && now.difference(lastOnlineAt!) <= kOnlineThreshold;
+      online ??
+      (lastOnlineAt != null && now.difference(lastOnlineAt!) <= kOnlineThreshold);
 }
 
 @freezed

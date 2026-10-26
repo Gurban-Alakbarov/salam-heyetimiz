@@ -22,6 +22,7 @@ Device deviceDtoToEntity(DeviceDto d) => Device(
   geofenceEnabled: d.geofenceEnabled ?? false,
   geofenceRadiusM: d.geofenceRadiusM,
   lastOnlineAt: _date(d.lastOnlineAt),
+  online: d.online,
   cooldownSecondsRemaining: d.cooldownSecondsRemaining,
   model: d.deviceModel == null
       ? null

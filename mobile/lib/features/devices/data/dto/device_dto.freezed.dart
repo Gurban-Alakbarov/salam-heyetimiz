@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DeviceDto {
 
- int get id; String? get label; String? get serial; String? get imageUrl; String? get address; String? get status; String? get role; bool? get canOpen; String? get suspensionReason; bool? get viaFamily; bool? get canShareVisitorLink; double? get latitude; double? get longitude; bool? get geofenceEnabled; int? get geofenceRadiusM; String? get lastOnlineAt; DeviceModelDto? get deviceModel; int? get cooldownSecondsRemaining; SubscriptionBriefDto? get subscription;
+ int get id; String? get label; String? get serial; String? get imageUrl; String? get address; String? get status; String? get role; bool? get canOpen; String? get suspensionReason; bool? get viaFamily; bool? get canShareVisitorLink; double? get latitude; double? get longitude; bool? get geofenceEnabled; int? get geofenceRadiusM; String? get lastOnlineAt; bool? get online; DeviceModelDto? get deviceModel; int? get cooldownSecondsRemaining; SubscriptionBriefDto? get subscription;
 /// Create a copy of DeviceDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $DeviceDtoCopyWith<DeviceDto> get copyWith => _$DeviceDtoCopyWithImpl<DeviceDto>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeviceDto&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.address, address) || other.address == address)&&(identical(other.status, status) || other.status == status)&&(identical(other.role, role) || other.role == role)&&(identical(other.canOpen, canOpen) || other.canOpen == canOpen)&&(identical(other.suspensionReason, suspensionReason) || other.suspensionReason == suspensionReason)&&(identical(other.viaFamily, viaFamily) || other.viaFamily == viaFamily)&&(identical(other.canShareVisitorLink, canShareVisitorLink) || other.canShareVisitorLink == canShareVisitorLink)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.geofenceEnabled, geofenceEnabled) || other.geofenceEnabled == geofenceEnabled)&&(identical(other.geofenceRadiusM, geofenceRadiusM) || other.geofenceRadiusM == geofenceRadiusM)&&(identical(other.lastOnlineAt, lastOnlineAt) || other.lastOnlineAt == lastOnlineAt)&&(identical(other.deviceModel, deviceModel) || other.deviceModel == deviceModel)&&(identical(other.cooldownSecondsRemaining, cooldownSecondsRemaining) || other.cooldownSecondsRemaining == cooldownSecondsRemaining)&&(identical(other.subscription, subscription) || other.subscription == subscription));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeviceDto&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.address, address) || other.address == address)&&(identical(other.status, status) || other.status == status)&&(identical(other.role, role) || other.role == role)&&(identical(other.canOpen, canOpen) || other.canOpen == canOpen)&&(identical(other.suspensionReason, suspensionReason) || other.suspensionReason == suspensionReason)&&(identical(other.viaFamily, viaFamily) || other.viaFamily == viaFamily)&&(identical(other.canShareVisitorLink, canShareVisitorLink) || other.canShareVisitorLink == canShareVisitorLink)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.geofenceEnabled, geofenceEnabled) || other.geofenceEnabled == geofenceEnabled)&&(identical(other.geofenceRadiusM, geofenceRadiusM) || other.geofenceRadiusM == geofenceRadiusM)&&(identical(other.lastOnlineAt, lastOnlineAt) || other.lastOnlineAt == lastOnlineAt)&&(identical(other.online, online) || other.online == online)&&(identical(other.deviceModel, deviceModel) || other.deviceModel == deviceModel)&&(identical(other.cooldownSecondsRemaining, cooldownSecondsRemaining) || other.cooldownSecondsRemaining == cooldownSecondsRemaining)&&(identical(other.subscription, subscription) || other.subscription == subscription));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,label,serial,imageUrl,address,status,role,canOpen,suspensionReason,viaFamily,canShareVisitorLink,latitude,longitude,geofenceEnabled,geofenceRadiusM,lastOnlineAt,deviceModel,cooldownSecondsRemaining,subscription]);
+int get hashCode => Object.hashAll([runtimeType,id,label,serial,imageUrl,address,status,role,canOpen,suspensionReason,viaFamily,canShareVisitorLink,latitude,longitude,geofenceEnabled,geofenceRadiusM,lastOnlineAt,online,deviceModel,cooldownSecondsRemaining,subscription]);
 
 @override
 String toString() {
-  return 'DeviceDto(id: $id, label: $label, serial: $serial, imageUrl: $imageUrl, address: $address, status: $status, role: $role, canOpen: $canOpen, suspensionReason: $suspensionReason, viaFamily: $viaFamily, canShareVisitorLink: $canShareVisitorLink, latitude: $latitude, longitude: $longitude, geofenceEnabled: $geofenceEnabled, geofenceRadiusM: $geofenceRadiusM, lastOnlineAt: $lastOnlineAt, deviceModel: $deviceModel, cooldownSecondsRemaining: $cooldownSecondsRemaining, subscription: $subscription)';
+  return 'DeviceDto(id: $id, label: $label, serial: $serial, imageUrl: $imageUrl, address: $address, status: $status, role: $role, canOpen: $canOpen, suspensionReason: $suspensionReason, viaFamily: $viaFamily, canShareVisitorLink: $canShareVisitorLink, latitude: $latitude, longitude: $longitude, geofenceEnabled: $geofenceEnabled, geofenceRadiusM: $geofenceRadiusM, lastOnlineAt: $lastOnlineAt, online: $online, deviceModel: $deviceModel, cooldownSecondsRemaining: $cooldownSecondsRemaining, subscription: $subscription)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $DeviceDtoCopyWith<$Res>  {
   factory $DeviceDtoCopyWith(DeviceDto value, $Res Function(DeviceDto) _then) = _$DeviceDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, String? label, String? serial, String? imageUrl, String? address, String? status, String? role, bool? canOpen, String? suspensionReason, bool? viaFamily, bool? canShareVisitorLink, double? latitude, double? longitude, bool? geofenceEnabled, int? geofenceRadiusM, String? lastOnlineAt, DeviceModelDto? deviceModel, int? cooldownSecondsRemaining, SubscriptionBriefDto? subscription
+ int id, String? label, String? serial, String? imageUrl, String? address, String? status, String? role, bool? canOpen, String? suspensionReason, bool? viaFamily, bool? canShareVisitorLink, double? latitude, double? longitude, bool? geofenceEnabled, int? geofenceRadiusM, String? lastOnlineAt, bool? online, DeviceModelDto? deviceModel, int? cooldownSecondsRemaining, SubscriptionBriefDto? subscription
 });
 
 
@@ -65,7 +65,7 @@ class _$DeviceDtoCopyWithImpl<$Res>
 
 /// Create a copy of DeviceDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = freezed,Object? serial = freezed,Object? imageUrl = freezed,Object? address = freezed,Object? status = freezed,Object? role = freezed,Object? canOpen = freezed,Object? suspensionReason = freezed,Object? viaFamily = freezed,Object? canShareVisitorLink = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? geofenceEnabled = freezed,Object? geofenceRadiusM = freezed,Object? lastOnlineAt = freezed,Object? deviceModel = freezed,Object? cooldownSecondsRemaining = freezed,Object? subscription = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = freezed,Object? serial = freezed,Object? imageUrl = freezed,Object? address = freezed,Object? status = freezed,Object? role = freezed,Object? canOpen = freezed,Object? suspensionReason = freezed,Object? viaFamily = freezed,Object? canShareVisitorLink = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? geofenceEnabled = freezed,Object? geofenceRadiusM = freezed,Object? lastOnlineAt = freezed,Object? online = freezed,Object? deviceModel = freezed,Object? cooldownSecondsRemaining = freezed,Object? subscription = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
@@ -83,7 +83,8 @@ as double?,longitude: freezed == longitude ? _self.longitude : longitude // igno
 as double?,geofenceEnabled: freezed == geofenceEnabled ? _self.geofenceEnabled : geofenceEnabled // ignore: cast_nullable_to_non_nullable
 as bool?,geofenceRadiusM: freezed == geofenceRadiusM ? _self.geofenceRadiusM : geofenceRadiusM // ignore: cast_nullable_to_non_nullable
 as int?,lastOnlineAt: freezed == lastOnlineAt ? _self.lastOnlineAt : lastOnlineAt // ignore: cast_nullable_to_non_nullable
-as String?,deviceModel: freezed == deviceModel ? _self.deviceModel : deviceModel // ignore: cast_nullable_to_non_nullable
+as String?,online: freezed == online ? _self.online : online // ignore: cast_nullable_to_non_nullable
+as bool?,deviceModel: freezed == deviceModel ? _self.deviceModel : deviceModel // ignore: cast_nullable_to_non_nullable
 as DeviceModelDto?,cooldownSecondsRemaining: freezed == cooldownSecondsRemaining ? _self.cooldownSecondsRemaining : cooldownSecondsRemaining // ignore: cast_nullable_to_non_nullable
 as int?,subscription: freezed == subscription ? _self.subscription : subscription // ignore: cast_nullable_to_non_nullable
 as SubscriptionBriefDto?,
@@ -195,10 +196,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String? label,  String? serial,  String? imageUrl,  String? address,  String? status,  String? role,  bool? canOpen,  String? suspensionReason,  bool? viaFamily,  bool? canShareVisitorLink,  double? latitude,  double? longitude,  bool? geofenceEnabled,  int? geofenceRadiusM,  String? lastOnlineAt,  DeviceModelDto? deviceModel,  int? cooldownSecondsRemaining,  SubscriptionBriefDto? subscription)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String? label,  String? serial,  String? imageUrl,  String? address,  String? status,  String? role,  bool? canOpen,  String? suspensionReason,  bool? viaFamily,  bool? canShareVisitorLink,  double? latitude,  double? longitude,  bool? geofenceEnabled,  int? geofenceRadiusM,  String? lastOnlineAt,  bool? online,  DeviceModelDto? deviceModel,  int? cooldownSecondsRemaining,  SubscriptionBriefDto? subscription)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DeviceDto() when $default != null:
-return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_that.status,_that.role,_that.canOpen,_that.suspensionReason,_that.viaFamily,_that.canShareVisitorLink,_that.latitude,_that.longitude,_that.geofenceEnabled,_that.geofenceRadiusM,_that.lastOnlineAt,_that.deviceModel,_that.cooldownSecondsRemaining,_that.subscription);case _:
+return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_that.status,_that.role,_that.canOpen,_that.suspensionReason,_that.viaFamily,_that.canShareVisitorLink,_that.latitude,_that.longitude,_that.geofenceEnabled,_that.geofenceRadiusM,_that.lastOnlineAt,_that.online,_that.deviceModel,_that.cooldownSecondsRemaining,_that.subscription);case _:
   return orElse();
 
 }
@@ -216,10 +217,10 @@ return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String? label,  String? serial,  String? imageUrl,  String? address,  String? status,  String? role,  bool? canOpen,  String? suspensionReason,  bool? viaFamily,  bool? canShareVisitorLink,  double? latitude,  double? longitude,  bool? geofenceEnabled,  int? geofenceRadiusM,  String? lastOnlineAt,  DeviceModelDto? deviceModel,  int? cooldownSecondsRemaining,  SubscriptionBriefDto? subscription)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String? label,  String? serial,  String? imageUrl,  String? address,  String? status,  String? role,  bool? canOpen,  String? suspensionReason,  bool? viaFamily,  bool? canShareVisitorLink,  double? latitude,  double? longitude,  bool? geofenceEnabled,  int? geofenceRadiusM,  String? lastOnlineAt,  bool? online,  DeviceModelDto? deviceModel,  int? cooldownSecondsRemaining,  SubscriptionBriefDto? subscription)  $default,) {final _that = this;
 switch (_that) {
 case _DeviceDto():
-return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_that.status,_that.role,_that.canOpen,_that.suspensionReason,_that.viaFamily,_that.canShareVisitorLink,_that.latitude,_that.longitude,_that.geofenceEnabled,_that.geofenceRadiusM,_that.lastOnlineAt,_that.deviceModel,_that.cooldownSecondsRemaining,_that.subscription);case _:
+return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_that.status,_that.role,_that.canOpen,_that.suspensionReason,_that.viaFamily,_that.canShareVisitorLink,_that.latitude,_that.longitude,_that.geofenceEnabled,_that.geofenceRadiusM,_that.lastOnlineAt,_that.online,_that.deviceModel,_that.cooldownSecondsRemaining,_that.subscription);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -236,10 +237,10 @@ return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String? label,  String? serial,  String? imageUrl,  String? address,  String? status,  String? role,  bool? canOpen,  String? suspensionReason,  bool? viaFamily,  bool? canShareVisitorLink,  double? latitude,  double? longitude,  bool? geofenceEnabled,  int? geofenceRadiusM,  String? lastOnlineAt,  DeviceModelDto? deviceModel,  int? cooldownSecondsRemaining,  SubscriptionBriefDto? subscription)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String? label,  String? serial,  String? imageUrl,  String? address,  String? status,  String? role,  bool? canOpen,  String? suspensionReason,  bool? viaFamily,  bool? canShareVisitorLink,  double? latitude,  double? longitude,  bool? geofenceEnabled,  int? geofenceRadiusM,  String? lastOnlineAt,  bool? online,  DeviceModelDto? deviceModel,  int? cooldownSecondsRemaining,  SubscriptionBriefDto? subscription)?  $default,) {final _that = this;
 switch (_that) {
 case _DeviceDto() when $default != null:
-return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_that.status,_that.role,_that.canOpen,_that.suspensionReason,_that.viaFamily,_that.canShareVisitorLink,_that.latitude,_that.longitude,_that.geofenceEnabled,_that.geofenceRadiusM,_that.lastOnlineAt,_that.deviceModel,_that.cooldownSecondsRemaining,_that.subscription);case _:
+return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_that.status,_that.role,_that.canOpen,_that.suspensionReason,_that.viaFamily,_that.canShareVisitorLink,_that.latitude,_that.longitude,_that.geofenceEnabled,_that.geofenceRadiusM,_that.lastOnlineAt,_that.online,_that.deviceModel,_that.cooldownSecondsRemaining,_that.subscription);case _:
   return null;
 
 }
@@ -251,7 +252,7 @@ return $default(_that.id,_that.label,_that.serial,_that.imageUrl,_that.address,_
 @JsonSerializable()
 
 class _DeviceDto implements DeviceDto {
-  const _DeviceDto({required this.id, this.label, this.serial, this.imageUrl, this.address, this.status, this.role, this.canOpen, this.suspensionReason, this.viaFamily, this.canShareVisitorLink, this.latitude, this.longitude, this.geofenceEnabled, this.geofenceRadiusM, this.lastOnlineAt, this.deviceModel, this.cooldownSecondsRemaining, this.subscription});
+  const _DeviceDto({required this.id, this.label, this.serial, this.imageUrl, this.address, this.status, this.role, this.canOpen, this.suspensionReason, this.viaFamily, this.canShareVisitorLink, this.latitude, this.longitude, this.geofenceEnabled, this.geofenceRadiusM, this.lastOnlineAt, this.online, this.deviceModel, this.cooldownSecondsRemaining, this.subscription});
   factory _DeviceDto.fromJson(Map<String, dynamic> json) => _$DeviceDtoFromJson(json);
 
 @override final  int id;
@@ -270,6 +271,7 @@ class _DeviceDto implements DeviceDto {
 @override final  bool? geofenceEnabled;
 @override final  int? geofenceRadiusM;
 @override final  String? lastOnlineAt;
+@override final  bool? online;
 @override final  DeviceModelDto? deviceModel;
 @override final  int? cooldownSecondsRemaining;
 @override final  SubscriptionBriefDto? subscription;
@@ -287,16 +289,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeviceDto&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.address, address) || other.address == address)&&(identical(other.status, status) || other.status == status)&&(identical(other.role, role) || other.role == role)&&(identical(other.canOpen, canOpen) || other.canOpen == canOpen)&&(identical(other.suspensionReason, suspensionReason) || other.suspensionReason == suspensionReason)&&(identical(other.viaFamily, viaFamily) || other.viaFamily == viaFamily)&&(identical(other.canShareVisitorLink, canShareVisitorLink) || other.canShareVisitorLink == canShareVisitorLink)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.geofenceEnabled, geofenceEnabled) || other.geofenceEnabled == geofenceEnabled)&&(identical(other.geofenceRadiusM, geofenceRadiusM) || other.geofenceRadiusM == geofenceRadiusM)&&(identical(other.lastOnlineAt, lastOnlineAt) || other.lastOnlineAt == lastOnlineAt)&&(identical(other.deviceModel, deviceModel) || other.deviceModel == deviceModel)&&(identical(other.cooldownSecondsRemaining, cooldownSecondsRemaining) || other.cooldownSecondsRemaining == cooldownSecondsRemaining)&&(identical(other.subscription, subscription) || other.subscription == subscription));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeviceDto&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.address, address) || other.address == address)&&(identical(other.status, status) || other.status == status)&&(identical(other.role, role) || other.role == role)&&(identical(other.canOpen, canOpen) || other.canOpen == canOpen)&&(identical(other.suspensionReason, suspensionReason) || other.suspensionReason == suspensionReason)&&(identical(other.viaFamily, viaFamily) || other.viaFamily == viaFamily)&&(identical(other.canShareVisitorLink, canShareVisitorLink) || other.canShareVisitorLink == canShareVisitorLink)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.geofenceEnabled, geofenceEnabled) || other.geofenceEnabled == geofenceEnabled)&&(identical(other.geofenceRadiusM, geofenceRadiusM) || other.geofenceRadiusM == geofenceRadiusM)&&(identical(other.lastOnlineAt, lastOnlineAt) || other.lastOnlineAt == lastOnlineAt)&&(identical(other.online, online) || other.online == online)&&(identical(other.deviceModel, deviceModel) || other.deviceModel == deviceModel)&&(identical(other.cooldownSecondsRemaining, cooldownSecondsRemaining) || other.cooldownSecondsRemaining == cooldownSecondsRemaining)&&(identical(other.subscription, subscription) || other.subscription == subscription));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,label,serial,imageUrl,address,status,role,canOpen,suspensionReason,viaFamily,canShareVisitorLink,latitude,longitude,geofenceEnabled,geofenceRadiusM,lastOnlineAt,deviceModel,cooldownSecondsRemaining,subscription]);
+int get hashCode => Object.hashAll([runtimeType,id,label,serial,imageUrl,address,status,role,canOpen,suspensionReason,viaFamily,canShareVisitorLink,latitude,longitude,geofenceEnabled,geofenceRadiusM,lastOnlineAt,online,deviceModel,cooldownSecondsRemaining,subscription]);
 
 @override
 String toString() {
-  return 'DeviceDto(id: $id, label: $label, serial: $serial, imageUrl: $imageUrl, address: $address, status: $status, role: $role, canOpen: $canOpen, suspensionReason: $suspensionReason, viaFamily: $viaFamily, canShareVisitorLink: $canShareVisitorLink, latitude: $latitude, longitude: $longitude, geofenceEnabled: $geofenceEnabled, geofenceRadiusM: $geofenceRadiusM, lastOnlineAt: $lastOnlineAt, deviceModel: $deviceModel, cooldownSecondsRemaining: $cooldownSecondsRemaining, subscription: $subscription)';
+  return 'DeviceDto(id: $id, label: $label, serial: $serial, imageUrl: $imageUrl, address: $address, status: $status, role: $role, canOpen: $canOpen, suspensionReason: $suspensionReason, viaFamily: $viaFamily, canShareVisitorLink: $canShareVisitorLink, latitude: $latitude, longitude: $longitude, geofenceEnabled: $geofenceEnabled, geofenceRadiusM: $geofenceRadiusM, lastOnlineAt: $lastOnlineAt, online: $online, deviceModel: $deviceModel, cooldownSecondsRemaining: $cooldownSecondsRemaining, subscription: $subscription)';
 }
 
 
@@ -307,7 +309,7 @@ abstract mixin class _$DeviceDtoCopyWith<$Res> implements $DeviceDtoCopyWith<$Re
   factory _$DeviceDtoCopyWith(_DeviceDto value, $Res Function(_DeviceDto) _then) = __$DeviceDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String? label, String? serial, String? imageUrl, String? address, String? status, String? role, bool? canOpen, String? suspensionReason, bool? viaFamily, bool? canShareVisitorLink, double? latitude, double? longitude, bool? geofenceEnabled, int? geofenceRadiusM, String? lastOnlineAt, DeviceModelDto? deviceModel, int? cooldownSecondsRemaining, SubscriptionBriefDto? subscription
+ int id, String? label, String? serial, String? imageUrl, String? address, String? status, String? role, bool? canOpen, String? suspensionReason, bool? viaFamily, bool? canShareVisitorLink, double? latitude, double? longitude, bool? geofenceEnabled, int? geofenceRadiusM, String? lastOnlineAt, bool? online, DeviceModelDto? deviceModel, int? cooldownSecondsRemaining, SubscriptionBriefDto? subscription
 });
 
 
@@ -324,7 +326,7 @@ class __$DeviceDtoCopyWithImpl<$Res>
 
 /// Create a copy of DeviceDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = freezed,Object? serial = freezed,Object? imageUrl = freezed,Object? address = freezed,Object? status = freezed,Object? role = freezed,Object? canOpen = freezed,Object? suspensionReason = freezed,Object? viaFamily = freezed,Object? canShareVisitorLink = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? geofenceEnabled = freezed,Object? geofenceRadiusM = freezed,Object? lastOnlineAt = freezed,Object? deviceModel = freezed,Object? cooldownSecondsRemaining = freezed,Object? subscription = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = freezed,Object? serial = freezed,Object? imageUrl = freezed,Object? address = freezed,Object? status = freezed,Object? role = freezed,Object? canOpen = freezed,Object? suspensionReason = freezed,Object? viaFamily = freezed,Object? canShareVisitorLink = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? geofenceEnabled = freezed,Object? geofenceRadiusM = freezed,Object? lastOnlineAt = freezed,Object? online = freezed,Object? deviceModel = freezed,Object? cooldownSecondsRemaining = freezed,Object? subscription = freezed,}) {
   return _then(_DeviceDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
@@ -342,7 +344,8 @@ as double?,longitude: freezed == longitude ? _self.longitude : longitude // igno
 as double?,geofenceEnabled: freezed == geofenceEnabled ? _self.geofenceEnabled : geofenceEnabled // ignore: cast_nullable_to_non_nullable
 as bool?,geofenceRadiusM: freezed == geofenceRadiusM ? _self.geofenceRadiusM : geofenceRadiusM // ignore: cast_nullable_to_non_nullable
 as int?,lastOnlineAt: freezed == lastOnlineAt ? _self.lastOnlineAt : lastOnlineAt // ignore: cast_nullable_to_non_nullable
-as String?,deviceModel: freezed == deviceModel ? _self.deviceModel : deviceModel // ignore: cast_nullable_to_non_nullable
+as String?,online: freezed == online ? _self.online : online // ignore: cast_nullable_to_non_nullable
+as bool?,deviceModel: freezed == deviceModel ? _self.deviceModel : deviceModel // ignore: cast_nullable_to_non_nullable
 as DeviceModelDto?,cooldownSecondsRemaining: freezed == cooldownSecondsRemaining ? _self.cooldownSecondsRemaining : cooldownSecondsRemaining // ignore: cast_nullable_to_non_nullable
 as int?,subscription: freezed == subscription ? _self.subscription : subscription // ignore: cast_nullable_to_non_nullable
 as SubscriptionBriefDto?,

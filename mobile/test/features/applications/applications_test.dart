@@ -44,11 +44,11 @@ void main() {
       expect(m.legal.single.rejectionReason, 'VÖEN');
     });
 
-    test('a typed account may only file its own kind; legacy NULL may file either', () {
+    test('a physical account files only physical; a legal account may also file physical; NULL either', () {
       expect(MyApplications.fromJson(mine(null)).canFilePhysical, isTrue);
       expect(MyApplications.fromJson(mine(null)).canFileLegal, isTrue);
       expect(MyApplications.fromJson(mine('physical')).canFileLegal, isFalse);
-      expect(MyApplications.fromJson(mine('legal')).canFilePhysical, isFalse);
+      expect(MyApplications.fromJson(mine('legal')).canFilePhysical, isTrue); // e.g. the person's own home
       expect(MyApplications.fromJson(mine('legal')).canFileLegal, isTrue);
     });
 

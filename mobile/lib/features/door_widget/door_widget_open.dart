@@ -73,9 +73,13 @@ Future<void> doorWidgetOpenCallback(Uri? uri) async {
   await HomeWidget.saveWidgetData<int>(lastOpenKey, nowMs);
   await _writeCode(statusKey, kDoorWidgetOpeningCode);
 
+  // The widget's own open-only token first (long-lived — WidgetTokenSync); the app's access token only as a
+  // fallback for an install that has not been issued one yet.
+  const store = SecureStore();
+  final widgetToken = await store.read(StorageKeys.widgetToken);
   final outcome = await performDoorWidgetOpen(
     config: config,
-    accessToken: await const SecureStore().read(StorageKeys.accessToken),
+    accessToken: (widgetToken != null && widgetToken.isNotEmpty) ? widgetToken : await store.read(StorageKeys.accessToken),
     baseUrl: await service.baseUrl(),
     repositoryFactory: backgroundBarrierRepository,
   );

@@ -120,8 +120,9 @@ class MyApplications {
   final List<IndividualApplication> individual;
   final List<LegalApplication> legal;
 
-  /// A typed account files only its own kind (server: 409 account_type_mismatch); legacy NULL may file either.
-  bool get canFilePhysical => accountType != AccountType.legal && !individual.any((a) => a.isOpen);
+  /// A physical account files only physical applications (server: 409 account_type_mismatch). A legal account
+  /// may also file a physical one (e.g. for the person's own home); legacy NULL may file either.
+  bool get canFilePhysical => !individual.any((a) => a.isOpen);
   bool get canFileLegal => accountType != AccountType.physical;
 
   factory MyApplications.fromJson(Map<String, dynamic> j) {

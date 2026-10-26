@@ -7,6 +7,9 @@ class StorageKeys {
   static const String accessToken = 'access_token';
   static const String refreshToken = 'refresh_token';
   static const String installUuid = 'install_uuid';
+  // Home-screen widget's open-only token (WidgetTokenSync) + when it was issued (ms since epoch).
+  static const String widgetToken = 'widget_token';
+  static const String widgetTokenIssuedAt = 'widget_token_issued_at';
 
   // Prefs (non-sensitive)
   static const String themeMode = 'theme_mode';

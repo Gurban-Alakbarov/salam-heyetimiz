@@ -1,11 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/providers.dart';
 import 'door_widget_service.dart';
+import 'widget_token_sync.dart';
 
 /// Home-screen door-widget DI — granular providers (no god-provider; Constitution §5).
 
 final doorWidgetServiceProvider = Provider<DoorWidgetService>(
   (ref) => const DoorWidgetService(),
+);
+
+/// The widget's open-only token (re)issued for this install — see [WidgetTokenSync].
+final widgetTokenSyncProvider = Provider<WidgetTokenSync>(
+  (ref) => WidgetTokenSync(ref.watch(apiClientProvider), ref.watch(secureStoreProvider)),
 );
 
 /// One installed widget instance + the barrier it is currently bound to (null when

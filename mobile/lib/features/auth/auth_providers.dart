@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/providers.dart';
@@ -166,6 +168,8 @@ class BootstrapController extends AsyncNotifier<BootstrapEntity> {
           forceUpdate: forceUpdate || me.app.forceUpdate,
         ),
       );
+      // Keep the home-screen widget's open-only token current (re-issued weekly; best-effort, not awaited).
+      if (meRes.isSuccess) unawaited(ref.read(widgetTokenSyncProvider).ensure());
     }
 
     ref.read(authStateProvider.notifier).resolve();

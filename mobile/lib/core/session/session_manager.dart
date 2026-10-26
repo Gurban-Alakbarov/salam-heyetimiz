@@ -56,6 +56,9 @@ class SessionManager extends ChangeNotifier {
     _current = null;
     await _store.delete(StorageKeys.accessToken);
     await _store.delete(StorageKeys.refreshToken);
+    // The home-screen widget's token goes with the session (the server revokes it on logout too).
+    await _store.delete(StorageKeys.widgetToken);
+    await _store.delete(StorageKeys.widgetTokenIssuedAt);
     notifyListeners();
   }
 

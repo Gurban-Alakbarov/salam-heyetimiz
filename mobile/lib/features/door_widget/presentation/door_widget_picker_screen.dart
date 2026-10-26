@@ -91,6 +91,8 @@ class DoorWidgetPickerScreen extends ConsumerWidget {
     );
     // Invariant: a configured widget ⇒ the background isolate knows the base URL.
     await service.setBaseUrl(ref.read(appConfigProvider).apiBaseUrl);
+    // …and has its own long-lived open-only token (no "session expired" at the gate).
+    await ref.read(widgetTokenSyncProvider).ensure();
     ref.invalidate(installedDoorWidgetsProvider);
 
     if (fromConfigure) {

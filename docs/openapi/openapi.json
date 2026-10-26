@@ -2898,6 +2898,7 @@
         ],
         "summary": "Update an admin",
         "operationId": "adminUpdateAdmin",
+        "description": "K4 — setting `role: complex_manager` needs a complex (`complex_id` in the body, or the admin's current one),\nexactly as on create: otherwise **422** on `complex_id`. Clearing `complex_id` of a complex_manager leaves it\nscoped to no complex at all — never global.\n",
         "security": [
           {
             "adminBearerAuth": []
@@ -6012,6 +6013,7 @@
             }
           }
         },
+        "description": "K4 — only an admin with the `complex_manager` role can be a complex's manager: any other role answers\n**422** `not_complex_manager` (nothing changes).\n",
         "responses": {
           "200": {
             "description": "Assigned"
@@ -6023,7 +6025,14 @@
             "$ref": "#/components/responses/Forbidden"
           },
           "422": {
-            "$ref": "#/components/responses/ValidationError"
+            "description": "`not_complex_manager`, or validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -6040,6 +6049,7 @@
             "adminBearerAuth": []
           }
         ],
+        "description": "K4 — the unbound complex_manager is scoped to NO complex (every scoped list empty, every scoped record\n404) until it is assigned again; it never falls back to the global scope.\n",
         "parameters": [
           {
             "in": "path",
@@ -9691,7 +9701,7 @@
         "summary": "Open the barrier with a visitor link",
         "operationId": "visitorLinkOpen",
         "security": [],
-        "description": "Issues the relay through the SAME pipeline as the mobile app; every attempt is audited. Poll\n`GET /v1/visit/{token}/command/{commandId}` for the outcome. Refusals (standard envelope):\n**404** `visitor_link_not_found`, **410** `visitor_link_expired`, **403** `visitor_link_revoked` /\n`visitor_link_usage_exceeded`, **409** `visitor_device_inactive`. Throttle `visitor-open`\n(6/min per token + 20/min per IP).\n",
+        "description": "Issues the relay through the SAME pipeline as the mobile app; every attempt is audited. Poll\n`GET /v1/visit/{token}/command/{commandId}` for the outcome. Refusals (standard envelope):\n**404** `visitor_link_not_found`, **410** `visitor_link_expired`, **403** `visitor_link_revoked` /\n`visitor_link_usage_exceeded`, **409** `visitor_device_inactive`. Throttle `visitor-open`\n(6/min per token + 20/min per IP).\nK7 — a resident's link lives on the creator's own access: once the creator can no longer open the device\n(removed, account deleted or blocked, subscription ended) it answers **403** `visitor_link_revoked`, and the\nstatus endpoint reports `status: revoked`. Removals that revoke the roster revoke the creator's live links\non that device at once. Admin-created links are not tied to a resident.\n",
         "parameters": [
           {
             "in": "path",

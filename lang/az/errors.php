@@ -61,6 +61,7 @@ return [
     'wrong_recovery_code' => 'Bərpa kodu yanlışdır və ya artıq istifadə olunub.',
     'tfa_required' => 'Bu əməliyyat üçün iki faktorlu təsdiq tələb olunur.',
     'internal_error' => 'Daxili xəta baş verdi. Sorğu nömrəsi: :request_id',
+    'not_complex_manager' => 'Bu əməliyyat yalnız kompleks meneceri (complex_manager) rolunda admin üçündür.',
     'email_taken' => 'Bu email başqa hesaba aiddir.',
     'email_already_verified' => 'Hesabın email-i artıq təsdiqlənib və dəyişdirilə bilməz.',
     'subscription_access_removed' => 'Bu abunəlik üzrə cihaza girişiniz yoxdur; ödəniş qəbul edilmir.',

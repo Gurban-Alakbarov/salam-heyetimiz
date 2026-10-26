@@ -503,11 +503,16 @@ paths:
               type: object
               required: [admin_id]
               properties: { admin_id: { type: integer, format: int64 } }
+      description: |
+        K4 — only an admin with the `complex_manager` role can be a complex's manager: any other role answers
+        **422** `not_complex_manager` (nothing changes).
       responses:
         '200': { description: Assigned }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
-        '422': { $ref: '#/components/responses/ValidationError' }
+        '422':
+          description: '`not_complex_manager`, or validation'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   /admin/complexes/{complexId}/managers/{adminId}:
     delete:
@@ -515,6 +520,9 @@ paths:
       summary: Unassign a manager from a complex
       operationId: adminUnassignComplexManager
       security: [{ adminBearerAuth: [] }]
+      description: |
+        K4 — the unbound complex_manager is scoped to NO complex (every scoped list empty, every scoped record
+        404) until it is assigned again; it never falls back to the global scope.
       parameters:
         - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
         - { in: path, name: adminId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
@@ -2088,6 +2096,10 @@ paths:
         **404** `visitor_link_not_found`, **410** `visitor_link_expired`, **403** `visitor_link_revoked` /
         `visitor_link_usage_exceeded`, **409** `visitor_device_inactive`. Throttle `visitor-open`
         (6/min per token + 20/min per IP).
+        K7 — a resident's link lives on the creator's own access: once the creator can no longer open the device
+        (removed, account deleted or blocked, subscription ended) it answers **403** `visitor_link_revoked`, and the
+        status endpoint reports `status: revoked`. Removals that revoke the roster revoke the creator's live links
+        on that device at once. Admin-created links are not tied to a resident.
       parameters:
         - { in: path, name: token, required: true, schema: { type: string, pattern: '^[A-Za-z0-9_-]+$', example: 'VISITOR_LINK_TOKEN' }, description: 'Plaintext visitor-link token (the credential)' }
       responses:

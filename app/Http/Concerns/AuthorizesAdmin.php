@@ -54,7 +54,8 @@ trait AuthorizesAdmin
     protected function assertDeviceInScope(Request $request, Device $device): void
     {
         $scope = $this->complexScopeId($request);
-        if ($scope !== null && (int) ($device->complex_id ?? 0) !== $scope) {
+        // A device outside any complex is never in a scoped admin's complex (K4: incl. NO_COMPLEX_SCOPE = 0).
+        if ($scope !== null && ($device->complex_id === null || (int) $device->complex_id !== $scope)) {
             abort(404);
         }
     }

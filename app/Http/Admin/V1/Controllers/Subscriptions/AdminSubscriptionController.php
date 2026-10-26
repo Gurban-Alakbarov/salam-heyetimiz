@@ -46,7 +46,7 @@ class AdminSubscriptionController
         $sub = \App\Domain\Subscriptions\Models\Subscription::query()->with(['deviceUser.device', 'deviceUser.user', 'periods'])->findOrFail($id);
         $device = $sub->deviceUser?->device;
         $scope = $this->complexScopeId($request);
-        abort_if($scope !== null && (int) ($device?->complex_id ?? 0) !== $scope, 404);
+        abort_if($scope !== null && ($device?->complex_id === null || (int) $device->complex_id !== $scope), 404); // K4
 
         $periods = $sub->periods->sortBy('id')->values();
 

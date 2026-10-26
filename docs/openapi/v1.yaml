@@ -1717,6 +1717,10 @@ paths:
       tags: [Admin / Admins]
       summary: Update an admin
       operationId: adminUpdateAdmin
+      description: |
+        K4 — setting `role: complex_manager` needs a complex (`complex_id` in the body, or the admin's current one),
+        exactly as on create: otherwise **422** on `complex_id`. Clearing `complex_id` of a complex_manager leaves it
+        scoped to no complex at all — never global.
       security:
         - adminBearerAuth: []
       x-authorization: super_admin

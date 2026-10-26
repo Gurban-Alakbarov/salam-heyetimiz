@@ -11,6 +11,7 @@ use App\Domain\Roster\Models\DeviceUser;
 use App\Http\Concerns\AuthorizesAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Context;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -112,6 +113,17 @@ class ComplexManagementController
 
         /** @var AdminUser $admin */
         $admin = AdminUser::query()->findOrFail($v['admin_id']);
+        // K4 — only a complex_manager is a complex's manager; binding a global role to a complex means nothing
+        // (its scope stays global) and only hides that from whoever reads the complex.
+        if (! $admin->role->isComplexScoped()) {
+            $requestId = Context::get('request_id');
+
+            return response()->json(['error' => [
+                'code' => 'not_complex_manager', 'message_key' => 'errors.not_complex_manager',
+                'message' => 'Kompleksə yalnız complex_manager rolunda admin təyin edilə bilər.', 'details' => null,
+                'request_id' => is_string($requestId) ? $requestId : null,
+            ]], 422);
+        }
         $admin->forceFill(['complex_id' => $complex->id])->save();
         $this->audit->record('complex.manager_assigned', ['admin_id' => $admin->id], Complex::class, (int) $complex->id);
 

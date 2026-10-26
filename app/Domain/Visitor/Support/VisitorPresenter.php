@@ -25,7 +25,8 @@ final class VisitorPresenter
             'visitor_name' => $link->visitor_name,
             'purpose' => $link->purpose?->value,
             'access_type' => $link->access_type->value,
-            'status' => $link->statusLabel(now()),
+            // K7: a link whose creator lost access is revoked in effect even before any row change.
+            'status' => $unavailableReason === VisitorUsageResult::Revoked ? 'revoked' : $link->statusLabel(now()),
             'valid' => $valid,
             'reason' => $unavailableReason?->value,
             'expires_at' => optional($link->expires_at)->toIso8601String(),

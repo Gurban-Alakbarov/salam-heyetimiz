@@ -58,6 +58,7 @@ return [
     'wrong_recovery_code' => 'The recovery code is incorrect or already used.',
     'tfa_required' => 'Two-factor verification is required for this action.',
     'internal_error' => 'An internal error occurred. Request id: :request_id',
+    'not_complex_manager' => 'This action is only for an admin with the complex manager role.',
     'email_taken' => 'This email belongs to another account.',
     'email_already_verified' => 'The account email is already verified and cannot be changed.',
     'subscription_access_removed' => 'You no longer have access to this device; the payment is not accepted.',

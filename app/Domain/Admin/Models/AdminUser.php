@@ -44,10 +44,21 @@ class AdminUser extends Authenticatable
         return $this->role === AdminRole::SuperAdmin;
     }
 
-    /** The complex this admin is scoped to (complex_manager), or null for global roles. */
+    /**
+     * K4 — the scope of a complex_manager that is bound to no complex (unassigned, or never bound): no complex
+     * has this id, so every scoped query comes back empty and every scoped check refuses. Fail closed — a
+     * complex-scoped role never falls back to the global (null) scope.
+     */
+    public const NO_COMPLEX_SCOPE = 0;
+
+    /** The complex this admin is scoped to (complex_manager), or null for global roles (see NO_COMPLEX_SCOPE). */
     public function complexScopeId(): ?int
     {
-        return $this->role->isComplexScoped() && $this->complex_id !== null ? (int) $this->complex_id : null;
+        if (! $this->role->isComplexScoped()) {
+            return null;
+        }
+
+        return $this->complex_id !== null ? (int) $this->complex_id : self::NO_COMPLEX_SCOPE;
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace App\Domain\Visitor;
 
 use App\Domain\DeviceComm\Events\OpenCommandCompleted;
+use App\Domain\Roster\Events\RosterUserRemoved;
 use App\Domain\Visitor\Listeners\IncrementVisitorUsageOnOpenCompleted;
+use App\Domain\Visitor\Listeners\RevokeVisitorLinksOnAccessRemoval;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,5 +19,6 @@ class ModuleServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(OpenCommandCompleted::class, IncrementVisitorUsageOnOpenCompleted::class);
+        Event::listen(RosterUserRemoved::class, RevokeVisitorLinksOnAccessRemoval::class); // K7
     }
 }

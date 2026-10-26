@@ -14,6 +14,9 @@ use App\Domain\DeviceComm\Services\OpenCommandService;
 use App\Domain\DeviceComm\Support\AcceptedOpenCommand;
 use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Models\Device;
+use App\Domain\Subscriptions\Queries\SubscriptionStatusQuery;
+use App\Domain\Users\Enums\UserStatus;
+use App\Domain\Users\Models\User;
 use App\Domain\Visitor\Enums\VisitorUsageResult;
 use App\Domain\Visitor\Exceptions\VisitorLinkUnavailableException;
 use App\Domain\Visitor\Models\VisitorLink;
@@ -30,6 +33,8 @@ use Illuminate\Support\Facades\DB;
  * DispatchOpenCommandJob → CommandDispatcher → TraccarDriver) — no special or weaker path. The link IS
  * the authorisation, so there is no roster/subscription gate; instead every attempt is validated
  * (revoked / expired / usage / device-active) under a row lock and written to visitor_link_usages.
+ * K7 — a resident's link is an extension of THEIR access: it stops working the moment its creator can no
+ * longer open the device (removed, deleted, blocked, subscription ended) and reports as revoked.
  * usage_count is NOT incremented here — it advances only when the open is CONFIRMED successful
  * (IncrementVisitorUsageOnOpenCompleted), so a courier's one-time link is never burned by an offline unit.
  */
@@ -40,6 +45,7 @@ final class VisitorAccessService
         private readonly OpenCommandService $commands,
         private readonly DriverResolver $drivers,
         private readonly ExpectedCompletionEstimator $estimator,
+        private readonly SubscriptionStatusQuery $access,
     ) {}
 
     /** Resolve a plaintext token to its link, or 404. Read-only (no usage recorded). */
@@ -67,6 +73,7 @@ final class VisitorAccessService
             $link->isExpired($now) => VisitorUsageResult::Expired,
             $link->isUsageExhausted() => VisitorUsageResult::UsageExceeded,
             ! $this->deviceOpenable($link->device) => VisitorUsageResult::DeviceInactive,
+            $this->creatorLostAccess($link) => VisitorUsageResult::Revoked, // K7
             default => null,
         };
     }
@@ -166,6 +173,9 @@ final class VisitorAccessService
         if (! $this->deviceOpenable($link->device)) {
             return VisitorUsageResult::DeviceInactive;
         }
+        if ($this->creatorLostAccess($link)) {
+            return VisitorUsageResult::Revoked; // K7 — the resident behind the link no longer has access
+        }
         if ($link->max_usage !== null && ($link->usage_count + $this->inFlightOpens($link)) >= $link->max_usage) {
             // Settled successes PLUS opens still running for this link — closes the double-click race so a
             // one-time link can never fire the relay twice.
@@ -183,6 +193,26 @@ final class VisitorAccessService
             ->whereIn('state', [OpenCommandState::Queued->value, OpenCommandState::Dispatching->value])
             ->where('metadata->visitor_link_id', (int) $link->getKey())
             ->count();
+    }
+
+    /**
+     * K7 — a resident-created link lives on its creator's access: the creator must still be an active account
+     * that can open this device right now (active roster row + own active subscription, device not disabled).
+     * Admin-created links rest on the admin's authority and are not tied to any resident.
+     */
+    private function creatorLostAccess(VisitorLink $link): bool
+    {
+        if ($link->created_by_user_id === null) {
+            return false;
+        }
+
+        /** @var User|null $creator */
+        $creator = User::query()->find($link->created_by_user_id); // a deleted (soft-deleted) account is gone
+        if ($creator === null || $creator->status !== UserStatus::Active) {
+            return true;
+        }
+
+        return ! $this->access->for((int) $creator->getKey(), (int) $link->device_id)->canOpen;
     }
 
     private function deviceOpenable(?Device $device): bool

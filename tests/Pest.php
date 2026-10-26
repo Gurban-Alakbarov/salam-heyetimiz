@@ -328,6 +328,17 @@ function makeSubscription(DeviceUser $deviceUser, array $attrs = []): Subscripti
  */
 function mintVisitorLink(Device $device, User|AdminUser $creator, ?VisitorAccessType $type = null, ?int $durationMinutes = 60, ?string $visitorName = 'Kuryer'): array
 {
+    // The API only lets a resident who can open the device mint a link, and the link lives on that access
+    // (K7) — give a resident creator on the roster the active subscription that precondition implies.
+    if ($creator instanceof User) {
+        $row = DeviceUser::query()->where('device_id', $device->getKey())->where('user_id', $creator->getKey())
+            ->where('status', 'active')->first();
+        if ($row !== null && ! Subscription::query()->where('device_user_id', $row->getKey())
+            ->where('status', SubscriptionStatus::Active->value)->where('ends_at', '>', now())->exists()) {
+            makeSubscription($row);
+        }
+    }
+
     $result = app(VisitorLinkService::class)->create($device, $creator, new CreateVisitorLinkData(
         accessType: $type ?? VisitorAccessType::TimeLimited,
         visitorName: $visitorName,

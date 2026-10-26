@@ -4,14 +4,11 @@ namespace App\Http\Api\V1\Controllers\Auth;
 
 use App\Domain\Auth\Actions\LogoutUser;
 use App\Domain\Auth\Actions\RefreshTokens;
-use App\Domain\Auth\Actions\SendOtp;
-use App\Domain\Auth\Actions\VerifyOtpAndIssueTokens;
+use App\Domain\Auth\Exceptions\SmsOtpRetiredException;
 use App\Domain\Auth\Support\AuthTokens;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
 use App\Domain\Users\Models\User;
 use App\Http\Api\V1\Requests\Auth\RefreshTokenRequest;
-use App\Http\Api\V1\Requests\Auth\RequestOtpRequest;
-use App\Http\Api\V1\Requests\Auth\VerifyOtpRequest;
 use App\Http\Resources\UserSelfResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,31 +17,16 @@ class AuthController
 {
     public function __construct(private readonly SubscriptionQuery $subscriptions) {}
 
-    /** POST /v1/auth/otp/request — requestOtp (202, anti-enumeration). */
-    public function requestOtp(RequestOtpRequest $request, SendOtp $action): JsonResponse
+    /** POST /v1/auth/otp/request — requestOtp: retired (K6) → 410 sms_otp_retired; no SMS, no account. */
+    public function requestOtp(): never
     {
-        $result = $action->handle(
-            phone: (string) $request->input('phone'),
-            purpose: $request->purpose(),
-            ip: (string) $request->ip(),
-            locale: app()->getLocale(),
-        );
-
-        return response()->json($result, 202);
+        throw new SmsOtpRetiredException;
     }
 
-    /** POST /v1/auth/otp/verify — verifyOtp (200 AuthSuccess). */
-    public function verifyOtp(VerifyOtpRequest $request, VerifyOtpAndIssueTokens $action): JsonResponse
+    /** POST /v1/auth/otp/verify — verifyOtp: retired (K6) → 410 sms_otp_retired; never issues tokens. */
+    public function verifyOtp(): never
     {
-        $tokens = $action->handle(
-            phone: (string) $request->input('phone'),
-            code: (string) $request->input('code'),
-            device: $request->deviceData(),
-            ip: (string) $request->ip(),
-            userAgent: $request->userAgent(),
-        );
-
-        return $this->authSuccess($tokens);
+        throw new SmsOtpRetiredException;
     }
 
     /** POST /v1/auth/refresh — refreshToken (200 AuthSuccess, rotated). */

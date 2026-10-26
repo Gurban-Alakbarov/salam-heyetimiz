@@ -188,7 +188,15 @@ export function useDecommissionDevice(id: number) {
 // ---- barrier / resident assignment (Roster) ----
 export interface AssignOwnerInput {
   owner_phone: string
+  /** K1 — the owner registers in the app with this email (the email code proves the account is theirs). */
+  owner_email?: string
   location_label?: string
+}
+
+export interface AddDeviceUserInput {
+  phone: string
+  /** K1 — same as AssignOwnerInput.owner_email, for a resident. */
+  email?: string
 }
 
 export function useAssignDevice(id: number) {
@@ -203,8 +211,8 @@ export function useAssignDevice(id: number) {
 export function useAddDeviceUser(id: number) {
   const invalidate = useDeviceInvalidation()
   return useMutation({
-    mutationFn: async (phone: string) =>
-      (await api.post<DeviceUser>(`/admin/v1/devices/${id}/users`, { phone })).data,
+    mutationFn: async (input: AddDeviceUserInput) =>
+      (await api.post<DeviceUser>(`/admin/v1/devices/${id}/users`, input)).data,
     onSuccess: () => invalidate(id),
   })
 }

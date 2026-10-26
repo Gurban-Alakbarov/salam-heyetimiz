@@ -9,6 +9,8 @@ export interface Resident {
   phone_masked: string
   /** Full email — admin surface only; null for phone-only accounts. */
   email: string | null
+  /** K1 — false while the owner has not proven the email in the app (an admin may still record / correct it). */
+  email_verified: boolean
   full_name: string | null
   role: DeviceUserRole
   last_open_at: string | null
@@ -32,6 +34,23 @@ export function useResidents(params: ResidentParams) {
     queryFn: async () =>
       (await api.get<Paginated<Resident>>('/admin/v1/residents', { params: cleanParams({ ...params }) })).data,
     placeholderData: keepPreviousData,
+  })
+}
+
+/**
+ * Record the owner's email on a not-yet-verified account (residents.update, K1). An account created by phone
+ * can only be activated in the app with THIS email — a phone number alone never hands it over. 409
+ * email_taken / email_already_verified.
+ */
+export function useSetResidentEmail() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { userId: number; email: string }) => {
+      await api.put(`/admin/v1/residents/${input.userId}/email`, { email: input.email })
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['residents'] })
+    },
   })
 }
 

@@ -10,6 +10,7 @@ import {
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { OwnerEmailField } from '@/components/OwnerEmailField'
 import { PermissionGate } from '@/components/PermissionGate'
 import { Button } from '@/components/ui/button'
 import {
@@ -163,15 +164,26 @@ function TransferDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   loading: boolean
-  onSubmit: (payload: { new_owner_phone: string; reason: string; keep_existing_users: boolean }) => void
+  onSubmit: (payload: {
+    new_owner_phone: string
+    new_owner_email?: string
+    reason: string
+    keep_existing_users: boolean
+  }) => void
 }) {
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [reason, setReason] = useState('')
   const [keep, setKeep] = useState(true)
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    onSubmit({ new_owner_phone: phone.trim(), reason: reason.trim(), keep_existing_users: keep })
+    onSubmit({
+      new_owner_phone: phone.trim(),
+      new_owner_email: email.trim() || undefined,
+      reason: reason.trim(),
+      keep_existing_users: keep,
+    })
   }
 
   return (
@@ -182,6 +194,7 @@ function TransferDialog({
         onOpenChange(next)
         if (!next) {
           setPhone('')
+          setEmail('')
           setReason('')
           setKeep(true)
         }
@@ -204,6 +217,7 @@ function TransferDialog({
                 required
               />
             </div>
+            <OwnerEmailField id="transfer-email" value={email} onChange={setEmail} who="Yeni sahib" />
             <div className="space-y-2">
               <Label htmlFor="transfer-reason">Səbəb</Label>
               <Textarea id="transfer-reason" value={reason} onChange={(e) => setReason(e.target.value)} required />

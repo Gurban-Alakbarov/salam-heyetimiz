@@ -11,5 +11,6 @@ class RosterMemberData extends Data
     public function __construct(
         public readonly string $phone,
         public readonly DeviceUserRole $role = DeviceUserRole::User,
+        public readonly ?string $email = null,
     ) {}
 }

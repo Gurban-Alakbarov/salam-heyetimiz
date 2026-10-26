@@ -174,20 +174,27 @@ function currentTotp(string $secret = TEST_TOTP_SECRET): string
 }
 
 /**
- * Run the full OTP login flow and return the AuthSuccess body (access_token, refresh_token, user).
+ * Run the full email-OTP login flow (the only mobile sign-in since K6 retired phone OTP) and return the
+ * token payload (access_token, refresh_token, user). A verified account is provisioned for $phone first.
  *
  * @return array<string, mixed>
  */
 function authenticateViaOtp(string $phone, string $installUuid = TEST_INSTALL_UUID): array
 {
-    test()->postJson('/v1/auth/otp/request', ['phone' => $phone])->assertStatus(202);
-    $code = app(\App\Domain\Auth\Adapters\FakeOtpTransport::class)->lastCodeFor($phone);
+    $user = User::query()->firstOrCreate(['phone' => $phone]);
+    $user->forceFill([
+        'email' => $user->email ?? 'u'.preg_replace('/\D/', '', $phone).'@test.az',
+        'email_verified_at' => $user->email_verified_at ?? now(),
+    ])->save();
 
-    return test()->postJson('/v1/auth/otp/verify', [
-        'phone' => $phone,
+    test()->postJson('/v1/auth/login', ['email' => $user->email])->assertStatus(202);
+    $code = app(\App\Domain\Auth\Adapters\FakeEmailOtpTransport::class)->lastCodeFor($user->email);
+
+    return test()->postJson('/v1/auth/verify-email', [
+        'email' => $user->email,
         'code' => $code,
         'device' => ['install_uuid' => $installUuid, 'platform' => 'ios'],
-    ])->assertOk()->json();
+    ])->assertOk()->json('data');
 }
 
 /**

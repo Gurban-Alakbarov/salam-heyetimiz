@@ -8,6 +8,7 @@ use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Roster\Queries\ResidentQuery;
 use App\Domain\Users\Models\User;
+use App\Domain\Users\Services\AccountEmailService;
 use App\Http\Concerns\AuthorizesAdmin;
 use App\Support\Pagination\Cursor;
 use App\Support\Phone\PhoneNumber;
@@ -52,6 +53,8 @@ class AdminResidentController
                 'phone_masked' => PhoneNumber::tryFromInput($r->phone)?->masked() ?? $r->phone,
                 // Full email (admin surface only) — the account identifier admins search/act on.
                 'email' => $r->email,
+                // K1: false = the owner has not proven this email yet (admin may still record / correct it).
+                'email_verified' => $r->email_verified_at !== null,
                 'full_name' => $r->full_name,
                 'role' => $r->role,
                 'last_open_at' => $r->last_open_at !== null ? Carbon::parse($r->last_open_at)->toIso8601String() : null,
@@ -85,21 +88,55 @@ class AdminResidentController
 
         /** @var User $user */
         $user = User::query()->findOrFail($userId);
-
-        $scopeComplexId = $this->complexScopeId($request);
-        if ($scopeComplexId !== null) {
-            $outsideScope = DeviceUser::query()
-                ->join('devices', 'devices.id', '=', 'device_users.device_id')
-                ->where('device_users.user_id', $userId)
-                ->where('device_users.status', DeviceUserStatus::Active->value)
-                ->where(fn ($q) => $q->whereNull('devices.complex_id')->orWhere('devices.complex_id', '!=', $scopeComplexId))
-                ->exists();
-
-            abort_if($outsideScope, 403);
-        }
+        $this->assertResidentInScope($request, $userId);
 
         $action->handle($user, $request->user());
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * PUT /admin/v1/residents/{userId}/email — adminSetResidentEmail (residents.update).
+     *
+     * K1: record the owner's email on a not-yet-verified account (e.g. created by phone at device
+     * assignment). The owner then registers with this email and proves it with the email OTP — a phone
+     * number alone never hands over an account with live access. The email stays unverified here; a
+     * verified email is the login identity and is never replaced (409 email_already_verified); an email
+     * of another account answers 409 email_taken.
+     */
+    public function setEmail(Request $request, int $userId, AccountEmailService $emails): JsonResponse
+    {
+        $this->requirePermission($request, Permission::RESIDENTS_UPDATE);
+        $email = $request->validate(['email' => ['required', 'string', 'email:rfc', 'max:160']])['email'];
+
+        /** @var User $user */
+        $user = User::query()->findOrFail($userId);
+        $this->assertResidentInScope($request, $userId);
+
+        $user = $emails->record($user, $email);
+
+        return response()->json([
+            'user_id' => (int) $user->getKey(),
+            'email' => $user->email,
+            'email_verified' => $user->email_verified_at !== null,
+        ]);
+    }
+
+    /** complex_manager: only a resident whose active memberships all sit inside its own complex (else 403). */
+    private function assertResidentInScope(Request $request, int $userId): void
+    {
+        $scopeComplexId = $this->complexScopeId($request);
+        if ($scopeComplexId === null) {
+            return;
+        }
+
+        $outsideScope = DeviceUser::query()
+            ->join('devices', 'devices.id', '=', 'device_users.device_id')
+            ->where('device_users.user_id', $userId)
+            ->where('device_users.status', DeviceUserStatus::Active->value)
+            ->where(fn ($q) => $q->whereNull('devices.complex_id')->orWhere('devices.complex_id', '!=', $scopeComplexId))
+            ->exists();
+
+        abort_if($outsideScope, 403);
     }
 }

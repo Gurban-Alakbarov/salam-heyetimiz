@@ -4,6 +4,7 @@ import { useAddDeviceUser, useAssignDevice, useGrantSubscription, useRemoveDevic
 import { ApiError } from '@/lib/api'
 import { PERM } from '@/auth/permissions'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { OwnerEmailField } from '@/components/OwnerEmailField'
 import { PermissionGate } from '@/components/PermissionGate'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Badge } from '@/components/ui/badge'
@@ -171,8 +172,8 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
         open={addOpen}
         onOpenChange={setAddOpen}
         loading={addUser.isPending}
-        onSubmit={(phone) =>
-          addUser.mutate(phone, {
+        onSubmit={(input) =>
+          addUser.mutate(input, {
             onSuccess: () => {
               toast({ variant: 'success', title: 'Sakin əlavə edildi' })
               setAddOpen(false)
@@ -314,14 +315,19 @@ function AssignOwnerDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   loading: boolean
-  onSubmit: (payload: { owner_phone: string; location_label?: string }) => void
+  onSubmit: (payload: { owner_phone: string; owner_email?: string; location_label?: string }) => void
 }) {
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [label, setLabel] = useState('')
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    onSubmit({ owner_phone: phone.trim(), location_label: label.trim() || undefined })
+    onSubmit({
+      owner_phone: phone.trim(),
+      owner_email: email.trim() || undefined,
+      location_label: label.trim() || undefined,
+    })
   }
 
   return (
@@ -332,6 +338,7 @@ function AssignOwnerDialog({
         onOpenChange(next)
         if (!next) {
           setPhone('')
+          setEmail('')
           setLabel('')
         }
       }}
@@ -355,6 +362,7 @@ function AssignOwnerDialog({
                 required
               />
             </div>
+            <OwnerEmailField id="assign-email" value={email} onChange={setEmail} who="Sahib" />
             <div className="space-y-2">
               <Label htmlFor="assign-label">Ünvan / yer (istəyə bağlı)</Label>
               <Input
@@ -389,13 +397,14 @@ function AddResidentDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   loading: boolean
-  onSubmit: (phone: string) => void
+  onSubmit: (input: { phone: string; email?: string }) => void
 }) {
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    onSubmit(phone.trim())
+    onSubmit({ phone: phone.trim(), email: email.trim() || undefined })
   }
 
   return (
@@ -404,7 +413,10 @@ function AddResidentDialog({
       onOpenChange={(next) => {
         if (loading) return
         onOpenChange(next)
-        if (!next) setPhone('')
+        if (!next) {
+          setPhone('')
+          setEmail('')
+        }
       }}
     >
       <DialogContent>
@@ -416,15 +428,18 @@ function AddResidentDialog({
               avtomatik yaradılır və whitelist-ə əlavə olunur.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2 py-4">
-            <Label htmlFor="member-phone">Sakinin telefonu</Label>
-            <Input
-              id="member-phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+994XXXXXXXXX"
-              required
-            />
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="member-phone">Sakinin telefonu</Label>
+              <Input
+                id="member-phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+994XXXXXXXXX"
+                required
+              />
+            </div>
+            <OwnerEmailField id="member-email" value={email} onChange={setEmail} who="Sakin" />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>

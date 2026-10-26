@@ -308,6 +308,8 @@ export type UpdateDeviceInput = Partial<Omit<CreateDeviceInput, 'serial' | 'devi
 }
 export interface TransferInput {
   new_owner_phone: string
+  /** K1 — recorded on a not-yet-verified account so the new owner can register with it. */
+  new_owner_email?: string
   reason: string
   keep_existing_users?: boolean
 }

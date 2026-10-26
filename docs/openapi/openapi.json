@@ -4,7 +4,7 @@
     "title": "Salam Həyətimiz API",
     "version": "1.3.0",
     "summary": "REST API for the Salam Həyətimiz remote access-control platform.",
-    "description": "# Overview\n\nThis document is the **binding contract** between the Laravel backend and all clients\n(Flutter mobile app, Blade admin panel, and Kapital Bank webhooks). It is the source\nof truth referenced by `TECHNICAL_SPECIFICATION.md` §9 and aligns with `DATABASE_ARCHITECTURE.md` v1.0.\n\nThe API is split into two surfaces:\n\n| Surface | Prefix | Audience | Auth |\n|---|---|---|---|\n| Mobile / Public | `/v1` | End users, device owners, technical mobile mode | Phone + OTP → JWT (`bearerAuth`) |\n| Admin | `/admin/v1` | Super admin, technical (back-office) | Email + password + TOTP → JWT (`adminBearerAuth`) |\n| Webhooks | `/v1/payments/callback` | Kapital Bank | HMAC signature + IP allowlist |\n\nAll times are **UTC** in **RFC 3339** form. All money is in **minor units** (qəpik;\n1 AZN = 100). Currency is always **AZN**.\n\n# Authentication\n\n## Mobile (`bearerAuth`)\nPhone-based OTP authentication. The flow:\n\n1. `POST /auth/otp/request` with phone — backend dispatches a 6-digit SMS OTP (TTL 120 s, max 5 attempts).\n2. `POST /auth/otp/verify` with phone + code + device fingerprint — backend issues a JWT access token (15 min) and an opaque refresh token (60 days).\n3. Send `Authorization: Bearer <access_token>` on subsequent calls.\n4. Refresh with `POST /auth/refresh` when the access token nears expiry; refresh tokens **rotate** on every use.\n\nTokens are bound to the install (`device_fingerprint`); changing devices requires re-OTP.\nLogout (`POST /auth/logout`) revokes the refresh token server-side.\n\n## Admin (`adminBearerAuth`)\nEmail + password + mandatory TOTP for super admin. Two-step login:\n\n1. `POST /admin/v1/auth/login` → short-lived 2FA challenge token.\n2. `POST /admin/v1/auth/2fa/verify` → admin JWT.\n\nAdmin tokens are not interchangeable with mobile tokens — disjoint identity spaces.\n\n## Bank callback (`bankCallbackSignature`)\nSigned by Kapital Bank with `X-Kapital-Signature` (HMAC-SHA256 over the canonical body\nusing a shared secret). Server **always** double-verifies via `getOrderStatus` before\nmutating state (defence-in-depth).\n\n# Authorization\n\nAuthorization is enforced server-side on every endpoint. Roles:\n\n| Role | Identity | Where |\n|---|---|---|\n| `user` | Any authenticated mobile user | Default for mobile endpoints |\n| `owner` | `device_users.role='owner'` for the target device | Roster + invitations |\n| `technical_mobile` | An admin with `role='technical'` operating in mobile | Device provisioning endpoints in mobile mode |\n| `super_admin` | `admin_users.role='super_admin'` | Full admin |\n| `technical` | `admin_users.role='technical'` | Admin: devices module + read-only users |\n\nPer-endpoint authorization requirements are documented in each operation's\n`x-authorization` field and enforced via Laravel policies.\n\n# Pagination\n\nAll list endpoints use **opaque cursor pagination** — never offset.\n\nRequest:\n```\nGET /v1/devices/{id}/commands?limit=50&cursor=eyJpZCI6MTIzNCwidCI6IjIwMjYtMDYtMDhUMDA6MDA6MDBaIn0\n```\n\n| Query param | Type | Default | Max | Notes |\n|---|---|---|---|---|\n| `limit` | int | 25 | 100 | Page size |\n| `cursor` | string | — | — | Opaque; from previous response's `page.next_cursor` |\n| `order` | enum | `desc` | — | `asc` or `desc` on default sort key |\n\nResponse envelope:\n```json\n{\n  \"data\": [...],\n  \"page\": {\n    \"next_cursor\": \"eyJ...\",\n    \"has_more\": true,\n    \"limit\": 50\n  }\n}\n```\n\n`next_cursor` is `null` when there are no further pages.\n\n# Idempotency\n\nAll mutating endpoints accept and recommend the `Idempotency-Key` header.\n\n- The key MUST be a UUID v4 (or any string ≤ 60 chars).\n- The server stores the canonical response keyed by `(scope, actor, key)` for **24 h** (table: `idempotency_keys`).\n- Replays with the same key return the **same status and body**, without re-executing.\n- Replays with the same key but a different request body return `409 conflict` (`idempotency_mismatch`).\n\nEndpoints that **require** Idempotency-Key (server rejects on absence):\n- `POST /devices/{id}/open`\n- `POST /orders`\n- `POST /subscriptions/{id}/renew`\n- `POST /admin/v1/orders/{id}/refund`\n\nAll other mutating endpoints **accept but do not require** it.\n\n# Rate Limits\n\nLimits are enforced at the API gateway. Every response includes:\n\n```\nX-RateLimit-Limit: 120\nX-RateLimit-Remaining: 117\nX-RateLimit-Reset: 1717945200\n```\n\n| Bucket | Limit |\n|---|---|\n| `/auth/otp/request` | 3 / phone / 10 min, 30 / IP / hour |\n| `/auth/otp/verify` | 10 / phone / 10 min |\n| `/devices/*/open` | 12 / user / min, 4 / device / min |\n| Authenticated mobile generic | 120 req / min / user |\n| Admin generic | 600 req / min / admin |\n| `/payments/callback` | 600 req / min / source-IP (allowlisted) |\n| Unauthenticated generic | 30 req / min / IP |\n\nExceeding any bucket returns **`429 rate_limited`** with `Retry-After` (seconds).\n\n# Errors\n\nUniform error envelope across all endpoints:\n\n```json\n{\n  \"error\": {\n    \"code\": \"subscription_required\",\n    \"message_key\": \"errors.subscription_required\",\n    \"message\": \"Aboneliyiniz başa çatıb.\",\n    \"details\": { \"device_id\": 42 },\n    \"request_id\": \"01JCGZ9F9XZ7P0X5MFK7Z7VYNZ\"\n  }\n}\n```\n\n`message` is localized per `Accept-Language` (az/ru/en). `message_key` is locale-independent\nand stable for client logic. `request_id` is the correlation ID also written to the audit log.\n\nStandard codes:\n\n| HTTP | `code` | When |\n|---|---|---|\n| 400 | `bad_request` | Malformed request beyond field validation |\n| 401 | `unauthenticated` | Missing / invalid / expired token |\n| 403 | `forbidden` | Authenticated but disallowed |\n| 403 | `subscription_required` | Sub is not `active` for the device/user |\n| 403 | `device_disabled` | Device disabled by admin |\n| 404 | `not_found` | |\n| 409 | `conflict` | Resource state precludes operation |\n| 409 | `idempotency_mismatch` | Same key, different body |\n| 422 | `validation_failed` | Field-level errors (see `ValidationError`) |\n| 429 | `rate_limited` | Bucket exhausted |\n| 429 | `cooldown` | Open-command cooldown active |\n| 502 | `device_offline` | Driver could not reach device |\n| 503 | `payment_provider_unavailable` | Kapital Bank unreachable / degraded |\n| 500 | `internal_error` | Unexpected; check `request_id` |\n\n# Versioning\n\nPath-versioned (`/v1/`). Breaking changes ship under `/v2/`. Within a major version we add\nnew fields / endpoints additively. Deprecation announced via `Sunset` header at least 90 days\nbefore removal.\n\n# Conventions\n\n- `Content-Type: application/json; charset=utf-8` on all bodies.\n- `Accept-Language: az | ru | en` — defaults to `az`.\n- All IDs are unsigned 64-bit integers serialized as JSON numbers (always < `Number.MAX_SAFE_INTEGER` for the foreseeable future; client libraries should still treat as 64-bit).\n- `null` is used for absence; never empty-string sentinels.\n- Booleans are `true`/`false`, never `0`/`1`.\n",
+    "description": "# Overview\n\nThis document is the **binding contract** between the Laravel backend and all clients\n(Flutter mobile app, Blade admin panel, and Kapital Bank webhooks). It is the source\nof truth referenced by `TECHNICAL_SPECIFICATION.md` §9 and aligns with `DATABASE_ARCHITECTURE.md` v1.0.\n\nThe API is split into two surfaces:\n\n| Surface | Prefix | Audience | Auth |\n|---|---|---|---|\n| Mobile / Public | `/v1` | End users, device owners, technical mobile mode | Phone + OTP → JWT (`bearerAuth`) |\n| Admin | `/admin/v1` | Super admin, technical (back-office) | Email + password + TOTP → JWT (`adminBearerAuth`) |\n| Webhooks | `/v1/payments/callback` | Kapital Bank | HMAC signature + IP allowlist |\n\nAll times are **UTC** in **RFC 3339** form. All money is in **minor units** (qəpik;\n1 AZN = 100). Currency is always **AZN**.\n\n# Authentication\n\n## Mobile (`bearerAuth`)\nEmail-OTP authentication. The flow:\n\n1. `POST /auth/register` (new account) or `POST /auth/login` (verified account) with the email — backend emails a 6-digit OTP (TTL 120 s, max 5 attempts).\n2. `POST /auth/verify-email` with email + code + device fingerprint — backend issues a JWT access token (15 min) and an opaque refresh token (60 days).\n3. Send `Authorization: Bearer <access_token>` on subsequent calls.\n4. Refresh with `POST /auth/refresh` when the access token nears expiry; refresh tokens **rotate** on every use.\n\nTokens are bound to the install (`device_fingerprint`); changing devices requires re-OTP.\nLogout (`POST /auth/logout`) revokes the refresh token server-side.\n\n## Admin (`adminBearerAuth`)\nEmail + password + mandatory TOTP for super admin. Two-step login:\n\n1. `POST /admin/v1/auth/login` → short-lived 2FA challenge token.\n2. `POST /admin/v1/auth/2fa/verify` → admin JWT.\n\nAdmin tokens are not interchangeable with mobile tokens — disjoint identity spaces.\n\n## Bank callback (`bankCallbackSignature`)\nSigned by Kapital Bank with `X-Kapital-Signature` (HMAC-SHA256 over the canonical body\nusing a shared secret). Server **always** double-verifies via `getOrderStatus` before\nmutating state (defence-in-depth).\n\n# Authorization\n\nAuthorization is enforced server-side on every endpoint. Roles:\n\n| Role | Identity | Where |\n|---|---|---|\n| `user` | Any authenticated mobile user | Default for mobile endpoints |\n| `owner` | `device_users.role='owner'` for the target device | Roster + invitations |\n| `technical_mobile` | An admin with `role='technical'` operating in mobile | Device provisioning endpoints in mobile mode |\n| `super_admin` | `admin_users.role='super_admin'` | Full admin |\n| `technical` | `admin_users.role='technical'` | Admin: devices module + read-only users |\n\nPer-endpoint authorization requirements are documented in each operation's\n`x-authorization` field and enforced via Laravel policies.\n\n# Pagination\n\nAll list endpoints use **opaque cursor pagination** — never offset.\n\nRequest:\n```\nGET /v1/devices/{id}/commands?limit=50&cursor=eyJpZCI6MTIzNCwidCI6IjIwMjYtMDYtMDhUMDA6MDA6MDBaIn0\n```\n\n| Query param | Type | Default | Max | Notes |\n|---|---|---|---|---|\n| `limit` | int | 25 | 100 | Page size |\n| `cursor` | string | — | — | Opaque; from previous response's `page.next_cursor` |\n| `order` | enum | `desc` | — | `asc` or `desc` on default sort key |\n\nResponse envelope:\n```json\n{\n  \"data\": [...],\n  \"page\": {\n    \"next_cursor\": \"eyJ...\",\n    \"has_more\": true,\n    \"limit\": 50\n  }\n}\n```\n\n`next_cursor` is `null` when there are no further pages.\n\n# Idempotency\n\nAll mutating endpoints accept and recommend the `Idempotency-Key` header.\n\n- The key MUST be a UUID v4 (or any string ≤ 60 chars).\n- The server stores the canonical response keyed by `(scope, actor, key)` for **24 h** (table: `idempotency_keys`).\n- Replays with the same key return the **same status and body**, without re-executing.\n- Replays with the same key but a different request body return `409 conflict` (`idempotency_mismatch`).\n\nEndpoints that **require** Idempotency-Key (server rejects on absence):\n- `POST /devices/{id}/open`\n- `POST /orders`\n- `POST /subscriptions/{id}/renew`\n- `POST /admin/v1/orders/{id}/refund`\n\nAll other mutating endpoints **accept but do not require** it.\n\n# Rate Limits\n\nLimits are enforced at the API gateway. Every response includes:\n\n```\nX-RateLimit-Limit: 120\nX-RateLimit-Remaining: 117\nX-RateLimit-Reset: 1717945200\n```\n\n| Bucket | Limit |\n|---|---|\n| `/auth/otp/request` (retired, 410) | 3 / phone / 10 min, 30 / IP / hour |\n| `/auth/otp/verify` (retired, 410) | 10 / phone / 10 min |\n| `/devices/*/open` | 12 / user / min, 4 / device / min |\n| Authenticated mobile generic | 120 req / min / user |\n| Admin generic | 600 req / min / admin |\n| `/payments/callback` | 600 req / min / source-IP (allowlisted) |\n| Unauthenticated generic | 30 req / min / IP |\n\nExceeding any bucket returns **`429 rate_limited`** with `Retry-After` (seconds).\n\n# Errors\n\nUniform error envelope across all endpoints:\n\n```json\n{\n  \"error\": {\n    \"code\": \"subscription_required\",\n    \"message_key\": \"errors.subscription_required\",\n    \"message\": \"Aboneliyiniz başa çatıb.\",\n    \"details\": { \"device_id\": 42 },\n    \"request_id\": \"01JCGZ9F9XZ7P0X5MFK7Z7VYNZ\"\n  }\n}\n```\n\n`message` is localized per `Accept-Language` (az/ru/en). `message_key` is locale-independent\nand stable for client logic. `request_id` is the correlation ID also written to the audit log.\n\nStandard codes:\n\n| HTTP | `code` | When |\n|---|---|---|\n| 400 | `bad_request` | Malformed request beyond field validation |\n| 401 | `unauthenticated` | Missing / invalid / expired token |\n| 403 | `forbidden` | Authenticated but disallowed |\n| 403 | `subscription_required` | Sub is not `active` for the device/user |\n| 403 | `device_disabled` | Device disabled by admin |\n| 404 | `not_found` | |\n| 409 | `conflict` | Resource state precludes operation |\n| 409 | `idempotency_mismatch` | Same key, different body |\n| 422 | `validation_failed` | Field-level errors (see `ValidationError`) |\n| 429 | `rate_limited` | Bucket exhausted |\n| 429 | `cooldown` | Open-command cooldown active |\n| 502 | `device_offline` | Driver could not reach device |\n| 503 | `payment_provider_unavailable` | Kapital Bank unreachable / degraded |\n| 500 | `internal_error` | Unexpected; check `request_id` |\n\n# Versioning\n\nPath-versioned (`/v1/`). Breaking changes ship under `/v2/`. Within a major version we add\nnew fields / endpoints additively. Deprecation announced via `Sunset` header at least 90 days\nbefore removal.\n\n# Conventions\n\n- `Content-Type: application/json; charset=utf-8` on all bodies.\n- `Accept-Language: az | ru | en` — defaults to `az`.\n- All IDs are unsigned 64-bit integers serialized as JSON numbers (always < `Number.MAX_SAFE_INTEGER` for the foreseeable future; client libraries should still treat as 64-bit).\n- `null` is used for absence; never empty-string sentinels.\n- Booleans are `true`/`false`, never `0`/`1`.\n",
     "contact": {
       "name": "Salam Həyətimiz Engineering",
       "email": "engineering@salamhayetimiz.az"
@@ -280,62 +280,15 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Request an OTP for the given phone number",
+        "summary": "(Retired) phone OTP request — always 410",
+        "description": "**Retired (K6).** Phone-OTP sign-in provisioned an account from a bare phone number. The app signs in by\nemail OTP only (`/auth/register`, `/auth/login`, `/auth/verify-email`). The route stays (throttled) so old\nclients get a clear answer: no SMS is sent and no account is created, whatever the body.\n",
         "operationId": "requestOtp",
+        "deprecated": true,
         "security": [],
         "x-rate-limit": "3/phone/10min, 30/IP/hour",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "phone"
-                ],
-                "properties": {
-                  "phone": {
-                    "type": "string",
-                    "pattern": "^\\+994\\d{9}$",
-                    "example": "+994501234567"
-                  },
-                  "purpose": {
-                    "type": "string",
-                    "enum": [
-                      "login",
-                      "recover"
-                    ],
-                    "default": "login"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
-          "202": {
-            "description": "OTP dispatched (response identical regardless of phone existence — prevents enumeration)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "expires_in_seconds": {
-                      "type": "integer",
-                      "example": 120
-                    },
-                    "resend_available_in_seconds": {
-                      "type": "integer",
-                      "example": 30
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "$ref": "#/components/responses/ValidationError"
+          "410": {
+            "$ref": "#/components/responses/SmsOtpRetired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -348,88 +301,15 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Verify an OTP and exchange for tokens",
+        "summary": "(Retired) phone OTP verify — always 410",
+        "description": "**Retired (K6).** Never issues tokens; use `/auth/verify-email`.\n",
         "operationId": "verifyOtp",
+        "deprecated": true,
         "security": [],
         "x-rate-limit": "10/phone/10min",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "phone",
-                  "code",
-                  "device"
-                ],
-                "properties": {
-                  "phone": {
-                    "type": "string",
-                    "pattern": "^\\+994\\d{9}$"
-                  },
-                  "code": {
-                    "type": "string",
-                    "pattern": "^\\d{6}$"
-                  },
-                  "device": {
-                    "$ref": "#/components/schemas/DeviceFingerprintInput"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
-          "200": {
-            "description": "Auth success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthSuccess"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Wrong code / expired / max attempts",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "examples": {
-                  "wrong_code": {
-                    "value": {
-                      "error": {
-                        "code": "wrong_code",
-                        "message": "Kod yanlışdır."
-                      }
-                    }
-                  },
-                  "expired": {
-                    "value": {
-                      "error": {
-                        "code": "otp_expired",
-                        "message": "Kodun vaxtı bitib."
-                      }
-                    }
-                  },
-                  "max_attempts": {
-                    "value": {
-                      "error": {
-                        "code": "otp_max_attempts",
-                        "message": "Çox cəhd oldu."
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "$ref": "#/components/responses/ValidationError"
+          "410": {
+            "$ref": "#/components/responses/SmsOtpRetired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -2159,6 +2039,13 @@
                     "type": "string",
                     "pattern": "^\\+994\\d{9}$"
                   },
+                  "owner_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 160,
+                    "nullable": true,
+                    "description": "Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed)."
+                  },
                   "region_id": {
                     "type": "integer",
                     "format": "int64",
@@ -3515,6 +3402,13 @@
                   "new_owner_phone": {
                     "type": "string",
                     "pattern": "^\\+994\\d{9}$"
+                  },
+                  "new_owner_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 160,
+                    "nullable": true,
+                    "description": "Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed)."
                   },
                   "reason": {
                     "type": "string",
@@ -6446,12 +6340,38 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "phone"
+                  "owner_phone"
                 ],
                 "properties": {
-                  "phone": {
+                  "owner_phone": {
                     "type": "string",
+                    "pattern": "^\\+994\\d{9}$",
                     "example": "+994501234567"
+                  },
+                  "owner_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 160,
+                    "nullable": true,
+                    "description": "Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed)."
+                  },
+                  "region_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "nullable": true
+                  },
+                  "location_label": {
+                    "type": "string",
+                    "maxLength": 160,
+                    "nullable": true
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "nullable": true
                   }
                 }
               }
@@ -6467,6 +6387,16 @@
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "description": "`email_taken`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
             "$ref": "#/components/responses/ValidationError"
@@ -6508,6 +6438,13 @@
                   "label": {
                     "type": "string",
                     "example": "Blok A"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 160,
+                    "nullable": true,
+                    "description": "Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed)."
                   }
                 }
               }
@@ -6523,6 +6460,16 @@
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "description": "`email_taken`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
             "$ref": "#/components/responses/ValidationError"
@@ -8293,6 +8240,101 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/admin/v1/residents/{userId}/email": {
+      "put": {
+        "tags": [
+          "Admin / Residents"
+        ],
+        "summary": "Record the owner's email on a not-yet-verified account",
+        "operationId": "adminSetResidentEmail",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Requires `residents.update` (K1). An account created by phone (device assignment) with live access can only\nbe taken over by registering with THIS email — the email OTP proves the registrant owns it; a phone\nnumber alone never hands it over (registration answers **409** `phone_linked_to_account`). The email stays\nunverified. **409** `email_already_verified` for a different email on a verified account (re-sending its\nown email is a no-op 200); **409** `email_taken` when another (incl. deleted) account uses it. A\n`complex_manager` gets **403** for a resident with active roster rows outside its complex. Audited\n`resident.email_recorded` (masked).\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 160,
+                    "example": "owner@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "email_verified": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "`email_taken` | `email_already_verified`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
           }
         }
       }
@@ -11113,6 +11155,23 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/ValidationErrorEnvelope"
+            }
+          }
+        }
+      },
+      "SmsOtpRetired": {
+        "description": "Phone-OTP sign-in is retired (K6) — sign in by email OTP",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "sms_otp_retired",
+                "message_key": "errors.sms_otp_retired",
+                "message": "Telefonla giriş dayandırılıb. Tətbiqi yeniləyin və email ilə daxil olun."
+              }
             }
           }
         }
@@ -15121,6 +15180,10 @@
             "format": "email",
             "nullable": true,
             "example": "resident@example.com"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "description": "K1 — false while the owner has not proven the email (an admin may still record / correct it)."
           },
           "complex": {
             "type": "string",

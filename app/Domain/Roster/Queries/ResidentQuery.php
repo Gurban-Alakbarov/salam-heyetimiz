@@ -26,7 +26,7 @@ final class ResidentQuery
             ->whereNull('d.deleted_at')
             ->where('du.status', 'active')
             ->select([
-                'du.id as device_user_id', 'du.user_id', 'u.phone', 'u.email', 'u.full_name', 'du.role', 'du.last_open_at',
+                'du.id as device_user_id', 'du.user_id', 'u.phone', 'u.email', 'u.email_verified_at', 'u.full_name', 'du.role', 'du.last_open_at',
                 'd.id as device_id', 'd.serial', 'd.status as device_status', 'd.last_online_at',
                 'c.id as complex_id', 'c.name as complex_name',
                 's.status as sub_status', 's.ends_at as sub_ends_at',

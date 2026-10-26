@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 /*
 | Phase 2 — Email-OTP registration + login API. Unified envelope { success, message, data, meta, errors }
-| on every NEW endpoint; the legacy phone-OTP endpoints stay in their own shape (asserted untouched).
+| on every NEW endpoint; the legacy phone-OTP endpoints are retired (K6, 410 in their own error shape).
 | No real SMTP (the email transport is the in-memory fake).
 */
 
@@ -164,10 +164,9 @@ it('rate-limits register per email with a unified 429', function () {
         ->assertJsonPath('errors.code', 'rate_limited');
 });
 
-it('leaves the legacy phone-OTP endpoints in their original shape (untouched)', function () {
-    // legacy request returns the bare {expires_in_seconds,...} (NOT the unified envelope)
+it('the legacy phone-OTP endpoint is retired (K6) — 410 in the legacy error shape, not the unified envelope', function () {
     test()->postJson('/v1/auth/otp/request', ['phone' => '+994509990001'])
-        ->assertStatus(202)
-        ->assertJsonStructure(['expires_in_seconds', 'resend_available_in_seconds'])
+        ->assertStatus(410)
+        ->assertJsonPath('error.code', 'sms_otp_retired')
         ->assertJsonMissingPath('success');
 });

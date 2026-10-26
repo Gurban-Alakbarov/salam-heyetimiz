@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Trash2, Wifi, WifiOff } from 'lucide-react'
+import { Loader2, Mail, Search, Trash2, Wifi, WifiOff } from 'lucide-react'
 import { useComplexList } from '@/api/complexes'
-import { type Resident, useDeleteResident, useResidents } from '@/api/residents'
+import { type Resident, useDeleteResident, useResidents, useSetResidentEmail } from '@/api/residents'
 import { ApiError } from '@/lib/api'
 import { PERM } from '@/auth/permissions'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -14,7 +14,16 @@ import { EmptyState, ErrorState, TableSkeleton } from '@/components/states'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/toast'
 import { formatDateTime } from '@/lib/format'
@@ -27,6 +36,7 @@ export function ResidentsPage() {
   const [q, setQ] = useState('')
   const [complexId, setComplexId] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Resident | null>(null)
+  const [emailTarget, setEmailTarget] = useState<Resident | null>(null)
   const { cursor, next, prev, reset, canPrev, pageIndex } = useCursor()
   const { data: complexes } = useComplexList()
   const query = useResidents({ q: q || undefined, complex_id: complexId ? Number(complexId) : undefined, cursor })
@@ -81,7 +91,27 @@ export function ResidentsPage() {
                 <TableRow key={r.device_user_id}>
                   <TableCell className="font-medium">{r.phone_masked}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {r.email ? <span className="select-all break-all">{r.email}</span> : '—'}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {r.email ? <span className="select-all break-all">{r.email}</span> : '—'}
+                      {/* K1: an unproven email can still be recorded / corrected; a verified one is the login. */}
+                      {r.email && !r.email_verified && (
+                        <Badge variant="muted" title="Sakin bu e-poçtu tətbiqdə hələ təsdiqləməyib">təsdiqlənməyib</Badge>
+                      )}
+                      {!r.email_verified && (
+                        <PermissionGate anyOf={[PERM.residentsUpdate]}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            aria-label="E-poçt yaz"
+                            title={r.email ? 'E-poçtu düzəlt' : 'E-poçt yaz'}
+                            onClick={() => setEmailTarget(r)}
+                          >
+                            <Mail className="h-3.5 w-3.5" />
+                          </Button>
+                        </PermissionGate>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>{r.complex?.name ?? <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell>
@@ -160,6 +190,79 @@ export function ResidentsPage() {
           })
         }}
       />
+
+      <SetEmailDialog resident={emailTarget} onClose={() => setEmailTarget(null)} />
     </div>
+  )
+}
+
+/**
+ * K1 — record the email a phone-created owner will register with. Only that email can activate the
+ * account in the app (the email code proves it); a phone number alone never does.
+ */
+function SetEmailDialog({ resident, onClose }: { resident: Resident | null; onClose: () => void }) {
+  const [email, setEmail] = useState('')
+  const setResidentEmail = useSetResidentEmail()
+  const { toast } = useToast()
+
+  useEffect(() => {
+    setEmail(resident?.email ?? '')
+  }, [resident])
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!resident) return
+    setResidentEmail.mutate(
+      { userId: resident.user_id, email: email.trim() },
+      {
+        onSuccess: () => {
+          toast({ variant: 'success', title: 'E-poçt yazıldı', description: 'Sakin indi bu e-poçt ilə qeydiyyatdan keçə bilər.' })
+          onClose()
+        },
+        onError: (err) =>
+          toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
+      },
+    )
+  }
+
+  return (
+    <Dialog
+      open={resident !== null}
+      onOpenChange={(next) => {
+        if (!next && !setResidentEmail.isPending) onClose()
+      }}
+    >
+      <DialogContent>
+        <form onSubmit={submit}>
+          <DialogHeader>
+            <DialogTitle>{resident?.email ? 'E-poçtu düzəlt' : 'E-poçt yaz'}</DialogTitle>
+            <DialogDescription>
+              {resident?.phone_masked} — sakin tətbiqdə yalnız bu e-poçt ilə qeydiyyatdan keçib hesabını (cihazları,
+              abunəliyi ilə birlikdə) aktivləşdirə bilər. E-poçtu sakinin özündən öyrənin.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            <Label htmlFor="resident-email">E-poçt</Label>
+            <Input
+              id="resident-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="ad@example.com"
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={setResidentEmail.isPending}>
+              İmtina
+            </Button>
+            <Button type="submit" disabled={setResidentEmail.isPending || !email.trim()}>
+              {setResidentEmail.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Yaz
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

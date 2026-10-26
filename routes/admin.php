@@ -131,6 +131,8 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     // Residents directory (residents.view; complex_manager scoped) + account removal (residents.delete)
     Route::get('residents', [AdminResidentController::class, 'index'])->name('adminListResidents');
     Route::delete('residents/{userId}', [AdminResidentController::class, 'destroy'])->whereNumber('userId')->name('adminDeleteResident');
+    // K1 — record the owner's email on a not-yet-verified account (residents.update)
+    Route::put('residents/{userId}/email', [AdminResidentController::class, 'setEmail'])->whereNumber('userId')->name('adminSetResidentEmail');
 
     // Notification campaigns (batch 11 — notifications.view / notifications.send; complex_manager scoped).
     // audience/preview before {campaignId} so the static path is not captured by the numeric param.

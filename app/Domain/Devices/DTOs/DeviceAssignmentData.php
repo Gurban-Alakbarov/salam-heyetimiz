@@ -13,5 +13,6 @@ class DeviceAssignmentData extends Data
         public readonly ?string $locationLabel = null,
         public readonly ?float $latitude = null,
         public readonly ?float $longitude = null,
+        public readonly ?string $ownerEmail = null,
     ) {}
 }

@@ -19,6 +19,7 @@ export const PERM = {
   visitorLinksManage: 'visitor_links.manage',
   residentsView: 'residents.view',
   residentsCreate: 'residents.create',
+  residentsUpdate: 'residents.update',
   residentsDelete: 'residents.delete',
   ordersView: 'orders.view',
   paymentsView: 'payments.view',

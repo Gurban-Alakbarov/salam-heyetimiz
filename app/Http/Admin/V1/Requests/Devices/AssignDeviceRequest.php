@@ -28,6 +28,8 @@ class AssignDeviceRequest extends FormRequest
             'location_label' => ['sometimes', 'nullable', 'string', 'max:160'],
             'latitude' => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
+            // K1 — the owner's email, recorded on a not-yet-verified account so the owner can register with it.
+            'owner_email' => ['sometimes', 'nullable', 'string', 'email:rfc', 'max:160'],
         ];
     }
 
@@ -41,6 +43,7 @@ class AssignDeviceRequest extends FormRequest
             locationLabel: $v['location_label'] ?? null,
             latitude: isset($v['latitude']) ? (float) $v['latitude'] : null,
             longitude: isset($v['longitude']) ? (float) $v['longitude'] : null,
+            ownerEmail: $v['owner_email'] ?? null,
         );
     }
 }

@@ -61,7 +61,9 @@ Route::prefix('visit')->group(function (): void {
 Route::get('invites/{token}', [InviteController::class, 'show'])->where('token', '[A-Za-z0-9_-]+')->middleware('throttle:public')->name('getInvitation');
 
 // ---- Public auth (batch 07) — no guard; rate-limited per R-SEC-16 ----
-Route::post('auth/otp/request', [AuthController::class, 'requestOtp'])->middleware('throttle:otp-request')->name('requestOtp');
+// Phone OTP sign-in is retired (K6): both answer 410 sms_otp_retired; kept routed (and throttled) so old
+// clients get a clear answer instead of a 404.
+Route::post('auth/otp/request',[AuthController::class, 'requestOtp'])->middleware('throttle:otp-request')->name('requestOtp');
 Route::post('auth/otp/verify', [AuthController::class, 'verifyOtp'])->middleware('throttle:otp-verify')->name('verifyOtp');
 Route::post('auth/refresh', [AuthController::class, 'refresh'])->middleware('throttle:public')->name('refreshToken');
 

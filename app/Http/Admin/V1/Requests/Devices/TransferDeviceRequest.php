@@ -23,6 +23,7 @@ class TransferDeviceRequest extends FormRequest
             'new_owner_phone' => ['required', 'string', 'regex:/^\+994\d{9}$/'],
             'reason' => ['required', 'string', 'max:255'],
             'keep_existing_users' => ['sometimes', 'boolean'],
+            'new_owner_email' => ['sometimes', 'nullable', 'string', 'email:rfc', 'max:160'], // K1
         ];
     }
 
@@ -34,6 +35,7 @@ class TransferDeviceRequest extends FormRequest
             newOwnerPhone: (string) $v['new_owner_phone'],
             reason: (string) $v['reason'],
             keepExistingUsers: (bool) ($v['keep_existing_users'] ?? true),
+            newOwnerEmail: $v['new_owner_email'] ?? null,
         );
     }
 }

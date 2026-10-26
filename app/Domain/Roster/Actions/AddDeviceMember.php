@@ -9,6 +9,7 @@ use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Roster\Services\RosterService;
 use App\Domain\Users\Enums\UserStatus;
 use App\Domain\Users\Models\User;
+use App\Domain\Users\Services\AccountEmailService;
 use App\Support\Enums\ActorKind;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,10 @@ use Illuminate\Support\Facades\DB;
  */
 final class AddDeviceMember
 {
-    public function __construct(private readonly RosterService $roster) {}
+    public function __construct(
+        private readonly RosterService $roster,
+        private readonly AccountEmailService $emails,
+    ) {}
 
     public function handle(Device $device, RosterMemberData $data, AdminUser $admin): DeviceUser
     {
@@ -30,6 +34,8 @@ final class AddDeviceMember
                 ['phone' => $data->phone],
                 ['phone_country' => 'AZ', 'preferred_language' => 'az', 'status' => UserStatus::Active->value],
             );
+            // K1 — the resident registers with this email later; the email OTP proves the account is theirs.
+            $this->emails->recordIfUnverified($user, $data->email);
 
             return $this->roster->addMember($device, $user, $data->role, ActorKind::Admin, (int) $admin->getKey());
         });

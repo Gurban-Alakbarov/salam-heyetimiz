@@ -1,6 +1,5 @@
 <?php
 
-use App\Domain\Auth\Adapters\FakeOtpTransport;
 use App\Domain\Auth\Enums\RefreshTokenRevocationReason;
 use App\Domain\Auth\Models\RefreshToken;
 use App\Domain\Users\Models\User;
@@ -11,14 +10,7 @@ use App\Domain\Users\Models\User;
 
 function authenticatedTokens(string $phone): array
 {
-    test()->postJson('/v1/auth/otp/request', ['phone' => $phone])->assertStatus(202);
-    $code = app(FakeOtpTransport::class)->lastCodeFor($phone);
-
-    return test()->postJson('/v1/auth/otp/verify', [
-        'phone' => $phone,
-        'code' => $code,
-        'device' => ['install_uuid' => TEST_INSTALL_UUID, 'platform' => 'android'],
-    ])->assertOk()->json();
+    return authenticateViaOtp($phone);
 }
 
 it('rotates the refresh token and issues a fresh pair', function () {

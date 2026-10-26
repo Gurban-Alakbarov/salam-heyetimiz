@@ -634,10 +634,24 @@ paths:
           application/json:
             schema:
               type: object
-              required: [phone]
-              properties: { phone: { type: string, example: '+994501234567' } }
+              required: [owner_phone]
+              properties:
+                owner_phone: { type: string, pattern: '^\+994\d{9}$', example: '+994501234567' }
+                owner_email:
+                  type: string
+                  format: email
+                  maxLength: 160
+                  nullable: true
+                  description: 'Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed).'
+                region_id: { type: integer, format: int64, nullable: true }
+                location_label: { type: string, maxLength: 160, nullable: true }
+                latitude: { type: number, nullable: true }
+                longitude: { type: number, nullable: true }
       responses:
         '200': { description: Assigned }
+        '409':
+          description: '`email_taken`'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
@@ -659,8 +673,17 @@ paths:
               properties:
                 phone: { type: string, example: '+994501234567' }
                 label: { type: string, example: 'Blok A' }
+                email:
+                  type: string
+                  format: email
+                  maxLength: 160
+                  nullable: true
+                  description: 'Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed).'
       responses:
         '200': { description: Added }
+        '409':
+          description: '`email_taken`'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
@@ -1421,6 +1444,50 @@ paths:
         '409':
           description: '`resident_owns_device`'
           content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  /admin/residents/{userId}/email:
+    put:
+      tags: [Admin / Residents]
+      summary: Record the owner's email on a not-yet-verified account
+      operationId: adminSetResidentEmail
+      security: [{ adminBearerAuth: [] }]
+      description: |
+        Requires `residents.update` (K1). An account created by phone (device assignment) with live access can only
+        be taken over by registering with THIS email — the email OTP proves the registrant owns it; a phone
+        number alone never hands it over (registration answers **409** `phone_linked_to_account`). The email stays
+        unverified. **409** `email_already_verified` for a different email on a verified account (re-sending its
+        own email is a no-op 200); **409** `email_taken` when another (incl. deleted) account uses it. A
+        `complex_manager` gets **403** for a resident with active roster rows outside its complex. Audited
+        `resident.email_recorded` (masked).
+      parameters:
+        - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email, maxLength: 160, example: 'owner@example.com' }
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id: { type: integer, format: int64 }
+                  email: { type: string, format: email }
+                  email_verified: { type: boolean }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`email_taken` | `email_already_verified`'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   # ===========================================================================
   # Admin / Subscriptions — detail
@@ -2814,6 +2881,7 @@ components:
         phone: { type: string, example: '+99450****67', description: Masked }
         # Full email — admin surface only.
         email: { type: string, format: email, nullable: true, example: 'resident@example.com' }
+        email_verified: { type: boolean, description: 'K1 — false while the owner has not proven the email (an admin may still record / correct it).' }
         complex: { type: string, nullable: true }
         device_online: { type: boolean }
         subscription_status: { type: string, nullable: true }

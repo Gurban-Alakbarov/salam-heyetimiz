@@ -26,6 +26,7 @@ class AddDeviceMemberRequest extends FormRequest
         return [
             'phone' => ['required', 'string', 'regex:/^\+994\d{9}$/'],
             'role' => ['sometimes', 'string', 'in:user'],
+            'email' => ['sometimes', 'nullable', 'string', 'email:rfc', 'max:160'], // K1
         ];
     }
 
@@ -36,6 +37,7 @@ class AddDeviceMemberRequest extends FormRequest
         return new RosterMemberData(
             phone: (string) $v['phone'],
             role: DeviceUserRole::User,
+            email: $v['email'] ?? null,
         );
     }
 }

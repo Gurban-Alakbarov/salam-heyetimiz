@@ -32,6 +32,15 @@ final class RegistrationException extends \Exception
         return new self(422, 'Doğrulama xətası baş verdi.', fieldErrors: ['phone' => ['Bu telefon nömrəsi artıq istifadədədir.']]);
     }
 
+    /**
+     * K1 — the phone belongs to an unverified account with live access whose recorded email is not this one.
+     * A phone number alone never hands that account over; support records the owner's email first.
+     */
+    public static function phoneLinkedToAccount(): self
+    {
+        return new self(409, 'Bu telefon nömrəsi mövcud hesaba bağlıdır. Hesabı aktivləşdirmək üçün dəstək xidmətinə email ünvanınızı bildirin, sonra həmin email ilə qeydiyyatdan keçin.', errorCode: 'phone_linked_to_account');
+    }
+
     public static function conflict(): self
     {
         return new self(409, 'Bu məlumatlarla qeydiyyat mümkün deyil. Dəstək ilə əlaqə saxlayın.', errorCode: 'registration_conflict');

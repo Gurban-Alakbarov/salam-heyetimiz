@@ -58,4 +58,7 @@ return [
     'wrong_recovery_code' => 'The recovery code is incorrect or already used.',
     'tfa_required' => 'Two-factor verification is required for this action.',
     'internal_error' => 'An internal error occurred. Request id: :request_id',
+    'email_taken' => 'This email belongs to another account.',
+    'email_already_verified' => 'The account email is already verified and cannot be changed.',
+    'sms_otp_retired' => 'Phone sign-in has been retired. Update the app and sign in with your email.',
 ];

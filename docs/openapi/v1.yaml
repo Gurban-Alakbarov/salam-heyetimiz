@@ -24,10 +24,10 @@ info:
     # Authentication
 
     ## Mobile (`bearerAuth`)
-    Phone-based OTP authentication. The flow:
+    Email-OTP authentication. The flow:
 
-    1. `POST /auth/otp/request` with phone — backend dispatches a 6-digit SMS OTP (TTL 120 s, max 5 attempts).
-    2. `POST /auth/otp/verify` with phone + code + device fingerprint — backend issues a JWT access token (15 min) and an opaque refresh token (60 days).
+    1. `POST /auth/register` (new account) or `POST /auth/login` (verified account) with the email — backend emails a 6-digit OTP (TTL 120 s, max 5 attempts).
+    2. `POST /auth/verify-email` with email + code + device fingerprint — backend issues a JWT access token (15 min) and an opaque refresh token (60 days).
     3. Send `Authorization: Bearer <access_token>` on subsequent calls.
     4. Refresh with `POST /auth/refresh` when the access token nears expiry; refresh tokens **rotate** on every use.
 
@@ -120,8 +120,8 @@ info:
 
     | Bucket | Limit |
     |---|---|
-    | `/auth/otp/request` | 3 / phone / 10 min, 30 / IP / hour |
-    | `/auth/otp/verify` | 10 / phone / 10 min |
+    | `/auth/otp/request` (retired, 410) | 3 / phone / 10 min, 30 / IP / hour |
+    | `/auth/otp/verify` (retired, 410) | 10 / phone / 10 min |
     | `/devices/*/open` | 12 / user / min, 4 / device / min |
     | Authenticated mobile generic | 120 req / min / user |
     | Admin generic | 600 req / min / admin |
@@ -311,84 +311,31 @@ paths:
   /auth/otp/request:
     post:
       tags: [Auth]
-      summary: Request an OTP for the given phone number
+      summary: (Retired) phone OTP request — always 410
+      description: |
+        **Retired (K6).** Phone-OTP sign-in provisioned an account from a bare phone number. The app signs in by
+        email OTP only (`/auth/register`, `/auth/login`, `/auth/verify-email`). The route stays (throttled) so old
+        clients get a clear answer: no SMS is sent and no account is created, whatever the body.
       operationId: requestOtp
+      deprecated: true
       security: []
       x-rate-limit: 3/phone/10min, 30/IP/hour
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: false
-              required: [phone]
-              properties:
-                phone:
-                  type: string
-                  pattern: '^\+994\d{9}$'
-                  example: '+994501234567'
-                purpose:
-                  type: string
-                  enum: [login, recover]
-                  default: login
       responses:
-        '202':
-          description: OTP dispatched (response identical regardless of phone existence — prevents enumeration)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  expires_in_seconds:
-                    type: integer
-                    example: 120
-                  resend_available_in_seconds:
-                    type: integer
-                    example: 30
-        '422': { $ref: '#/components/responses/ValidationError' }
+        '410': { $ref: '#/components/responses/SmsOtpRetired' }
         '429': { $ref: '#/components/responses/RateLimited' }
 
   /auth/otp/verify:
     post:
       tags: [Auth]
-      summary: Verify an OTP and exchange for tokens
+      summary: (Retired) phone OTP verify — always 410
+      description: |
+        **Retired (K6).** Never issues tokens; use `/auth/verify-email`.
       operationId: verifyOtp
+      deprecated: true
       security: []
       x-rate-limit: 10/phone/10min
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: false
-              required: [phone, code, device]
-              properties:
-                phone:
-                  type: string
-                  pattern: '^\+994\d{9}$'
-                code:
-                  type: string
-                  pattern: '^\d{6}$'
-                device:
-                  $ref: '#/components/schemas/DeviceFingerprintInput'
       responses:
-        '200':
-          description: Auth success
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/AuthSuccess' }
-        '401':
-          description: Wrong code / expired / max attempts
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Error' }
-              examples:
-                wrong_code: { value: { error: { code: 'wrong_code', message: 'Kod yanlışdır.' } } }
-                expired: { value: { error: { code: 'otp_expired', message: 'Kodun vaxtı bitib.' } } }
-                max_attempts: { value: { error: { code: 'otp_max_attempts', message: 'Çox cəhd oldu.' } } }
-        '422': { $ref: '#/components/responses/ValidationError' }
+        '410': { $ref: '#/components/responses/SmsOtpRetired' }
         '429': { $ref: '#/components/responses/RateLimited' }
 
   /auth/refresh:
@@ -1339,6 +1286,12 @@ paths:
               required: [owner_phone]
               properties:
                 owner_phone: { type: string, pattern: '^\+994\d{9}$' }
+                owner_email:
+                  type: string
+                  format: email
+                  maxLength: 160
+                  nullable: true
+                  description: 'Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed).'
                 region_id: { type: integer, format: int64, nullable: true }
                 location_label: { type: string, maxLength: 160, nullable: true }
                 latitude: { type: number, nullable: true }
@@ -2012,6 +1965,12 @@ paths:
               required: [new_owner_phone, reason]
               properties:
                 new_owner_phone: { type: string, pattern: '^\+994\d{9}$' }
+                new_owner_email:
+                  type: string
+                  format: email
+                  maxLength: 160
+                  nullable: true
+                  description: 'Optional (K1). Recorded on a not-yet-verified account so its owner can register with it (the email OTP proves it); ignored when the account already verified its own email. **409** `email_taken` when another account uses it (nothing is changed).'
                 reason: { type: string, maxLength: 255 }
                 keep_existing_users: { type: boolean, default: true }
       responses:
@@ -2872,6 +2831,12 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ValidationErrorEnvelope' }
+    SmsOtpRetired:
+      description: Phone-OTP sign-in is retired (K6) — sign in by email OTP
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: { code: 'sms_otp_retired', message_key: 'errors.sms_otp_retired', message: 'Telefonla giriş dayandırılıb. Tətbiqi yeniləyin və email ilə daxil olun.' } }
     RateLimited:
       description: Bucket exhausted
       headers:

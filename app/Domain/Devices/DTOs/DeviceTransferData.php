@@ -11,5 +11,6 @@ class DeviceTransferData extends Data
         public readonly string $newOwnerPhone,
         public readonly string $reason,
         public readonly bool $keepExistingUsers = true,
+        public readonly ?string $newOwnerEmail = null,
     ) {}
 }

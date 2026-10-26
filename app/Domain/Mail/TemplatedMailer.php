@@ -5,6 +5,7 @@ namespace App\Domain\Mail;
 use App\Domain\Admin\Services\SettingsService;
 use App\Domain\Admin\Settings\RuntimeMailer;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\Facades\Lang;
 
 /**
  * Generic transactional-email composer. Resolves the subject (Settings, per EmailType), renders the
@@ -32,14 +33,23 @@ final class TemplatedMailer
      */
     public function send(EmailType $type, string $to, array $data, string $locale = 'az'): void
     {
-        $subject = $this->subject($type);
-        $html = $this->htmlEnabled() ? $this->view->make($type->view(), $data + ['subject' => $subject])->render() : null;
+        $subject = $this->subject($type, $locale);
+        $html = $this->htmlEnabled() ? $this->view->make($type->view(), $data + ['subject' => $subject, 'locale' => $locale])->render() : null;
 
         $this->mailer->send($to, $subject, $this->text($data), $html);
     }
 
-    private function subject(EmailType $type): string
+    /**
+     * A8 — the admin-editable subject (Settings) is the Azerbaijani one; another language uses its own copy from
+     * lang/{locale}/emails.php when the type has one.
+     */
+    private function subject(EmailType $type, string $locale = 'az'): string
     {
+        $key = 'emails.subjects.'.$type->value;
+        if ($locale !== 'az' && Lang::has($key, $locale, false)) {
+            return (string) __($key, [], $locale);
+        }
+
         $configured = trim((string) $this->settings->value('email', $type->subjectKey()));
 
         return $configured !== '' ? $configured : $type->defaultSubject();

@@ -21,4 +21,6 @@ enum NotificationType: string
     case FamilyMemberRemoved = 'family_member_removed';
     /** O7 — the Komendant handed a family to another member (to the whole family). */
     case FamilyHeadChanged = 'family_head_changed';
+    /** A8 — the user's application (legal entity or individual) was rejected. */
+    case ApplicationRejected = 'application_rejected';
 }

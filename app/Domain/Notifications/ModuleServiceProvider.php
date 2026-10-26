@@ -2,10 +2,12 @@
 
 namespace App\Domain\Notifications;
 
+use App\Domain\Applications\Events\ApplicationRejected;
 use App\Domain\DeviceComm\Events\OpenCommandCompleted;
 use App\Domain\Notifications\Adapters\FakePushClient;
 use App\Domain\Notifications\Adapters\FcmPushClient;
 use App\Domain\Notifications\Contracts\PushClient;
+use App\Domain\Notifications\Listeners\SendApplicationRejectedNotification;
 use App\Domain\Notifications\Listeners\SendComplexFamilyNotification;
 use App\Domain\Notifications\Listeners\SendSubscriptionActivatedNotification;
 use App\Domain\Notifications\Listeners\SendSubscriptionExpiredNotification;
@@ -67,6 +69,9 @@ class ModuleServiceProvider extends ServiceProvider
 
         // O7 — the Komendant changed a family (member removed / head changed): the people concerned are told.
         Event::listen(ComplexFamilyChanged::class, SendComplexFamilyNotification::class);
+
+        // A8 — a rejected applicant is told in the app as well as by email.
+        Event::listen(ApplicationRejected::class, SendApplicationRejectedNotification::class);
     }
 
     /** Absolute path to the service-account JSON, or null when unset/missing (→ FakePushClient). */

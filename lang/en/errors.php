@@ -41,6 +41,7 @@ return [
     'not_family_head' => 'This resident does not head a family in this complex.',
     'not_family_member' => 'The chosen person is not a member of this family.',
     'family_action_invalid' => 'The family choice is not valid.',
+    'feedback_not_applicable' => 'Feedback cannot be given for this command.',
     'notification_not_mutable' => 'This notification cannot be switched off.',
     'idempotency_key_required' => 'The Idempotency-Key header is required.',
     // Visitor links

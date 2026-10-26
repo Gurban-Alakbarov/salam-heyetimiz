@@ -44,6 +44,13 @@ class NotificationTemplatesSeeder extends Seeder
             'en' => ['subject' => 'Family head changed', 'body' => 'The new head of your family at {complex_name} is {head_name}.'],
         ]);
 
+        // A8 — the user's application (legal entity or individual) was rejected. Operational, forced.
+        $this->seedTemplate('application.rejected', NotificationCategory::Operational, [
+            'az' => ['subject' => 'Müraciətiniz təsdiqlənmədi', 'body' => 'Səbəb: {reason}. Məlumatları düzəldib yenidən müraciət edə bilərsiniz.'],
+            'ru' => ['subject' => 'Ваша заявка не одобрена', 'body' => 'Причина: {reason}. Вы можете исправить данные и подать заявку снова.'],
+            'en' => ['subject' => 'Your application was not approved', 'body' => 'Reason: {reason}. You can correct the details and apply again.'],
+        ]);
+
         // system.admin_campaign — admin free-text broadcast (INVENTORY §2; system_announcement type).
         // Category operational; fixed push + inapp via the mask (R-NOT-04). No locale rows: the copy is
         // supplied per-campaign in the admin's single chosen language and delivered as-is (no translation).

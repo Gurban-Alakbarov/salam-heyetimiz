@@ -6,6 +6,7 @@ use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Admin\Models\Complex;
 use App\Domain\Applications\Enums\LegalEntityApplicationStatus;
 use App\Domain\Applications\Exceptions\ApplicationException;
+use App\Domain\Applications\Events\ApplicationRejected;
 use App\Domain\Applications\Jobs\SendApplicationRejectedEmailJob;
 use App\Domain\Applications\Models\LegalEntityApplication;
 use App\Domain\Applications\Support\LegalComplexDuplicates;
@@ -93,6 +94,9 @@ final class LegalEntityApplicationReview
             ], LegalEntityApplication::class, (int) $locked->id);
 
             SendApplicationRejectedEmailJob::dispatch((int) $locked->id)->afterCommit();
+            DB::afterCommit(fn () => ApplicationRejected::dispatch(
+                SendApplicationRejectedEmailJob::LEGAL, (int) $locked->id, (int) $locked->applicant_user_id, (string) $locked->rejection_reason,
+            ));
 
             return $locked;
         });

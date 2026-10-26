@@ -1,7 +1,7 @@
 {{-- Generic transactional-email shell. All email types @extends this. Email-safe: inline CSS, table
      layout, no external CSS/JS. See docs/registration/USER_REGISTRATION_ARCHITECTURE.md §7. --}}
 <!doctype html>
-<html lang="az">
+<html lang="{{ $locale ?? 'az' }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,8 +17,8 @@
         </td></tr>
         <tr><td style="padding:28px;">@yield('content')</td></tr>
         <tr><td style="padding:16px 28px;background:#fafafa;border-top:1px solid #eeeeee;font-size:11px;color:#9ca3af;">
-          &copy; {{ date('Y') }} {{ $brand ?? 'Salam Həyətimiz' }}@if(! empty($supportEmail)) &middot; Dəstək: {{ $supportEmail }}@endif<br>
-          Bu avtomatik mesajdır, cavab verməyin.
+          &copy; {{ date('Y') }} {{ $brand ?? 'Salam Həyətimiz' }}@if(! empty($supportEmail)) &middot; {{ __('emails.support', [], $locale ?? 'az') }}: {{ $supportEmail }}@endif<br>
+          {{ __('emails.automatic', [], $locale ?? 'az') }}
         </td></tr>
       </table>
     </td></tr>

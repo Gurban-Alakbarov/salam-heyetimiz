@@ -24,7 +24,7 @@ beforeEach(function () {
 it('lists templates with locale completeness, placeholders and the read-only campaign wrapper', function () {
     $data = collect($this->actingAs($this->super, 'admin')->getJson('/admin/v1/notification-templates')->assertOk()->json('data'))->keyBy('template_key');
 
-    expect($data)->toHaveCount(11) // + O7 family.member_removed / family.head_changed
+    expect($data)->toHaveCount(12) // + O7 family.member_removed / family.head_changed, A8 application.rejected
         ->and($data['device.opened']['placeholders'])->toBe(['visitor_name', 'device_label'])
         ->and($data['family.head_changed']['placeholders'])->toBe(['head_name', 'complex_name'])
         ->and($data['device.opened']['locales_complete'])->toBeTrue()

@@ -28,6 +28,10 @@ class DeviceResource extends JsonResource
             'role' => $this->caller_role,
             'can_open' => (bool) $this->caller_can_open,
             'suspension_reason' => $this->caller_suspension_reason,
+            // A4 — the caller's access comes through a family head (BR-19: may open, never share), and whether the
+            // caller may create visitor links on this device at all (= can open AND not via family).
+            'via_family' => (bool) $this->caller_via_family,
+            'can_share_visitor_link' => (bool) $this->caller_can_open && ! $this->caller_via_family,
             'latitude' => $this->latitude !== null ? (float) $this->latitude : null,
             'longitude' => $this->longitude !== null ? (float) $this->longitude : null,
             // GEOFENCE-1 — when true the app must attach the caller's GPS to /open (else the backend

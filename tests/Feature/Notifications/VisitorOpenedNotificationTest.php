@@ -202,3 +202,16 @@ it('notifies the creating admin\'s linked mobile account on a complex device (no
 
     expect(Notification::query()->where('user_id', $komendantUser->id)->count())->toBe(2);
 });
+
+it('names a nameless visitor "Qonaq" instead of leaving a leading blank (A13)', function () {
+    Bus::fake();
+    $resident = makeUser('+994506000091');
+    $device = makeOwnedDevice(makeUser('+994506000092'), 'VN-A13', '+994700600091');
+    $device->update(['location_label' => 'Blok A']);
+    [$link] = mintVisitorLink($device, $resident, VisitorAccessType::TimeLimited, 60, null);
+
+    fireVisitorOpen($device, (int) $link->id);
+
+    $inapp = Notification::query()->where('user_id', $resident->id)->where('channel', 'inapp')->sole();
+    expect($inapp->payload['body'])->toBe('Qonaq Blok A qapısını açdı');
+});

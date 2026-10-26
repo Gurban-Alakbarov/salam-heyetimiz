@@ -687,6 +687,8 @@ paths:
       description: |
         Used after opens where `driver_confirms_actuation = false` to capture whether the
         gate actually moved. One feedback per (command, user); replays return the previous value.
+        A6 — only for a command that reached the barrier (`dispatched` / `opened`); any other state is
+        **409** `feedback_not_applicable` (`details.state`).
       parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
       requestBody:
         required: true
@@ -703,6 +705,9 @@ paths:
         '201': { description: Feedback recorded }
         '200': { description: Replay; feedback already on record }
         '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`feedback_not_applicable` — the command failed, expired or was never sent'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   # ---------------------------------------------------------------------------
   # Roster (owner only)
@@ -3108,6 +3113,12 @@ components:
         can_open:
           type: boolean
           description: True if the caller is allowed to open right now (sub active, device active, not in cooldown)
+        via_family:
+          type: boolean
+          description: A4 — the caller's access comes through a family head (may open, never share)
+        can_share_visitor_link:
+          type: boolean
+          description: A4 — the caller may create visitor links here (`can_open` and not `via_family`); hide "invite" otherwise
         suspension_reason:
           type: string
           description: |

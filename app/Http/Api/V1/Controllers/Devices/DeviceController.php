@@ -7,6 +7,8 @@ use App\Domain\Devices\Enums\DeviceListFilter;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Devices\Queries\DeviceQuery;
 use App\Domain\Roster\Enums\DeviceUserRole;
+use App\Domain\Roster\Enums\DeviceUserStatus;
+use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
 use App\Domain\Subscriptions\Queries\SubscriptionStatusQuery;
 use App\Http\Api\V1\Requests\Devices\UpdateGeofenceRequest;
@@ -93,6 +95,12 @@ class DeviceController
             : DeviceUserRole::User->value;
         $device->caller_can_open = $result->canOpen;
         $device->caller_suspension_reason = $result->suspensionReason->value;
+        $device->caller_via_family = DeviceUser::query()
+            ->where('device_id', $device->getKey())
+            ->where('user_id', $userId)
+            ->where('status', DeviceUserStatus::Active->value)
+            ->whereNotNull('family_link_id')
+            ->exists();
     }
 
     private function limit(Request $request): int

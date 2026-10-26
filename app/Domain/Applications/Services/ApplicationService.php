@@ -5,7 +5,9 @@ namespace App\Domain\Applications\Services;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Applications\Enums\IndividualApplicationStatus;
 use App\Domain\Applications\Enums\LegalEntityApplicationStatus;
+use App\Domain\Applications\Events\ApplicationRejected;
 use App\Domain\Applications\Exceptions\ApplicationException;
+use App\Domain\Applications\Jobs\SendApplicationRejectedEmailJob;
 use App\Domain\Applications\Models\IndividualApplication;
 use App\Domain\Applications\Models\LegalEntityApplication;
 use App\Domain\Applications\Support\LegalComplexDuplicates;
@@ -150,6 +152,14 @@ final class ApplicationService
             'admin_id' => (int) $admin->getKey(),
             'device_id' => $deviceId,
         ], IndividualApplication::class, (int) $application->id);
+
+        // A8 — a rejected individual applicant is told too (email + in the app), like a legal one.
+        if ($to === IndividualApplicationStatus::Rejected) {
+            SendApplicationRejectedEmailJob::dispatch((int) $application->id, SendApplicationRejectedEmailJob::INDIVIDUAL)->afterCommit();
+            DB::afterCommit(fn () => ApplicationRejected::dispatch(
+                SendApplicationRejectedEmailJob::INDIVIDUAL, (int) $application->id, (int) $application->user_id, (string) $application->rejection_reason,
+            ));
+        }
 
         return $application->refresh();
     }

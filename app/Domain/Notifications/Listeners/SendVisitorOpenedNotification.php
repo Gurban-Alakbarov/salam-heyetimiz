@@ -30,6 +30,9 @@ use Illuminate\Support\Facades\Log;
  */
 final class SendVisitorOpenedNotification
 {
+    /** A13 — the visitor's name when the link has none, per recipient language. */
+    private const GUEST = ['az' => 'Qonaq', 'ru' => 'Гость', 'en' => 'Guest'];
+
     public function __construct(
         private readonly NotificationDispatcher $dispatcher,
         private readonly TemplateRenderer $renderer,
@@ -79,7 +82,8 @@ final class SendVisitorOpenedNotification
 
         $locale = $recipient->preferred_language ?? Locale::default();
         $rendered = $this->renderer->render('device.opened', $locale, [
-            'visitor_name' => $link->visitor_name ?? '',
+            // A13 — a link without a visitor name reads "Qonaq …" / "Гость …" / "Guest …", never " Blok A …".
+            'visitor_name' => trim((string) $link->visitor_name) !== '' ? trim((string) $link->visitor_name) : self::GUEST[$locale->value],
             'device_label' => $this->devices->locationLabel($deviceId) ?? '',
         ]);
 

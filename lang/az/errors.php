@@ -44,6 +44,7 @@ return [
     'not_family_head' => 'Bu sakin bu kompleksdə ailə başçısı deyil.',
     'not_family_member' => 'Seçilən şəxs bu ailənin üzvü deyil.',
     'family_action_invalid' => 'Ailə üçün seçim düzgün deyil.',
+    'feedback_not_applicable' => 'Bu komanda üçün "qapı açıldımı?" cavabı qəbul edilmir.',
     'notification_not_mutable' => 'Bu bildirişi söndürmək olmur.',
     'idempotency_key_required' => 'Idempotency-Key başlığı tələb olunur.',
     // Visitor links

@@ -48,3 +48,23 @@ it('hides another user’s command behind a 404', function () {
         'gate_moved' => true,
     ])->assertStatus(404);
 });
+
+it('takes feedback only for a command that reached the barrier (A6)', function (string $state, int $status) {
+    $owner = makeUser('+994509300010');
+    $device = makeOpenableDevice($owner, 'SER-F6', '+994700093010');
+    $du = DeviceUser::query()->where('device_id', $device->id)->where('user_id', $owner->id)->firstOrFail();
+    $command = makeOpenCommand($device, $owner, $du, ['state' => $state]);
+
+    $res = $this->actingAs($owner, 'user')->postJson("/v1/commands/{$command->id}/feedback", ['gate_moved' => false])->assertStatus($status);
+
+    if ($status === 409) {
+        $res->assertJsonPath('error.code', 'feedback_not_applicable');
+        expect(OpenCommandFeedback::query()->where('open_command_id', $command->id)->count())->toBe(0);
+    }
+})->with([
+    'dispatched' => ['dispatched', 201],
+    'opened' => ['opened', 201],
+    'failed' => ['failed', 409],
+    'expired' => ['expired', 409],
+    'queued' => ['queued', 409],
+]);

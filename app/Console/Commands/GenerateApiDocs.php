@@ -39,7 +39,7 @@ class GenerateApiDocs extends Command
         }
 
         $this->spec = json_decode(File::get($specPath), true);
-        $baseUrl = $this->spec['servers'][0]['url'] ?? 'https://api.salamheyetimiz.com';
+        $baseUrl = $this->spec['servers'][0]['url'] ?? 'https://api.sezam.salam.az';
 
         $this->writePostman($baseUrl);
         $this->writeBruno($baseUrl);

@@ -41,7 +41,7 @@ return [
         'webp_quality' => 82,
         'accept_ext' => ['jpg', 'jpeg', 'png', 'webp'],
         'accept_mimes' => ['image/jpeg', 'image/png', 'image/webp'],
-        // Public base for stored URLs. Null → config('app.url'). Prod: https://api.salamheyetimiz.com
+        // Public base for stored URLs. Null → config('app.url'). Prod: https://sezam.salam.az
         'base_url' => env('DEVICE_IMAGE_BASE_URL'),
     ],
 

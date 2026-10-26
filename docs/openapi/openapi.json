@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "https://api.salamheyetimiz.com",
+      "url": "https://api.sezam.salam.az",
       "description": "Production"
     },
     {
@@ -11814,7 +11814,7 @@
               "Location": {
                 "schema": {
                   "type": "string",
-                  "example": "https://api.salamheyetimiz.com/v1/payments/return?paymentId=KB-FAKE-PLACEHOLDER"
+                  "example": "https://api.sezam.salam.az/v1/payments/return?paymentId=KB-FAKE-PLACEHOLDER"
                 }
               }
             }

@@ -52,7 +52,7 @@ merged.paths = normPaths
 merged.openapi = '3.1.0'
 merged.info = { ...merged.info, version: '1.3.0' }
 merged.servers = [
-  { url: 'https://api.salamheyetimiz.com', description: 'Production' },
+  { url: 'https://api.sezam.salam.az', description: 'Production' },
   { url: 'http://localhost:8000', description: 'Local development' },
 ]
 

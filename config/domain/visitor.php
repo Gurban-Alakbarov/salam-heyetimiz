@@ -5,7 +5,7 @@
 | (Laravel serves /v/{token} — see routes/web.php); it is deliberately NOT the api. subdomain.
 */
 return [
-    // Base origin for the shareable URL: https://salamheyetimiz.com  → /v/{token}
+    // Base origin for the shareable URL: https://sezam.salam.az  → /v/{token}
     'base_url' => rtrim((string) env('VISITOR_LINK_BASE_URL', (string) config('app.url')), '/'),
     'path' => 'v',
 

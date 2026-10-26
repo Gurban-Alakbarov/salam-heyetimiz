@@ -12,7 +12,7 @@ it('serves the merged OpenAPI 3.1 spec as JSON', function () {
     $spec = $res->json();
     expect($spec['openapi'])->toBe('3.1.0')
         ->and($spec['info']['version'])->toBe('1.3.0')
-        ->and($spec['servers'][0]['url'])->toBe('https://api.salamheyetimiz.com');
+        ->and($spec['servers'][0]['url'])->toBe('https://api.sezam.salam.az');
 
     // Real endpoints (mobile + admin + webhook + new) are all present and absolutely pathed.
     expect($spec['paths'])->toHaveKeys([
@@ -86,7 +86,7 @@ it('generates valid Postman + Bruno collections', function () {
     $postman = json_decode(file_get_contents(base_path('docs/postman/Salam.postman_collection.json')), true);
     expect($postman['info']['schema'])->toContain('v2.1.0')
         ->and($postman['item'])->not->toBeEmpty()
-        ->and($postman['variable'])->toContain(['key' => 'baseUrl', 'value' => 'https://api.salamheyetimiz.com']);
+        ->and($postman['variable'])->toContain(['key' => 'baseUrl', 'value' => 'https://api.sezam.salam.az']);
 
     expect(file_exists(base_path('docs/bruno/bruno.json')))->toBeTrue()
         ->and(file_exists(base_path('docs/bruno/environments/Production.bru')))->toBeTrue();

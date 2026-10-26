@@ -15,5 +15,5 @@ return [
     'inviter_max_per_day' => 30,
 
     // Public landing link base; the plaintext token is appended (universal link in B6/B13).
-    'link_base' => env('INVITATION_LINK_BASE', rtrim((string) env('APP_URL', 'https://salamheyetimiz.com'), '/').'/invite'),
+    'link_base' => env('INVITATION_LINK_BASE', rtrim((string) env('APP_URL', 'https://sezam.salam.az'), '/').'/invite'),
 ];

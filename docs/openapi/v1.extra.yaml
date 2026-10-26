@@ -2961,7 +2961,7 @@ paths:
           description: Redirect to the payment return page
           headers:
             Location:
-              schema: { type: string, example: 'https://api.salamheyetimiz.com/v1/payments/return?paymentId=KB-FAKE-PLACEHOLDER' }
+              schema: { type: string, example: 'https://api.sezam.salam.az/v1/payments/return?paymentId=KB-FAKE-PLACEHOLDER' }
         '403': { description: Invalid or expired signature }
         '404': { description: Fake gateway inactive, unknown action, or no such test order }
         '429': { $ref: '#/components/responses/RateLimited' }

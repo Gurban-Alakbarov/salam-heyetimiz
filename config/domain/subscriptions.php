@@ -13,7 +13,7 @@ return [
     'term_days' => 30,
 
     'abandoned_intent_hours' => 24, // B7: unpaid complex subscribe intent → cancelled + roster row revoked
-    'grace_days' => 7, // "renewed before expiry" extension window after ends_at (R-DOM-08)
+    'grace_days' => 7, // A14: no longer used for renewal math (an ended subscription restarts at payment)
 
     'reminder_days' => [7, 1], // monthly term: D-7 / D-1 only (D-30/D-15 would fire at purchase)
 

@@ -212,9 +212,9 @@ final class SubscriptionService
      */
     public function renew(Subscription $subscription, Order $order, int $amountMinor): Subscription
     {
-        $graceDays = (int) config('domain.subscriptions.grace_days', 7);
         $terms = $this->prices->commercial($subscription->tier);
-        $period = $this->term->renew($subscription->ends_at->toImmutable(), $terms['term_days'], $graceDays, $this->clock->now());
+        // A14 — an ended subscription restarts from the payment, never back-dated over days without access.
+        $period = $this->term->renew($subscription->ends_at->toImmutable(), $terms['term_days'], $this->clock->now());
 
         return DB::transaction(function () use ($subscription, $order, $amountMinor, $period, $terms): Subscription {
             $subscription->forceFill([

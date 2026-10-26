@@ -165,6 +165,8 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('devices/{deviceId}/assign', [AdminDeviceRosterController::class, 'assignOwner'])->whereNumber('deviceId')->name('adminAssignDevice');
     Route::post('devices/{deviceId}/users', [AdminDeviceRosterController::class, 'addUser'])->whereNumber('deviceId')->name('adminAddDeviceUser');
     Route::delete('devices/{deviceId}/users/{userId}', [AdminDeviceRosterController::class, 'removeUser'])->whereNumber('deviceId')->whereNumber('userId')->name('adminRemoveDeviceUser');
+    // Y5 — move a resident to another gate; the remaining paid time moves with them (residents.update)
+    Route::post('devices/{deviceId}/users/{userId}/move', [AdminDeviceRosterController::class, 'moveUser'])->whereNumber('deviceId')->whereNumber('userId')->name('adminMoveDeviceUser');
     // Grant entitlement without a payment (subscriptions.manage)
     Route::post('devices/{deviceId}/users/{userId}/subscription', [AdminDeviceRosterController::class, 'grantSubscription'])->whereNumber('deviceId')->whereNumber('userId')->name('adminGrantSubscription');
 

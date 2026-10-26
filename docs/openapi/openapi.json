@@ -1417,6 +1417,7 @@
         "summary": "Initiate a manual renewal — creates an order and returns the bank redirect",
         "operationId": "renewSubscription",
         "x-authorization": "must be the payer (owner for main, owner or sub-user for additional)",
+        "description": "O2 — whoever may pay for the subscription may renew it: the beneficiary, the head of the active family link\nit was granted through (renews a member's ended subscription, pays as the payer), or the private device\nowner. Anyone else → **404**. A subscription whose access is gone → **422** `subscription_access_removed`.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKeyRequired"
@@ -2071,6 +2072,7 @@
         "summary": "Assign an owner to a device (technical mobile mode)",
         "operationId": "techAssignDevice",
         "x-authorization": "admin role=technical or super_admin",
+        "description": "Y6 — a complex-mode device never has an owner → **409** `device_is_complex_mode` (switch it to private mode first).",
         "security": [
           {
             "adminBearerAuth": []
@@ -3439,6 +3441,7 @@
         ],
         "summary": "Transfer ownership to another user",
         "operationId": "adminTransferDevice",
+        "description": "Y6 — a complex-mode device has no owner to transfer → **409** `device_is_complex_mode`.",
         "security": [
           {
             "adminBearerAuth": []
@@ -6591,6 +6594,97 @@
         }
       }
     },
+    "/admin/v1/devices/{deviceId}/users/{userId}/move": {
+      "post": {
+        "tags": [
+          "Admin / Devices"
+        ],
+        "summary": "Move a resident to another gate (the remaining paid time moves too)",
+        "operationId": "adminMoveDeviceUser",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Y5 — requires `residents.update`; both gates in the caller's scope (complex_manager: else **404**). The\nresident leaves this gate (whitelist removal, guest links revoked) and joins the target; a live\nsubscription moves with them — the target row's subscription takes the same tier, terms and end date\n(active), this one is cancelled `moved_to_device`; nothing is paid again. Without a live subscription only\nthe access moves. Refusals change nothing: **422** `move_same_device`, `move_not_movable` (owner / family\nmember), `move_target_inactive`, `move_not_complex_member`; **409** `move_target_subscribed`; **404**\n`roster_member_not_found`. Returns the resident's row on the target gate. Audited `resident.moved`.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DeviceId"
+          },
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "target_device_id"
+                ],
+                "properties": {
+                  "target_device_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Moved — the resident's row on the target gate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceUser"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "`move_target_subscribed`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`move_same_device` | `move_not_movable` | `move_target_inactive` | `move_not_complex_member` | validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/v1/system/health": {
       "get": {
         "tags": [
@@ -7878,7 +7972,7 @@
             "adminBearerAuth": []
           }
         ],
-        "description": "Requires `applications.manage` **and** `complexes.manage`. Creates the residential complex in the same\ntransaction and returns it alongside the application. **409** `application_not_pending` when already reviewed.\n",
+        "description": "Requires `applications.manage` **and** `complexes.manage`. Creates the residential complex in the same\ntransaction and returns it alongside the application. **409** `application_not_pending` when already reviewed.\nY8 — **409** `duplicate_legal_application` when the same VÖEN already has THIS complex approved (an older\npending duplicate); nothing is created.\n",
         "parameters": [
           {
             "in": "path",
@@ -9144,7 +9238,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "VÖEN = 10 digits; one pending application per VÖEN. **409** `application_duplicate_voen` /\n`account_type_mismatch` (standard error envelope).\n",
+        "description": "VÖEN = 10 digits; one pending application per VÖEN. **409** `application_duplicate_voen` /\n`account_type_mismatch` (standard error envelope). Y8 — one company may run several complexes: the same VÖEN\nis fine for a DIFFERENT complex, but the same complex already approved (name compared without case, quotes,\npunctuation or spacing; also its current, possibly renamed, name) → **409** `duplicate_legal_application`\n(on submit and on edit).\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -10781,7 +10875,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "Requires `residents.create`. Not this complex's invitation → **404**. **409** `invitation_not_resendable`, **429** `invitation_rate_limited`.",
+        "description": "Requires `residents.create`. Not this complex's invitation → **404**. **409** `invitation_not_resendable`, **429** `invitation_rate_limited`. O6 — an EXPIRED invitation while a newer one to the same email is live → **409** `invitation_already_pending` (re-send the live one).",
         "parameters": [
           {
             "in": "path",
@@ -11913,6 +12007,10 @@
               "active",
               "revoked"
             ]
+          },
+          "via_family": {
+            "type": "boolean",
+            "description": "Y5 — access granted through a family link (follows the head; not moved on its own)."
           },
           "added_by_user": {
             "$ref": "#/components/schemas/UserBrief"

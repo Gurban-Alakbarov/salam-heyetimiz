@@ -6,12 +6,14 @@ use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Devices\Actions\AssignDeviceOwner;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Actions\AddDeviceMember;
+use App\Domain\Roster\Actions\MoveDeviceMember;
 use App\Domain\Roster\Actions\RemoveDeviceMember;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Exceptions\RosterMemberNotFoundException;
 use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Subscriptions\Actions\GrantSubscription;
 use App\Domain\Subscriptions\Queries\SubscriptionQuery;
+use App\Domain\Users\Models\User;
 use App\Http\Admin\V1\Requests\Devices\AddDeviceMemberRequest;
 use App\Http\Admin\V1\Requests\Devices\AssignDeviceRequest;
 use App\Http\Admin\V1\Requests\Devices\GrantSubscriptionRequest;
@@ -68,6 +70,31 @@ class AdminDeviceRosterController
         $action->handle($device, $userId, $request->user());
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * POST /admin/v1/devices/{deviceId}/users/{userId}/move {target_device_id} — adminMoveDeviceUser
+     * (residents.update). Y5: the resident leaves this gate for the target one and their remaining paid time goes
+     * with them (no new payment). Both gates must be in the caller's scope. Returns the row on the target gate.
+     */
+    public function moveUser(Request $request, int $deviceId, int $userId, MoveDeviceMember $action, SubscriptionQuery $subscriptions): JsonResponse
+    {
+        $this->requirePermission($request, Permission::RESIDENTS_UPDATE);
+        $targetId = (int) $request->validate(['target_device_id' => ['required', 'integer', 'min:1']])['target_device_id'];
+
+        $from = Device::query()->findOrFail($deviceId);
+        $this->assertDeviceInScope($request, $from);
+        $to = Device::query()->findOrFail($targetId);
+        $this->assertDeviceInScope($request, $to);
+        /** @var User $user */
+        $user = User::query()->findOrFail($userId);
+
+        $result = $action->handle($from, $user, $to, $request->user());
+
+        $member = $result['row']->loadMissing('user');
+        $member->subscription_brief = $subscriptions->forDeviceUser((int) $member->getKey());
+
+        return (new DeviceUserResource($member))->response()->setStatusCode(200);
     }
 
     /**

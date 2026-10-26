@@ -4,6 +4,8 @@ namespace App\Domain\Devices\Actions;
 
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Devices\DTOs\DeviceAssignmentData;
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
+use App\Domain\Devices\Exceptions\DeviceIsComplexModeException;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Devices\Services\DeviceOwnershipService;
 use App\Domain\Users\Enums\UserStatus;
@@ -25,6 +27,11 @@ final class AssignDeviceOwner
 
     public function handle(Device $device, DeviceAssignmentData $data, AdminUser $admin): Device
     {
+        // Y6 — a complex-mode device never has an owner; checked before anyone is provisioned.
+        if ($device->ownership_mode === DeviceOwnershipMode::Complex) {
+            throw new DeviceIsComplexModeException;
+        }
+
         return DB::transaction(function () use ($device, $data, $admin): Device {
             /** @var User $owner */
             $owner = User::query()->firstOrCreate(

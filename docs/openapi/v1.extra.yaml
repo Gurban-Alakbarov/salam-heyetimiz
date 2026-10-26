@@ -739,6 +739,46 @@ paths:
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  /admin/devices/{deviceId}/users/{userId}/move:
+    post:
+      tags: [Admin / Devices]
+      summary: Move a resident to another gate (the remaining paid time moves too)
+      operationId: adminMoveDeviceUser
+      security: [{ adminBearerAuth: [] }]
+      description: |
+        Y5 — requires `residents.update`; both gates in the caller's scope (complex_manager: else **404**). The
+        resident leaves this gate (whitelist removal, guest links revoked) and joins the target; a live
+        subscription moves with them — the target row's subscription takes the same tier, terms and end date
+        (active), this one is cancelled `moved_to_device`; nothing is paid again. Without a live subscription only
+        the access moves. Refusals change nothing: **422** `move_same_device`, `move_not_movable` (owner / family
+        member), `move_target_inactive`, `move_not_complex_member`; **409** `move_target_subscribed`; **404**
+        `roster_member_not_found`. Returns the resident's row on the target gate. Audited `resident.moved`.
+      parameters:
+        - { $ref: '#/components/parameters/DeviceId' }
+        - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_device_id]
+              properties:
+                target_device_id: { type: integer, format: int64, minimum: 1 }
+      responses:
+        '200':
+          description: Moved — the resident's row on the target gate
+          content: { application/json: { schema: { $ref: '#/components/schemas/DeviceUser' } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`move_target_subscribed`'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422':
+          description: '`move_same_device` | `move_not_movable` | `move_target_inactive` | `move_not_complex_member` | validation'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
   # ===========================================================================
   # Admin / System Health
   # ===========================================================================
@@ -1302,6 +1342,8 @@ paths:
       description: |
         Requires `applications.manage` **and** `complexes.manage`. Creates the residential complex in the same
         transaction and returns it alongside the application. **409** `application_not_pending` when already reviewed.
+        Y8 — **409** `duplicate_legal_application` when the same VÖEN already has THIS complex approved (an older
+        pending duplicate); nothing is created.
       parameters:
         - { in: path, name: id, required: true, schema: { type: integer, format: int64, minimum: 1 } }
       requestBody:
@@ -1845,7 +1887,10 @@ paths:
       security: [{ bearerAuth: [] }]
       description: |
         VÖEN = 10 digits; one pending application per VÖEN. **409** `application_duplicate_voen` /
-        `account_type_mismatch` (standard error envelope).
+        `account_type_mismatch` (standard error envelope). Y8 — one company may run several complexes: the same VÖEN
+        is fine for a DIFFERENT complex, but the same complex already approved (name compared without case, quotes,
+        punctuation or spacing; also its current, possibly renamed, name) → **409** `duplicate_legal_application`
+        (on submit and on edit).
       requestBody:
         required: true
         content:
@@ -2569,7 +2614,7 @@ paths:
       summary: Re-send a complex invitation
       operationId: komendantResendInvitation
       security: [{ bearerAuth: [] }]
-      description: Requires `residents.create`. Not this complex's invitation → **404**. **409** `invitation_not_resendable`, **429** `invitation_rate_limited`.
+      description: Requires `residents.create`. Not this complex's invitation → **404**. **409** `invitation_not_resendable`, **429** `invitation_rate_limited`. O6 — an EXPIRED invitation while a newer one to the same email is live → **409** `invitation_already_pending` (re-send the live one).
       parameters:
         - { in: path, name: id, required: true, schema: { type: integer, format: int64, minimum: 1 } }
       responses:

@@ -165,6 +165,8 @@ export interface DeviceUser {
   user: UserBrief | null
   role: DeviceUserRole
   status: DeviceUserStatus
+  /** Y5: access granted through a family link — it follows the head and is not moved on its own. */
+  via_family?: boolean
   added_at: string | null
   last_open_at: string | null
   subscription: SubscriptionBrief | null

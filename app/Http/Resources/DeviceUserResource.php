@@ -24,6 +24,8 @@ class DeviceUserResource extends JsonResource
             'user' => new UserBriefResource($this->whenLoaded('user')),
             'role' => $this->role->value,
             'status' => $this->status->value,
+            // Y5 — access granted through a family link (it follows the head; such a row is not moved on its own).
+            'via_family' => $this->family_link_id !== null,
             'added_at' => optional($this->created_at)->toIso8601String(),
             'last_open_at' => optional($this->last_open_at)->toIso8601String(),
             'subscription' => $this->subscription_brief !== null

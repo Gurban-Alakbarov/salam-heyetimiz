@@ -27,6 +27,12 @@ final class ApplicationException extends RuntimeException
         return new self('application_duplicate_voen', 'Bu VÖEN ilə gözləmədə olan müraciət artıq mövcuddur.', 409);
     }
 
+    /** Y8 — this company (VÖEN) already has THIS complex approved; a different complex is welcome. */
+    public static function duplicateComplex(): self
+    {
+        return new self('duplicate_legal_application', 'Bu VÖEN ilə bu kompleks üçün müraciət artıq təsdiqlənib.', 409);
+    }
+
     public static function notEditable(): self
     {
         return new self('application_not_editable', 'Müraciət artıq baxılır və dəyişdirilə bilməz.', 409);

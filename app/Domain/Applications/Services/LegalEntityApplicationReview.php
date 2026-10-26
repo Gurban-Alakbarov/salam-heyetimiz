@@ -8,6 +8,7 @@ use App\Domain\Applications\Enums\LegalEntityApplicationStatus;
 use App\Domain\Applications\Exceptions\ApplicationException;
 use App\Domain\Applications\Jobs\SendApplicationRejectedEmailJob;
 use App\Domain\Applications\Models\LegalEntityApplication;
+use App\Domain\Applications\Support\LegalComplexDuplicates;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Support\Time\Clock;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,7 @@ final class LegalEntityApplicationReview
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly Clock $clock,
+        private readonly LegalComplexDuplicates $duplicates,
     ) {}
 
     public function approve(LegalEntityApplication $application, AdminUser $admin, ?int $regionId = null): Complex
@@ -37,6 +39,8 @@ final class LegalEntityApplicationReview
             if ($locked->status !== LegalEntityApplicationStatus::Pending) {
                 throw ApplicationException::notPending();
             }
+            // Y8 — an older pending duplicate of an approved complex never creates a second complex.
+            $this->duplicates->assertNotApproved((string) $locked->voen, (string) $locked->complex_name);
 
             /** @var Complex $complex */
             $complex = Complex::query()->create([

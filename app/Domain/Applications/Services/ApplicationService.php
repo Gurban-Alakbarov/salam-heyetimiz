@@ -8,6 +8,7 @@ use App\Domain\Applications\Enums\LegalEntityApplicationStatus;
 use App\Domain\Applications\Exceptions\ApplicationException;
 use App\Domain\Applications\Models\IndividualApplication;
 use App\Domain\Applications\Models\LegalEntityApplication;
+use App\Domain\Applications\Support\LegalComplexDuplicates;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Models\Device;
@@ -30,6 +31,7 @@ final class ApplicationService
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly Clock $clock,
+        private readonly LegalComplexDuplicates $duplicates,
     ) {}
 
     /** @param  array<string, mixed>  $data  validated */
@@ -64,6 +66,7 @@ final class ApplicationService
     {
         $this->assertAccountType($user, AccountType::Legal);
         $this->assertVoenFree((string) $data['voen']);
+        $this->duplicates->assertNotApproved((string) $data['voen'], (string) $data['complex_name']); // Y8
 
         try {
             $application = DB::transaction(function () use ($user, $data): LegalEntityApplication {
@@ -104,6 +107,7 @@ final class ApplicationService
         if ((string) $data['voen'] !== $application->voen) {
             $this->assertVoenFree((string) $data['voen'], (int) $application->id);
         }
+        $this->duplicates->assertNotApproved((string) $data['voen'], (string) $data['complex_name']); // Y8
         $application->forceFill($this->legalFields($data))->save();
         $this->audit->record('application.legal_updated', ['application_id' => (int) $application->id], LegalEntityApplication::class, (int) $application->id);
 

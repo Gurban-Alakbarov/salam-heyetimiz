@@ -932,6 +932,10 @@ paths:
       summary: Initiate a manual renewal — creates an order and returns the bank redirect
       operationId: renewSubscription
       x-authorization: must be the payer (owner for main, owner or sub-user for additional)
+      description: |
+        O2 — whoever may pay for the subscription may renew it: the beneficiary, the head of the active family link
+        it was granted through (renews a member's ended subscription, pays as the payer), or the private device
+        owner. Anyone else → **404**. A subscription whose access is gone → **422** `subscription_access_removed`.
       parameters: [{ $ref: '#/components/parameters/IdempotencyKeyRequired' }]
       requestBody:
         required: false
@@ -1274,6 +1278,7 @@ paths:
       summary: Assign an owner to a device (technical mobile mode)
       operationId: techAssignDevice
       x-authorization: admin role=technical or super_admin
+      description: Y6 — a complex-mode device never has an owner → **409** `device_is_complex_mode` (switch it to private mode first).
       security:
         - adminBearerAuth: []
       parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
@@ -1957,6 +1962,7 @@ paths:
       tags: [Admin / Devices]
       summary: Transfer ownership to another user
       operationId: adminTransferDevice
+      description: Y6 — a complex-mode device has no owner to transfer → **409** `device_is_complex_mode`.
       security:
         - adminBearerAuth: []
       x-authorization: super_admin
@@ -3131,6 +3137,7 @@ components:
         user: { $ref: '#/components/schemas/UserBrief' }
         role: { type: string, enum: [owner, user] }
         status: { type: string, enum: [active, revoked] }
+        via_family: { type: boolean, description: 'Y5 — access granted through a family link (follows the head; not moved on its own).' }
         added_by_user: { $ref: '#/components/schemas/UserBrief' }
         added_at: { type: string, format: date-time }
         last_open_at: { type: string, format: date-time, nullable: true }

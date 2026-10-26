@@ -81,8 +81,9 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
         )}
       </PermissionGate>
 
+      {/* Y6: a complex gate has no owner, so there is no ownership to transfer. */}
       <PermissionGate anyOf={[PERM.devicesTransfer]}>
-        {!isDecommissioned && (
+        {!isDecommissioned && device.ownership_mode !== 'complex' && (
           <Button variant="outline" onClick={() => setTransferOpen(true)}>
             Köçür
           </Button>

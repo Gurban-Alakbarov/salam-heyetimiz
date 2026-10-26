@@ -61,20 +61,34 @@ final class InvitationService
             throw InvitationException::rateLimited($cooldown - (int) abs($now->getTimestamp() - $invitation->last_sent_at->getTimestamp()));
         }
 
+        // O6 — reviving an EXPIRED invitation while a newer one to the same email is already live would break the
+        // one-live-invite rule (unique index → 500). The live one is the one to (re)send.
+        if ($invitation->status === InvitationStatus::Expired && $this->hasLiveSibling($invitation, $now)) {
+            throw InvitationException::alreadyPending();
+        }
+
         $this->hitLimit('invitation:send:inv:'.$invitation->getKey(), (int) config('domain.invitations.resend_max_per_day', 5));
         $this->hitLimit('invitation:send:inviter:'.$this->inviterKey($invitation), (int) config('domain.invitations.inviter_max_per_day', 30));
 
         $token = $this->tokens->generate();
 
-        DB::transaction(function () use ($invitation, $token, $now): void {
-            $invitation->forceFill([
-                'token_hash' => $token['hash'],
-                'status' => InvitationStatus::Pending->value,
-                'expires_at' => $now->addDays($this->ttlDays()),
-                'send_count' => (int) $invitation->send_count + 1,
-                'last_sent_at' => $now,
-            ])->save();
-        });
+        try {
+            DB::transaction(function () use ($invitation, $token, $now): void {
+                $invitation->forceFill([
+                    'token_hash' => $token['hash'],
+                    'status' => InvitationStatus::Pending->value,
+                    'expires_at' => $now->addDays($this->ttlDays()),
+                    'send_count' => (int) $invitation->send_count + 1,
+                    'last_sent_at' => $now,
+                ])->save();
+            });
+        } catch (QueryException $e) {
+            // A concurrent fresh invite to the same email won the one-live-invite race.
+            if (str_contains($e->getMessage(), 'uq_invitations_active_')) {
+                throw InvitationException::alreadyPending();
+            }
+            throw $e;
+        }
 
         SendInvitationEmailJob::dispatch((int) $invitation->getKey(), $token['plaintext'])->afterCommit();
 
@@ -173,6 +187,25 @@ final class InvitationService
         SendInvitationEmailJob::dispatch((int) $invitation->getKey(), $token['plaintext'])->afterCommit();
 
         return ['invitation' => $invitation, 'token' => $token['plaintext']];
+    }
+
+    /**
+     * Another invitation of the same kind, target and email that is still live. A sibling that is pending but past
+     * its expiry (not swept yet) is expired here first, exactly as on create, so it does not block the resend.
+     */
+    private function hasLiveSibling(Invitation $invitation, \DateTimeInterface $now): bool
+    {
+        $siblings = fn () => Invitation::query()
+            ->whereKeyNot($invitation->getKey())
+            ->where('kind', $invitation->kind->value)
+            ->where('invitee_email', $invitation->invitee_email)
+            ->when($invitation->complex_id !== null, fn ($q) => $q->where('complex_id', $invitation->complex_id))
+            ->when($invitation->invited_by_user_id !== null, fn ($q) => $q->where('invited_by_user_id', $invitation->invited_by_user_id))
+            ->where('status', InvitationStatus::Pending->value);
+
+        $siblings()->where('expires_at', '<=', $now)->update(['status' => InvitationStatus::Expired->value, 'updated_at' => $now]);
+
+        return $siblings()->exists();
     }
 
     private function hitLimit(string $key, int $max): void

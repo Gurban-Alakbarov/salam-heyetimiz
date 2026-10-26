@@ -260,6 +260,48 @@ final class SubscriptionService
     }
 
     /**
+     * Y5 — an admin moves a resident to another gate: the remaining paid time goes with them, nothing is paid
+     * again. The target roster row's subscription (one per row) takes over the same tier, terms and end date and
+     * becomes active; the source one is cancelled (`moved_to_device`). Its paid periods stay on the source row as
+     * history. Both events fire, so each gate's whitelist follows (complex: subscription-based).
+     */
+    public function moveTo(Subscription $from, DeviceUser $to): Subscription
+    {
+        return DB::transaction(function () use ($from, $to): Subscription {
+            /** @var Subscription|null $target */
+            $target = Subscription::query()->where('device_user_id', $to->getKey())->lockForUpdate()->first();
+
+            $attributes = [
+                'tier' => $from->tier->value,
+                'price_minor' => (int) $from->price_minor,
+                'currency' => $from->currency,
+                'term_days' => (int) $from->term_days,
+                'starts_at' => $this->clock->now(),
+                'ends_at' => $from->ends_at,
+                'status' => SubscriptionStatus::Active->value,
+                'auto_renew' => false,
+                'cancelled_at' => null,
+                'cancellation_reason' => null,
+                // same end date → the same point in its reminder cycle (Y1)
+                'last_reminder_kind' => $from->last_reminder_kind?->value,
+                'last_reminder_sent_at' => $from->last_reminder_sent_at,
+            ];
+
+            if ($target !== null) {
+                $target->forceFill($attributes)->save();
+            } else {
+                /** @var Subscription $target */
+                $target = Subscription::query()->create(['device_user_id' => $to->getKey()] + $attributes);
+            }
+
+            $this->cancel($from, 'moved_to_device');
+            SubscriptionActivated::dispatch($target);
+
+            return $target;
+        });
+    }
+
+    /**
      * Apply a refund's subscription impact (§14.5.1). $moneyFull reflects the Payments outcome
      * (OrderRefunded vs OrderPartiallyRefunded); a partial money refund still becomes a full revoke
      * if the pro-rata removal zeroes the remaining term.

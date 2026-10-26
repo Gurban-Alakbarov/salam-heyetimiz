@@ -1,6 +1,13 @@
 import { type FormEvent, useState } from 'react'
-import { BadgeCheck, Loader2, Trash2, UserCog, UserPlus } from 'lucide-react'
-import { useAddDeviceUser, useAssignDevice, useGrantSubscription, useRemoveDeviceUser } from '@/api/devices'
+import { ArrowRightLeft, BadgeCheck, Loader2, Trash2, UserCog, UserPlus } from 'lucide-react'
+import {
+  useAddDeviceUser,
+  useAssignDevice,
+  useDevices,
+  useGrantSubscription,
+  useMoveDeviceUser,
+  useRemoveDeviceUser,
+} from '@/api/devices'
 import { ApiError } from '@/lib/api'
 import { PERM } from '@/auth/permissions'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -20,9 +27,10 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/toast'
-import { formatDateTime } from '@/lib/format'
+import { formatDate, formatDateTime } from '@/lib/format'
 import type { DeviceAdminDetail, DeviceUser, DeviceUserRole, DeviceUserStatus } from '@/types/api'
 
 const rosterRoleLabels: Record<DeviceUserRole, string> = { owner: 'Sahib', user: 'İstifadəçi' }
@@ -34,13 +42,17 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
   const addUser = useAddDeviceUser(device.id)
   const removeUser = useRemoveDeviceUser(device.id)
   const grant = useGrantSubscription(device.id)
+  const move = useMoveDeviceUser(device.id)
 
   const [assignOpen, setAssignOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<DeviceUser | null>(null)
   const [grantTarget, setGrantTarget] = useState<DeviceUser | null>(null)
+  const [moveTarget, setMoveTarget] = useState<DeviceUser | null>(null)
 
   const hasOwner = device.owner !== null
+  // Y6: a complex gate never has an owner — residents are added straight away (each pays for themselves).
+  const isComplex = device.ownership_mode === 'complex'
   const notifyError = (err: unknown) =>
     toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined })
 
@@ -48,7 +60,7 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
         <CardTitle className="text-base">İstifadəçilər ({device.users.length})</CardTitle>
-        {hasOwner ? (
+        {hasOwner || isComplex ? (
           <PermissionGate anyOf={[PERM.residentsCreate]}>
             <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
               <UserPlus className="h-4 w-4" />
@@ -67,7 +79,7 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
       <CardContent className="px-0 pb-0">
         {device.users.length === 0 ? (
           <p className="px-6 pb-6 text-sm text-muted-foreground">
-            {hasOwner ? 'İstifadəçi yoxdur.' : 'Cihaz hələ heç bir sakinə təyin edilməyib.'}
+            {hasOwner || isComplex ? 'İstifadəçi yoxdur.' : 'Cihaz hələ heç bir sakinə təyin edilməyib.'}
           </p>
         ) : (
           <Table>
@@ -128,6 +140,20 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
                             onClick={() => setGrantTarget(u)}
                           >
                             <BadgeCheck className="h-4 w-4 text-emerald-600" />
+                          </Button>
+                        </PermissionGate>
+                      )}
+                      {/* Y5: a plain resident moves to another gate with the remaining paid time. */}
+                      {u.role !== 'owner' && !u.via_family && u.status === 'active' && u.user !== null && (
+                        <PermissionGate anyOf={[PERM.residentsUpdate]}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            aria-label="Başqa cihaza köçür"
+                            title="Başqa cihaza köçür (abunəlik də keçir)"
+                            onClick={() => setMoveTarget(u)}
+                          >
+                            <ArrowRightLeft className="h-4 w-4" />
                           </Button>
                         </PermissionGate>
                       )}
@@ -202,6 +228,32 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
             },
             onError: notifyError,
           })
+        }}
+      />
+
+      <MoveResidentDialog
+        device={device}
+        member={moveTarget}
+        loading={move.isPending}
+        onOpenChange={(next) => {
+          if (!next) setMoveTarget(null)
+        }}
+        onSubmit={(targetDeviceId) => {
+          if (!moveTarget?.user) return
+          move.mutate(
+            { userId: moveTarget.user.id, targetDeviceId },
+            {
+              onSuccess: (row) => {
+                toast({
+                  variant: 'success',
+                  title: 'Sakin köçürüldü',
+                  description: row.subscription?.status === 'active' ? 'Abunəlik yeni cihaza keçdi.' : undefined,
+                })
+                setMoveTarget(null)
+              },
+              onError: notifyError,
+            },
+          )
         }}
       />
 
@@ -298,6 +350,100 @@ function GrantSubscriptionDialog({
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {isExtension ? 'Uzat' : 'Aktivləşdir'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/**
+ * Y5 — move a resident to another gate: they leave this one and join the target, and their remaining paid time
+ * moves with them (no new payment). Candidates are the other active gates of the same complex (complex device)
+ * or of the same owner (private device); the API re-checks everything (scope, membership, target subscription).
+ */
+function MoveResidentDialog({
+  device,
+  member,
+  loading,
+  onOpenChange,
+  onSubmit,
+}: {
+  device: DeviceAdminDetail
+  member: DeviceUser | null
+  loading: boolean
+  onOpenChange: (open: boolean) => void
+  onSubmit: (targetDeviceId: number) => void
+}) {
+  const [target, setTarget] = useState('')
+  const isComplex = device.ownership_mode === 'complex'
+  const candidatesQuery = useDevices(isComplex ? { limit: 100 } : { owner_user_id: device.owner?.id, limit: 100 })
+  const candidates = (candidatesQuery.data?.data ?? []).filter(
+    (d) =>
+      d.id !== device.id &&
+      d.status === 'active' &&
+      (isComplex
+        ? d.ownership_mode === 'complex' && d.complex_id === device.complex_id
+        : d.owner?.id === device.owner?.id),
+  )
+  const sub = member?.subscription
+  const liveSub = sub?.status === 'active'
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    if (target) onSubmit(Number(target))
+  }
+
+  return (
+    <Dialog
+      open={member !== null}
+      onOpenChange={(next) => {
+        if (loading) return
+        onOpenChange(next)
+        if (!next) setTarget('')
+      }}
+    >
+      <DialogContent>
+        <form onSubmit={submit}>
+          <DialogHeader>
+            <DialogTitle>Başqa cihaza köçür</DialogTitle>
+            <DialogDescription>
+              {member?.user?.email ?? member?.user?.phone_masked} bu cihazdan çıxarılıb seçdiyiniz cihaza əlavə olunacaq.{' '}
+              {liveSub ? (
+                <>
+                  Aktiv abunəliyi ({formatDate(sub?.ends_at)} tarixinədək) yeni cihaza keçəcək —{' '}
+                  <strong>yenidən ödəniş tələb olunmur</strong>.
+                </>
+              ) : (
+                'Aktiv abunəliyi yoxdur — yalnız giriş köçürülür.'
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            <Label htmlFor="move-target">Hədəf cihaz</Label>
+            {candidatesQuery.isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            ) : candidates.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Köçürmək üçün uyğun aktiv cihaz yoxdur.</p>
+            ) : (
+              <Select id="move-target" value={target} onChange={(e) => setTarget(e.target.value)} required>
+                <option value="">Cihaz seçin…</option>
+                {candidates.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.location_label ? `${d.location_label} (${d.serial})` : d.serial}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+              İmtina
+            </Button>
+            <Button type="submit" disabled={loading || !target}>
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              Köçür
             </Button>
           </DialogFooter>
         </form>

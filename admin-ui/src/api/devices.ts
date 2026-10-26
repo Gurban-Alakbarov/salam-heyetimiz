@@ -217,6 +217,26 @@ export function useAddDeviceUser(id: number) {
   })
 }
 
+/**
+ * Y5 — move a resident to another gate (residents.update): this gate's access ends, the target's starts, and the
+ * remaining paid time moves with them (no new payment). Returns the resident's row on the target gate.
+ */
+export function useMoveDeviceUser(id: number) {
+  const invalidate = useDeviceInvalidation()
+  return useMutation({
+    mutationFn: async (input: { userId: number; targetDeviceId: number }) =>
+      (
+        await api.post<DeviceUser>(`/admin/v1/devices/${id}/users/${input.userId}/move`, {
+          target_device_id: input.targetDeviceId,
+        })
+      ).data,
+    onSuccess: (_row, input) => {
+      invalidate(id)
+      invalidate(input.targetDeviceId)
+    },
+  })
+}
+
 export function useRemoveDeviceUser(id: number) {
   const invalidate = useDeviceInvalidation()
   return useMutation({

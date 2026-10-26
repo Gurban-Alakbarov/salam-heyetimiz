@@ -7,7 +7,8 @@ use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Admin\Models\Complex;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Devices\Models\Device;
-use App\Domain\Roster\Models\DeviceUser;
+use App\Domain\Roster\Enums\ComplexMemberStatus;
+use App\Domain\Roster\Models\ComplexMember;
 use App\Http\Concerns\AuthorizesAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -169,7 +170,8 @@ class ComplexManagementController
                 'devices' => $deviceIds->count(),
                 'devices_online' => Device::query()->whereIn('id', $deviceIds)
                     ->where('last_online_at', '>=', now()->subMinutes($offlineMinutes))->count(),
-                'residents' => DeviceUser::query()->whereIn('device_id', $deviceIds)->where('status', 'active')->distinct('user_id')->count('user_id'),
+                // A7 — the same count as the Komendant app and the complex's residents list: active members.
+                'residents' => ComplexMember::query()->where('complex_id', $c->id)->where('status', ComplexMemberStatus::Active->value)->count(),
                 'managers' => AdminUser::query()->where('complex_id', $c->id)->count(),
             ],
         ];

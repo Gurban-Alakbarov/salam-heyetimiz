@@ -2,6 +2,7 @@
 
 namespace App\Domain\Roster\Services;
 
+use App\Domain\Admin\Exceptions\ComplexInactiveException;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Enums\DeviceUserRole;
@@ -50,6 +51,7 @@ final class FamilyService
     public function invite(User $head, Device $device, string $email, string $firstName, string $lastName): array
     {
         $this->assertHead($head, $device);
+        ComplexInactiveException::assertActive($device->complex_id !== null ? (int) $device->complex_id : null); // A7
         $email = mb_strtolower(trim($email));
         if ($email === mb_strtolower((string) $head->email)) {
             throw InvitationException::invalidTarget();

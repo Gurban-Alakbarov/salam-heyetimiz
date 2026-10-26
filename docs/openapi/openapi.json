@@ -518,6 +518,7 @@
           {
             "in": "query",
             "name": "filter",
+            "description": "A10 — `suspended` lists the caller's devices switched off by an admin (status disabled).",
             "schema": {
               "type": "string",
               "enum": [
@@ -6600,6 +6601,7 @@
             "adminBearerAuth": []
           }
         ],
+        "description": "A10 — every active roster row is one number on the barrier's whitelist; when the device model's\n`whitelist_capacity` (default 100) is reached → **409** `whitelist_full` (`details.capacity`).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/DeviceId"
@@ -9265,11 +9267,12 @@
               "enum": [
                 "active",
                 "used",
+                "used_up",
                 "expired",
                 "revoked"
               ]
             },
-            "description": "Derived status (`used` = usage exhausted); omit for all"
+            "description": "Derived status (`used_up` — as shown on the rows — or its older alias `used` = usage exhausted); omit for all"
           },
           {
             "in": "query",
@@ -9995,7 +9998,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "**Idempotency-Key is required** (absent → 422 `validation_failed` with field `Idempotency-Key`). Creates the\ncaller's roster row + pending subscription and an order — same contract as `createOrder`: open\n`bank_redirect_url` to pay. Non-members / devices not in the complex → **404**. **409**\n`subscription_already_active` (`details.subscription_id`).\n",
+        "description": "**Idempotency-Key is required** (absent → 422 `validation_failed` with field `Idempotency-Key`). Creates the\ncaller's roster row + pending subscription and an order — same contract as `createOrder`: open\n`bank_redirect_url` to pay. Non-members / devices not in the complex → **404**. **409**\n`subscription_already_active` (`details.subscription_id`). A7 — a deactivated complex → **422**\n`complex_inactive`; a full whitelist → **409** `whitelist_full`.\n",
         "parameters": [
           {
             "in": "path",
@@ -10189,11 +10192,12 @@
               "enum": [
                 "active",
                 "used",
+                "used_up",
                 "expired",
                 "revoked"
               ]
             },
-            "description": "Derived status (`used` = usage exhausted); omit for all"
+            "description": "Derived status (`used_up` — as shown on the rows — or its older alias `used` = usage exhausted); omit for all"
           },
           {
             "$ref": "#/components/parameters/Limit"
@@ -11401,7 +11405,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "Requires `residents.create`. Errors (standard envelope): **409** `already_resident` /\n`invitation_already_pending`, **422** validation / `invitation_invalid_target`, **429** `invitation_rate_limited`.\n",
+        "description": "Requires `residents.create`. Errors (standard envelope): **409** `already_resident` /\n`invitation_already_pending`, **422** validation / `invitation_invalid_target` / `complex_inactive` (A7 — a\ndeactivated complex takes no new residents; accepting such an invitation is refused the same way),\n**429** `invitation_rate_limited`.\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -12476,6 +12480,10 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "online": {
+            "type": "boolean",
+            "description": "A2 — computed with the one shared window (15 min, domain.devices.offline_threshold_minutes)"
           },
           "image_url": {
             "type": "string",

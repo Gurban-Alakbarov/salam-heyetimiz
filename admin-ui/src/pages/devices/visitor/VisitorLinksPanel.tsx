@@ -32,6 +32,7 @@ import { ACCESS_TYPE_OPTIONS, PURPOSE_OPTIONS, accessTypeLabel, purposeLabel, us
 const STATUS_OPTIONS = [
   { value: '', label: 'Bütün statuslar' },
   { value: 'active', label: 'Aktiv' },
+  { value: 'used_up', label: 'İstifadə olunub' },
   { value: 'expired', label: 'Vaxtı bitib' },
   { value: 'revoked', label: 'Ləğv edilib' },
 ]

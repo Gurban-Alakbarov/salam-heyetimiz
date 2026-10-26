@@ -2,6 +2,7 @@
 
 namespace App\Domain\Roster\Actions;
 
+use App\Domain\Admin\Exceptions\ComplexInactiveException;
 use App\Domain\Admin\Models\Complex;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Roster\Enums\InvitationKind;
@@ -88,6 +89,7 @@ final class ClaimInvitation
             }
 
             $complexId = (int) $invitation->complex_id;
+            ComplexInactiveException::assertActive($complexId); // A7 — a deactivated complex takes no new residents
             $this->memberships->join($complexId, $user, (int) $invitation->getKey());
 
             $this->audit->record('invitation.accepted', [

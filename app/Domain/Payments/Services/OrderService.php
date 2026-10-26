@@ -362,8 +362,11 @@ final class OrderService
             }
 
             $subscription = Subscription::query()->find($item->referencedId);
-            if ($subscription !== null && $this->deliverability->blocker($subscription) !== null) {
-                throw ValidationException::withMessages(['items' => __('errors.subscription_access_removed')]);
+            $blocker = $subscription !== null ? $this->deliverability->blocker($subscription) : null;
+            if ($blocker !== null) {
+                throw ValidationException::withMessages(['items' => __(
+                    $blocker === SubscriptionDeliverability::COMPLEX_INACTIVE ? 'errors.complex_inactive' : 'errors.subscription_access_removed',
+                )]);
             }
         }
     }

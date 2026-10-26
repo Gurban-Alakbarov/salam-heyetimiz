@@ -476,6 +476,7 @@ paths:
         - $ref: '#/components/parameters/Cursor'
         - in: query
           name: filter
+          description: A10 — `suspended` lists the caller's devices switched off by an admin (status disabled).
           schema:
             type: string
             enum: [all, owned, member, suspended]
@@ -3146,6 +3147,9 @@ components:
           maximum: 65535
           description: Allowed distance from the device in metres (null when the geofence is off).
         last_online_at: { type: string, format: date-time, nullable: true }
+        online:
+          type: boolean
+          description: A2 — computed with the one shared window (15 min, domain.devices.offline_threshold_minutes)
         image_url: { type: string, maxLength: 2048, nullable: true, description: Barrier photo URL (null → app shows a placeholder) }
         address: { type: string, maxLength: 255, nullable: true, description: Full street address (null → app shows a fallback) }
 

@@ -699,6 +699,9 @@ paths:
       summary: Add a resident to a device roster
       operationId: adminAddDeviceUser
       security: [{ adminBearerAuth: [] }]
+      description: |
+        A10 — every active roster row is one number on the barrier's whitelist; when the device model's
+        `whitelist_capacity` (default 100) is reached → **409** `whitelist_full` (`details.capacity`).
       parameters: [{ $ref: '#/components/parameters/DeviceId' }]
       requestBody:
         required: true
@@ -1850,7 +1853,7 @@ paths:
       description: Requires `visitor_links.view`. Complex-scoped for `complex_manager`. Cursor-paginated, newest first.
       parameters:
         - { in: query, name: device_id, schema: { type: integer, format: int64 } }
-        - { in: query, name: status, schema: { type: string, enum: [active, used, expired, revoked] }, description: 'Derived status (`used` = usage exhausted); omit for all' }
+        - { in: query, name: status, schema: { type: string, enum: [active, used, used_up, expired, revoked] }, description: 'Derived status (`used_up` — as shown on the rows — or its older alias `used` = usage exhausted); omit for all' }
         - { in: query, name: q, schema: { type: string }, description: Substring match on visitor name }
         - { in: query, name: purpose, schema: { $ref: '#/components/schemas/VisitorPurpose' } }
         - { in: query, name: access_type, schema: { type: string, enum: [one_time, time_limited] } }
@@ -2170,7 +2173,8 @@ paths:
         **Idempotency-Key is required** (absent → 422 `validation_failed` with field `Idempotency-Key`). Creates the
         caller's roster row + pending subscription and an order — same contract as `createOrder`: open
         `bank_redirect_url` to pay. Non-members / devices not in the complex → **404**. **409**
-        `subscription_already_active` (`details.subscription_id`).
+        `subscription_already_active` (`details.subscription_id`). A7 — a deactivated complex → **422**
+        `complex_inactive`; a full whitelist → **409** `whitelist_full`.
       parameters:
         - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
         - { $ref: '#/components/parameters/DeviceId' }
@@ -2254,7 +2258,7 @@ paths:
       security: [{ bearerAuth: [] }]
       description: Ownership is enforced server-side. Rows here also carry `first_used_at`. Cursor-paginated, newest first.
       parameters:
-        - { in: query, name: status, schema: { type: string, enum: [active, used, expired, revoked] }, description: 'Derived status (`used` = usage exhausted); omit for all' }
+        - { in: query, name: status, schema: { type: string, enum: [active, used, used_up, expired, revoked] }, description: 'Derived status (`used_up` — as shown on the rows — or its older alias `used` = usage exhausted); omit for all' }
         - { $ref: '#/components/parameters/Limit' }
         - { $ref: '#/components/parameters/Cursor' }
       responses:
@@ -2794,7 +2798,9 @@ paths:
       security: [{ bearerAuth: [] }]
       description: |
         Requires `residents.create`. Errors (standard envelope): **409** `already_resident` /
-        `invitation_already_pending`, **422** validation / `invitation_invalid_target`, **429** `invitation_rate_limited`.
+        `invitation_already_pending`, **422** validation / `invitation_invalid_target` / `complex_inactive` (A7 — a
+        deactivated complex takes no new residents; accepting such an invitation is refused the same way),
+        **429** `invitation_rate_limited`.
       requestBody:
         required: true
         content:

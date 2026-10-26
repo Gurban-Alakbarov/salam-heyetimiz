@@ -2,6 +2,7 @@
 
 namespace App\Domain\Roster\Services;
 
+use App\Domain\Catalog\Models\DeviceModel;
 use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Enums\DeviceUserRole;
@@ -12,6 +13,7 @@ use App\Domain\Roster\Events\RosterUserRemoved;
 use App\Domain\Roster\Exceptions\CannotRemoveOwnerException;
 use App\Domain\Roster\Exceptions\DeviceNotAssignedException;
 use App\Domain\Roster\Exceptions\RosterMemberNotFoundException;
+use App\Domain\Roster\Exceptions\WhitelistFullException;
 use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Roster\Models\DeviceUserHistory;
 use App\Domain\Users\Models\User;
@@ -58,6 +60,8 @@ final class RosterService
                 return $active; // idempotent — already on the roster
             }
 
+            $this->assertWhitelistRoom($device);
+
             /** @var DeviceUser|null $revoked */
             $revoked = DeviceUser::query()
                 ->where('device_id', $device->getKey())
@@ -97,6 +101,25 @@ final class RosterService
 
             return $row;
         });
+    }
+
+    /**
+     * A10 — every active roster row is one phone number on the barrier's whitelist, and the device model holds at
+     * most `whitelist_capacity` of them (config domain.devices.whitelist.default_capacity when the model has
+     * none). The device row is locked so two concurrent adds cannot both take the last slot.
+     */
+    private function assertWhitelistRoom(Device $device): void
+    {
+        Device::query()->whereKey($device->getKey())->lockForUpdate()->first();
+
+        $capacity = (int) (DeviceModel::query()->whereKey($device->device_model_id)->value('whitelist_capacity')
+            ?? config('domain.devices.whitelist.default_capacity', 100));
+        $used = DeviceUser::query()->where('device_id', $device->getKey())
+            ->where('status', DeviceUserStatus::Active->value)->count();
+
+        if ($capacity > 0 && $used >= $capacity) {
+            throw new WhitelistFullException($capacity);
+        }
     }
 
     /** Revoke a resident's roster row (whitelist removal follows via the event). Owners cannot be removed here. */

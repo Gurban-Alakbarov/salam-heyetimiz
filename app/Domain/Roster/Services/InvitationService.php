@@ -2,6 +2,7 @@
 
 namespace App\Domain\Roster\Services;
 
+use App\Domain\Admin\Exceptions\ComplexInactiveException;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Roster\Enums\InvitationKind;
 use App\Domain\Roster\Enums\InvitationStatus;
@@ -31,6 +32,8 @@ final class InvitationService
     /** @return array{invitation: Invitation, token: string} */
     public function createComplexResident(int $complexId, AdminUser $inviter, string $email, string $firstName, string $lastName): array
     {
+        ComplexInactiveException::assertActive($complexId); // A7
+
         return $this->create(InvitationKind::ComplexResident, [
             'complex_id' => $complexId,
             'invited_by_admin_id' => (int) $inviter->getKey(),

@@ -87,8 +87,9 @@ final class VisitorLinkQuery
         match ($status) {
             'revoked' => $query->whereNotNull('revoked_at'),
             'expired' => $query->whereNull('revoked_at')->whereNotNull('expires_at')->where('expires_at', '<=', $now),
-            // Usage-exhausted but not yet revoked/expired — matches VisitorLink::statusLabel()'s 'used_up'.
-            'used' => $query->whereNull('revoked_at')
+            // Usage-exhausted but not yet revoked/expired — VisitorLink::statusLabel()'s 'used_up'. A5: the value a
+            // client sees on the rows (`used_up`) filters too; `used` stays for the existing app.
+            'used', 'used_up' => $query->whereNull('revoked_at')
                 ->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', $now))
                 ->whereNotNull('max_usage')->whereColumn('usage_count', '>=', 'max_usage'),
             'active' => $query->whereNull('revoked_at')

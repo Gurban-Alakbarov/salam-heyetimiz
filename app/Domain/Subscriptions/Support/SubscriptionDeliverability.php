@@ -2,6 +2,8 @@
 
 namespace App\Domain\Subscriptions\Support;
 
+use App\Domain\Admin\Models\Complex;
+use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Models\DeviceUser;
@@ -18,6 +20,9 @@ final class SubscriptionDeliverability
 
     public const DEVICE_REMOVED = 'device_removed';
 
+    /** A7 — the device belongs to a deactivated complex: no new payment / renewal for it. */
+    public const COMPLEX_INACTIVE = 'complex_inactive';
+
     /** Null while the subscription can be served; otherwise why it cannot (ACCESS_REMOVED / DEVICE_REMOVED). */
     public function blocker(Subscription $subscription): ?string
     {
@@ -28,6 +33,16 @@ final class SubscriptionDeliverability
         }
 
         // Decommissioned devices are soft-deleted, so the default scope already hides them.
-        return Device::query()->whereKey($row->device_id)->exists() ? null : self::DEVICE_REMOVED;
+        $device = Device::query()->find($row->device_id);
+        if ($device === null) {
+            return self::DEVICE_REMOVED;
+        }
+
+        if ($device->ownership_mode === DeviceOwnershipMode::Complex && $device->complex_id !== null
+            && Complex::query()->whereKey($device->complex_id)->where('is_active', false)->exists()) {
+            return self::COMPLEX_INACTIVE;
+        }
+
+        return null;
     }
 }

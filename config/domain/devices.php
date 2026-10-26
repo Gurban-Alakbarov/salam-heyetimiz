@@ -12,11 +12,13 @@ return [
         'device_global_seconds' => 2, // per-device
     ],
 
-    'offline_threshold_hours' => 24, // legacy diagnose() window (stale-device cleanup)
+    'offline_threshold_hours' => 24, // legacy stale-device window — no longer used for "online" (A2)
 
     // A device is "online" in the admin panel only if telemetry arrived within this window. The UMKa
     // reports at most every ~5 min (period.max 300s + keepalive), so 15 min (3×) avoids flapping while
     // reflecting the real Traccar-fed connectivity (last_online_at is updated by the event-forward webhook).
+    // A2 — the ONE online window: admin panel, Komendant, mobile (`online` in the device payload) and the
+    // Traccar diagnose() all use it.
     'offline_threshold_minutes' => 15,
 
     'diagnostics_interval_hours' => 6,

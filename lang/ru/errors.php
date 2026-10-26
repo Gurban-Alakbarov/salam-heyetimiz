@@ -42,6 +42,8 @@ return [
     'not_family_member' => 'Выбранный человек не является членом этой семьи.',
     'family_action_invalid' => 'Неверный выбор для семьи.',
     'feedback_not_applicable' => 'Для этой команды отзыв не принимается.',
+    'whitelist_full' => 'Белый список устройства заполнен (:capacity номеров). Сначала удалите кого-нибудь.',
+    'complex_inactive' => 'Комплекс деактивирован: новые приглашения, подписки и оплаты не принимаются.',
     'notification_not_mutable' => 'Это уведомление нельзя отключить.',
     'idempotency_key_required' => 'Требуется заголовок Idempotency-Key.',
     // Visitor links

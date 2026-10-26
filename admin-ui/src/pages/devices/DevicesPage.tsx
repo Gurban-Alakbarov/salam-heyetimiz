@@ -30,7 +30,6 @@ const STATUS_OPTIONS = [
   { value: '', label: 'Bütün statuslar' },
   { value: 'unassigned', label: 'Təyin olunmayıb' },
   { value: 'active', label: 'Aktiv' },
-  { value: 'suspended', label: 'Dayandırılıb' },
   { value: 'disabled', label: 'Bağlı' },
   { value: 'decommissioned', label: 'Çıxarılıb' },
 ]

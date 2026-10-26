@@ -39,6 +39,10 @@ class DeviceResource extends JsonResource
             'geofence_enabled' => (bool) $this->geofence_enabled,
             'geofence_radius_m' => $this->geofence_radius_m,
             'last_online_at' => optional($this->last_online_at)->toIso8601String(),
+            // A2 — computed with the shared window (domain.devices.offline_threshold_minutes) so the app shows the
+            // same online state as the admin panel instead of using its own threshold.
+            'online' => $this->last_online_at !== null
+                && $this->last_online_at->greaterThan(now()->subMinutes((int) config('domain.devices.offline_threshold_minutes', 15))),
             'image_url' => $this->image_url,
             'address' => $this->address,
         ];

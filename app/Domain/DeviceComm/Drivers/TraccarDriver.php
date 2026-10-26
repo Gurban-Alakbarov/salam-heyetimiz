@@ -302,7 +302,8 @@ final class TraccarDriver implements DeviceDriver
 
     public function diagnose(Device $device): DriverDiagnosticResult
     {
-        $threshold = $this->clock->now()->subHours((int) config('domain.devices.offline_threshold_hours', 24));
+        // A2 — the same "online" window as every other surface (was a separate 24 h).
+        $threshold = $this->clock->now()->subMinutes((int) config('domain.devices.offline_threshold_minutes', 15));
         $online = $device->last_online_at !== null && $device->last_online_at->greaterThan($threshold);
 
         return new DriverDiagnosticResult(online: $online, signalStrength: $device->last_signal_strength);

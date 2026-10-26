@@ -31,8 +31,10 @@ final class DeviceQuery
             DeviceListFilter::Owned => $query->where('owner_user_id', $userId),
             DeviceListFilter::Member => $query->whereHas('deviceUsers', fn (Builder $q) => $memberOf($q)
                 ->where('role', DeviceUserRole::User->value)),
+            // A10 — nothing ever writes DeviceStatus::Suspended; "suspended" means switched off by an admin
+            // (disabled), with the legacy value kept in the set.
             DeviceListFilter::Suspended => $query
-                ->where('status', DeviceStatus::Suspended->value)
+                ->whereIn('status', [DeviceStatus::Disabled->value, DeviceStatus::Suspended->value])
                 ->where(fn (Builder $q) => $q->where('owner_user_id', $userId)
                     ->orWhereHas('deviceUsers', $memberOf)),
             DeviceListFilter::All => $query->where(fn (Builder $q) => $q->where('owner_user_id', $userId)

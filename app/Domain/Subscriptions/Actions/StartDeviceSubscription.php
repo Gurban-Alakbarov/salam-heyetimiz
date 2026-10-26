@@ -2,6 +2,7 @@
 
 namespace App\Domain\Subscriptions\Actions;
 
+use App\Domain\Admin\Exceptions\ComplexInactiveException;
 use App\Domain\Devices\Enums\DeviceOwnershipMode;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Payments\DTOs\OrderCreationData;
@@ -53,6 +54,7 @@ final class StartDeviceSubscription
 
         // membership + active device — DevicePolicy::subscribe (B4), server-side.
         Gate::forUser($user)->authorize('subscribe', $device);
+        ComplexInactiveException::assertActive($complexId); // A7
 
         $subscription = DB::transaction(function () use ($device, $user): Subscription {
             Device::query()->whereKey($device->getKey())->lockForUpdate()->first();

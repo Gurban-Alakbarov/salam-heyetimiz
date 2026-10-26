@@ -3216,7 +3216,10 @@ components:
             *(v1.1, HIGH-14)* Server-computed estimate based on the device's driver and a
             rolling p90 of recent successful opens. The UX SHOULD size its progress UI to
             this hint, not to a fixed constant. Defaults to a per-driver constant when the
-            rolling window has < 10 samples.
+            rolling window has < 10 samples. Y2: for a model that confirms the open by polling the
+            device's own reply (VL110C) it is never below that whole confirmation window plus the send
+            (15 × 1.5 s + 3 s = 25 500 ms), so a client polling against it does not report a slow but
+            successful open as a timeout.
         driver_confirms_actuation:
           type: boolean
           description: |

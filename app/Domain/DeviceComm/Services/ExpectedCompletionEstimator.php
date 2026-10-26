@@ -30,11 +30,29 @@ final class ExpectedCompletionEstimator
             ->map(static fn ($ms): int => (int) $ms)
             ->all();
 
-        if (count($latencies) < self::MIN_SAMPLES) {
-            return (int) config('domain.device_comm.expected_completion_ms_defaults.'.$driver->value, 5000);
+        $estimate = count($latencies) < self::MIN_SAMPLES
+            ? (int) config('domain.device_comm.expected_completion_ms_defaults.'.$driver->value, 5000)
+            : $this->p90($latencies);
+
+        return max($estimate, $this->confirmationWindowMs($device, $driver));
+    }
+
+    /**
+     * Y2 — a model confirmed by polling the device's own commandResult (VL110C: the open reply comes ~15s later)
+     * settles only after up to the driver's whole poll window. Clients size their polling on this estimate
+     * (app: ceil(ms/1200)+3 polls, home widget: +2), so it must cover that window plus the send — otherwise a
+     * successful open is shown as a timeout. 0 for every other model (their estimate is unchanged).
+     */
+    private function confirmationWindowMs(Device $device, DriverType $driver): int
+    {
+        if ($driver !== DriverType::Traccar || ! (bool) ($device->model?->command_result_confirm ?? false)) {
+            return 0;
         }
 
-        return $this->p90($latencies);
+        $attempts = max(1, (int) config('domain.device_comm.command_result_poll_attempts', 15));
+        $intervalMs = max(0, (int) config('domain.device_comm.command_result_poll_interval_ms', 1500));
+
+        return $attempts * $intervalMs + (int) config('domain.device_comm.command_result_send_overhead_ms', 3000);
     }
 
     /**

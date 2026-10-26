@@ -142,6 +142,9 @@ final class SubscriptionService
                     'ends_at' => $start->addDays($termDays),
                     'cancelled_at' => null,
                     'cancellation_reason' => null,
+                    // Y1 — a new end date starts a new reminder cycle (D-7 / D-1 fire again before it).
+                    'last_reminder_kind' => null,
+                    'last_reminder_sent_at' => null,
                 ])->save();
             }
 
@@ -174,6 +177,8 @@ final class SubscriptionService
                 'ends_at' => $period['end'],
                 'cancelled_at' => null,
                 'cancellation_reason' => null,
+                'last_reminder_kind' => null, // Y1 — a new end date, a new reminder cycle
+                'last_reminder_sent_at' => null,
             ])->save();
 
             $subscription->periods()->create([
@@ -208,6 +213,10 @@ final class SubscriptionService
                 'price_minor' => $terms['price_minor'],
                 'term_days' => $terms['term_days'],
                 'ends_at' => $period['end'],
+                // Y1 — the renewed period gets its own D-7 / D-1 reminders; without this reset the first
+                // period's "D-1 already sent" mark silenced every later period's reminders.
+                'last_reminder_kind' => null,
+                'last_reminder_sent_at' => null,
             ])->save();
 
             $subscription->periods()->create([

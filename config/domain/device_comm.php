@@ -43,6 +43,9 @@ return [
     'command_result_poll_attempts' => (int) env('DEVICE_CMD_RESULT_ATTEMPTS', 15),
     'command_result_poll_interval_ms' => (int) env('DEVICE_CMD_RESULT_INTERVAL_MS', 1500),
     'command_result_lookback_hours' => (int) env('DEVICE_CMD_RESULT_LOOKBACK_HOURS', 12),
+    // Y2 — queue pickup + Traccar send on top of the poll window above: the expected_completion_ms a client
+    // polls against is at least attempts×interval + this for confirm-via-result models (15×1.5s + 3s = 25.5s).
+    'command_result_send_overhead_ms' => (int) env('DEVICE_CMD_RESULT_SEND_OVERHEAD_MS', 3000),
     // A response containing any of these markers = success (incl. the idempotent "…is not running!"
     // which means the relay is already in the requested state). Everything else = failure.
     'command_result_success_markers' => ['Success!', 'is not running'],

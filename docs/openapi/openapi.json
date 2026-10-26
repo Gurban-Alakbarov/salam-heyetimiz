@@ -12065,7 +12065,7 @@
           "expected_completion_ms": {
             "type": "integer",
             "example": 5000,
-            "description": "*(v1.1, HIGH-14)* Server-computed estimate based on the device's driver and a\nrolling p90 of recent successful opens. The UX SHOULD size its progress UI to\nthis hint, not to a fixed constant. Defaults to a per-driver constant when the\nrolling window has < 10 samples.\n"
+            "description": "*(v1.1, HIGH-14)* Server-computed estimate based on the device's driver and a\nrolling p90 of recent successful opens. The UX SHOULD size its progress UI to\nthis hint, not to a fixed constant. Defaults to a per-driver constant when the\nrolling window has < 10 samples. Y2: for a model that confirms the open by polling the\ndevice's own reply (VL110C) it is never below that whole confirmation window plus the send\n(15 × 1.5 s + 3 s = 25 500 ms), so a client polling against it does not report a slow but\nsuccessful open as a timeout.\n"
           },
           "driver_confirms_actuation": {
             "type": "boolean",

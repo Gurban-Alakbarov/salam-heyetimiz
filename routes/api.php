@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Api\V1\Controllers\Applications\ApplicationController;
+use App\Http\Api\V1\Controllers\Auth\AccountDeletionController;
 use App\Http\Api\V1\Controllers\Auth\AuthController;
 use App\Http\Api\V1\Controllers\Auth\BiometricController;
 use App\Http\Api\V1\Controllers\Commands\OpenCommandController;
@@ -80,6 +81,8 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
 
     // Current user + authed bootstrap (one-shot — user, devices, subscriptions, app config, flags).
     Route::get('me', [BootstrapController::class, 'me'])->name('currentUser');
+    // Y7 — delete my own account (store requirement); confirm:true, 409 successor_required for device owners.
+    Route::delete('me', [AccountDeletionController::class, 'destroy'])->name('deleteMyAccount');
 
     Route::post('me/biometrics/enroll', [BiometricController::class, 'enroll'])->name('enrollBiometrics');
     Route::delete('me/biometrics', [BiometricController::class, 'disable'])->name('disableBiometrics');

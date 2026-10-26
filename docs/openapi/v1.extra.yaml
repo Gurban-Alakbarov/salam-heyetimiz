@@ -216,6 +216,35 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MeBootstrapEnvelope' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+    delete:
+      tags: [App / Bootstrap]
+      summary: Delete my account (irreversible)
+      operationId: deleteMyAccount
+      security: [{ bearerAuth: [] }]
+      description: |
+        Y7 — in-app account deletion (App Store / Google Play requirement). Same removal as an admin deletion:
+        access to every device ends, live subscriptions are cancelled (`resident_deleted`, no refund), the family
+        this account heads loses the access granted through it (`removed_by_family_head`), its family / complex
+        memberships, pending family invitations, guest links and Komendant link end, every session and install is
+        revoked. The personal data is erased at once (phone → `del:<id>`, email / name / IP / push tokens → null;
+        only their sha256 stays in the audit log) — the phone and email can register again right away. There is
+        no restore. **409** `successor_required` while the account still owns a device (transfer it first).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirm]
+              properties:
+                confirm: { type: boolean, enum: [true], description: Must be true — guards against an accidental call }
+      responses:
+        '204': { description: Deleted; the access token stops working on the next request }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '409':
+          description: '`successor_required`'
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   # ===========================================================================
   # Admin / Impersonation
@@ -1442,6 +1471,9 @@ paths:
       description: |
         Requires `residents.delete`. A `complex_manager` gets **403** when the resident has active roster rows on
         devices outside its complex. **409** `resident_owns_device` when the user still owns a device.
+        Y7 — the same removal as `DELETE /v1/me` (incl. the family it heads, memberships, invitations, Komendant
+        link), and the personal data is erased at once (phone → `del:<id>`, email / name / IP / push tokens → null),
+        so the phone and email can register again.
       parameters:
         - { in: path, name: userId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
       responses:

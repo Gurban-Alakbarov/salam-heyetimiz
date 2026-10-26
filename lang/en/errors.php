@@ -58,6 +58,7 @@ return [
     'wrong_recovery_code' => 'The recovery code is incorrect or already used.',
     'tfa_required' => 'Two-factor verification is required for this action.',
     'internal_error' => 'An internal error occurred. Request id: :request_id',
+    'successor_required' => 'A device is registered to your account. Contact support to transfer it before deleting the account.',
     'not_complex_manager' => 'This action is only for an admin with the complex manager role.',
     'email_taken' => 'This email belongs to another account.',
     'email_already_verified' => 'The account email is already verified and cannot be changed.',

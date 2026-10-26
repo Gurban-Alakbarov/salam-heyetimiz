@@ -19,6 +19,9 @@ class ResidentDeleted implements AuditableEvent
         public readonly ?int $adminId,
         public readonly int $revokedMemberships,
         public readonly int $cancelledSubscriptions,
+        public readonly bool $selfService = false,
+        /** @var array{phone_sha256: ?string, email_sha256: ?string} — Y7: only hashes of the erased identifiers */
+        public readonly array $erasedHashes = ['phone_sha256' => null, 'email_sha256' => null],
     ) {}
 
     public function auditAction(): string
@@ -34,6 +37,11 @@ class ResidentDeleted implements AuditableEvent
             'revoked_memberships' => $this->revokedMemberships,
             'cancelled_subscriptions' => $this->cancelledSubscriptions,
             'soft_deleted' => true,
+            'self_service' => $this->selfService,
+            'anonymised' => true,
+            // sha256 of the original phone / email — lets support match a ghost without keeping the data.
+            'phone_sha256' => $this->erasedHashes['phone_sha256'] ?? null,
+            'email_sha256' => $this->erasedHashes['email_sha256'] ?? null,
         ];
     }
 }

@@ -9,12 +9,14 @@ use App\Domain\Payments\Enums\OrderStatus;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Roster\Enums\DeviceUserStatus;
 use App\Domain\Roster\Models\DeviceUser;
+use App\Domain\Roster\Models\FamilyLink;
 use App\Domain\Roster\Services\RosterService;
 use App\Domain\Subscriptions\Enums\SubscriptionStatus;
 use App\Domain\Subscriptions\Models\Subscription;
 use App\Domain\Subscriptions\Services\SubscriptionService;
 use App\Support\Enums\ActorKind;
 use App\Support\Time\Clock;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,6 +25,11 @@ use Illuminate\Support\Facades\DB;
  * in-flight order, the subscription is cancelled (reason abandoned_intent) and the self-created roster row
  * revoked. Rows with ANY paid history, family rows (B8) and private devices are never touched. A later
  * subscribe simply reactivates the row and reopens the subscription (B2/B4).
+ *
+ * O8 — a family head's access is what its members' rows hang on: when a head's row is swept, the rows it
+ * granted to its family on THAT device (never paid either) are swept with it, so no member keeps access the head
+ * lost. A head whose family on that device has a paying member (paid history or a checkout in flight) is left
+ * alone — sweeping it would orphan, or cancel without refund, someone who paid.
  */
 final class SweepAbandonedSubscriptionIntents
 {
@@ -56,7 +63,22 @@ final class SweepAbandonedSubscriptionIntents
                     /** @var DeviceUser $row */
                     $row = $subscription->deviceUser;
 
-                    DB::transaction(function () use ($subscription, $row): void {
+                    $familyRows = $this->familyRowsGrantedBy($row);
+                    if ($familyRows->contains(fn (DeviceUser $member): bool => $this->hasPaid($member))) {
+                        continue; // O8 — never orphan a paying family member
+                    }
+
+                    DB::transaction(function () use ($subscription, $row, $familyRows): void {
+                        $memberRowIds = [];
+                        foreach ($familyRows as $member) {
+                            $memberSub = Subscription::query()->where('device_user_id', $member->getKey())->first();
+                            if ($memberSub !== null && in_array($memberSub->status, [SubscriptionStatus::Active, SubscriptionStatus::PendingPayment], true)) {
+                                $this->subscriptions->cancel($memberSub, 'abandoned_intent');
+                            }
+                            $this->roster->removeMember($member->device, $member->user, ActorKind::System, null);
+                            $memberRowIds[] = (int) $member->getKey();
+                        }
+
                         $this->subscriptions->cancel($subscription, 'abandoned_intent');
                         $this->roster->removeMember($row->device, $row->user, ActorKind::System, null);
                         $this->audit->record('subscription.abandoned_intent_swept', [
@@ -64,6 +86,7 @@ final class SweepAbandonedSubscriptionIntents
                             'device_user_id' => (int) $row->getKey(),
                             'device_id' => (int) $row->device_id,
                             'user_id' => (int) $row->user_id,
+                            'family_device_user_ids' => $memberRowIds,
                         ], Subscription::class, (int) $subscription->getKey());
                     });
                     $count++;
@@ -71,6 +94,29 @@ final class SweepAbandonedSubscriptionIntents
             });
 
         return $count;
+    }
+
+    /** @return Collection<int, DeviceUser> the head's live family rows on the same device */
+    private function familyRowsGrantedBy(DeviceUser $head): Collection
+    {
+        $linkIds = FamilyLink::query()->where('head_user_id', $head->user_id)->pluck('id');
+        if ($linkIds->isEmpty()) {
+            return collect();
+        }
+
+        return DeviceUser::query()->with('device', 'user')
+            ->where('device_id', $head->device_id)
+            ->where('status', DeviceUserStatus::Active->value)
+            ->whereIn('family_link_id', $linkIds)
+            ->get();
+    }
+
+    private function hasPaid(DeviceUser $member): bool
+    {
+        $subscription = Subscription::query()->where('device_user_id', $member->getKey())->first();
+
+        return $subscription !== null
+            && ($subscription->periods()->exists() || $this->hasInFlightOrder((int) $subscription->getKey()));
     }
 
     private function hasInFlightOrder(int $subscriptionId): bool

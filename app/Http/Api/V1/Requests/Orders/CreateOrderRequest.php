@@ -28,10 +28,35 @@ class CreateOrderRequest extends FormRequest
             'items' => ['required', 'array', 'min:1', 'max:10'],
             'items.*.item_type' => ['required', 'string', 'in:device,sub_main,sub_additional,sub_renewal'],
             'items.*.referenced_id' => ['required', 'integer', 'min:1'],
-            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:10'],
+            // O3 — every line is ONE thing (a device, or one subscription period); a quantity of 10 used to charge
+            // 10x for a single period. Optional; 1 is the only accepted value.
+            'items.*.quantity' => ['sometimes', 'integer', 'in:1'],
             'auto_renew' => ['sometimes', 'boolean'],
-            'return_url' => ['sometimes', 'nullable', 'string', 'max:2048'],
+            'return_url' => ['sometimes', 'nullable', 'string', 'max:2048', function (string $attribute, mixed $value, \Closure $fail): void {
+                if ($value !== null && ! self::isAllowedReturnUrl((string) $value)) {
+                    $fail('return_url yalnız tətbiqə (salam://) və ya icazə verilmiş https ünvana yönləndirə bilər.');
+                }
+            }],
         ];
+    }
+
+    /** O3 — back into the app (the configured salam:// scheme) or an https page on an allow-listed host. */
+    public static function isAllowedReturnUrl(string $url): bool
+    {
+        $appScheme = (string) parse_url((string) config('integrations.kapital.return_url_scheme'), PHP_URL_SCHEME);
+        $parts = parse_url($url);
+        if ($parts === false || ! isset($parts['scheme'])) {
+            return false;
+        }
+        $scheme = strtolower($parts['scheme']);
+        if ($appScheme !== '' && $scheme === strtolower($appScheme)) {
+            return true;
+        }
+
+        return $scheme === 'https'
+            && isset($parts['host'])
+            && ! isset($parts['user'])
+            && in_array(strtolower($parts['host']), array_map('strtolower', (array) config('integrations.kapital.allowed_return_hosts')), true);
     }
 
     public function toData(): OrderCreationData
@@ -42,7 +67,7 @@ class CreateOrderRequest extends FormRequest
             static fn (array $item): OrderItemData => new OrderItemData(
                 itemType: OrderItemType::from($item['item_type']),
                 referencedId: (int) $item['referenced_id'],
-                quantity: (int) $item['quantity'],
+                quantity: (int) ($item['quantity'] ?? 1),
             ),
             $validated['items'],
         );

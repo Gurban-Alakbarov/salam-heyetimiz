@@ -16,6 +16,7 @@ use App\Http\Api\V1\Controllers\Health\HealthController;
 use App\Http\Api\V1\Controllers\Invitations\InviteController;
 use App\Http\Api\V1\Controllers\Komendant\KomendantController;
 use App\Http\Api\V1\Controllers\Notifications\NotificationController;
+use App\Http\Api\V1\Controllers\Notifications\NotificationSettingsController;
 use App\Http\Api\V1\Controllers\Notifications\PushTokenController;
 use App\Http\Api\V1\Controllers\Orders\OrderController;
 use App\Http\Api\V1\Controllers\Payments\FakeCheckoutController;
@@ -88,6 +89,9 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
     Route::delete('me/biometrics', [BiometricController::class, 'disable'])->name('disableBiometrics');
 
     // Push token registration/de-registration for the current install (batch 11 — Notifications).
+    // O13 — which notifications the user lets reach the phone (push); the inbox keeps everything.
+    Route::get('me/notification-settings', [NotificationSettingsController::class, 'index'])->name('getNotificationSettings');
+    Route::put('me/notification-settings', [NotificationSettingsController::class, 'update'])->name('updateNotificationSetting');
     Route::put('notifications/push-token', [PushTokenController::class, 'upsert'])->name('upsertPushToken');
     Route::delete('notifications/push-token', [PushTokenController::class, 'destroy'])->name('deletePushToken');
 

@@ -37,6 +37,7 @@ return [
     'subscription_not_renewable' => 'The subscription cannot be renewed in its current state.',
     'auto_renew_unavailable' => 'Auto-renew is not available yet.',
     'signature_invalid' => 'The signature is invalid or missing.',
+    'notification_not_mutable' => 'This notification cannot be switched off.',
     'idempotency_key_required' => 'The Idempotency-Key header is required.',
     // Visitor links
     'visitor_link_not_found' => 'This invitation is not valid.',

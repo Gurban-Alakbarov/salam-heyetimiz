@@ -19,11 +19,12 @@ class NotificationTemplatesSeeder extends Seeder
     public function run(): void
     {
         // device.opened — visitor barrier open (INVENTORY §1). Category operational.
+        // O13: user-mutable — a resident may switch its push off (the inbox still records it).
         $this->seedTemplate('device.opened', NotificationCategory::Operational, [
             'az' => ['subject' => 'Qonaq daxil oldu', 'body' => '{visitor_name} {device_label} qapısını açdı'],
             'ru' => ['subject' => 'Гость вошёл', 'body' => '{visitor_name} открыл(а) дверь {device_label}'],
             'en' => ['subject' => 'Visitor entered', 'body' => '{visitor_name} opened {device_label}'],
-        ]);
+        ], mutable: true);
 
         // Subscription lifecycle (INVENTORY §2). Category billing (forced, never user-mutable). Copy is
         // static per threshold/state — no business variables (LOCKED DECISION 1).
@@ -34,20 +35,21 @@ class NotificationTemplatesSeeder extends Seeder
         // system.admin_campaign — admin free-text broadcast (INVENTORY §2; system_announcement type).
         // Category operational; fixed push + inapp via the mask (R-NOT-04). No locale rows: the copy is
         // supplied per-campaign in the admin's single chosen language and delivered as-is (no translation).
-        $this->seedTemplate('system.admin_campaign', NotificationCategory::Operational, []);
+        // O13: user-mutable as well.
+        $this->seedTemplate('system.admin_campaign', NotificationCategory::Operational, [], mutable: true);
     }
 
     /**
      * @param  array<string, array{subject: string, body: string}>  $locales
      */
-    private function seedTemplate(string $templateKey, NotificationCategory $category, array $locales): void
+    private function seedTemplate(string $templateKey, NotificationCategory $category, array $locales, bool $mutable = false): void
     {
         $template = NotificationTemplate::query()->updateOrCreate(
             ['template_key' => $templateKey],
             [
                 'default_channels_mask' => NotificationChannel::Push->bit() | NotificationChannel::Inapp->bit(),
                 'category' => $category,
-                'is_user_mutable' => false,
+                'is_user_mutable' => $mutable,
                 'is_active' => true,
             ],
         );

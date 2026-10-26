@@ -40,6 +40,7 @@ return [
     'subscription_not_renewable' => 'Abonelik hazırkı vəziyyətində yenilənə bilməz.',
     'auto_renew_unavailable' => 'Avtomatik yenilənmə hələ əlçatan deyil.',
     'signature_invalid' => 'İmza yanlışdır və ya yoxdur.',
+    'notification_not_mutable' => 'Bu bildirişi söndürmək olmur.',
     'idempotency_key_required' => 'Idempotency-Key başlığı tələb olunur.',
     // Visitor links
     'visitor_link_not_found' => 'Bu dəvət keçərli deyil.',

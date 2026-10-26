@@ -37,6 +37,7 @@ return [
     'subscription_not_renewable' => 'Подписку нельзя продлить в текущем состоянии.',
     'auto_renew_unavailable' => 'Автопродление пока недоступно.',
     'signature_invalid' => 'Подпись недействительна или отсутствует.',
+    'notification_not_mutable' => 'Это уведомление нельзя отключить.',
     'idempotency_key_required' => 'Требуется заголовок Idempotency-Key.',
     // Visitor links
     'visitor_link_not_found' => 'Приглашение недействительно.',

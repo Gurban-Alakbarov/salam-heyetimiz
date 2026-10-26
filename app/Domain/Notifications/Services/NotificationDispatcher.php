@@ -20,13 +20,20 @@ use App\Support\Time\Clock;
  */
 final class NotificationDispatcher
 {
-    public function __construct(private readonly Clock $clock) {}
+    public function __construct(
+        private readonly Clock $clock,
+        private readonly NotificationPreferences $preferences,
+    ) {}
 
     public function dispatch(NotificationRequest $request): void
     {
         $partitionKey = (int) $this->clock->now()->format('Ym');
 
         foreach ($request->channels as $channel) {
+            // O13 — a push the user switched off for this template is not sent; the in-app row still is.
+            if ($channel === NotificationChannel::Push && $this->preferences->pushMuted($request->userId, $request->templateKey)) {
+                continue;
+            }
             $this->materialise($request, $channel, $partitionKey);
         }
     }

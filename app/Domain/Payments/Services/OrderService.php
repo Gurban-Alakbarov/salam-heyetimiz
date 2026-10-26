@@ -68,25 +68,28 @@ final class OrderService
         $this->assertPayerMayPaySubscriptions($payer, $data->items); // 403 for someone else's revoked access
         $this->assertSubscriptionsDeliverable($data->items);          // 422 even for the beneficiary (K3)
 
-        // MED-02 / R-PAY-11: never open a second in-flight order for the same subject.
-        foreach ($data->items as $item) {
-            if ($item->referencedId !== null) {
-                $inFlight = $this->findInFlightForSubject($item->itemType, $item->referencedId);
-                if ($inFlight !== null) {
-                    // B7: another payer's open checkout is never handed out (payer ≠ beneficiary is allowed,
-                    // but each order — and its checkout URL — belongs to whoever started it).
-                    if ((int) $inFlight->payer_user_id !== (int) $payer->getKey()) {
-                        throw ValidationException::withMessages(['items' => 'Bu abunəlik üçün ödəniş artıq başlanıb.']);
-                    }
-
-                    return $inFlight;
-                }
-            }
-        }
-
+        $this->assertNoDuplicateSubjects($data->items);
         $amountMinor = array_sum(array_column($lines, 'total_amount_minor'));
 
-        $order = DB::transaction(function () use ($payer, $data, $lines, $amountMinor, $idempotencyKey): Order {
+        $outcome = DB::transaction(function () use ($payer, $data, $lines, $amountMinor, $idempotencyKey): array {
+            // MED-02 / R-PAY-11 / O4: never open a second in-flight order for the same subject. The subjects are
+            // locked first, so two concurrent requests for the same subscription / device are serialised.
+            $this->lockSubjects($data->items);
+            foreach ($data->items as $item) {
+                if ($item->referencedId !== null) {
+                    $inFlight = $this->findInFlightForSubject($item->itemType, $item->referencedId);
+                    if ($inFlight !== null) {
+                        // B7: another payer's open checkout is never handed out (payer ≠ beneficiary is allowed,
+                        // but each order — and its checkout URL — belongs to whoever started it).
+                        if ((int) $inFlight->payer_user_id !== (int) $payer->getKey()) {
+                            throw ValidationException::withMessages(['items' => 'Bu abunəlik üçün ödəniş artıq başlanıb.']);
+                        }
+
+                        return ['existing' => $inFlight];
+                    }
+                }
+            }
+
             $order = new Order([
                 'reference' => 'PENDING',
                 'payer_user_id' => $payer->getKey(),
@@ -107,8 +110,14 @@ final class OrderService
                 $order->items()->create($line);
             }
 
-            return $order;
+            return ['created' => $order];
         });
+
+        if (isset($outcome['existing'])) {
+            return $outcome['existing'];
+        }
+        /** @var Order $order */
+        $order = $outcome['created'];
 
         OrderCreated::dispatch($order);
 
@@ -379,15 +388,66 @@ final class OrderService
         }
     }
 
+    /**
+     * O4 — the subject is the THING being paid for, not the line's type: sub_main / sub_additional / sub_renewal
+     * all reference a subscription id, so any of them in flight blocks the others for that subscription.
+     */
     private function findInFlightForSubject(OrderItemType $type, int $referencedId): ?Order
     {
         return Order::query()
             ->whereIn('status', [OrderStatus::Pending->value, OrderStatus::Authorising->value])
             ->whereHas('items', function ($query) use ($type, $referencedId): void {
-                $query->where('item_type', $type->value)->where('referenced_id', $referencedId);
+                $query->whereIn('item_type', $this->subjectTypes($type))->where('referenced_id', $referencedId);
             })
             ->orderByDesc('id')
             ->first();
+    }
+
+    /** @return list<string> */
+    private function subjectTypes(OrderItemType $type): array
+    {
+        return $type === OrderItemType::Device
+            ? [OrderItemType::Device->value]
+            : [OrderItemType::SubMain->value, OrderItemType::SubAdditional->value, OrderItemType::SubRenewal->value];
+    }
+
+    /** O4 — one order pays for a subject once: the same subscription / device twice in one request is a 422. */
+    private function assertNoDuplicateSubjects(array $items): void
+    {
+        $seen = [];
+        foreach ($items as $item) {
+            if ($item->referencedId === null) {
+                continue;
+            }
+            $key = ($item->itemType === OrderItemType::Device ? 'device' : 'subscription').':'.$item->referencedId;
+            if (isset($seen[$key])) {
+                throw ValidationException::withMessages(['items' => 'Eyni abunəlik və ya cihaz sifarişdə bir dəfə ola bilər.']);
+            }
+            $seen[$key] = true;
+        }
+    }
+
+    /** O4 — lock the subscription / device rows this order pays for, so the in-flight check cannot race. */
+    private function lockSubjects(array $items): void
+    {
+        $subscriptionIds = [];
+        $deviceIds = [];
+        foreach ($items as $item) {
+            if ($item->referencedId === null) {
+                continue;
+            }
+            if ($item->itemType === OrderItemType::Device) {
+                $deviceIds[] = $item->referencedId;
+            } else {
+                $subscriptionIds[] = $item->referencedId;
+            }
+        }
+        if ($subscriptionIds !== []) {
+            Subscription::query()->whereKey($subscriptionIds)->orderBy('id')->lockForUpdate()->get(['id']);
+        }
+        if ($deviceIds !== []) {
+            DB::table('devices')->whereIn('id', $deviceIds)->orderBy('id')->lockForUpdate()->get(['id']);
+        }
     }
 
     private function callbackTimeoutMinutes(): int

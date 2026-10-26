@@ -1836,6 +1836,92 @@
         }
       }
     },
+    "/v1/me/notification-settings": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "The notifications the user may switch off, with their push state (O13)",
+        "operationId": "getNotificationSettings",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Lists every user-mutable notification template (today `device.opened` — a guest opened the gate — and\n`system.admin_campaign` — announcements) with whether its push reaches the phone. Subscription\n(billing) reminders are not switchable and are not listed.\n",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSettingList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Switch the push of one notification on or off (O13)",
+        "operationId": "updateNotificationSetting",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Off = no push for that notification; the in-app inbox (`GET /v1/notifications`) still records it.\n**422** `notification_not_mutable` for a forced (billing) or unknown template. Returns the full list.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "template_key",
+                  "push_enabled"
+                ],
+                "properties": {
+                  "template_key": {
+                    "type": "string",
+                    "maxLength": 80,
+                    "example": "device.opened"
+                  },
+                  "push_enabled": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved — the full list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSettingList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
     "/v1/notifications/push-token": {
       "put": {
         "tags": [
@@ -12671,6 +12757,26 @@
           }
         }
       },
+      "NotificationSettingList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "template_key": {
+                  "type": "string",
+                  "example": "device.opened"
+                },
+                "push_enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
       "OrderCreate": {
         "type": "object",
         "additionalProperties": false,
@@ -12693,6 +12799,7 @@
             "type": "array",
             "minItems": 1,
             "maxItems": 10,
+            "description": "O4 — each subject (a device, or a subscription whatever the line type) at most once per order (**422**\non `items` otherwise). While an order for a subscription is still open, a new request for the same\nsubscription — under any of sub_main / sub_additional / sub_renewal — returns that open order.\n",
             "items": {
               "$ref": "#/components/schemas/OrderItemCreate"
             }
@@ -12704,6 +12811,7 @@
           "return_url": {
             "type": "string",
             "format": "uri",
+            "description": "O3 — only back into the app (`salam://…`) or to an `https` page on an allow-listed host\n(`KAPITAL_ALLOWED_RETURN_HOSTS`, default the API host + sezam.salam.az); anything else is **422**.\n",
             "example": "salam://payment/return"
           }
         }
@@ -12713,8 +12821,7 @@
         "additionalProperties": false,
         "required": [
           "item_type",
-          "referenced_id",
-          "quantity"
+          "referenced_id"
         ],
         "properties": {
           "item_type": {
@@ -12733,8 +12840,11 @@
           },
           "quantity": {
             "type": "integer",
-            "minimum": 1,
-            "maximum": 10
+            "enum": [
+              1
+            ],
+            "default": 1,
+            "description": "O3 — one device or one subscription period per line; any other value is 422."
           }
         }
       },

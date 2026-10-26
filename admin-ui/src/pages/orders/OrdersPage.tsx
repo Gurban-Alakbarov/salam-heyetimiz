@@ -6,6 +6,7 @@ import { CursorPagination } from '@/components/CursorPagination'
 import { PageHeader } from '@/components/PageHeader'
 import { StatusBadge } from '@/components/StatusBadge'
 import { EmptyState, ErrorState, TableSkeleton } from '@/components/states'
+import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
@@ -40,6 +41,7 @@ const BANK_STATUS: Record<string, string> = {
 
 export function OrdersPage() {
   const [status, setStatus] = useState('')
+  const [needsRefund, setNeedsRefund] = useState(false)
   const [search, setSearch] = useState('')
   const [q, setQ] = useState('')
   const { cursor, next, prev, reset, canPrev, pageIndex } = useCursor()
@@ -52,9 +54,15 @@ export function OrdersPage() {
 
   useEffect(() => {
     reset()
-  }, [status, q, reset])
+  }, [status, q, needsRefund, reset])
 
-  const query = useOrders({ status: status || undefined, q: q || undefined, cursor, limit: 25 })
+  const query = useOrders({
+    status: status || undefined,
+    q: q || undefined,
+    needs_refund: needsRefund ? 1 : undefined,
+    cursor,
+    limit: 25,
+  })
   const rows = query.data?.data ?? []
 
   return (
@@ -78,6 +86,16 @@ export function OrdersPage() {
             </option>
           ))}
         </Select>
+        {/* K3: paid for access that no longer exists — finance refunds these by hand. */}
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-input"
+            checked={needsRefund}
+            onChange={(e) => setNeedsRefund(e.target.checked)}
+          />
+          Yalnız refund gözləyənlər
+        </label>
       </div>
 
       <Card className="overflow-hidden">
@@ -116,7 +134,19 @@ export function OrdersPage() {
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-muted-foreground">{o.customer ?? '—'}</TableCell>
                       <TableCell>
-                        <StatusBadge kind="order" value={o.status as OrderStatus} />
+                        <div className="flex flex-wrap items-center gap-1">
+                          <StatusBadge kind="order" value={o.status as OrderStatus} />
+                          {o.refund_required && (
+                            <Badge variant="destructive" title="Ödəniş gəlib, amma giriş artıq yoxdur — pulu geri qaytarın">
+                              Refund gözləyir
+                            </Badge>
+                          )}
+                          {o.late_captured_at && (
+                            <Badge variant="warning" title="Bank sifarişin vaxtı bitdikdən sonra ödənişi təsdiqləyib">
+                              Gec ödəniş
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-xs text-muted-foreground">{BANK_STATUS[o.status] ?? '—'}</TableCell>
                       <TableCell className="max-w-[14rem] truncate font-mono text-xs text-muted-foreground" title={o.bank_order_id ?? ''}>

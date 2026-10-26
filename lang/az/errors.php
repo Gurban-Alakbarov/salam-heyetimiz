@@ -63,5 +63,6 @@ return [
     'internal_error' => 'Daxili xəta baş verdi. Sorğu nömrəsi: :request_id',
     'email_taken' => 'Bu email başqa hesaba aiddir.',
     'email_already_verified' => 'Hesabın email-i artıq təsdiqlənib və dəyişdirilə bilməz.',
+    'subscription_access_removed' => 'Bu abunəlik üzrə cihaza girişiniz yoxdur; ödəniş qəbul edilmir.',
     'sms_otp_retired' => 'Telefonla giriş dayandırılıb. Tətbiqi yeniləyin və email ilə daxil olun.',
 ];

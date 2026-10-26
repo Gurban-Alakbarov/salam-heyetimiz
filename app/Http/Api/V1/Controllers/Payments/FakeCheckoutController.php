@@ -7,6 +7,7 @@ use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Adapters\PaymentGateway;
 use App\Domain\Payments\DTOs\KapitalCallbackData;
 use App\Domain\Payments\Enums\BankStatus;
+use App\Domain\Payments\Enums\OrderStatus;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Services\PaymentCallbackService;
 use App\Domain\Payments\Support\PaymentGatewayMode;
@@ -51,7 +52,7 @@ class FakeCheckoutController
         return response()->view('payments.fake-checkout', [
             'order' => $order,
             'amount' => number_format(((int) $order->amount_minor) / 100, 2, '.', ' '),
-            'settled' => $order->status->isTerminal(),
+            'settled' => $this->settled($order),
             'actions' => $actions,
             'returnUrl' => route('paymentReturn', ['paymentId' => $order->bank_order_id], false),
         ])->header('Cache-Control', 'no-store')->header('X-Robots-Tag', 'noindex');
@@ -67,7 +68,7 @@ class FakeCheckoutController
         $bankOrderId = (string) $order->bank_order_id;
         $returnUrl = route('paymentReturn', ['paymentId' => $bankOrderId]);
 
-        if ($order->status->isTerminal()) {
+        if ($this->settled($order)) {
             return redirect()->to($returnUrl); // already settled — idempotent, nothing to simulate
         }
 
@@ -91,6 +92,15 @@ class FakeCheckoutController
         ], Order::class, (int) $order->id);
 
         return redirect()->to($returnUrl);
+    }
+
+    /**
+     * Like a real bank page, the simulated one outlives OUR order TTL: an order we expired can still be paid
+     * here, and that late capture runs the real pipeline (K2). Every other terminal order is settled.
+     */
+    private function settled(Order $order): bool
+    {
+        return $order->status->isTerminal() && $order->status !== OrderStatus::Expired;
     }
 
     private function resolveOrder(string $reference): Order

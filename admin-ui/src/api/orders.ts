@@ -6,6 +6,8 @@ import type { Order, Paginated } from '@/types/api'
 export interface OrderListParams {
   status?: string
   q?: string
+  /** K3 finance worklist: paid orders flagged refund_required, not refunded yet. */
+  needs_refund?: 1
   limit?: number
   cursor?: string | null
 }

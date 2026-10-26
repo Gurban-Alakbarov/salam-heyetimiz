@@ -1,12 +1,13 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, Loader2, RefreshCw, Undo2 } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, Clock, Loader2, RefreshCw, Undo2 } from 'lucide-react'
 import { useOrder, useRecheckOrder, useRefundOrder } from '@/api/orders'
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
 import { PermissionGate } from '@/components/PermissionGate'
 import { StatusBadge } from '@/components/StatusBadge'
 import { ErrorState, LoadingState } from '@/components/states'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -189,6 +190,34 @@ export function OrderDetailPage() {
               )}
             </div>
           </div>
+
+          {/* K3: the bank captured money for access that no longer exists — refund it by hand. */}
+          {order.refund_required && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <div>
+                <AlertTitle>Refund gözləyir: {formatMoney(order.refund_required.amount_minor, order.currency)}</AlertTitle>
+                <AlertDescription>
+                  Ödəniş gəlib, amma abunəlik verilə bilmədi — sakinin həmin cihaza girişi artıq yoxdur
+                  {order.refund_required.lines.some((l) => l.reason === 'device_removed') && ' (və ya cihaz sökülüb)'}.
+                  Abunəlik aktivləşdirilməyib. Pulu "Geri qaytar" düyməsi ilə qaytarın.
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+          {/* K2: captured after we had expired the order on timeout. */}
+          {order.late_captured_at && (
+            <Alert variant="warning">
+              <Clock className="h-4 w-4" />
+              <div>
+                <AlertTitle>Gec ödəniş</AlertTitle>
+                <AlertDescription>
+                  Bank ödənişi sifarişin vaxtı bitdikdən sonra təsdiqləyib ({formatDateTime(order.late_captured_at)}). Ödəniş
+                  itirilmədi və normal qaydada tətbiq olundu.
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
 
           <Summary order={order} />
 

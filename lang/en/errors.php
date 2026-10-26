@@ -60,5 +60,6 @@ return [
     'internal_error' => 'An internal error occurred. Request id: :request_id',
     'email_taken' => 'This email belongs to another account.',
     'email_already_verified' => 'The account email is already verified and cannot be changed.',
+    'subscription_access_removed' => 'You no longer have access to this device; the payment is not accepted.',
     'sms_otp_retired' => 'Phone sign-in has been retired. Update the app and sign in with your email.',
 ];

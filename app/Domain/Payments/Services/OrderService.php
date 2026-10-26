@@ -2,6 +2,7 @@
 
 namespace App\Domain\Payments\Services;
 
+use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Devices\Services\DeviceLookup;
 use App\Domain\Payments\Adapters\PaymentGateway;
 use App\Domain\Payments\DTOs\GatewayStatusResult;
@@ -21,10 +22,12 @@ use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Support\OrderPricing;
 use App\Domain\Payments\Support\PaymentSettings;
 use App\Domain\Subscriptions\Models\Subscription;
+use App\Domain\Subscriptions\Support\SubscriptionDeliverability;
 use App\Domain\Subscriptions\Support\SubscriptionPaymentAuthorizer;
 use App\Domain\Users\Models\User;
 use App\Support\Time\Clock;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -42,6 +45,8 @@ final class OrderService
         private readonly DeviceLookup $devices,
         private readonly PaymentSettings $paymentSettings,
         private readonly SubscriptionPaymentAuthorizer $payers,
+        private readonly SubscriptionDeliverability $deliverability,
+        private readonly AuditLogger $audit,
     ) {}
 
     public function create(User $payer, OrderCreationData $data, ?string $idempotencyKey): Order
@@ -60,7 +65,8 @@ final class OrderService
 
         $lines = $this->priceItems($data->items);
         $this->assertDeviceSaleItemsAreSellable($data->items);
-        $this->assertPayerMayPaySubscriptions($payer, $data->items);
+        $this->assertPayerMayPaySubscriptions($payer, $data->items); // 403 for someone else's revoked access
+        $this->assertSubscriptionsDeliverable($data->items);          // 422 even for the beneficiary (K3)
 
         // MED-02 / R-PAY-11: never open a second in-flight order for the same subject.
         foreach ($data->items as $item) {
@@ -127,18 +133,35 @@ final class OrderService
         return $order->refresh();
     }
 
-    public function markPaid(Order $order, GatewayStatusResult $status): Order
+    /**
+     * @param  bool  $late  K2 — the bank captured an order we had already expired on timeout (the user finished
+     *                      on the bank page after our TTL): it is recorded as paid, never lost.
+     */
+    public function markPaid(Order $order, GatewayStatusResult $status, bool $late = false): Order
     {
         if ($order->status === OrderStatus::Paid) {
             return $order;
         }
 
-        return DB::transaction(function () use ($order, $status): Order {
+        return DB::transaction(function () use ($order, $status, $late): Order {
+            // A callback and a reconcile pass can settle the same order at once: the row lock makes the
+            // capture (payment row + OrderPaid -> activation) happen exactly once.
+            $current = Order::query()->lockForUpdate()->findOrFail($order->getKey());
+            if ($current->status === OrderStatus::Paid) {
+                return $order->refresh();
+            }
+            $previous = $current->status;
+
             $order->forceFill([
                 'status' => OrderStatus::Paid,
                 'paid_at' => $this->clock->now(),
                 'failed_reason' => null,
-            ])->save();
+            ] + ($late ? [
+                'failed_at' => null,
+                'metadata' => array_merge($current->metadata ?? [], [
+                    'late_capture' => ['previous_status' => $previous->value, 'captured_at' => $this->clock->now()->toIso8601String()],
+                ]),
+            ] : []))->save();
 
             $order->payments()->create([
                 'bank_transaction_id' => $status->bankTransactionId,
@@ -153,10 +176,59 @@ final class OrderService
                 'occurred_at' => $this->clock->now(),
             ]);
 
+            if ($late) {
+                $this->audit->record('order.late_capture', [
+                    'order_id' => (int) $order->id,
+                    'order_reference' => $order->reference,
+                    'bank_order_id' => $order->bank_order_id,
+                    'previous_status' => $previous->value,
+                    'amount_minor' => (int) $order->amount_minor,
+                ], Order::class, (int) $order->id);
+                Log::warning('payments.late_capture', ['order_id' => (int) $order->id, 'reference' => $order->reference]);
+            }
+
             OrderPaid::dispatch($order);
 
             return $order;
         });
+    }
+
+    /**
+     * K3 — a paid line could not be delivered (its access is gone). Decision 2026-10-26: no automatic refund;
+     * the order is flagged in `metadata.refund_required` (admin orders list `needs_refund=1`) so finance
+     * refunds it through the normal refund flow. Repeated flags for the same order accumulate their lines.
+     */
+    public function flagRefundRequired(Order $order, int $subscriptionId, int $amountMinor, string $reason): void
+    {
+        DB::transaction(function () use ($order, $subscriptionId, $amountMinor, $reason): void {
+            $current = Order::query()->lockForUpdate()->findOrFail($order->getKey());
+            $metadata = $current->metadata ?? [];
+            $flag = $metadata['refund_required'] ?? ['amount_minor' => 0, 'lines' => []];
+
+            foreach ($flag['lines'] as $line) {
+                if ((int) $line['subscription_id'] === $subscriptionId) {
+                    return; // already flagged (listener replay)
+                }
+            }
+
+            $flag['lines'][] = ['subscription_id' => $subscriptionId, 'amount_minor' => $amountMinor, 'reason' => $reason];
+            $flag['amount_minor'] = (int) $flag['amount_minor'] + $amountMinor;
+            $flag['flagged_at'] = $this->clock->now()->toIso8601String();
+            $metadata['refund_required'] = $flag;
+
+            $current->forceFill(['metadata' => $metadata])->save();
+            $order->forceFill(['metadata' => $metadata])->syncOriginalAttribute('metadata');
+
+            $this->audit->record('order.refund_required', [
+                'order_id' => (int) $current->id,
+                'order_reference' => $current->reference,
+                'subscription_id' => $subscriptionId,
+                'amount_minor' => $amountMinor,
+                'reason' => $reason,
+            ], Order::class, (int) $current->id);
+        });
+
+        Log::warning('payments.refund_required', ['order_id' => (int) $order->id, 'subscription_id' => $subscriptionId, 'reason' => $reason]);
     }
 
     public function markFailed(Order $order, ?string $reason, GatewayStatusResult $status): Order
@@ -263,6 +335,26 @@ final class OrderService
                 throw ValidationException::withMessages([
                     'items' => __('errors.device_not_sellable'),
                 ]);
+            }
+        }
+    }
+
+    /**
+     * K3 — a subscription whose access is gone (roster row revoked, device removed) is never offered for
+     * payment, whoever pays: the money would buy nothing.
+     *
+     * @param  array<int, OrderItemData>  $items
+     */
+    private function assertSubscriptionsDeliverable(array $items): void
+    {
+        foreach ($items as $item) {
+            if ($item->itemType === OrderItemType::Device || $item->referencedId === null) {
+                continue;
+            }
+
+            $subscription = Subscription::query()->find($item->referencedId);
+            if ($subscription !== null && $this->deliverability->blocker($subscription) !== null) {
+                throw ValidationException::withMessages(['items' => __('errors.subscription_access_removed')]);
             }
         }
     }

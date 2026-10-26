@@ -16,10 +16,11 @@ class ReconcileOrdersCommand extends Command
         $result = $reconciler->reconcile();
 
         $this->info(sprintf(
-            'rechecked=%d resolved=%d expired=%d',
+            'rechecked=%d resolved=%d expired=%d late_captured=%d',
             $result['rechecked'],
             $result['resolved'],
             $result['expired'],
+            $result['late_captured'],
         ));
 
         return self::SUCCESS;

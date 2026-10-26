@@ -3,11 +3,13 @@
 namespace App\Domain\Payments;
 
 use App\Domain\Payments\Events\PaymentCallbackReceived;
+use App\Domain\Payments\Listeners\FlagOrderForRefund;
 use App\Domain\Payments\Listeners\HandlePaymentCallbackReceived;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Models\Refund;
 use App\Domain\Payments\Policies\OrderPolicy;
 use App\Domain\Payments\Policies\RefundPolicy;
+use App\Domain\Subscriptions\Events\PaidSubscriptionUndeliverable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -29,5 +31,6 @@ class ModuleServiceProvider extends ServiceProvider
         Gate::policy(Refund::class, RefundPolicy::class);
 
         Event::listen(PaymentCallbackReceived::class, HandlePaymentCallbackReceived::class);
+        Event::listen(PaidSubscriptionUndeliverable::class, FlagOrderForRefund::class); // K3
     }
 }

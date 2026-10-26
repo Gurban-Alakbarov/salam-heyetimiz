@@ -139,15 +139,37 @@ it('is idempotent: acting on a settled order changes nothing', function () {
         ->and($order->fresh()->payments()->count())->toBe(1);
 });
 
-it('expired orders stay expired (existing expiry sweep) and report failure', function () {
+it('an expired order declined at the bank afterwards stays expired and reports failure', function () {
     $order = createFakeOrder();
     $this->travel(31)->minutes();
     app(OrderService::class)->expireStale();
 
     expect($order->fresh()->status)->toBe(OrderStatus::Expired);
-    fakeAction($order, 'pay')->assertRedirect();
+    fakeAction($order, 'decline')->assertRedirect();
     expect($order->fresh()->status)->toBe(OrderStatus::Expired);
     $this->get('/v1/payments/return?paymentId='.$order->bank_order_id)->assertSee('status=failure', false);
+});
+
+it('K2: an expired order PAID at the bank afterwards is captured late, never lost', function () {
+    $order = createFakeOrder();
+    $this->travel(31)->minutes();
+    app(OrderService::class)->expireStale();
+    expect($order->fresh()->status)->toBe(OrderStatus::Expired);
+
+    // like a real bank page, the simulated one outlives our TTL
+    fakeAction($order, 'pay')->assertRedirect();
+
+    $order->refresh();
+    expect($order->status)->toBe(OrderStatus::Paid)
+        ->and($order->paid_at)->not->toBeNull()
+        ->and($order->metadata['late_capture']['previous_status'])->toBe('expired')
+        ->and(DB::table('audit_logs')->where('action', 'order.late_capture')->count())->toBe(1)
+        ->and(\App\Http\Resources\OrderResource::make($order)->resolve()['late_captured_at'])->not->toBeNull();
+    $this->get('/v1/payments/return?paymentId='.$order->bank_order_id)->assertSee('status=success', false);
+
+    // replaying the action changes nothing (paid is settled)
+    fakeAction($order, 'pay')->assertRedirect();
+    expect($order->fresh()->payments()->count())->toBe(1);
 });
 
 it('refuses to simulate a non-fake (real-bank) order', function () {

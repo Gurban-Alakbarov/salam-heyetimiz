@@ -16,6 +16,10 @@ return [
     // Hourly reconciler resolves authorising orders older than this (R-PAY-13).
     'authorising_recheck_after_minutes' => 30,
 
+    // K2 — orders expired on timeout within this window are re-asked at the bank every reconcile run; a
+    // capture that happened after we expired the order is recorded as paid (late capture), never lost.
+    'late_capture_window_hours' => 72,
+
     // Refund pre-checks (R-PAY-09).
     'refund_window_days' => 365,
 

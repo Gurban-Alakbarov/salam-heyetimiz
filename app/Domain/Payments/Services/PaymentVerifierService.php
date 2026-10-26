@@ -23,7 +23,8 @@ final class PaymentVerifierService
     /** Returns true if a terminal state was applied; false if still PENDING (caller should recheck). */
     public function verifyAndApply(Order $order): bool
     {
-        if ($order->status->isTerminal()) {
+        $late = $this->awaitsLateCapture($order);
+        if ($order->status->isTerminal() && ! $late) {
             return true; // already settled; idempotent no-op
         }
 
@@ -33,7 +34,25 @@ final class PaymentVerifierService
 
         $status = $this->gateway->getOrderStatus($order->bank_order_id);
 
+        if ($late) {
+            // K2 — only a capture can still change an order we expired; any other answer leaves it expired.
+            if ($status->status === BankStatus::Approved) {
+                $this->orders->markPaid($order, $status, late: true);
+            }
+
+            return true;
+        }
+
         return $this->apply($order, $status);
+    }
+
+    /**
+     * K2 — an order we expired on timeout (callback never came) may still be captured at the bank afterwards
+     * (the user finished on the bank page after our TTL). Its money must never be lost: it is re-verified.
+     */
+    private function awaitsLateCapture(Order $order): bool
+    {
+        return $order->status === OrderStatus::Expired && $order->bank_order_id !== null;
     }
 
     public function verifyAndApplyByBankOrderId(string $bankOrderId): bool

@@ -35,6 +35,7 @@ class AdminOrderController
             limit: max(1, min(100, (int) $request->query('limit', 20))),
             cursor: Cursor::decode($request->query('cursor')),
             q: $request->query('q'),
+            needsRefund: $request->boolean('needs_refund'), // K3 finance worklist
         );
 
         return response()->json([

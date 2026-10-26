@@ -225,6 +225,15 @@ export interface Order {
   items?: OrderItem[]
   /** B1: fake-gateway order ("TEST ÖDƏNİŞ"). */
   is_test?: boolean
+  /** K3: paid for access that no longer exists — finance refunds it by hand (null once refunded / nothing to do). */
+  refund_required?: OrderRefundRequired | null
+  /** K2: the bank captured it after we had expired the order on timeout. */
+  late_captured_at?: string | null
+}
+export interface OrderRefundRequired {
+  amount_minor: number
+  flagged_at: string
+  lines: { subscription_id: number; amount_minor: number; reason: 'access_removed' | 'device_removed' | string }[]
 }
 export interface Refund {
   id: number

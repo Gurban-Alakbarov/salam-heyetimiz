@@ -3773,6 +3773,14 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "in": "query",
+            "name": "needs_refund",
+            "description": "K3 finance worklist — only paid orders flagged `refund_required` that are not refunded yet.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -12442,6 +12450,49 @@
           "failed_reason": {
             "type": "string",
             "nullable": true
+          },
+          "refund_required": {
+            "type": "object",
+            "nullable": true,
+            "description": "K3 — the bank captured money for access that no longer exists (the beneficiary was removed / deleted,\nor the device is gone), so the subscription was NOT activated. Finance refunds it by hand through the\nnormal refund flow (no automatic refunds). Null when there is nothing to refund, and once refunded.\n",
+            "properties": {
+              "amount_minor": {
+                "type": "integer",
+                "example": 1200
+              },
+              "flagged_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lines": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "subscription_id": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "amount_minor": {
+                      "type": "integer"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "enum": [
+                        "access_removed",
+                        "device_removed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "late_captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "K2 — the bank captured this order after it had been expired on timeout; it was paid late (never lost)."
           },
           "created_at": {
             "type": "string",

@@ -37,6 +37,11 @@ class OrderResource extends JsonResource
             'paid_at' => optional($this->paid_at)->toIso8601String(),
             'failed_at' => optional($this->failed_at)->toIso8601String(),
             'failed_reason' => $this->failed_reason,
+            // K3 — paid for access that no longer exists: finance must refund it by hand (null = nothing to do).
+            // Cleared from view once the order is refunded.
+            'refund_required' => $this->status->isPaidLike() ? ($this->metadata['refund_required'] ?? null) : null,
+            // K2 — the bank captured it after we had expired the order on timeout.
+            'late_captured_at' => $this->metadata['late_capture']['captured_at'] ?? null,
             'created_at' => optional($this->created_at)->toIso8601String(),
             'updated_at' => optional($this->updated_at)->toIso8601String(),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Payments\Queries;
 
+use App\Domain\Payments\Enums\OrderStatus;
 use App\Domain\Payments\Models\Order;
 use App\Support\Pagination\Cursor;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -37,9 +38,16 @@ final class OrderQuery
         int $limit,
         ?int $cursor,
         ?string $q = null,
+        bool $needsRefund = false,
     ): array {
         $query = Order::query()->with(['items', 'payer:id,phone,email', 'payments']);
         $this->applyStatus($query, $status);
+
+        // K3 — finance worklist: paid orders flagged refund_required that are not refunded yet.
+        if ($needsRefund) {
+            $query->whereIn('status', [OrderStatus::Paid->value, OrderStatus::PartiallyRefunded->value])
+                ->whereNotNull('metadata->refund_required');
+        }
 
         if ($purpose !== null) {
             $query->where('purpose', $purpose);

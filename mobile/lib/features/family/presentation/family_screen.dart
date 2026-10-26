@@ -200,9 +200,11 @@ class _MemberCardState extends ConsumerState<_MemberCard> {
   Future<void> _pay(FamilySubscription sub) async {
     final l = AppLocalizations.of(context);
     setState(() => _payingSubscriptionId = sub.id);
-    final result = await ref
-        .read(paymentsRepositoryProvider)
-        .payPendingSubscription(sub.id, sub.tier);
+    // O2 — a pending subscription is paid as is; an ended one is renewed (same checkout afterwards).
+    final payments = ref.read(paymentsRepositoryProvider);
+    final result = sub.isExpired
+        ? await payments.renewSubscription(sub.id)
+        : await payments.payPendingSubscription(sub.id, sub.tier);
     if (!mounted) return;
     setState(() => _payingSubscriptionId = null);
     await result.fold(
@@ -314,7 +316,9 @@ class _MemberCardState extends ConsumerState<_MemberCard> {
                     _payingSubscriptionId != null &&
                     _payingSubscriptionId == g.subscription?.id,
                 onPay:
-                    g.subscription != null && g.subscription!.isPendingPayment
+                    g.subscription != null &&
+                        (g.subscription!.isPendingPayment ||
+                            g.subscription!.isExpired)
                     ? () => _pay(g.subscription!)
                     : null,
               ),
@@ -371,6 +375,8 @@ class _GrantRow extends StatelessWidget {
           Text(
             sub.isActive && sub.endsAt != null
                 ? l.famSubActiveUntil(_fmt(sub.endsAt!))
+                : sub.isExpired && sub.endsAt != null
+                ? '${l.cxStatusExpired} · ${_fmt(sub.endsAt!)}'
                 : '${l.payPendingAdditional} · ${formatMinor(sub.priceMinor, sub.currency)}',
             style: text.bodySmall,
           ),
@@ -379,8 +385,8 @@ class _GrantRow extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           AppSecondaryButton(
             key: Key('fam-pay-${sub!.id}'),
-            label: l.famPayFor,
-            icon: Icons.payment,
+            label: sub.isExpired ? l.subscriptionRenew : l.famPayFor,
+            icon: sub.isExpired ? Icons.autorenew : Icons.payment,
             onPressed: paying ? null : onPay,
           ),
         ],

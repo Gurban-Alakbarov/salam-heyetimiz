@@ -419,6 +419,35 @@ void main() {
     );
 
     testWidgets(
+      'O2: an ended member subscription offers "renew" — the head renews it (not the pending-payment path)',
+      (tester) async {
+        when(() => payments.renewSubscription(44)).thenAnswer(
+          (_) async => Success(
+            PaymentOrder.fromJson({
+              'id': 92,
+              'reference': 'r2',
+              'status': 'pending',
+              'amount_minor': 1200,
+            }),
+          ),
+        );
+        await pump(
+          tester,
+          managed: const [ManagedDevice(deviceId: 1, label: 'Giriş')],
+          members: [FamilyMember.fromJson(_memberJson(subStatus: 'expired'))],
+        );
+
+        expect(find.text(l.cxStatusExpired), findsOneWidget);
+        expect(find.text(l.subscriptionRenew), findsOneWidget);
+        await tester.tap(find.byKey(const Key('fam-pay-44')));
+        await tester.pumpAndSettle();
+        verify(() => payments.renewSubscription(44)).called(1);
+        verifyNever(() => payments.payPendingSubscription(any(), any()));
+        expect(visited, ['/checkout/92']);
+      },
+    );
+
+    testWidgets(
       'a refused payment (403) shows the server refusal and opens no checkout',
       (tester) async {
         when(

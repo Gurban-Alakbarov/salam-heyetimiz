@@ -31,6 +31,9 @@ class FamilySubscription {
   bool get isActive => status == 'active';
   bool get isPendingPayment => status == 'pending_payment';
 
+  /// O2 — the head can renew a member's ended subscription (POST /v1/subscriptions/{id}/renew).
+  bool get isExpired => status == 'expired';
+
   factory FamilySubscription.fromJson(Map<String, dynamic> j) =>
       FamilySubscription(
         id: _int(j['id']),

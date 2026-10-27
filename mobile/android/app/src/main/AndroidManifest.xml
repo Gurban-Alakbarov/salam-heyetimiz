@@ -36,12 +36,14 @@
             </intent-filter>
             <!-- B13: links are handled once, by app_links (not Flutter's built-in router deep linking). -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
-            <!-- B13: invitation App Link https://salamheyetimiz.com/invite/{token} (B6 web landing). autoVerify
-                 succeeds once /.well-known/assetlinks.json carries the release signing fingerprint (B6). -->
+            <!-- B13: invitation App Link https://sezam.salam.az/invite/{token} (B6 web landing); the old
+                 salamheyetimiz.com host stays for links sent before 2026-10-27. autoVerify succeeds once
+                 /.well-known/assetlinks.json carries the release signing fingerprint (B6). -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="sezam.salam.az" android:pathPrefix="/invite/" />
                 <data android:scheme="https" android:host="salamheyetimiz.com" android:pathPrefix="/invite/" />
             </intent-filter>
             <!-- B13: hosted-checkout return salam://payment/return?status=&order=&test= (B1 PaymentReturnController).

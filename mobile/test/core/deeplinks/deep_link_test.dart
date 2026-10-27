@@ -20,7 +20,9 @@ class _MemStore implements SecureStore {
 
 void main() {
   group('DeepLinkParser — invitation app links (B6)', () {
-    test('accepts https://salamheyetimiz.com/invite/{token} (and www.)', () {
+    test('accepts https://sezam.salam.az/invite/{token} and the old salamheyetimiz.com links', () {
+      expect(DeepLinkParser.parse(Uri.parse('https://sezam.salam.az/invite/$_token')), const InviteLink(_token));
+      expect(DeepLinkParser.parse(Uri.parse('https://sezam.salam.az/invite/$_token/')), const InviteLink(_token));
       expect(DeepLinkParser.parse(Uri.parse('https://salamheyetimiz.com/invite/$_token')), const InviteLink(_token));
       expect(DeepLinkParser.parse(Uri.parse('https://www.salamheyetimiz.com/invite/$_token/')), const InviteLink(_token));
     });
@@ -29,6 +31,8 @@ void main() {
       for (final raw in [
         'https://evil.example/invite/$_token',
         'https://salamheyetimiz.com.evil.example/invite/$_token',
+        'https://sezam.salam.az.evil.example/invite/$_token',
+        'https://evil.sezam.salam.az/invite/$_token',
         'http://salamheyetimiz.com/invite/$_token',
         'https://salamheyetimiz.com/invite/short',
         'https://salamheyetimiz.com/invite/$_token/extra',
@@ -78,7 +82,7 @@ void main() {
 
   group('checkout WebView navigation policy', () {
     test('web pages load, the return hand-off finishes, everything else is blocked', () {
-      expect(checkoutNavigation('https://api.salamheyetimiz.com/v1/payments/fake-checkout/SH-1?signature=x'), CheckoutNav.allow);
+      expect(checkoutNavigation('https://api.sezam.salam.az/v1/payments/fake-checkout/SH-1?signature=x'), CheckoutNav.allow);
       expect(checkoutNavigation('http://10.0.2.2:8010/v1/payments/return?paymentId=KB-FAKE-1'), CheckoutNav.allow);
       expect(checkoutNavigation('salam://payment/return?status=success&order=SH-1&test=1'), CheckoutNav.finish);
       for (final raw in ['intent://scan/#Intent;scheme=zxing;end', 'tel:+994500000000', 'file:///etc/hosts', 'salam://other', 'javascript:alert(1)']) {

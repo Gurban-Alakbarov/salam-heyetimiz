@@ -20,15 +20,18 @@ class AppConfig {
   /// `--dart-define=API_BASE_URL=http://10.0.2.2:8010`. The prod flavor never reads it.
   static const String _nonProdApiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.salamheyetimiz.com',
+    defaultValue: 'https://api.sezam.salam.az',
   );
 
   /// Host of invitation universal / app links (`https://<host>/invite/{token}`, B6).
-  static const String inviteLinkHost = 'salamheyetimiz.com';
+  static const String inviteLinkHost = 'sezam.salam.az';
+
+  /// Invitation links sent before the move to sezam.salam.az (2026-10-27) still open the app.
+  static const Set<String> legacyInviteLinkHosts = {'salamheyetimiz.com', 'www.salamheyetimiz.com'};
 
   static const AppConfig prod = AppConfig(
     env: AppEnv.prod,
-    apiBaseUrl: 'https://api.salamheyetimiz.com',
+    apiBaseUrl: 'https://api.sezam.salam.az',
     appName: 'Salam Həyətimiz',
   );
 

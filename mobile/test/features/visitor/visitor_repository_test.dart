@@ -41,7 +41,7 @@ void main() {
           'status': 'active',
         },
         'token': 'PLAINTOKEN',
-        'url': 'https://salamheyetimiz.com/v/PLAINTOKEN',
+        'url': 'https://sezam.salam.az/v/PLAINTOKEN',
       },
     );
 
@@ -49,7 +49,7 @@ void main() {
 
     expect(result.isSuccess, isTrue);
     final link = (result as Success).value;
-    expect(link.url, 'https://salamheyetimiz.com/v/PLAINTOKEN');
+    expect(link.url, 'https://sezam.salam.az/v/PLAINTOKEN');
     expect(link.token, 'PLAINTOKEN');
     expect(link.accessType, VisitorAccessType.oneTime);
     expect(link.visitorName, 'Kuryer');

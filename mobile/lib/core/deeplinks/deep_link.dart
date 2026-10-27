@@ -12,7 +12,7 @@ sealed class DeepLink {
   const DeepLink();
 }
 
-/// `https://salamheyetimiz.com/invite/{token}` (B6 web landing / app link).
+/// `https://sezam.salam.az/invite/{token}` (B6 web landing / app link; old salamheyetimiz.com links too).
 class InviteLink extends DeepLink {
   const InviteLink(this.token);
   final String token;
@@ -54,7 +54,7 @@ class DeepLinkParser {
   static const String customScheme = 'salam';
   static final RegExp _token = RegExp(r'^[A-Za-z0-9_-]{16,128}$');
   static final RegExp _reference = RegExp(r'^[A-Za-z0-9_-]{1,64}$');
-  static final Set<String> _inviteHosts = {AppConfig.inviteLinkHost, 'www.${AppConfig.inviteLinkHost}'};
+  static final Set<String> _inviteHosts = {AppConfig.inviteLinkHost, ...AppConfig.legacyInviteLinkHosts};
 
   static DeepLink parse(Uri uri) {
     final scheme = uri.scheme.toLowerCase();

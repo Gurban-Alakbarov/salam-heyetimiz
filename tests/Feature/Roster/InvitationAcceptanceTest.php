@@ -169,11 +169,11 @@ it('serves the web landing and the app-link association files (404 until configu
     $this->get('/.well-known/assetlinks.json')->assertNotFound();
     $this->get('/.well-known/apple-app-site-association')->assertNotFound();
 
-    config(['domain.app_links.android.sha256_cert_fingerprints' => ['AA:BB'], 'domain.app_links.ios.app_id' => 'TEAM123.com.salamheyetimiz.salamMobile']);
+    config(['domain.app_links.android.sha256_cert_fingerprints' => ['AA:BB'], 'domain.app_links.ios.app_id' => 'TEAM123.az.salam.sezam']);
     $this->get('/.well-known/assetlinks.json')->assertOk()
-        ->assertJsonPath('0.target.package_name', 'com.salamheyetimiz.salam_mobile')
+        ->assertJsonPath('0.target.package_name', 'az.salam.sezam')
         ->assertJsonPath('0.target.sha256_cert_fingerprints', ['AA:BB']);
     $this->get('/.well-known/apple-app-site-association')->assertOk()
-        ->assertJsonPath('applinks.details.0.appIDs', ['TEAM123.com.salamheyetimiz.salamMobile'])
+        ->assertJsonPath('applinks.details.0.appIDs', ['TEAM123.az.salam.sezam'])
         ->assertJsonPath('applinks.details.0.components', [['/' => '/invite/*']]);
 });

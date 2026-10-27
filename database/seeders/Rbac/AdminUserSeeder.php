@@ -33,12 +33,12 @@ class AdminUserSeeder extends Seeder
         $recoveryHashes = array_map(static fn (string $code): string => Hash::make($code), self::DEMO_RECOVERY_CODES);
 
         $accounts = [
-            ['email' => 'super@salamheyetimiz.com', 'name' => 'Demo Super Admin', 'role' => 'super_admin', 'password' => 'Sup3r!Salam-RBAC#2026', 'complex_id' => null],
-            ['email' => 'technical@salamheyetimiz.com', 'name' => 'Demo Technical', 'role' => 'technical', 'password' => 'Tech!Salam-RBAC#2026', 'complex_id' => null],
-            ['email' => 'operator@salamheyetimiz.com', 'name' => 'Demo Operator', 'role' => 'operator', 'password' => 'Oper!Salam-RBAC#2026', 'complex_id' => null],
-            ['email' => 'finance@salamheyetimiz.com', 'name' => 'Demo Finance', 'role' => 'finance', 'password' => 'Fin!Salam-RBAC#2026x', 'complex_id' => null],
-            ['email' => 'support@salamheyetimiz.com', 'name' => 'Demo Support', 'role' => 'support', 'password' => 'Supp!Salam-RBAC#2026', 'complex_id' => null],
-            ['email' => 'manager@salamheyetimiz.com', 'name' => 'Demo Complex Manager', 'role' => 'complex_manager', 'password' => 'Mgr!Salam-RBAC#2026x', 'complex_id' => $complexAId],
+            ['email' => 'super@sezam.salam.az', 'name' => 'Demo Super Admin', 'role' => 'super_admin', 'password' => 'Sup3r!Salam-RBAC#2026', 'complex_id' => null],
+            ['email' => 'technical@sezam.salam.az', 'name' => 'Demo Technical', 'role' => 'technical', 'password' => 'Tech!Salam-RBAC#2026', 'complex_id' => null],
+            ['email' => 'operator@sezam.salam.az', 'name' => 'Demo Operator', 'role' => 'operator', 'password' => 'Oper!Salam-RBAC#2026', 'complex_id' => null],
+            ['email' => 'finance@sezam.salam.az', 'name' => 'Demo Finance', 'role' => 'finance', 'password' => 'Fin!Salam-RBAC#2026x', 'complex_id' => null],
+            ['email' => 'support@sezam.salam.az', 'name' => 'Demo Support', 'role' => 'support', 'password' => 'Supp!Salam-RBAC#2026', 'complex_id' => null],
+            ['email' => 'manager@sezam.salam.az', 'name' => 'Demo Complex Manager', 'role' => 'complex_manager', 'password' => 'Mgr!Salam-RBAC#2026x', 'complex_id' => $complexAId],
         ];
 
         foreach ($accounts as $account) {

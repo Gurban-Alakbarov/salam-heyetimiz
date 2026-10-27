@@ -4,7 +4,7 @@
 
 > ⚠️ **SECURITY:** these are demo accounts with documented passwords + a shared 2FA secret. **Disable or
 > rotate them before real production launch** — especially the demo super admin. Deactivate via the Admins
-> page or re-seed with new values. The original production super admin (`admin@salamheyetimiz.com`) is
+> page or re-seed with new values. The original production super admin (`admin@sezam.salam.az`) is
 > unchanged.
 
 ## Login URL
@@ -18,12 +18,12 @@ sidebar**, and unauthorized pages/buttons are hidden (and return 403 if reached 
 
 | Role | Email | Password | Scope |
 |---|---|---|---|
-| **Super Admin** | `super@salamheyetimiz.com` | `Sup3r!Salam-RBAC#2026` | all |
-| **Technical** | `technical@salamheyetimiz.com` | `Tech!Salam-RBAC#2026` | all complexes |
-| **Operator** | `operator@salamheyetimiz.com` | `Oper!Salam-RBAC#2026` | all complexes |
-| **Finance** | `finance@salamheyetimiz.com` | `Fin!Salam-RBAC#2026x` | all complexes |
-| **Support** | `support@salamheyetimiz.com` | `Supp!Salam-RBAC#2026` | all complexes |
-| **Complex Manager** | `manager@salamheyetimiz.com` | `Mgr!Salam-RBAC#2026x` | **Salam Həyət A only** |
+| **Super Admin** | `super@sezam.salam.az` | `Sup3r!Salam-RBAC#2026` | all |
+| **Technical** | `technical@sezam.salam.az` | `Tech!Salam-RBAC#2026` | all complexes |
+| **Operator** | `operator@sezam.salam.az` | `Oper!Salam-RBAC#2026` | all complexes |
+| **Finance** | `finance@sezam.salam.az` | `Fin!Salam-RBAC#2026x` | all complexes |
+| **Support** | `support@sezam.salam.az` | `Supp!Salam-RBAC#2026` | all complexes |
+| **Complex Manager** | `manager@sezam.salam.az` | `Mgr!Salam-RBAC#2026x` | **Salam Həyət A only** |
 
 ## 2FA (same for every demo account)
 

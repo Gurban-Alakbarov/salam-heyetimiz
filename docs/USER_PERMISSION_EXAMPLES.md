@@ -8,11 +8,11 @@ compare — same role, different effective access. 2FA: same as the other demo a
 
 | Account | Email | Password | Role | Override | Net effect |
 |---|---|---|---|---|---|
-| **Technical #1** | `technical1@salamheyetimiz.com` | `Tech1!Salam-RBAC#2026` | technical | **+ `orders.view`, `refunds.view`** | also sees **Sifarişlər + Geri qaytarmalar** (Finance pages) |
-| **Technical #2** | `technical2@salamheyetimiz.com` | `Tech2!Salam-RBAC#2026` | technical | none | plain Technical — **no** Finance |
-| **Finance #1** | `finance1@salamheyetimiz.com` | `Fin1!Salam-RBAC#2026` | finance | **− `refunds.create`** | still Finance, but **no refund button** |
-| **Operator #1** | `operator1@salamheyetimiz.com` | `Oper1!Salam-RBAC#2026` | operator | **+ `devices.diagnostics.view`** | also opens **Diaqnostika** |
-| **Support #1** | `support1@salamheyetimiz.com` | `Supp1!Salam-RBAC#2026` | support | **+ `devices.diagnostics.view`** | read-only Support **+ Diagnostics** |
+| **Technical #1** | `technical1@sezam.salam.az` | `Tech1!Salam-RBAC#2026` | technical | **+ `orders.view`, `refunds.view`** | also sees **Sifarişlər + Geri qaytarmalar** (Finance pages) |
+| **Technical #2** | `technical2@sezam.salam.az` | `Tech2!Salam-RBAC#2026` | technical | none | plain Technical — **no** Finance |
+| **Finance #1** | `finance1@sezam.salam.az` | `Fin1!Salam-RBAC#2026` | finance | **− `refunds.create`** | still Finance, but **no refund button** |
+| **Operator #1** | `operator1@sezam.salam.az` | `Oper1!Salam-RBAC#2026` | operator | **+ `devices.diagnostics.view`** | also opens **Diaqnostika** |
+| **Support #1** | `support1@sezam.salam.az` | `Supp1!Salam-RBAC#2026` | support | **+ `devices.diagnostics.view`** | read-only Support **+ Diagnostics** |
 
 ## What to check (UI + API)
 

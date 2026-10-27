@@ -163,7 +163,7 @@ class DemoDataSeeder extends Seeder
                     ['action' => $action, 'actor_id' => $superId, 'auditable_id' => $tid, 'auditable_type' => $type],
                     [
                         'actor_kind' => 'admin',
-                        'actor_label' => 'super@salamheyetimiz.com',
+                        'actor_label' => 'super@sezam.salam.az',
                         'payload' => ['demo' => true],
                         'ip' => '185.208.206.174',
                         'created_at' => now()->subHours($k + 1),

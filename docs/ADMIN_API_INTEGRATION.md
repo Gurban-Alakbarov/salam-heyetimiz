@@ -168,7 +168,7 @@ POST /auth/2fa/verify {challenge_token, totp | recovery_code}
 ```bash
 curl -sS -X POST https://salamheyetimiz.com/admin/v1/auth/login \
   -H "Accept: application/json" -H "Content-Type: application/json" \
-  -d '{"email":"admin@salamheyetimiz.com","password":"S3cret-Passw0rd!"}'
+  -d '{"email":"admin@sezam.salam.az","password":"S3cret-Passw0rd!"}'
 ```
 
 **axios**
@@ -199,7 +199,7 @@ if (data.challenge_token) {
   "expires_in": 1800,
   "admin": {
     "id": 1,
-    "email": "admin@salamheyetimiz.com",
+    "email": "admin@sezam.salam.az",
     "name": "Operator One",
     "role": "super_admin",
     "phone": null,

@@ -22,11 +22,11 @@ class PermissionOverrideSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            ['email' => 'technical1@salamheyetimiz.com', 'name' => 'Technical #1', 'role' => 'technical', 'password' => 'Tech1!Salam-RBAC#2026', 'grant' => ['orders.view', 'refunds.view'], 'revoke' => []],
-            ['email' => 'technical2@salamheyetimiz.com', 'name' => 'Technical #2', 'role' => 'technical', 'password' => 'Tech2!Salam-RBAC#2026', 'grant' => [], 'revoke' => []],
-            ['email' => 'finance1@salamheyetimiz.com', 'name' => 'Finance #1', 'role' => 'finance', 'password' => 'Fin1!Salam-RBAC#2026', 'grant' => [], 'revoke' => ['refunds.create']],
-            ['email' => 'operator1@salamheyetimiz.com', 'name' => 'Operator #1', 'role' => 'operator', 'password' => 'Oper1!Salam-RBAC#2026', 'grant' => ['devices.diagnostics.view'], 'revoke' => []],
-            ['email' => 'support1@salamheyetimiz.com', 'name' => 'Support #1', 'role' => 'support', 'password' => 'Supp1!Salam-RBAC#2026', 'grant' => ['devices.diagnostics.view'], 'revoke' => []],
+            ['email' => 'technical1@sezam.salam.az', 'name' => 'Technical #1', 'role' => 'technical', 'password' => 'Tech1!Salam-RBAC#2026', 'grant' => ['orders.view', 'refunds.view'], 'revoke' => []],
+            ['email' => 'technical2@sezam.salam.az', 'name' => 'Technical #2', 'role' => 'technical', 'password' => 'Tech2!Salam-RBAC#2026', 'grant' => [], 'revoke' => []],
+            ['email' => 'finance1@sezam.salam.az', 'name' => 'Finance #1', 'role' => 'finance', 'password' => 'Fin1!Salam-RBAC#2026', 'grant' => [], 'revoke' => ['refunds.create']],
+            ['email' => 'operator1@sezam.salam.az', 'name' => 'Operator #1', 'role' => 'operator', 'password' => 'Oper1!Salam-RBAC#2026', 'grant' => ['devices.diagnostics.view'], 'revoke' => []],
+            ['email' => 'support1@sezam.salam.az', 'name' => 'Support #1', 'role' => 'support', 'password' => 'Supp1!Salam-RBAC#2026', 'grant' => ['devices.diagnostics.view'], 'revoke' => []],
         ];
 
         $recoveryHashes = array_map(static fn (string $c): string => Hash::make($c), AdminUserSeeder::DEMO_RECOVERY_CODES);

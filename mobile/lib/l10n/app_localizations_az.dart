@@ -9,7 +9,7 @@ class AppLocalizationsAz extends AppLocalizations {
   AppLocalizationsAz([String locale = 'az']) : super(locale);
 
   @override
-  String get appTitle => 'Salam Həyətimiz';
+  String get appTitle => 'Salam Sesame';
 
   @override
   String get register => 'Qeydiyyat';
@@ -1236,6 +1236,9 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get famRemoved => 'Ailə üzvü çıxarıldı.';
+
+  @override
+  String get devRenewSubscription => 'Abunəliyi yenilə';
 
   @override
   String get deleteAccount => 'Hesabı sil';

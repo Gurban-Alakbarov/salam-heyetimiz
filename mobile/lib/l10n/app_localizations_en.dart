@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Salam Həyətimiz';
+  String get appTitle => 'Salam Sesame';
 
   @override
   String get register => 'Register';
@@ -1241,6 +1241,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get famRemoved => 'Family member removed.';
+
+  @override
+  String get devRenewSubscription => 'Renew subscription';
 
   @override
   String get deleteAccount => 'Delete account';

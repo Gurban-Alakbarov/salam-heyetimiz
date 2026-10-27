@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:salam_mobile/design_system/components/app_components.dart';
+import 'package:salam_mobile/core/error/failure.dart';
 import 'package:salam_mobile/design_system/components/app_inputs.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
 import 'package:salam_mobile/features/barrier/barrier_providers.dart';
 import 'package:salam_mobile/features/barrier/presentation/widgets/barrier_open_button.dart';
+import 'package:salam_mobile/features/complex/complex_providers.dart';
+import 'package:salam_mobile/features/complex/presentation/complex_failure.dart';
+import 'package:salam_mobile/features/devices/device_access_action.dart';
+import 'package:salam_mobile/features/devices/devices_providers.dart';
 import 'package:salam_mobile/features/devices/domain/entity/device_entities.dart';
 import 'package:salam_mobile/features/directions/directions_launcher.dart';
 import 'package:salam_mobile/features/visitor/presentation/widgets/invite_visitor_sheet.dart';
@@ -85,6 +89,15 @@ class DeviceCard extends StatelessWidget {
                       ),
                       const SizedBox(height: _photoGap),
                       const Spacer(),
+
+                      // ── B19: why it can't open — the card's central message, above the name ──
+                      if (!device.canOpen) ...[
+                        _InactiveNotice(
+                          key: Key('device-inactive-${device.id}'),
+                          reason: device.suspensionReason,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                      ],
 
                       // ── Name ─────────────────────────────────────────────────────
                       Text(
@@ -522,36 +535,184 @@ class _OpenAction extends ConsumerWidget {
 
     // Not active → a plain button; tapping it asks the parent to activate + fire the
     // open (keeps a single card bound to the global state).
-    final button = AppButton(
-      label: l.barrierOpen,
-      icon: Icons.lock_open_rounded,
-      onPressed: device.canOpen ? () => onOpenPressed?.call(device.id) : null,
+    if (device.canOpen) {
+      return _CardButton(
+        key: Key('device-open-${device.id}'),
+        label: l.barrierOpen,
+        icon: Icons.lock_open_rounded,
+        onPressed: () => onOpenPressed?.call(device.id),
+      );
+    }
+    // B19: the server gates opening via `can_open`; the WHY is shown above the name (_InactiveNotice) and
+    // the button becomes the subscription action the caller can actually take.
+    return _AccessAction(device: device);
+  }
+}
+
+/// B19 — the action for a card that cannot open: finish the pending payment, renew the expired
+/// subscription, or subscribe to a complex device. Falls back to the disabled "Qapını Aç" when there is
+/// nothing to pay for (device disabled, someone else's access, still resolving).
+class _AccessAction extends ConsumerStatefulWidget {
+  const _AccessAction({required this.device});
+
+  final Device device;
+
+  @override
+  ConsumerState<_AccessAction> createState() => _AccessActionState();
+}
+
+class _AccessActionState extends ConsumerState<_AccessAction> {
+  bool _busy = false;
+
+  Future<void> _start(DeviceAccessAction action) async {
+    final l = AppLocalizations.of(context);
+    final deviceId = widget.device.id;
+    setState(() => _busy = true);
+    final result = await startDeviceAccessPayment(ref, deviceId, action);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    await result.fold(
+      (f) async {
+        AppSnackBar.show(
+          context,
+          f is ForbiddenFailure
+              ? l.payErrForbidden
+              : complexFailureMessage(l, f),
+          isError: true,
+        );
+        ref.invalidate(deviceAccessActionProvider(deviceId));
+      },
+      (order) async {
+        // The result screen refreshes the device list on success (B18); a cancelled checkout keeps the
+        // subscription pending, so re-resolve the card's action either way.
+        await GoRouter.of(context).push('/checkout/${order.id}');
+        if (!mounted) return;
+        ref
+          ..invalidate(deviceAccessActionProvider(deviceId))
+          ..invalidate(pendingSubscriptionsProvider)
+          ..invalidate(deviceListProvider);
+      },
     );
-    // The server gates opening via `can_open`. When it's false the button is disabled
-    // (greyed) — surface WHY instead of a silent dead button.
-    if (device.canOpen) return button;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        button,
-        const SizedBox(height: AppSpacing.xs),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final action =
+        ref.watch(deviceAccessActionProvider(widget.device.id)).value ??
+        const NoDeviceAccessAction();
+    final (String label, IconData icon)? spec = switch (action) {
+      PayPendingAction() => (l.cxFinishPayment, Icons.payment),
+      RenewAction() => (l.devRenewSubscription, Icons.autorenew),
+      SubscribeAction() => (l.cxSubscribe, Icons.add_card),
+      NoDeviceAccessAction() => null,
+    };
+    if (spec == null) {
+      return _CardButton(
+        key: Key('device-open-${widget.device.id}'),
+        label: l.barrierOpen,
+        icon: Icons.lock_open_rounded,
+        onPressed: null,
+      );
+    }
+    return _CardButton(
+      key: Key('device-access-${widget.device.id}'),
+      label: spec.$1,
+      icon: spec.$2,
+      loading: _busy,
+      onPressed: _busy ? null : () => _start(action),
+    );
+  }
+}
+
+/// The card's full-width button: the app's filled button style, but the icon + label scale down instead of
+/// overflowing a half-width card on narrow phones / large accessibility text (B19).
+class _CardButton extends StatelessWidget {
+  const _CardButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    this.loading = false,
+    super.key,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton(
+      onPressed: loading ? null : onPressed,
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      ),
+      child: loading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.onBrand,
+              ),
+            )
+          : FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 20),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(label, maxLines: 1),
+                ],
+              ),
+            ),
+    );
+  }
+}
+
+/// B19 — "Abunəliyiniz aktiv deyil" (or the device's own reason) as the card's central message, in the
+/// photo area right above the name. Wraps to two lines and never leaves the card.
+class _InactiveNotice extends StatelessWidget {
+  const _InactiveNotice({required this.reason, super.key});
+
+  final String reason;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Align(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm + 2,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xCC141414),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.info_outline, size: 14, color: Colors.white70),
-            const SizedBox(width: AppSpacing.xs),
+            const Icon(Icons.lock_outline, size: 15, color: Colors.white),
+            const SizedBox(width: 6),
             Flexible(
               child: Text(
-                _openBlockedReason(l, device.suspensionReason),
+                _openBlockedReason(l, reason),
                 textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.white),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12.5,
+                ),
               ),
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }

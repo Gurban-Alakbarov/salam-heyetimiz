@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Salam Həyətimiz</string>
+	<string>Salam Sesame</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -86,7 +86,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>com.salamheyetimiz.salamMobile.payment</string>
+			<string>az.salam.sezam.payment</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>salam</string>

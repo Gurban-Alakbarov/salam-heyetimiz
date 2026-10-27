@@ -1,4 +1,4 @@
-package com.salamheyetimiz.salam_mobile
+package az.salam.sezam
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

@@ -328,8 +328,10 @@ class _FeedbackRow extends ConsumerWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          // Wrap (not Row): on a half-width device card the two answers stack instead of overflowing (B19).
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: AppSpacing.lg,
             children: [
               AppTextButton(
                 label: l.yes,
@@ -337,7 +339,6 @@ class _FeedbackRow extends ConsumerWidget {
                     .read(barrierOpenProvider.notifier)
                     .sendFeedback(commandId, gateMoved: true),
               ),
-              const SizedBox(width: AppSpacing.lg),
               AppTextButton(
                 label: l.no,
                 onPressed: () => ref

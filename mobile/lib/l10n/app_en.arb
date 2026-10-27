@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Salam Həyətimiz",
+  "appTitle": "Salam Sesame",
   "register": "Register",
   "login": "Login",
   "verifyOtp": "Verify OTP",
@@ -482,6 +482,7 @@
     "placeholders": { "name": { "type": "String" } }
   },
   "famRemoved": "Family member removed.",
+  "devRenewSubscription": "Renew subscription",
   "deleteAccount": "Delete account",
   "deleteAccountTitle": "Delete your account?",
   "deleteAccountBody": "Your account and personal data (name, phone, email) will be permanently deleted. Your access to every device ends, active subscriptions are cancelled (no refund), and the access you gave your family members is removed. This cannot be undone.",

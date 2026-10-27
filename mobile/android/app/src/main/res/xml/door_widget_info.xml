@@ -10,5 +10,5 @@
     android:previewLayout="@layout/door_widget"
     android:resizeMode="horizontal"
     android:updatePeriodMillis="0"
-    android:configure="com.salamheyetimiz.salam_mobile.MainActivity"
+    android:configure="az.salam.sezam.MainActivity"
     android:widgetCategory="home_screen" />

@@ -1,4 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Play policy: installed_apps declares these restricted permissions; AzNav detection only needs the
+         <queries> <package> entry below, so they are stripped from the merged manifest. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:node="remove"/>
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" tools:node="remove"/>
     <!-- Android 13+ runtime notification permission (FCM push). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Declared for the home-screen door widget's future background network call (W3). Release builds

@@ -22,7 +22,7 @@ class OsmLocationPicker extends ConsumerStatefulWidget {
   final String? errorText;
 
   static const LatLng defaultCenter = LatLng(40.4093, 49.8671); // Baku
-  static const String userAgentPackageName = 'com.salamheyetimiz.salam_mobile';
+  static const String userAgentPackageName = 'az.salam.sezam';
 
   @override
   ConsumerState<OsmLocationPicker> createState() => _OsmLocationPickerState();

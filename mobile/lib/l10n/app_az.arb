@@ -1,6 +1,6 @@
 {
   "@@locale": "az",
-  "appTitle": "Salam Həyətimiz",
+  "appTitle": "Salam Sesame",
   "register": "Qeydiyyat",
   "login": "Giriş",
   "verifyOtp": "OTP təsdiqi",
@@ -404,6 +404,8 @@
   "famRemoveTitle": "Ailə üzvünü çıxar",
   "famRemoveBody": "{name} ailə üzvlərindən çıxarılacaq. Verdiyiniz cihazlara girişi dərhal dayanacaq, abunəlikləri ləğv ediləcək. Avtomatik geri ödəniş edilmir.",
   "famRemoved": "Ailə üzvü çıxarıldı.",
+  "devRenewSubscription": "Abunəliyi yenilə",
+  "@devRenewSubscription": {"description": "B19: device card action for an expired subscription (existing renewal)."},
   "deleteAccount": "Hesabı sil",
   "@deleteAccount": {"description": "Y7: self-service account deletion (profile)."},
   "deleteAccountTitle": "Hesabınız silinsin?",

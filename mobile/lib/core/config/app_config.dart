@@ -32,7 +32,7 @@ class AppConfig {
   static const AppConfig prod = AppConfig(
     env: AppEnv.prod,
     apiBaseUrl: 'https://api.sezam.salam.az',
-    appName: 'Salam Həyətimiz',
+    appName: 'Salam Sesame',
   );
 
   static const AppConfig qa = AppConfig(

@@ -9,7 +9,7 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get appTitle => 'Salam Həyətimiz';
+  String get appTitle => 'Salam Sesame';
 
   @override
   String get register => 'Регистрация';
@@ -1242,6 +1242,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get famRemoved => 'Член семьи удалён.';
+
+  @override
+  String get devRenewSubscription => 'Продлить подписку';
 
   @override
   String get deleteAccount => 'Удалить аккаунт';

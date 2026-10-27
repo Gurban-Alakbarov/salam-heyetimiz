@@ -103,7 +103,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Salam Həyətimiz'**
+  /// **'Salam Sesame'**
   String get appTitle;
 
   /// No description provided for @register.
@@ -2373,6 +2373,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Family member removed.'**
   String get famRemoved;
+
+  /// No description provided for @devRenewSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Renew subscription'**
+  String get devRenewSubscription;
 
   /// No description provided for @deleteAccount.
   ///

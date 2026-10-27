@@ -4,7 +4,7 @@
      persisted door_widget_locale, so it does NOT depend on the device locale. -->
 <resources>
     <!-- User-visible launcher / app name (fixed, not localized). -->
-    <string name="app_name">Salam Həyətimiz</string>
+    <string name="app_name">Salam Sesame</string>
 
     <string name="dw_open">Aç</string>
     <string name="dw_opening">Açılır...</string>

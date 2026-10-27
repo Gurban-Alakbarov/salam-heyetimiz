@@ -68,7 +68,7 @@ void main() {
   test('provider identity is stable', () {
     expect(
       DoorWidgetService.androidProvider,
-      'com.salamheyetimiz.salam_mobile.DoorWidgetProvider',
+      'az.salam.sezam.DoorWidgetProvider',
     );
   });
 

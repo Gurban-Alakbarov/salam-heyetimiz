@@ -21,7 +21,7 @@ class DoorWidgetService {
   const DoorWidgetService();
 
   static const String androidProvider =
-      'com.salamheyetimiz.salam_mobile.DoorWidgetProvider';
+      'az.salam.sezam.DoorWidgetProvider';
 
   // ── Per-instance keys (suffixed by the real AppWidgetId) ───────────────────
   static String deviceIdKey(int widgetId) => 'door_widget_device_id_$widgetId';

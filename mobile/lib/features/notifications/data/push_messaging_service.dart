@@ -21,7 +21,7 @@ Future<void> fcmBackgroundHandler(RemoteMessage message) async {}
 const AndroidNotificationChannel _androidChannel = AndroidNotificationChannel(
   'high_importance_channel',
   'Bildirişlər',
-  description: 'Salam Həyətimiz push bildirişləri',
+  description: 'Salam Sesame push bildirişləri',
   importance: Importance.high,
 );
 

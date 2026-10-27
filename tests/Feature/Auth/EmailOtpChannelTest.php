@@ -158,3 +158,25 @@ it('keeps phone and email OTP rows isolated by channel', function () {
     // email row untouched by the phone verify
     expect(Otp::query()->where('email', 'iso@test.az')->first()->consumed_at)->toBeNull();
 });
+
+it('gives only the configured store-review email the fixed code, without sending mail', function () {
+    config(['domain.auth.review_account' => ['email' => 'review@sezam.salam.az', 'code' => '246810']]);
+    $svc = app(OtpService::class);
+
+    $svc->issueToEmail('Review@Sezam.Salam.az', OtpPurpose::Login, '127.0.0.1', 'en');
+    expect(app(FakeEmailOtpTransport::class)->lastCodeFor('Review@Sezam.Salam.az'))->toBeNull(); // no mail
+    $svc->verifyByEmail('Review@Sezam.Salam.az', '246810', OtpPurpose::Login); // must not throw
+
+    // Everyone else still gets a random, mailed code.
+    $svc->issueToEmail('other@test.az', OtpPurpose::Login, '127.0.0.1', 'az');
+    expect(emailCode('other@test.az'))->toMatch('/^\d{6}$/');
+    expect(fn () => $svc->verifyByEmail('other@test.az', '246810', OtpPurpose::Login))
+        ->toThrow(OtpVerificationException::class);
+});
+
+it('keeps the review login off unless a full-length numeric code is configured', function () {
+    config(['domain.auth.review_account' => ['email' => 'review@sezam.salam.az', 'code' => '12']]);
+    app(OtpService::class)->issueToEmail('review@sezam.salam.az', OtpPurpose::Login, '127.0.0.1', 'en');
+
+    expect(emailCode('review@sezam.salam.az'))->toMatch('/^\d{6}$/'); // normal random, mailed code
+});

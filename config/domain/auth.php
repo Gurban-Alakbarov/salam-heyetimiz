@@ -67,6 +67,13 @@ return [
         'max_attempts' => 5,
     ],
 
+    // Store-review login (Google Play / App Store reviewers cannot read our mailboxes). Only this one email gets
+    // the fixed code instead of a random one, and no mail is sent for it. Both unset = off (the default).
+    'review_account' => [
+        'email' => env('AUTH_REVIEW_EMAIL'),
+        'code' => env('AUTH_REVIEW_CODE'),
+    ],
+
     // Admin password login lockout (R-SEC-16 / Tech Spec §15.2).
     'admin_login' => [
         'max_failed' => 5,

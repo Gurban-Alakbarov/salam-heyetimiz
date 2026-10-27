@@ -56,10 +56,27 @@ final class OtpService
     {
         $this->throttle->register($email);
 
-        $code = $this->store('email', $email, 'email', $purpose, $ip);
-        $this->emailTransport->send($email, $code, $locale, $purpose);
+        $reviewCode = $this->reviewCode($email);
+        $code = $this->store('email', $email, 'email', $purpose, $ip, $reviewCode);
+        if ($reviewCode === null) {
+            $this->emailTransport->send($email, $code, $locale, $purpose);
+        }
 
         return $this->timing();
+    }
+
+    /** The fixed store-review code when $email is the configured review account (user-approved 2026-10-27), else null. */
+    private function reviewCode(string $email): ?string
+    {
+        $reviewEmail = trim((string) config('domain.auth.review_account.email'));
+        $code = trim((string) config('domain.auth.review_account.code'));
+        $length = (int) config('domain.auth.otp.length');
+
+        if ($reviewEmail === '' || ! preg_match('/^\d{'.$length.'}$/', $code)) {
+            return null;
+        }
+
+        return strcasecmp($reviewEmail, trim($email)) === 0 ? $code : null;
     }
 
     /**
@@ -81,11 +98,11 @@ final class OtpService
      * Generate + persist a code for a destination, superseding prior unconsumed codes for the
      * (destination, purpose) pair. Returns the cleartext code for the caller's transport.
      */
-    private function store(string $column, string $destination, string $channel, OtpPurpose $purpose, string $ip): string
+    private function store(string $column, string $destination, string $channel, OtpPurpose $purpose, string $ip, ?string $fixedCode = null): string
     {
         $ttl = (int) config('domain.auth.otp.ttl_seconds');
         $now = $this->clock->now();
-        $code = $this->generateCode((int) config('domain.auth.otp.length'));
+        $code = $fixedCode ?? $this->generateCode((int) config('domain.auth.otp.length'));
 
         DB::transaction(function () use ($column, $destination, $channel, $purpose, $now, $ttl, $code, $ip): void {
             // Supersede prior unconsumed codes for this (destination, purpose). The destination column

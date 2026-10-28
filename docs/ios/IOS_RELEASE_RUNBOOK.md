@@ -57,7 +57,7 @@ chmod +x mobile/ios/scripts/release_ipa.sh
 mobile/ios/scripts/release_ipa.sh 1
 ```
 The script does the whole build:
-- `flutter clean`, `pub get`, `pod install`;
+- `flutter clean`, `pub get` (plugins come through Swift Package Manager; `pod install` runs only if a Podfile exists);
 - `flutter build ios --no-codesign` with the prod entrypoint;
 - `xcodebuild archive`, with automatic signing through the API key;
 - `-exportArchive` with `destination=upload`, which uploads to App Store Connect.

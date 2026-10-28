@@ -26,7 +26,8 @@ AUTH=(-allowProvisioningUpdates
 
 flutter clean
 flutter pub get
-(cd ios && pod install --repo-update)
+# Flutter 3.44 resolves iOS plugins with Swift Package Manager; CocoaPods only when a Podfile exists.
+if [ -f ios/Podfile ]; then (cd ios && pod install --repo-update); fi
 
 # Writes ios/Flutter/Generated.xcconfig with the prod entrypoint + version, then Xcode archives it.
 flutter build ios --release --no-codesign -t lib/main_prod.dart --build-number "$BUILD_NUMBER"

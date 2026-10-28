@@ -8,6 +8,7 @@ import 'package:salam_mobile/design_system/theme/app_theme.dart';
 import 'package:salam_mobile/features/complex/complex_providers.dart';
 import 'package:salam_mobile/features/complex/data/complex_repository.dart';
 import 'package:salam_mobile/features/complex/domain/complex_entities.dart';
+import 'package:salam_mobile/features/barrier/presentation/widgets/barrier_open_button.dart';
 import 'package:salam_mobile/features/devices/device_access_action.dart';
 import 'package:salam_mobile/features/devices/devices_providers.dart';
 import 'package:salam_mobile/features/devices/domain/entity/device_entities.dart';
@@ -323,17 +324,12 @@ void main() {
     });
 
     testWidgets(
-      'nothing to pay → the disabled "Qapını Aç" stays (no fake action)',
+      'nothing to pay → the disabled open button stays (no fake action)',
       (tester) async {
         await pumpCard(tester, const NoDeviceAccessAction());
         expect(find.byKey(const Key('device-access-7')), findsNothing);
-        final button = tester.widget<FilledButton>(
-          find
-              .descendant(
-                of: find.byKey(const Key('device-open-7')),
-                matching: find.byType(FilledButton),
-              )
-              .first,
+        final button = tester.widget<BarrierPowerButton>(
+          find.byKey(const Key('device-open-7')),
         );
         expect(button.onPressed, isNull);
       },

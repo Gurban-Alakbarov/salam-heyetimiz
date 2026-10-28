@@ -22,12 +22,17 @@ class BarrierActionButton extends ConsumerStatefulWidget {
     required this.canDo,
     required this.direction,
     this.geofenceEnabled = false,
+    this.round = false,
     super.key,
   });
 
   final int deviceId;
   final bool canDo;
   final BarrierDirection direction;
+
+  /// Device card style: the round [BarrierPowerButton] (red while the command is in flight) with the
+  /// live status in light text under it, for a dark photo background.
+  final bool round;
 
   /// GEOFENCE-3 — when true, a foreground GPS fix is acquired before the command.
   /// Defaults to false so non-geofenced devices behave exactly as before.
@@ -102,23 +107,40 @@ class _BarrierActionButtonState extends ConsumerState<BarrierActionButton> {
       _ => labels.idle,
     };
 
+    final status = _BarrierStatus(
+      state: state,
+      cooldownLeft: _cooldownLeft,
+      labels: labels,
+      onDark: widget.round,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _BarrierStatus(
-          state: state,
-          cooldownLeft: _cooldownLeft,
-          labels: labels,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        AppButton(
-          label: label,
-          loading: inProgress,
-          onPressed: enabled ? trigger : null,
-        ),
+        if (widget.round) ...[
+          Center(
+            child: BarrierPowerButton(
+              semanticLabel: label,
+              busy: inProgress,
+              onPressed: enabled ? trigger : null,
+            ),
+          ),
+          if (state is! BarrierIdle) ...[
+            const SizedBox(height: AppSpacing.sm),
+            status,
+          ],
+        ] else ...[
+          status,
+          const SizedBox(height: AppSpacing.md),
+          AppButton(
+            label: label,
+            loading: inProgress,
+            onPressed: enabled ? trigger : null,
+          ),
+        ],
         // Actuation feedback only for open ("did the gate move?").
         if (_isOpen && state is BarrierSuccess && !state.actuated)
-          _FeedbackRow(commandId: state.commandId),
+          _FeedbackRow(commandId: state.commandId, onDark: widget.round),
         // GEOFENCE-3 — permanently-denied location: offer an OS Settings deep-link.
         if (state is BarrierFailed &&
             state.failure is LocationFailure &&
@@ -155,6 +177,73 @@ class BarrierOpenButton extends StatelessWidget {
     direction: BarrierDirection.open,
     geofenceEnabled: geofenceEnabled,
   );
+}
+
+/// The device card's round open button: green when it can open, red while the command is in flight
+/// ([busy]), grey when it cannot open. Icon only; [semanticLabel] is its tooltip and screen-reader name.
+class BarrierPowerButton extends StatelessWidget {
+  const BarrierPowerButton({
+    required this.semanticLabel,
+    required this.onPressed,
+    this.busy = false,
+    super.key,
+  });
+
+  final String semanticLabel;
+  final VoidCallback? onPressed;
+  final bool busy;
+
+  static const double _size = 62;
+  static const double _halo = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = busy
+        ? AppColors.danger
+        : (onPressed == null ? AppColors.n400 : AppColors.brand);
+    final lit = busy || onPressed != null;
+    return Tooltip(
+      message: semanticLabel,
+      child: Semantics(
+        button: true,
+        enabled: onPressed != null,
+        child: AnimatedContainer(
+          duration: AppDurations.base,
+          padding: const EdgeInsets.all(_halo),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color.withValues(alpha: lit ? 0.35 : 0.25),
+            boxShadow: lit
+                ? [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.45),
+                      blurRadius: 18,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Material(
+            color: color,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onPressed,
+              child: const SizedBox(
+                width: _size,
+                height: _size,
+                child: Icon(
+                  Icons.power_settings_new_rounded,
+                  color: Colors.white,
+                  size: 34,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Localized labels for a direction (Aç vs Bağla).
@@ -204,11 +293,15 @@ class _BarrierStatus extends StatelessWidget {
     required this.state,
     required this.cooldownLeft,
     required this.labels,
+    this.onDark = false,
   });
 
   final BarrierOpenState state;
   final int cooldownLeft;
   final _BarrierLabels labels;
+
+  /// Light text (the icon keeps its colour) over the device card's dark photo.
+  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
@@ -270,13 +363,20 @@ class _BarrierStatus extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: color, size: 20),
+        Icon(
+          icon,
+          color: onDark && color == AppColors.info ? Colors.white : color,
+          size: 20,
+        ),
         const SizedBox(width: AppSpacing.sm),
         Flexible(
           child: Text(
             text,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: onDark ? Colors.white : color,
+              fontWeight: onDark ? FontWeight.w600 : null,
+            ),
           ),
         ),
       ],
@@ -312,9 +412,10 @@ class _BarrierStatus extends StatelessWidget {
 }
 
 class _FeedbackRow extends ConsumerWidget {
-  const _FeedbackRow({required this.commandId});
+  const _FeedbackRow({required this.commandId, this.onDark = false});
 
   final int commandId;
+  final bool onDark;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -325,7 +426,10 @@ class _FeedbackRow extends ConsumerWidget {
         children: [
           Text(
             l.barrierGateMovedQuestion,
-            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: onDark ? Colors.white : null,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           // Wrap (not Row): on a half-width device card the two answers stack instead of overflowing (B19).

@@ -109,11 +109,11 @@ void main() {
     await tester.pumpAndSettle();
 
     // Default state: a single "Qapını Aç". There is NO close button in the pulse model.
-    expect(find.text('Qapını Aç'), findsOneWidget);
+    expect(find.byTooltip('Qapını Aç'), findsOneWidget);
     expect(find.text('Qapını Bağla'), findsNothing);
 
     // Open flows through the shared barrier pipeline (fake ack → poll → opened).
-    await tester.tap(find.text('Qapını Aç'));
+    await tester.tap(find.byTooltip('Qapını Aç'));
     await tester.pump(); // deliver tap → dispatch open
     await tester.pump(const Duration(seconds: 2)); // ack → pending → poll → opened
     await tester.pump(); // rebuild with the success state
@@ -126,7 +126,7 @@ void main() {
     // The pulse auto-returns the operated card to its normal idle state.
     await tester.pump(const Duration(seconds: 3)); // auto-reset delay
     await tester.pump();
-    expect(find.text('Qapını Aç'), findsOneWidget);
+    expect(find.byTooltip('Qapını Aç'), findsOneWidget);
     expect(find.text('Qapını Bağla'), findsNothing);
   });
 }

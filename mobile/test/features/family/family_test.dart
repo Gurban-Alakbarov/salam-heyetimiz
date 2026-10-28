@@ -581,7 +581,7 @@ void main() {
       expect(find.text('Online'), findsOneWidget);
       expect(find.byKey(const Key('device-invite-7')), findsOneWidget);
       expect(find.byKey(const Key('device-directions-7')), findsOneWidget);
-      expect(find.text('Qapını Aç'), findsOneWidget);
+      expect(find.byTooltip('Qapını Aç'), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('device-menu-7')));
       await tester.pumpAndSettle();

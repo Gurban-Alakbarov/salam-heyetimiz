@@ -24,8 +24,8 @@ import 'package:salam_mobile/l10n/app_localizations.dart';
 ///   │ ● Online         ⋮ │   status pill · menu (Cihaz məlumatı / Ailə üzvləri)
 ///   │   (device photo)   │
 ///   │ Name               │
-///   │ Dəvət et │ Yol göstər │   visitor invite · directions
-///   │ [    Qapını Aç   ] │   the single open pipeline
+///   │  (invite) (route)  │   visitor invite · directions (icon-only pills)
+///   │       (power)      │   round open button — the single open pipeline
 ///   └────────────────────┘
 ///
 /// UI only: every action is the same as before (visitor invite sheet, directions, info sheet, the shared
@@ -380,9 +380,9 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// "Dəvət et | Yol göstər" — the existing visitor-invite sheet and directions, as white text actions.
-/// A4 — "Dəvət et" only when the server says this caller may create visitor links here: a family member
-/// may open but never share access (BR-19), and nobody can share access they do not hold right now.
+/// Visitor invite · directions as icon-only green pills (the label is the tooltip / screen-reader name).
+/// A4 — the invite pill only when the server says this caller may create visitor links here: a family
+/// member may open but never share access (BR-19), and nobody can share access they do not hold right now.
 class _ActionRow extends StatelessWidget {
   const _ActionRow({required this.device});
 
@@ -391,41 +391,34 @@ class _ActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (device.canShareVisitorLink) ...[
-            Expanded(
-              child: _CardAction(
-                key: Key('device-invite-${device.id}'),
-                icon: Icons.person_add_alt_1_outlined,
-                label: l.inviteVisitor,
-                onTap: () => InviteVisitorSheet.show(
-                  context,
-                  deviceId: device.id,
-                  barrierLabel: device.label,
-                ),
-              ),
-            ),
-            const VerticalDivider(
-              width: 1,
-              thickness: 1,
-              color: Color(0x55FFFFFF),
-              indent: 6,
-              endIndent: 6,
-            ),
-          ],
-          Expanded(
-            child: _CardAction(
-              key: Key('device-directions-${device.id}'),
-              icon: Icons.directions_outlined,
-              label: l.directions,
-              onTap: () => _directions(context, l),
+    final directions = _CardAction(
+      key: Key('device-directions-${device.id}'),
+      icon: Icons.directions_outlined,
+      label: l.directions,
+      onTap: () => _directions(context, l),
+    );
+    if (!device.canShareVisitorLink) {
+      return Center(
+        child: FractionallySizedBox(widthFactor: 0.5, child: directions),
+      );
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: _CardAction(
+            key: Key('device-invite-${device.id}'),
+            icon: Icons.person_add_alt_1_outlined,
+            label: l.inviteVisitor,
+            onTap: () => InviteVisitorSheet.show(
+              context,
+              deviceId: device.id,
+              barrierLabel: device.label,
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(child: directions),
+      ],
     );
   }
 
@@ -457,47 +450,37 @@ class _CardAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.brMd,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.sm,
-          horizontal: 2,
+    return Tooltip(
+      message: label,
+      child: Material(
+        color: AppColors.brand.withValues(alpha: 0.72),
+        shape: StadiumBorder(
+          side: BorderSide(color: AppColors.success.withValues(alpha: 0.9)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 17),
-            const SizedBox(width: 3),
-            // Scales down instead of truncating ("Yol göstər" must stay readable on a half-width card).
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 22,
+              semanticLabel: label,
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-/// The full-width open action — the ONLY barrier command surface in the app.
+/// The round open action — the ONLY barrier command surface in the app.
 ///
-/// Idle (or another card is active): a single "Qapını Aç". Tapping it asks the
+/// Idle (or another card is active): the green power button. Tapping it asks the
 /// parent to mark this card active and dispatch the open, so only ONE card ever
 /// watches the single global barrier state. The active card then renders the shared
-/// [BarrierActionButton] (live sending → pending → success). There is NO close
+/// [BarrierActionButton] in its round style (red while sending / pending, then the result). There is NO close
 /// button — the relay is a pulse, so after a successful open the list screen briefly
 /// shows the success message then auto-returns the card to idle.
 class _OpenAction extends ConsumerWidget {
@@ -515,32 +498,27 @@ class _OpenAction extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
 
-    // Active card: reuse the shared open button (owns the live command status), on a light panel so the
-    // coloured status line stays legible over the photo.
+    // Active card: the shared open button (owns the live command status) in its round style; the status
+    // line under it is light text on the card's dark scrim.
     if (isActive) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.sm),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.94),
-          borderRadius: AppRadius.brMd,
-        ),
-        child: BarrierActionButton(
-          deviceId: device.id,
-          canDo: device.canOpen,
-          direction: BarrierDirection.open,
-          geofenceEnabled: device.geofenceEnabled,
-        ),
+      return BarrierActionButton(
+        deviceId: device.id,
+        canDo: device.canOpen,
+        direction: BarrierDirection.open,
+        geofenceEnabled: device.geofenceEnabled,
+        round: true,
       );
     }
 
-    // Not active → a plain button; tapping it asks the parent to activate + fire the
+    // Not active → the green power button; tapping it asks the parent to activate + fire the
     // open (keeps a single card bound to the global state).
     if (device.canOpen) {
-      return _CardButton(
-        key: Key('device-open-${device.id}'),
-        label: l.barrierOpen,
-        icon: Icons.lock_open_rounded,
-        onPressed: () => onOpenPressed?.call(device.id),
+      return Center(
+        child: BarrierPowerButton(
+          key: Key('device-open-${device.id}'),
+          semanticLabel: l.barrierOpen,
+          onPressed: () => onOpenPressed?.call(device.id),
+        ),
       );
     }
     // B19: the server gates opening via `can_open`; the WHY is shown above the name (_InactiveNotice) and
@@ -550,7 +528,7 @@ class _OpenAction extends ConsumerWidget {
 }
 
 /// B19 — the action for a card that cannot open: finish the pending payment, renew the expired
-/// subscription, or subscribe to a complex device. Falls back to the disabled "Qapını Aç" when there is
+/// subscription, or subscribe to a complex device. Falls back to the grey power button when there is
 /// nothing to pay for (device disabled, someone else's access, still resolving).
 class _AccessAction extends ConsumerStatefulWidget {
   const _AccessAction({required this.device});
@@ -608,11 +586,12 @@ class _AccessActionState extends ConsumerState<_AccessAction> {
       NoDeviceAccessAction() => null,
     };
     if (spec == null) {
-      return _CardButton(
-        key: Key('device-open-${widget.device.id}'),
-        label: l.barrierOpen,
-        icon: Icons.lock_open_rounded,
-        onPressed: null,
+      return Center(
+        child: BarrierPowerButton(
+          key: Key('device-open-${widget.device.id}'),
+          semanticLabel: l.barrierOpen,
+          onPressed: null,
+        ),
       );
     }
     return _CardButton(

@@ -55,7 +55,7 @@ void main() {
     expect(find.text('Blok A'), findsWidgets); // app bar title + card header
     expect(find.text('Blok B'), findsNothing);
     // Manual open button present; nothing auto-fires (D4).
-    expect(find.text('Qapını Aç'), findsOneWidget);
+    expect(find.byTooltip('Qapını Aç'), findsOneWidget);
   });
 
   testWidgets('device NOT in the roster → safe notice, NO card / open action', (

@@ -5,6 +5,9 @@ abstract class AnalyticsService {
   void logScreenView(String screen);
   void setUserId(String? id);
   void reset();
+
+  /// The user's "send usage statistics" choice (Profile). Off = nothing leaves the device.
+  Future<void> setEnabled(bool enabled);
 }
 
 class NoopAnalytics implements AnalyticsService {
@@ -18,4 +21,6 @@ class NoopAnalytics implements AnalyticsService {
   void setUserId(String? id) {}
   @override
   void reset() {}
+  @override
+  Future<void> setEnabled(bool enabled) async {}
 }

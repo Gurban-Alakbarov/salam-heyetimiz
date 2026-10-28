@@ -2517,6 +2517,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The family action failed. Refresh the list and try again.'**
   String get kmErrFamily;
+
+  /// No description provided for @privacyHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get privacyHeader;
+
+  /// No description provided for @analyticsSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Send usage statistics'**
+  String get analyticsSwitch;
+
+  /// No description provided for @analyticsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'To improve the app, we send which screens and features are used. Your name, email and phone number are never sent. Crash reports do not depend on this switch.'**
+  String get analyticsHint;
 }
 
 class _AppLocalizationsDelegate

@@ -110,6 +110,8 @@ class AuthStateNotifier extends Notifier<AuthState> {
       if (_resolved) {
         state = sm.isAuthenticated ? AuthState.authenticated : AuthState.guest;
       }
+      // Signed out (logout, deletion, failed refresh) → crash reports stop naming the last user.
+      if (!sm.isAuthenticated) ref.read(crashReporterProvider).setUserId(null);
     }
 
     sm.addListener(sync);
@@ -170,6 +172,8 @@ class BootstrapController extends AsyncNotifier<BootstrapEntity> {
       );
       // Keep the home-screen widget's open-only token current (re-issued weekly; best-effort, not awaited).
       if (meRes.isSuccess) unawaited(ref.read(widgetTokenSyncProvider).ensure());
+      // Restored session → crash reports carry the internal numeric id (never the email).
+      meRes.fold((_) {}, (me) => ref.read(crashReporterProvider).setUserId('${me.user.id}'));
     }
 
     ref.read(authStateProvider.notifier).resolve();

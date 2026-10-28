@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/core/session/session_roles.dart';
 import 'package:salam_mobile/features/auth/auth_providers.dart';
 import 'package:salam_mobile/features/auth/session_roles_provider.dart';
@@ -44,7 +45,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.listen(sessionRolesProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: '/',
     refreshListenable: refresh,
     redirect: (context, state) {
@@ -238,6 +239,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  // 1.0.1 — one screen view per route change, by route PATTERN (e.g. /family/:id), never the concrete
+  // ids in the URL. Consecutive repeats (redirect / refresh) are collapsed.
+  String? lastScreen;
+  void trackScreen() {
+    final pattern = router.routerDelegate.currentConfiguration.fullPath;
+    final screen = pattern.isEmpty ? '/' : pattern;
+    if (screen == lastScreen) return;
+    lastScreen = screen;
+    ref.read(analyticsProvider).logScreenView(screen);
+  }
+
+  router.routerDelegate.addListener(trackScreen);
+  ref.onDispose(() => router.routerDelegate.removeListener(trackScreen));
+  return router;
 });
 
 /// Only the two B9 account types pass through; anything else is dropped (legacy / no type).

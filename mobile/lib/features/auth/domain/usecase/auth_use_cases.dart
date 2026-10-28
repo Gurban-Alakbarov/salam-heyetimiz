@@ -100,6 +100,8 @@ class VerifyOtpUseCase {
   }) async {
     _crash.log('auth: verify_attempt');
     final result = await _repo.verifyEmail(email: email, code: code);
+    // Crash reports carry the internal numeric id only (1.0.1) — never the email.
+    result.fold((_) {}, (user) => _crash.setUserId('${user.id}'));
     if (result.isSuccess) {
       _analytics.logEvent(AuthEvents.otpVerified, params: {'flow': flow.name});
       _analytics.logEvent(

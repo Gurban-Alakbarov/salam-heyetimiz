@@ -514,5 +514,8 @@
     "placeholders": { "name": { "type": "String" } }
   },
   "kmNewHead": "New head",
-  "kmErrFamily": "The family action failed. Refresh the list and try again."
+  "kmErrFamily": "The family action failed. Refresh the list and try again.",
+  "privacyHeader": "Privacy",
+  "analyticsSwitch": "Send usage statistics",
+  "analyticsHint": "To improve the app, we send which screens and features are used. Your name, email and phone number are never sent. Crash reports do not depend on this switch."
 }

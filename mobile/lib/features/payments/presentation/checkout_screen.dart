@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/deeplinks/deep_link.dart';
+import '../../../core/di/providers.dart';
 import '../../../core/error/failure.dart';
 import '../../../design_system/components/app_components.dart';
 import '../../../l10n/app_localizations.dart';
@@ -65,17 +66,17 @@ CheckoutNav checkoutNavigation(String url) {
   return uri.isScheme('https') || uri.isScheme('http') ? CheckoutNav.allow : CheckoutNav.block;
 }
 
-class _CheckoutWebView extends StatefulWidget {
+class _CheckoutWebView extends ConsumerStatefulWidget {
   const _CheckoutWebView({required this.order, required this.url});
 
   final PaymentOrder order;
   final Uri url;
 
   @override
-  State<_CheckoutWebView> createState() => _CheckoutWebViewState();
+  ConsumerState<_CheckoutWebView> createState() => _CheckoutWebViewState();
 }
 
-class _CheckoutWebViewState extends State<_CheckoutWebView> {
+class _CheckoutWebViewState extends ConsumerState<_CheckoutWebView> {
   late final WebViewController _controller;
   bool _loading = true;
   bool _finished = false;
@@ -83,6 +84,7 @@ class _CheckoutWebViewState extends State<_CheckoutWebView> {
   @override
   void initState() {
     super.initState();
+    ref.read(analyticsProvider).logEvent(PaymentEvents.started);
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(

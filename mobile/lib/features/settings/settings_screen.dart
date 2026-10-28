@@ -78,6 +78,27 @@ class SettingsScreen extends ConsumerWidget {
 
             // ── Notifications (O13) ──────────────────────────────────────────
             const _NotificationSwitches(),
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Privacy (1.0.1): usage statistics; crash reports always stay on ──
+            AppListSection(
+              header: l.privacyHeader,
+              children: [
+                AppListTile(
+                  icon: Icons.insights_outlined,
+                  title: l.analyticsSwitch,
+                  trailing: Switch(
+                    key: const Key('settings-analytics'),
+                    value: ref.watch(analyticsEnabledProvider),
+                    onChanged: (v) => ref.read(analyticsEnabledProvider.notifier).set(v),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
+              child: Text(l.analyticsHint, style: Theme.of(context).textTheme.bodySmall),
+            ),
           ],
         ),
       ),

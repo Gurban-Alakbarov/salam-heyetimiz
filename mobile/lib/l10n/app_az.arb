@@ -451,5 +451,11 @@
   "kmNewHead": "Yeni başçı",
   "@kmNewHead": {"description": "O7: Komendant family actions."},
   "kmErrFamily": "Ailə əməliyyatı alınmadı. Siyahını yeniləyib yenidən cəhd edin.",
-  "@kmErrFamily": {"description": "O7: Komendant family actions."}
+  "@kmErrFamily": {"description": "O7: Komendant family actions."},
+  "privacyHeader": "Məxfilik",
+  "@privacyHeader": {"description": "1.0.1: Settings › Privacy › usage statistics switch."},
+  "analyticsSwitch": "İstifadə statistikasını göndər",
+  "@analyticsSwitch": {"description": "1.0.1: Settings › Privacy › usage statistics switch."},
+  "analyticsHint": "Tətbiqi yaxşılaşdırmaq üçün hansı ekranların və funksiyaların istifadə olunduğu göndərilir. Adınız, e-poçtunuz və telefon nömrəniz göndərilmir. Xəta hesabatları bu açardan asılı deyil.",
+  "@analyticsHint": {"description": "1.0.1: Settings › Privacy › usage statistics switch."}
 }

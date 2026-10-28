@@ -88,6 +88,32 @@ final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
   ThemeModeNotifier.new,
 );
 
+/// The persisted "send usage statistics" choice, hydrated in bootstrap (default on).
+final initialAnalyticsEnabledProvider = Provider<bool>((ref) => true);
+
+/// "Send usage statistics" switch (Profile, 1.0.1). Persisted; applied to the analytics SDK at once, so
+/// off means nothing more leaves the device. Crash reports are not affected by this switch.
+class AnalyticsEnabledNotifier extends Notifier<bool> {
+  @override
+  bool build() => ref.read(initialAnalyticsEnabledProvider);
+
+  Future<void> set(bool enabled) async {
+    state = enabled;
+    await ref.read(analyticsProvider).setEnabled(enabled);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(StorageKeys.analyticsEnabled, enabled);
+    } catch (_) {
+      // Best-effort persistence; the SDK already has the new value for this run.
+    }
+  }
+}
+
+final analyticsEnabledProvider =
+    NotifierProvider<AnalyticsEnabledNotifier, bool>(
+      AnalyticsEnabledNotifier.new,
+    );
+
 /// Initial app locale, hydrated from persisted `locale_code` in bootstrap and injected
 /// via a ProviderScope override (null = system/first-launch → app defaults to az).
 final initialLocaleProvider = Provider<Locale?>((ref) => null);

@@ -61,6 +61,9 @@ dependencies:
   android_intent_plus: ^6.1.0
   firebase_core: ^4.13.0
   firebase_messaging: ^16.5.0
+  # 1.0.1 — crash reports + usage analytics (release builds only; analytics can be switched off in Profile).
+  firebase_crashlytics: ^5.4.1
+  firebase_analytics: ^12.6.1
   flutter_local_notifications: ^22.3.0
   home_widget: ^0.9.3
   # GEOFENCE-3 — foreground GPS for the geofence open gate (When-In-Use only).

@@ -1318,4 +1318,14 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get kmErrFamily =>
       'Ailə əməliyyatı alınmadı. Siyahını yeniləyib yenidən cəhd edin.';
+
+  @override
+  String get privacyHeader => 'Məxfilik';
+
+  @override
+  String get analyticsSwitch => 'İstifadə statistikasını göndər';
+
+  @override
+  String get analyticsHint =>
+      'Tətbiqi yaxşılaşdırmaq üçün hansı ekranların və funksiyaların istifadə olunduğu göndərilir. Adınız, e-poçtunuz və telefon nömrəniz göndərilmir. Xəta hesabatları bu açardan asılı deyil.';
 }

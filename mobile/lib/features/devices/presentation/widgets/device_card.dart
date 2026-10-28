@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/core/error/failure.dart';
 import 'package:salam_mobile/design_system/components/app_inputs.dart';
 import 'package:salam_mobile/design_system/tokens/tokens.dart';
@@ -383,19 +384,19 @@ class _InfoRow extends StatelessWidget {
 /// Visitor invite · directions as icon-only green pills (the label is the tooltip / screen-reader name).
 /// A4 — the invite pill only when the server says this caller may create visitor links here: a family
 /// member may open but never share access (BR-19), and nobody can share access they do not hold right now.
-class _ActionRow extends StatelessWidget {
+class _ActionRow extends ConsumerWidget {
   const _ActionRow({required this.device});
 
   final Device device;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final directions = _CardAction(
       key: Key('device-directions-${device.id}'),
       icon: Icons.directions_outlined,
       label: l.directions,
-      onTap: () => _directions(context, l),
+      onTap: () => _directions(context, ref, l),
     );
     if (!device.canShareVisitorLink) {
       return Center(
@@ -422,11 +423,12 @@ class _ActionRow extends StatelessWidget {
     );
   }
 
-  void _directions(BuildContext context, AppLocalizations l) {
+  void _directions(BuildContext context, WidgetRef ref, AppLocalizations l) {
     if (!device.hasLocation) {
       AppSnackBar.show(context, l.directionsNoLocation, isError: true);
       return;
     }
+    ref.read(analyticsProvider).logEvent(DeviceEvents.directionsOpened);
     DirectionsLauncher.open(
       context,
       lat: device.latitude!,

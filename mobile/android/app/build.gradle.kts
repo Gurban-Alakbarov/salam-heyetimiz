@@ -7,6 +7,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
     // Google Services (Firebase) — consumes app/google-services.json (Phase 4A, Android FCM).
     id("com.google.gms.google-services")
+    // Crashlytics (1.0.1) — uploads the native symbol / mapping files for readable crash reports.
+    id("com.google.firebase.crashlytics")
 }
 
 // Release signing: the Play upload key, read from android/key.properties (gitignored; the keystore itself lives

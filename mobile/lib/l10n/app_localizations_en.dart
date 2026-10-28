@@ -1323,4 +1323,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get kmErrFamily =>
       'The family action failed. Refresh the list and try again.';
+
+  @override
+  String get privacyHeader => 'Privacy';
+
+  @override
+  String get analyticsSwitch => 'Send usage statistics';
+
+  @override
+  String get analyticsHint =>
+      'To improve the app, we send which screens and features are used. Your name, email and phone number are never sent. Crash reports do not depend on this switch.';
 }

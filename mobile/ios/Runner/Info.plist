@@ -38,6 +38,10 @@
 	<!-- Export compliance: the app only uses standard HTTPS/TLS encryption. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>FirebaseCrashlyticsCollectionEnabled</key>
+	<false/>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
 	<!-- map_launcher: navigation apps the "Directions" action can detect/hand off to. -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>

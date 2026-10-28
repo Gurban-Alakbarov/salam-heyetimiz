@@ -12,6 +12,7 @@ import 'domain/repository.dart';
 class DeviceEvents {
   DeviceEvents._();
   static const listOpened = 'device_list_opened';
+  static const directionsOpened = 'directions_opened';
 }
 
 final deviceRepositoryProvider = Provider<DeviceRepository>(

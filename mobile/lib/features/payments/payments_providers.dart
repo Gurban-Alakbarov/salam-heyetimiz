@@ -5,6 +5,13 @@ import '../../core/error/retry_policy.dart';
 import 'data/payments_repository.dart';
 import 'domain/payment_entities.dart';
 
+/// Payment analytics (1.0.1) — the outcome only, never amounts, cards or order references.
+class PaymentEvents {
+  PaymentEvents._();
+  static const started = 'payment_started';
+  static const result = 'payment_result';
+}
+
 /// Payments DI (B13) — mirrors the other features' granular providers.
 final paymentsRepositoryProvider = Provider<PaymentsRepository>(
   (ref) => PaymentsRepository(ref.watch(apiClientProvider)),

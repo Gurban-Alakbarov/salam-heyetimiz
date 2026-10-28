@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/di/providers.dart';
 import '../../../core/error/failure.dart';
 import '../../../design_system/components/app_components.dart';
 import '../../../design_system/tokens/tokens.dart';
@@ -95,6 +96,15 @@ class _PaymentResultScreenState extends ConsumerState<PaymentResultScreen> {
       onDone: () {
         if (!mounted) return;
         setState(() => _polling = false);
+        final outcome = _order?.outcome;
+        if (outcome != null && outcome.isFinal) {
+          ref
+              .read(analyticsProvider)
+              .logEvent(
+                PaymentEvents.result,
+                params: {'outcome': outcome.name},
+              );
+        }
         // A paid order changes access everywhere (B18): refresh it here, not in the caller — "Ana səhifəyə
         // qayıt" uses go(), which disposes the screen that pushed the checkout before it could refresh.
         if (_order?.outcome == PaymentOutcome.success) {

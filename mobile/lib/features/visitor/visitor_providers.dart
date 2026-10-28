@@ -7,6 +7,12 @@ import 'data/repository_impl.dart';
 import 'domain/entity/visitor_entities.dart';
 import 'domain/repository.dart';
 
+/// Visitor analytics (1.0.1) — the link's kind only, never the visitor's name.
+class VisitorEvents {
+  VisitorEvents._();
+  static const linkCreated = 'visitor_link_created';
+}
+
 final visitorRepositoryProvider = Provider<VisitorRepository>(
   (ref) => VisitorRepositoryImpl(
     VisitorRemoteDataSource(ref.watch(apiClientProvider)),
@@ -69,6 +75,14 @@ class VisitorCreateNotifier extends Notifier<VisitorCreateState> {
       (failure) => VisitorCreateFailed(failure),
       (link) => VisitorCreated(link),
     );
+    if (result.isSuccess) {
+      ref
+          .read(analyticsProvider)
+          .logEvent(
+            VisitorEvents.linkCreated,
+            params: {'access_type': accessType.name, 'purpose': purpose?.name},
+          );
+    }
   }
 
   /// Return to the form (e.g. to fix a validation error and retry).

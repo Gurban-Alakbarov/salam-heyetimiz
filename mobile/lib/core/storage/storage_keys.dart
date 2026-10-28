@@ -14,4 +14,6 @@ class StorageKeys {
   // Prefs (non-sensitive)
   static const String themeMode = 'theme_mode';
   static const String localeCode = 'locale_code';
+  // 1.0.1 — "send usage statistics" (Profile); absent = on.
+  static const String analyticsEnabled = 'analytics_enabled';
 }

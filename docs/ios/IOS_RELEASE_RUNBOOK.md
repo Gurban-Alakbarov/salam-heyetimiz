@@ -57,8 +57,8 @@ therefore uses manual **App Store** signing.
 
 First run the one-time signing setup:
 ```bash
-pip3 install --user cryptography
-python3 mobile/ios/scripts/setup_signing.py
+/usr/bin/python3 -m pip install --user cryptography   # use the system Python; Homebrew python here is broken
+/usr/bin/python3 mobile/ios/scripts/setup_signing.py
 security find-identity -v -p codesigning | grep "Apple Distribution"   # must list one identity
 ```
 The setup creates an "Apple Distribution" certificate (new key, kept in `~/salam-keys/dist-key.pem`) and the
@@ -118,8 +118,7 @@ When it succeeds, tell the user: **"Build 1 yükləndi"**. The Windows session t
    It must be 1320×2868 (or 1290×2796).
 6. Upload to the en-US and ru listings:
    ```bash
-   pip3 install --user cryptography
-   python3 mobile/ios/scripts/upload_screenshots.py ~/salam-shots/1.png ~/salam-shots/2.png ~/salam-shots/3.png ~/salam-shots/4.png
+   /usr/bin/python3 mobile/ios/scripts/upload_screenshots.py ~/salam-shots/1.png ~/salam-shots/2.png ~/salam-shots/3.png ~/salam-shots/4.png
    ```
 7. Tell the user: **"Ekran şəkilləri yükləndi"**.
 

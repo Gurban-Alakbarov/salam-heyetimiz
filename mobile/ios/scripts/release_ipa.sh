@@ -7,6 +7,7 @@
 # and mobile/ios/Runner/GoogleService-Info.plist (Firebase app salam-sesame, bundle az.salam.sezam).
 # Signing is manual App Store signing (no registered device needed): run ios/scripts/setup_signing.py once
 # first; it creates the "Apple Distribution" certificate + "Salam Sesame App Store" profile via the API key.
+# The signing settings live on the Runner target only (Swift packages must not get a profile).
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."   # → mobile/
@@ -35,7 +36,7 @@ flutter build ios --release --no-codesign -t lib/main_prod.dart --build-number "
 
 xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release \
   -destination 'generic/platform=iOS' -archivePath build/ios/Runner.xcarchive \
-  DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Apple Distribution"   PROVISIONING_PROFILE_SPECIFIER="Salam Sesame App Store" "${AUTH[@]}" archive
+  "${AUTH[@]}" archive   # Runner Release signs manually (Apple Distribution + "Salam Sesame App Store"), set in the project
 
 xcodebuild -exportArchive -archivePath build/ios/Runner.xcarchive \
   -exportOptionsPlist ios/ExportOptions.plist -exportPath build/ios/export "${AUTH[@]}"

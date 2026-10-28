@@ -31,10 +31,10 @@ Future<void> bootstrap(AppConfig config) async {
     WidgetsFlutterBinding.ensureInitialized();
     await Hive.initFlutter();
 
-    // Firebase / FCM — Android only for now (iOS Firebase config is deferred until Apple credentials
-    // land). The background handler must be registered before runApp. A failure here must never block
-    // app start, so it is reported non-fatally and the app continues without push.
-    if (defaultTargetPlatform == TargetPlatform.android) {
+    // Firebase / FCM — Android (google-services.json) and iOS (GoogleService-Info.plist + APNs key in
+    // Firebase). The background handler must be registered before runApp. A failure here must never
+    // block app start, so it is reported non-fatally and the app continues without push.
+    if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
       try {
         await Firebase.initializeApp();
         FirebaseMessaging.onBackgroundMessage(fcmBackgroundHandler);

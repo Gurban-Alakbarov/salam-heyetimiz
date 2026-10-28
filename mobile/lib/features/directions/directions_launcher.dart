@@ -3,19 +3,24 @@ import 'dart:io' show Platform;
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:installed_apps/installed_apps.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../design_system/components/app_inputs.dart';
 import '../../l10n/app_localizations.dart';
 
-/// AzNav — Azerbaijan's national navigation app (Sinam). Android-only.
+/// AzNav — Azerbaijan's national navigation app (Sinam).
 const _azNavPackage = 'net.sinam.aznav';
+
+/// AzNav on the App Store (Sinam MMC). Its iOS URL scheme is not public, so on iPhone the button opens
+/// AzNav's App Store page (which offers "Open" when it is installed) instead of a coordinate hand-off.
+const _azNavAppStoreUrl = 'https://apps.apple.com/app/id6758716660';
 
 /// Resident "Directions" — navigate to a barrier using **AzNav only**.
 ///
 /// Independent of Visitor Links. AzNav is the single supported navigation
 /// provider (no picker, no Google Maps/Waze/HERE/2GIS/Yandex, and no generic-map
-/// fallback). AzNav is Android-only; the destination coordinates are handed off
-/// exactly as before via [_launchAzNav].
+/// fallback). On Android the destination coordinates are handed off via
+/// [_launchAzNav]; on iPhone the button opens AzNav's App Store page.
 class DirectionsLauncher {
   DirectionsLauncher._();
 
@@ -28,6 +33,10 @@ class DirectionsLauncher {
     required double lng,
     String? label,
   }) async {
+    if (Platform.isIOS) {
+      await _openAzNavAppStore(context);
+      return;
+    }
     final available = Platform.isAndroid && await _isAzNavInstalled();
     if (!context.mounted) return;
 
@@ -69,6 +78,15 @@ class DirectionsLauncher {
     );
     if (install == true && context.mounted) {
       await _openAzNavStore(context);
+    }
+  }
+
+  static Future<void> _openAzNavAppStore(BuildContext context) async {
+    final l = AppLocalizations.of(context);
+    final ok = await launchUrl(Uri.parse(_azNavAppStoreUrl), mode: LaunchMode.externalApplication)
+        .catchError((_) => false);
+    if (!ok && context.mounted) {
+      AppSnackBar.show(context, l.directionsFailed, isError: true);
     }
   }
 

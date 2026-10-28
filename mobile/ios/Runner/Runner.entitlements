@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  B13 — PREPARED, NOT YET WIRED. Universal links for https://sezam.salam.az/invite/* (+ the old salamheyetimiz.com).
-  Intentionally NOT referenced by CODE_SIGN_ENTITLEMENTS yet: enabling it requires the Associated Domains
-  capability on the App ID + a regenerated provisioning profile, and the AASA file needs the Apple Team ID
-  (APP_LINKS_IOS_APP_ID, B6). It is wired at the TestFlight GO step (decision 2026-10-02).
+  Runner entitlements (wired via CODE_SIGN_ENTITLEMENTS). Push (APNs, production) for FCM, and universal
+  links for https://sezam.salam.az/invite/* (served by /.well-known/apple-app-site-association with the
+  Apple Team ID — APP_LINKS_IOS_APP_ID).
 -->
 <plist version="1.0">
 <dict>
+	<key>aps-environment</key>
+	<string>production</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:sezam.salam.az</string>
-		<string>applinks:salamheyetimiz.com</string>
 	</array>
 </dict>
 </plist>

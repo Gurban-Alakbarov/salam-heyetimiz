@@ -25,10 +25,10 @@ const AndroidNotificationChannel _androidChannel = AndroidNotificationChannel(
   importance: Importance.high,
 );
 
-/// Owns the FCM token lifecycle + message handling on Android — the only platform provisioned with
-/// Firebase so far. iOS stays behind the same PushClient/backend seam until Apple/Firebase iOS
-/// credentials land; the [_enabled] guard (Android + push flag + an initialised Firebase app) makes
-/// every method a safe no-op elsewhere, including widget tests where Firebase is never initialised.
+/// Owns the FCM token lifecycle + message handling on Android and iOS. The [_enabled] guard (a mobile
+/// platform + push flag + an initialised Firebase app) makes every method a safe no-op elsewhere,
+/// including widget tests where Firebase is never initialised. On iOS the OS shows foreground
+/// notifications itself (presentation options), so the local-notification copy is Android-only.
 ///
 /// Registration/refresh use the canonical PUT /v1/notifications/push-token (Phase 3, D3); the install
 /// is resolved server-side from the JWT fp, so multi-device isolation is preserved.
@@ -44,8 +44,10 @@ class PushMessagingService {
       FlutterLocalNotificationsPlugin();
   bool _messagingReady = false;
 
+  static bool get _isIos => defaultTargetPlatform == TargetPlatform.iOS;
+
   bool get _enabled =>
-      defaultTargetPlatform == TargetPlatform.android &&
+      (defaultTargetPlatform == TargetPlatform.android || _isIos) &&
       _flags.isEnabled(FeatureFlag.push) &&
       Firebase.apps.isNotEmpty;
 
@@ -58,6 +60,12 @@ class PushMessagingService {
       await _local.initialize(
         settings: const InitializationSettings(
           android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+          // Permission is asked by FirebaseMessaging.requestPermission, not here.
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          ),
         ),
         onDidReceiveNotificationResponse: (response) {
           final payload = response.payload;
@@ -70,7 +78,15 @@ class PushMessagingService {
           >()
           ?.createNotificationChannel(_androidChannel);
 
-      FirebaseMessaging.onMessage.listen(_showForeground);
+      if (_isIos) {
+        await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      } else {
+        FirebaseMessaging.onMessage.listen(_showForeground);
+      }
       FirebaseMessaging.onMessageOpenedApp.listen((m) => _routeFromData(m.data));
       FirebaseMessaging.instance.onTokenRefresh.listen(_registerToken);
 
@@ -89,6 +105,12 @@ class PushMessagingService {
     if (!_enabled) return;
     try {
       await FirebaseMessaging.instance.requestPermission();
+      // iOS: the FCM token needs the APNs token first, which can arrive a moment after launch.
+      if (_isIos) {
+        for (var i = 0; i < 10 && await FirebaseMessaging.instance.getAPNSToken() == null; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+        }
+      }
       final token = await FirebaseMessaging.instance.getToken();
       if (token != null) await _registerToken(token);
     } catch (e) {

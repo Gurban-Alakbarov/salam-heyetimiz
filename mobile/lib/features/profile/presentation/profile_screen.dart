@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -114,12 +115,14 @@ class ProfileScreen extends ConsumerWidget {
               chevron: true,
               onTap: () => _push(context, const SettingsScreen()),
             ),
-            AppListTile(
-              icon: Icons.widgets_outlined,
-              title: l.doorWidgetTitle,
-              chevron: true,
-              onTap: () => _push(context, const DoorWidgetManagementScreen()),
-            ),
+            // The home-screen door widget exists on Android only.
+            if (defaultTargetPlatform == TargetPlatform.android)
+              AppListTile(
+                icon: Icons.widgets_outlined,
+                title: l.doorWidgetTitle,
+                chevron: true,
+                onTap: () => _push(context, const DoorWidgetManagementScreen()),
+              ),
             AppListTile(
               icon: Icons.help_outline_rounded,
               title: l.profileHelp,

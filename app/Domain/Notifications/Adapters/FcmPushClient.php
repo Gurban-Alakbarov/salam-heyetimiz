@@ -94,6 +94,8 @@ final class FcmPushClient implements PushClient
                 'ids' => json_encode($data['ids'] ?? [], JSON_UNESCAPED_UNICODE) ?: '{}',
             ],
             'android' => ['priority' => 'HIGH'],
+            // iOS: play the default sound (APNs shows the notification silently without it).
+            'apns' => ['payload' => ['aps' => ['sound' => 'default']]],
         ];
     }
 

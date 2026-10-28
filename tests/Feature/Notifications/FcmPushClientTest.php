@@ -50,7 +50,8 @@ it('sends the hybrid message to FCM HTTP v1 and reports Delivered', function () 
             && $body['message']['notification'] === ['title' => 'Qonaq daxil oldu', 'body' => 'Kuryer baryeri açdı']
             && $body['message']['data']['type'] === 'visitor_link_used'
             && $body['message']['data']['notification_id'] === '4242'
-            && json_decode($body['message']['data']['ids'], true) === ['visitor_link_id' => 5, 'device_id' => 3];
+            && json_decode($body['message']['data']['ids'], true) === ['visitor_link_id' => 5, 'device_id' => 3]
+            && $body['message']['apns'] === ['payload' => ['aps' => ['sound' => 'default']]];
     });
 });
 

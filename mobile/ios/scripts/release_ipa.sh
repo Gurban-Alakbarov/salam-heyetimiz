@@ -5,7 +5,8 @@
 #
 # Needs (never committed): ~/salam-keys/AuthKey_N5BQL355YG.p8 (App Store Connect API key, App Manager)
 # and mobile/ios/Runner/GoogleService-Info.plist (Firebase app salam-sesame, bundle az.salam.sezam).
-# Signing is automatic through the API key, so no Apple ID login or 2FA is needed.
+# Signing is manual App Store signing (no registered device needed): run ios/scripts/setup_signing.py once
+# first; it creates the "Apple Distribution" certificate + "Salam Sesame App Store" profile via the API key.
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."   # → mobile/
@@ -34,7 +35,7 @@ flutter build ios --release --no-codesign -t lib/main_prod.dart --build-number "
 
 xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release \
   -destination 'generic/platform=iOS' -archivePath build/ios/Runner.xcarchive \
-  DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic "${AUTH[@]}" archive
+  DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Apple Distribution"   PROVISIONING_PROFILE_SPECIFIER="Salam Sesame App Store" "${AUTH[@]}" archive
 
 xcodebuild -exportArchive -archivePath build/ios/Runner.xcarchive \
   -exportOptionsPlist ios/ExportOptions.plist -exportPath build/ios/export "${AUTH[@]}"

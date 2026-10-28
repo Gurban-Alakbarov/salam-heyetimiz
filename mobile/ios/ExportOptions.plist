@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- App Store export used by ios/scripts/release_ipa.sh: signs automatically and uploads straight to
+<!-- App Store export used by ios/scripts/release_ipa.sh: signs with the App Store profile from setup_signing.py and uploads straight to
      App Store Connect (destination = upload). -->
 <plist version="1.0">
 <dict>
@@ -11,7 +11,14 @@
 	<key>teamID</key>
 	<string>2654395QYQ</string>
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>az.salam.sezam</key>
+		<string>Salam Sesame App Store</string>
+	</dict>
 	<key>uploadSymbols</key>
 	<true/>
 	<key>manageAppVersionAndBuildNumber</key>

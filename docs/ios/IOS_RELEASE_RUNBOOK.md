@@ -51,7 +51,25 @@ grep -A1 BUNDLE_ID mobile/ios/Runner/GoogleService-Info.plist   # must be az.sal
 ```
 The Xcode project already references `Runner/GoogleService-Info.plist`; only the file has to be there.
 
-## Step 3 — build and upload
+## Step 3 — signing (once) and build + upload
+The team has no registered devices, so Xcode's automatic signing cannot make a development profile. The build
+therefore uses manual **App Store** signing.
+
+First run the one-time signing setup:
+```bash
+pip3 install --user cryptography
+python3 mobile/ios/scripts/setup_signing.py
+security find-identity -v -p codesigning | grep "Apple Distribution"   # must list one identity
+```
+The setup creates an "Apple Distribution" certificate (new key, kept in `~/salam-keys/dist-key.pem`) and the
+"Salam Sesame App Store" profile, through the API key. It imports the key and certificate into the login keychain
+and installs the profile. Do not delete or revoke the existing "ALKN GROUP MMC" distribution certificate; it belongs
+to another app.
+
+If macOS shows a keychain dialog during the build ("codesign wants to access key"), the USER types the Mac login
+password there and clicks **Always Allow**. Never ask for or type that password yourself.
+
+Then build and upload:
 ```bash
 chmod +x mobile/ios/scripts/release_ipa.sh
 mobile/ios/scripts/release_ipa.sh 1
@@ -59,11 +77,11 @@ mobile/ios/scripts/release_ipa.sh 1
 The script does the whole build:
 - `flutter clean`, `pub get` (plugins come through Swift Package Manager; `pod install` runs only if a Podfile exists);
 - `flutter build ios --no-codesign` with the prod entrypoint;
-- `xcodebuild archive`, with automatic signing through the API key;
+- `xcodebuild archive` with manual "Apple Distribution" signing and the "Salam Sesame App Store" profile;
 - `-exportArchive` with `destination=upload`, which uploads to App Store Connect.
 
 Expect it to take 10–25 minutes. On failure, show the last ~40 lines and diagnose. Typical causes:
-- signing or profile: the API key needs App Manager, and `-allowProvisioningUpdates` is set;
+- signing or profile: re-run setup_signing.py, check `security find-identity`;
 - CocoaPods versions: try `cd mobile/ios && pod repo update && pod install`;
 - the deployment target.
 

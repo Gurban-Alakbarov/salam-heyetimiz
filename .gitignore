@@ -77,3 +77,6 @@ Homestead.yaml
 /.zed
 .DS_Store
 Thumbs.db
+
+# graphify knowledge graph (local, rebuilt with `graphify update .`)
+graphify-out/

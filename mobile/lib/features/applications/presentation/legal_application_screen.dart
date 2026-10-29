@@ -13,7 +13,7 @@ import '../../auth/auth_providers.dart';
 import '../applications_providers.dart';
 import '../domain/application_entities.dart';
 import 'application_failure.dart';
-import 'osm_location_picker.dart';
+import '../../geo/presentation/map_location_picker.dart';
 
 /// Legal entity (residential complex / building) application — IMPLEMENTATION_PLAN §11 / B14.
 /// Submitting never creates a complex: an admin reviews it (B9/B11). Contact person fields are prefilled
@@ -152,7 +152,13 @@ class _LegalApplicationScreenState extends ConsumerState<LegalApplicationScreen>
             _field('contact_phone', l.appPhone, _contactPhone, icon: Icons.phone_outlined, keyboard: TextInputType.phone),
             _field('contact_email', l.appEmail, _contactEmail, icon: Icons.email_outlined, keyboard: TextInputType.emailAddress),
             _field('address', l.appComplexAddress, _address, icon: Icons.home_outlined),
-            OsmLocationPicker(value: _location, errorText: _errors['location'], onChanged: (p) => setState(() => _location = p)),
+            MapLocationPicker(
+              value: _location,
+              errorText: _errors['location'],
+              onChanged: (p) => setState(() => _location = p),
+              // the pin's address (with house number) fills the address field; the user may still edit it
+              onAddress: (address) => setState(() => _address.text = address),
+            ),
             const SizedBox(height: AppSpacing.md),
             _field('apartments_count', l.appApartments, _apartments, icon: Icons.door_front_door_outlined, keyboard: TextInputType.number, formatters: digits),
             _field('note', l.appNote, _note, icon: Icons.notes_outlined),

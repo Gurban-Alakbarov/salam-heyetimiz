@@ -1328,4 +1328,17 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get analyticsHint =>
       'Tətbiqi yaxşılaşdırmaq üçün hansı ekranların və funksiyaların istifadə olunduğu göndərilir. Adınız, e-poçtunuz və telefon nömrəniz göndərilmir. Xəta hesabatları bu açardan asılı deyil.';
+
+  @override
+  String get geoSearchHint => 'Ünvan və ya yer axtar…';
+
+  @override
+  String get geoNoResults => 'Heç nə tapılmadı';
+
+  @override
+  String get geoSearchUnavailable =>
+      'Axtarış müvəqqəti işləmir — pini xəritədə özünüz qoyun';
+
+  @override
+  String get geoPinHint => 'Pini sürüşdürə və ya xəritəyə toxuna bilərsiniz';
 }

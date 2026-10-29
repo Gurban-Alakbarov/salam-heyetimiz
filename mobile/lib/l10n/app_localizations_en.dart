@@ -1333,4 +1333,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analyticsHint =>
       'To improve the app, we send which screens and features are used. Your name, email and phone number are never sent. Crash reports do not depend on this switch.';
+
+  @override
+  String get geoSearchHint => 'Search an address or place…';
+
+  @override
+  String get geoNoResults => 'Nothing found';
+
+  @override
+  String get geoSearchUnavailable =>
+      'Search is temporarily unavailable — place the pin on the map yourself';
+
+  @override
+  String get geoPinHint => 'Drag the pin or tap the map to move it';
 }

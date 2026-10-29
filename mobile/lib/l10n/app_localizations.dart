@@ -2535,6 +2535,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To improve the app, we send which screens and features are used. Your name, email and phone number are never sent. Crash reports do not depend on this switch.'**
   String get analyticsHint;
+
+  /// No description provided for @geoSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search an address or place…'**
+  String get geoSearchHint;
+
+  /// No description provided for @geoNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found'**
+  String get geoNoResults;
+
+  /// No description provided for @geoSearchUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Search is temporarily unavailable — place the pin on the map yourself'**
+  String get geoSearchUnavailable;
+
+  /// No description provided for @geoPinHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the pin or tap the map to move it'**
+  String get geoPinHint;
 }
 
 class _AppLocalizationsDelegate

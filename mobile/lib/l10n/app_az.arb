@@ -457,5 +457,13 @@
   "analyticsSwitch": "İstifadə statistikasını göndər",
   "@analyticsSwitch": {"description": "1.0.1: Settings › Privacy › usage statistics switch."},
   "analyticsHint": "Tətbiqi yaxşılaşdırmaq üçün hansı ekranların və funksiyaların istifadə olunduğu göndərilir. Adınız, e-poçtunuz və telefon nömrəniz göndərilmir. Xəta hesabatları bu açardan asılı deyil.",
-  "@analyticsHint": {"description": "1.0.1: Settings › Privacy › usage statistics switch."}
+  "@analyticsHint": {"description": "1.0.1: Settings › Privacy › usage statistics switch."},
+  "geoSearchHint": "Ünvan və ya yer axtar…",
+  "@geoSearchHint": {"description": "1.0.1: GoMap location picker (application forms)."},
+  "geoNoResults": "Heç nə tapılmadı",
+  "@geoNoResults": {"description": "1.0.1: GoMap location picker (application forms)."},
+  "geoSearchUnavailable": "Axtarış müvəqqəti işləmir — pini xəritədə özünüz qoyun",
+  "@geoSearchUnavailable": {"description": "1.0.1: GoMap location picker (application forms)."},
+  "geoPinHint": "Pini sürüşdürə və ya xəritəyə toxuna bilərsiniz",
+  "@geoPinHint": {"description": "1.0.1: GoMap location picker (application forms)."}
 }

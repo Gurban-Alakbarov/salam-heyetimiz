@@ -12,7 +12,7 @@ import '../../auth/auth_providers.dart';
 import 'application_failure.dart';
 import '../applications_providers.dart';
 import '../domain/application_entities.dart';
-import 'osm_location_picker.dart';
+import '../../geo/presentation/map_location_picker.dart';
 
 /// Physical person (private yard) application — IMPLEMENTATION_PLAN §10 / B14. Contact fields are
 /// prefilled from the signed-in profile; address + OSM pin are required. [onboarding] = shown right after
@@ -123,7 +123,13 @@ class _PhysicalApplicationScreenState extends ConsumerState<PhysicalApplicationS
             const SizedBox(height: AppSpacing.md),
             AppTextField(label: l.appAddress, controller: _address, errorText: _errors['address'], prefixIcon: Icons.home_outlined),
             const SizedBox(height: AppSpacing.md),
-            OsmLocationPicker(value: _location, errorText: _errors['location'], onChanged: (p) => setState(() => _location = p)),
+            MapLocationPicker(
+              value: _location,
+              errorText: _errors['location'],
+              onChanged: (p) => setState(() => _location = p),
+              // the pin's address (with house number) fills the address field; the user may still edit it
+              onAddress: (address) => setState(() => _address.text = address),
+            ),
             const SizedBox(height: AppSpacing.md),
             AppTextField(label: l.appNote, controller: _note, errorText: _errors['note'], prefixIcon: Icons.notes_outlined),
             const SizedBox(height: AppSpacing.lg),

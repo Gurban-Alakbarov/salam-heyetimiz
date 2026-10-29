@@ -1334,4 +1334,17 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get analyticsHint =>
       'Чтобы улучшать приложение, мы отправляем, какие экраны и функции используются. Ваше имя, e-mail и номер телефона не отправляются. Отчёты о сбоях не зависят от этого переключателя.';
+
+  @override
+  String get geoSearchHint => 'Найти адрес или место…';
+
+  @override
+  String get geoNoResults => 'Ничего не найдено';
+
+  @override
+  String get geoSearchUnavailable =>
+      'Поиск временно недоступен — поставьте метку на карте вручную';
+
+  @override
+  String get geoPinHint => 'Перетащите метку или коснитесь карты';
 }

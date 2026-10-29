@@ -5,6 +5,7 @@ namespace App\Http\Admin\V1\Requests\Devices;
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Subscriptions\Enums\SubscriptionTier;
+use App\Domain\Subscriptions\Support\SubscriptionPriceResolver;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -41,6 +42,6 @@ class GrantSubscriptionRequest extends FormRequest
 
     public function termDays(): int
     {
-        return (int) ($this->validated()['term_days'] ?? config('domain.subscriptions.term_days', 365));
+        return (int) ($this->validated()['term_days'] ?? app(SubscriptionPriceResolver::class)->commercial(SubscriptionTier::Main)['term_days']);
     }
 }

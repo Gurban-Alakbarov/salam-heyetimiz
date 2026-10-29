@@ -39,7 +39,8 @@ class SettingsController
             $api = $this->settings->groupForApi($group);
             $fields = [];
             foreach ($defs as $key => $def) {
-                $fields[] = ['key' => $key, 'type' => $def['type'], 'label' => $def['label'], 'options' => $def['options'] ?? null];
+                $fields[] = ['key' => $key, 'type' => $def['type'], 'label' => $def['label'], 'options' => $def['options'] ?? null,
+                    'hint' => $def['hint'] ?? null, 'min' => $def['min'] ?? null, 'max' => $def['max'] ?? null];
             }
             $groups[] = ['group' => $group, 'fields' => $fields, 'values' => $api['values'], 'secrets_set' => $api['secrets_set']];
         }
@@ -65,6 +66,14 @@ class SettingsController
         abort_unless(in_array($group, SettingsCatalog::groupNames(), true), 404);
 
         $input = (array) $request->except(['_token']);
+
+        // Number limits from the catalog (min / max) — a price of 0 or a 1-day term is never saved.
+        $invalid = $this->outOfRange($group, $input);
+        if ($invalid !== []) {
+            return response()->json([
+                'error' => ['code' => 'invalid_setting', 'message' => implode(' ', $invalid), 'fields' => array_keys($invalid)],
+            ], 422);
+        }
 
         // Payments: when the gateway is being enabled, validate (format + live OAuth) BEFORE persisting.
         // On failure nothing is saved and the exact upstream reason is returned (never a generic error).
@@ -170,6 +179,39 @@ class SettingsController
     }
 
     /**
+     * Catalog min / max for int and money fields (money is compared in minor units).
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, string> field → message
+     */
+    private function outOfRange(string $group, array $input): array
+    {
+        $errors = [];
+        foreach ($input as $key => $value) {
+            $def = SettingsCatalog::definition($group, (string) $key);
+            $type = $def['type'] ?? '';
+            if (! in_array($type, ['int', 'money'], true) || (! isset($def['min']) && ! isset($def['max']))) {
+                continue;
+            }
+            $label = (string) $def['label'];
+            if (! is_numeric($value)) {
+                $errors[$key] = "«{$label}» rəqəm olmalıdır.";
+
+                continue;
+            }
+            $n = $type === 'money' ? (int) round((float) $value) : (int) $value;
+            $fmt = fn (int $v): string => $type === 'money' ? sprintf('%.2f AZN', $v / 100) : (string) $v;
+            if (isset($def['min']) && $n < $def['min']) {
+                $errors[$key] = "«{$label}» ən azı {$fmt((int) $def['min'])} olmalıdır.";
+            } elseif (isset($def['max']) && $n > $def['max']) {
+                $errors[$key] = "«{$label}» ən çoxu {$fmt((int) $def['max'])} ola bilər.";
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * Effective payments settings = existing (decrypted) overlaid with incoming non-blank values. A blank
      * secret keeps the stored one (so validation uses the real secret).
      *
@@ -213,7 +255,10 @@ class SettingsController
             $old = $before[$key] ?? null;
             $new = $after[$key] ?? null;
             if ($old !== $new) {
-                $changes[] = ['key' => $key, 'old' => $this->scalar($old), 'new' => $this->scalar($new)];
+                $money = ($def['type'] ?? '') === 'money';
+                $changes[] = $money
+                    ? ['key' => $key, 'old' => sprintf('%.2f AZN', (int) $old / 100), 'new' => sprintf('%.2f AZN', (int) $new / 100)]
+                    : ['key' => $key, 'old' => $this->scalar($old), 'new' => $this->scalar($new)];
             }
         }
 

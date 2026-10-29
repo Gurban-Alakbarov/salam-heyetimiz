@@ -4,13 +4,14 @@ namespace App\Domain\Payments\Support;
 
 use App\Domain\Payments\DTOs\OrderItemData;
 use App\Domain\Payments\Enums\OrderItemType;
+use App\Domain\Subscriptions\Enums\SubscriptionTier;
 use App\Domain\Subscriptions\Models\Subscription;
 use App\Domain\Subscriptions\Support\SubscriptionPriceResolver;
 
 /**
- * Server-side pricing for order items (R-DOM-09). Prices are integer minor units (qəpik) sourced
- * from config/domain/subscriptions.php default_prices_minor. Item amounts are never trusted from
- * the client. Subscription lines go through unitPriceFor() → SubscriptionPriceResolver (15 AZN / year).
+ * Server-side pricing for order items (R-DOM-09). Prices are integer minor units (qəpik). Item amounts are
+ * never trusted from the client. Subscription prices come from SubscriptionPriceResolver (admin settings,
+ * config fallback); the device-sale default stays in config/domain/subscriptions.php.
  */
 final class OrderPricing
 {
@@ -36,12 +37,12 @@ final class OrderPricing
     public function unitPriceMinor(OrderItemType $type): int
     {
         $prices = (array) config('domain.subscriptions.default_prices_minor', []);
+        $resolver = $this->subscriptions ?? new SubscriptionPriceResolver();
 
         return match ($type) {
             OrderItemType::Device => (int) ($prices['device_sale'] ?? 13500),
-            OrderItemType::SubMain => (int) ($prices['sub_main'] ?? 1500),
-            OrderItemType::SubAdditional => (int) ($prices['sub_additional'] ?? 1500),
-            OrderItemType::SubRenewal => (int) ($prices['sub_main'] ?? 1500),
+            OrderItemType::SubMain, OrderItemType::SubRenewal => $resolver->commercial(SubscriptionTier::Main)['price_minor'],
+            OrderItemType::SubAdditional => $resolver->commercial(SubscriptionTier::Additional)['price_minor'],
         };
     }
 

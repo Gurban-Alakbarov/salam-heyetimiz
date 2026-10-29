@@ -1,12 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 
-export type SettingType = 'string' | 'int' | 'bool' | 'secret' | 'select' | 'text'
+/** money — stored in qəpik (minor units), edited in AZN. */
+export type SettingType = 'string' | 'int' | 'money' | 'bool' | 'secret' | 'select' | 'text'
 export interface SettingField {
   key: string
   type: SettingType
   label: string
   options?: string[] | null
+  /** Shown under the field. */
+  hint?: string | null
+  /** Limits the server enforces on save (money in qəpik). */
+  min?: number | null
+  max?: number | null
 }
 export interface SettingGroup {
   group: string

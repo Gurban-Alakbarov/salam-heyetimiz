@@ -114,6 +114,8 @@ final class SettingsService
                 $stored = ($value === true || $value === '1' || $value === 1 || $value === 'true') ? '1' : '0';
             } elseif ($type === 'int') {
                 $stored = (string) (int) $value;
+            } elseif ($type === 'money') {
+                $stored = (string) (int) round((float) $value); // minor units (qəpik)
             } else {
                 $stored = (string) $value;
             }
@@ -190,12 +192,12 @@ final class SettingsService
         $type = $def['type'] ?? 'string';
 
         if ($raw === null) {
-            return $type === 'bool' ? (bool) ($def['default'] ?? false) : ($type === 'int' ? (int) ($def['default'] ?? 0) : ($def['default'] ?? ''));
+            return $type === 'bool' ? (bool) ($def['default'] ?? false) : (in_array($type, ['int', 'money'], true) ? (int) ($def['default'] ?? 0) : ($def['default'] ?? ''));
         }
 
         return match ($type) {
             'bool' => $raw === '1' || $raw === 'true',
-            'int' => (int) $raw,
+            'int', 'money' => (int) $raw,
             'secret' => $this->tryDecrypt($raw),
             default => $raw,
         };

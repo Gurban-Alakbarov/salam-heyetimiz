@@ -393,6 +393,10 @@ function FieldInput({
     )
   }
 
+  if (field.type === 'money') {
+    return <MoneyInput id={id} field={field} value={value} onChange={onChange} />
+  }
+
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-sm font-medium">{field.label}</Label>
@@ -417,10 +421,42 @@ function FieldInput({
         <Input
           id={id}
           type={field.type === 'int' ? 'number' : 'text'}
+          min={field.min ?? undefined}
+          max={field.max ?? undefined}
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
         />
       )}
+      {field.hint && <p className="text-xs text-muted-foreground">{field.hint}</p>}
+    </div>
+  )
+}
+
+/** A price: the server keeps qəpik, the admin types AZN ("15" or "15.50"). */
+function MoneyInput({ id, field, value, onChange }: { id: string; field: SettingField; value: unknown; onChange: (v: unknown) => void }) {
+  const [text, setText] = useState(() => (Number(value ?? 0) / 100).toFixed(2))
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="text-sm font-medium">{field.label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          type="number"
+          inputMode="decimal"
+          step="0.01"
+          min={field.min != null ? field.min / 100 : undefined}
+          max={field.max != null ? field.max / 100 : undefined}
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value)
+            const azn = Number.parseFloat(e.target.value.replace(',', '.'))
+            onChange(Number.isFinite(azn) ? Math.round(azn * 100) : e.target.value)
+          }}
+          className="pr-14"
+        />
+        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">AZN</span>
+      </div>
+      {field.hint && <p className="text-xs text-muted-foreground">{field.hint}</p>}
     </div>
   )
 }

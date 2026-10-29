@@ -8,7 +8,9 @@ namespace App\Domain\Admin\Settings;
  * Defaults reuse the existing config/* values so nothing is lost. Adding a setting is one array entry —
  * the API, the seeded default, the encryption and the generic UI all pick it up with no other code change.
  *
- * type: string | int | bool | secret | select | readonly
+ * type: string | int | money | bool | secret | select | readonly
+ *   money — stored in minor units (qəpik), edited in AZN in the panel.
+ * Optional: min / max (int and money, enforced on save) and hint (shown under the field).
  */
 final class SettingsCatalog
 {
@@ -136,8 +138,13 @@ final class SettingsCatalog
                 'fallback_provider' => ['type' => 'select', 'default' => '', 'label' => 'Fallback provayder', 'options' => ['', 'lsim', 'infobip', 'twilio']],
             ],
             'subscriptions' => [
+                // LIVE: the price and term of every new subscription and paid renewal (SubscriptionPriceResolver).
+                'price_main_minor' => ['type' => 'money', 'default' => (int) config('domain.subscriptions.default_prices_minor.sub_main', 1500), 'label' => 'Sakin abunəliyinin qiyməti (AZN)', 'min' => 100, 'max' => 100000,
+                    'hint' => 'Yeni alışlara və yeniləmələrə dərhal tətbiq olunur. Aktiv abunəliklər bitənə qədər dəyişmir.'],
+                'price_additional_minor' => ['type' => 'money', 'default' => (int) config('domain.subscriptions.default_prices_minor.sub_additional', 1500), 'label' => 'Ailə üzvü abunəliyinin qiyməti (AZN)', 'min' => 100, 'max' => 100000],
+                'subscription_duration_days' => ['type' => 'int', 'default' => (int) config('domain.subscriptions.term_days', 365), 'label' => 'Abunəlik müddəti (gün)', 'min' => 30, 'max' => 730,
+                    'hint' => '365 = 1 il. Bir ödəniş bu qədər gün giriş verir.'],
                 'default_trial_days' => ['type' => 'int', 'default' => 0, 'label' => 'Default trial (gün)'],
-                'subscription_duration_days' => ['type' => 'int', 'default' => 365, 'label' => 'Abunəlik müddəti (gün)'],
                 'grace_period_days' => ['type' => 'int', 'default' => 7, 'label' => 'Güzəşt müddəti (gün)'],
                 'auto_renew_enabled' => ['type' => 'bool', 'default' => false, 'label' => 'Avtomatik yenilənmə'],
                 'renewal_reminder_days' => ['type' => 'int', 'default' => 7, 'label' => 'Yenilənmə xatırlatması (gün öncə)'],

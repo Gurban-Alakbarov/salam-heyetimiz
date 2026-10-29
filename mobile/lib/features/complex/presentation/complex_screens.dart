@@ -10,6 +10,7 @@ import '../../../design_system/tokens/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../devices/devices_providers.dart';
 import '../../home/home_providers.dart';
+import '../../subscriptions/presentation/price_label.dart';
 import '../complex_providers.dart';
 import '../domain/complex_entities.dart';
 import 'complex_failure.dart';
@@ -235,8 +236,10 @@ class _DeviceTile extends StatelessWidget {
                       Text(device.address!, style: text.bodySmall),
                     if (price != null && device.subscriptionTermDays != null)
                       Text(
-                        l.cxPrice(
-                          formatMinor(price, device.currency),
+                        termPriceLabel(
+                          l,
+                          price,
+                          device.currency,
                           device.subscriptionTermDays!,
                         ),
                         style: text.bodySmall,
@@ -378,8 +381,10 @@ class _ComplexDeviceScreenState extends ConsumerState<ComplexDeviceScreen> {
                     if (price != null && d.subscriptionTermDays != null) ...[
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        l.cxPrice(
-                          formatMinor(price, d.currency),
+                        termPriceLabel(
+                          l,
+                          price,
+                          d.currency,
                           d.subscriptionTermDays!,
                         ),
                         style: text.titleMedium,

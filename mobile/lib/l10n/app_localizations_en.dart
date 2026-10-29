@@ -662,7 +662,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentOrderNotFound => 'Order not found';
 
   @override
-  String get subscriptionRenew => 'Renew (12 AZN / 30 days)';
+  String get subscriptionRenew => 'Renew';
+
+  @override
+  String subscriptionRenewFor(String price) {
+    return 'Renew ($price)';
+  }
+
+  @override
+  String pricePerYear(String price) {
+    return '$price / year';
+  }
 
   @override
   String get subscriptionRenewNotEligible =>
@@ -1124,7 +1134,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'A subscription activates your access to this device.';
 
   @override
-  String get cxSubscriptionBlock => 'Monthly subscription';
+  String get cxSubscriptionBlock => 'Annual subscription';
 
   @override
   String get cxSubscribe => 'Subscribe';
@@ -1211,7 +1221,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get famInviteIntro =>
-      'An invitation valid for 7 days will be emailed for the selected device. Each family member has their own monthly subscription, paid by you or by the member.';
+      'An invitation valid for 7 days will be emailed for the selected device. Each family member has their own annual subscription, paid by you or by the member.';
 
   @override
   String get famGranted =>

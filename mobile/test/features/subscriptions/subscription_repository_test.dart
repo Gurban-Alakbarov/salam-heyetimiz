@@ -35,6 +35,9 @@ void main() {
             'auto_renew': true,
             'device_id': 5,
             'term_days': 365,
+            'currency': 'AZN',
+            'renewal_price_minor': 1500,
+            'renewal_term_days': 365,
           },
           {
             'id': 11,
@@ -63,6 +66,9 @@ void main() {
     expect(first.deviceId, 5); // device_id → resolved against the device list
     expect(first.daysRemaining, 142); // server value, taken as-is
     expect(first.termDays, 365);
+    expect(first.currency, 'AZN');
+    expect(first.renewalPriceMinor, 1500); // what a renewal costs today (server), shown on the renew button
+    expect(first.renewalTermDays, 365);
     expect(first.autoRenew, isTrue);
     expect(first.startsAt, isNotNull);
 
@@ -70,6 +76,7 @@ void main() {
     expect(subs[1].deviceId, 6);
     expect(subs[1].daysRemaining, 20);
     expect(subs[1].startsAt, isNull);
+    expect(subs[1].renewalPriceMinor, isNull); // an older server: plain "Yenilə"
   });
 
   test('listActive returns an empty list when the resident has none', () async {

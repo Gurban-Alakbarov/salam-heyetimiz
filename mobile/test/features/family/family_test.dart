@@ -62,6 +62,8 @@ Map<String, dynamic> _memberJson({String subStatus = 'pending_payment'}) => {
         'tier': 'additional',
         'price_minor': 1200,
         'term_days': 30,
+        'renewal_price_minor': 1500,
+        'renewal_term_days': 365,
         'currency': 'AZN',
         'ends_at': null,
       },
@@ -438,7 +440,8 @@ void main() {
         );
 
         expect(find.text(l.cxStatusExpired), findsOneWidget);
-        expect(find.text(l.subscriptionRenew), findsOneWidget);
+        // the button carries today's renewal price from the server (15 AZN / year), not the row's old snapshot
+        expect(find.text(l.subscriptionRenewFor(l.pricePerYear('15.00 AZN'))), findsOneWidget);
         await tester.tap(find.byKey(const Key('fam-pay-44')));
         await tester.pumpAndSettle();
         verify(() => payments.renewSubscription(44)).called(1);

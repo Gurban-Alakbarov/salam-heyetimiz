@@ -13,6 +13,7 @@ import '../../complex/complex_providers.dart';
 import '../../complex/domain/complex_entities.dart';
 import '../../devices/devices_providers.dart';
 import '../../payments/payments_providers.dart';
+import '../../subscriptions/presentation/price_label.dart';
 import '../domain/family_entities.dart';
 import '../family_providers.dart';
 import 'family_failure.dart';
@@ -385,7 +386,18 @@ class _GrantRow extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           AppSecondaryButton(
             key: Key('fam-pay-${sub!.id}'),
-            label: sub.isExpired ? l.subscriptionRenew : l.famPayFor,
+            label: !sub.isExpired
+                ? l.famPayFor
+                : sub.renewalPriceMinor != null && sub.renewalTermDays != null
+                ? l.subscriptionRenewFor(
+                    termPriceLabel(
+                      l,
+                      sub.renewalPriceMinor!,
+                      sub.currency,
+                      sub.renewalTermDays!,
+                    ),
+                  )
+                : l.subscriptionRenew,
             icon: sub.isExpired ? Icons.autorenew : Icons.payment,
             onPressed: paying ? null : onPay,
           ),

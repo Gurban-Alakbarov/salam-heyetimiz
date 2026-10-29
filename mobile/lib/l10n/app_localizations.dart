@@ -1333,8 +1333,20 @@ abstract class AppLocalizations {
   /// No description provided for @subscriptionRenew.
   ///
   /// In en, this message translates to:
-  /// **'Renew (12 AZN / 30 days)'**
+  /// **'Renew'**
   String get subscriptionRenew;
+
+  /// Renew button with today's renewal price from the server, e.g. 15.00 AZN / year
+  ///
+  /// In en, this message translates to:
+  /// **'Renew ({price})'**
+  String subscriptionRenewFor(String price);
+
+  /// No description provided for @pricePerYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / year'**
+  String pricePerYear(String price);
 
   /// No description provided for @subscriptionRenewNotEligible.
   ///
@@ -2167,7 +2179,7 @@ abstract class AppLocalizations {
   /// No description provided for @cxSubscriptionBlock.
   ///
   /// In en, this message translates to:
-  /// **'Monthly subscription'**
+  /// **'Annual subscription'**
   String get cxSubscriptionBlock;
 
   /// No description provided for @cxSubscribe.
@@ -2323,7 +2335,7 @@ abstract class AppLocalizations {
   /// No description provided for @famInviteIntro.
   ///
   /// In en, this message translates to:
-  /// **'An invitation valid for 7 days will be emailed for the selected device. Each family member has their own monthly subscription, paid by you or by the member.'**
+  /// **'An invitation valid for 7 days will be emailed for the selected device. Each family member has their own annual subscription, paid by you or by the member.'**
   String get famInviteIntro;
 
   /// No description provided for @famGranted.

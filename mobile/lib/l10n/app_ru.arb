@@ -230,7 +230,19 @@
   "paymentRecheck": "Проверить снова",
   "paymentDone": "На главную",
   "paymentOrderNotFound": "Заказ не найден",
-  "subscriptionRenew": "Продлить (12 AZN / 30 дней)",
+  "subscriptionRenew": "Продлить",
+  "subscriptionRenewFor": "Продлить ({price})",
+  "@subscriptionRenewFor": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "pricePerYear": "{price} / год",
+  "@pricePerYear": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
   "subscriptionRenewNotEligible": "Эту подписку сейчас нельзя продлить.",
   "regTypeTitle": "Тип регистрации",
   "regTypePhysical": "Физическое лицо",
@@ -369,7 +381,7 @@
   "cxStatusExpired": "Истекла",
   "cxPrice": "{price} / {days} дн.",
   "cxPriceNote": "Подписка активирует ваш доступ к этому устройству.",
-  "cxSubscriptionBlock": "Ежемесячная подписка",
+  "cxSubscriptionBlock": "Годовая подписка",
   "cxSubscribe": "Оформить подписку",
   "cxFinishPayment": "Завершить оплату",
   "cxRenew": "Продлить",
@@ -395,7 +407,7 @@
   "famNoMembers": "Пока нет членов семьи.",
   "famNoInvitations": "Пока нет семейных приглашений.",
   "famDeviceLabel": "Устройство",
-  "famInviteIntro": "Для выбранного устройства будет отправлено приглашение на 7 дней. У каждого члена семьи своя ежемесячная подписка — её оплачиваете вы или сам участник.",
+  "famInviteIntro": "Для выбранного устройства будет отправлено приглашение на 7 дней. У каждого члена семьи своя годовая подписка — её оплачиваете вы или сам участник.",
   "famGranted": "Члену семьи выдан доступ к устройству. Подписка ожидает оплаты.",
   "famSubNone": "Нет подписки",
   "famSubActiveUntil": "Активна до {date}",

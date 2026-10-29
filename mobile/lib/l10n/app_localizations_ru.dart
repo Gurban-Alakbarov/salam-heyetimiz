@@ -663,7 +663,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get paymentOrderNotFound => 'Заказ не найден';
 
   @override
-  String get subscriptionRenew => 'Продлить (12 AZN / 30 дней)';
+  String get subscriptionRenew => 'Продлить';
+
+  @override
+  String subscriptionRenewFor(String price) {
+    return 'Продлить ($price)';
+  }
+
+  @override
+  String pricePerYear(String price) {
+    return '$price / год';
+  }
 
   @override
   String get subscriptionRenewNotEligible =>
@@ -1125,7 +1135,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Подписка активирует ваш доступ к этому устройству.';
 
   @override
-  String get cxSubscriptionBlock => 'Ежемесячная подписка';
+  String get cxSubscriptionBlock => 'Годовая подписка';
 
   @override
   String get cxSubscribe => 'Оформить подписку';
@@ -1212,7 +1222,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get famInviteIntro =>
-      'Для выбранного устройства будет отправлено приглашение на 7 дней. У каждого члена семьи своя ежемесячная подписка — её оплачиваете вы или сам участник.';
+      'Для выбранного устройства будет отправлено приглашение на 7 дней. У каждого члена семьи своя годовая подписка — её оплачиваете вы или сам участник.';
 
   @override
   String get famGranted =>

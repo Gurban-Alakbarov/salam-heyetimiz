@@ -21,6 +21,8 @@ abstract class SubscriptionDto with _$SubscriptionDto {
     int? termDays,
     int? priceMinor,
     String? currency,
+    int? renewalPriceMinor,
+    int? renewalTermDays,
   }) = _SubscriptionDto;
 
   factory SubscriptionDto.fromJson(Map<String, dynamic> json) =>

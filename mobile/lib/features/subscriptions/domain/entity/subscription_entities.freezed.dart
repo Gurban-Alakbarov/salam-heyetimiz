@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Subscription {
 
- int get id; String get tier; String get status; DateTime? get startsAt; DateTime? get endsAt; int? get daysRemaining; bool get autoRenew; int? get deviceId; int? get termDays;
+ int get id; String get tier; String get status; DateTime? get startsAt; DateTime? get endsAt; int? get daysRemaining; bool get autoRenew; int? get deviceId; int? get termDays; String? get currency;/// What a renewal costs today and the term it buys (server's commercial price, not this row's snapshot).
+ int? get renewalPriceMinor; int? get renewalTermDays;
 /// Create a copy of Subscription
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $SubscriptionCopyWith<Subscription> get copyWith => _$SubscriptionCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Subscription&&(identical(other.id, id) || other.id == id)&&(identical(other.tier, tier) || other.tier == tier)&&(identical(other.status, status) || other.status == status)&&(identical(other.startsAt, startsAt) || other.startsAt == startsAt)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.daysRemaining, daysRemaining) || other.daysRemaining == daysRemaining)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.termDays, termDays) || other.termDays == termDays));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Subscription&&(identical(other.id, id) || other.id == id)&&(identical(other.tier, tier) || other.tier == tier)&&(identical(other.status, status) || other.status == status)&&(identical(other.startsAt, startsAt) || other.startsAt == startsAt)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.daysRemaining, daysRemaining) || other.daysRemaining == daysRemaining)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.termDays, termDays) || other.termDays == termDays)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.renewalPriceMinor, renewalPriceMinor) || other.renewalPriceMinor == renewalPriceMinor)&&(identical(other.renewalTermDays, renewalTermDays) || other.renewalTermDays == renewalTermDays));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,tier,status,startsAt,endsAt,daysRemaining,autoRenew,deviceId,termDays);
+int get hashCode => Object.hash(runtimeType,id,tier,status,startsAt,endsAt,daysRemaining,autoRenew,deviceId,termDays,currency,renewalPriceMinor,renewalTermDays);
 
 @override
 String toString() {
-  return 'Subscription(id: $id, tier: $tier, status: $status, startsAt: $startsAt, endsAt: $endsAt, daysRemaining: $daysRemaining, autoRenew: $autoRenew, deviceId: $deviceId, termDays: $termDays)';
+  return 'Subscription(id: $id, tier: $tier, status: $status, startsAt: $startsAt, endsAt: $endsAt, daysRemaining: $daysRemaining, autoRenew: $autoRenew, deviceId: $deviceId, termDays: $termDays, currency: $currency, renewalPriceMinor: $renewalPriceMinor, renewalTermDays: $renewalTermDays)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $SubscriptionCopyWith<$Res>  {
   factory $SubscriptionCopyWith(Subscription value, $Res Function(Subscription) _then) = _$SubscriptionCopyWithImpl;
 @useResult
 $Res call({
- int id, String tier, String status, DateTime? startsAt, DateTime? endsAt, int? daysRemaining, bool autoRenew, int? deviceId, int? termDays
+ int id, String tier, String status, DateTime? startsAt, DateTime? endsAt, int? daysRemaining, bool autoRenew, int? deviceId, int? termDays, String? currency, int? renewalPriceMinor, int? renewalTermDays
 });
 
 
@@ -62,7 +63,7 @@ class _$SubscriptionCopyWithImpl<$Res>
 
 /// Create a copy of Subscription
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tier = null,Object? status = null,Object? startsAt = freezed,Object? endsAt = freezed,Object? daysRemaining = freezed,Object? autoRenew = null,Object? deviceId = freezed,Object? termDays = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tier = null,Object? status = null,Object? startsAt = freezed,Object? endsAt = freezed,Object? daysRemaining = freezed,Object? autoRenew = null,Object? deviceId = freezed,Object? termDays = freezed,Object? currency = freezed,Object? renewalPriceMinor = freezed,Object? renewalTermDays = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,tier: null == tier ? _self.tier : tier // ignore: cast_nullable_to_non_nullable
@@ -73,6 +74,9 @@ as DateTime?,daysRemaining: freezed == daysRemaining ? _self.daysRemaining : day
 as int?,autoRenew: null == autoRenew ? _self.autoRenew : autoRenew // ignore: cast_nullable_to_non_nullable
 as bool,deviceId: freezed == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as int?,termDays: freezed == termDays ? _self.termDays : termDays // ignore: cast_nullable_to_non_nullable
+as int?,currency: freezed == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+as String?,renewalPriceMinor: freezed == renewalPriceMinor ? _self.renewalPriceMinor : renewalPriceMinor // ignore: cast_nullable_to_non_nullable
+as int?,renewalTermDays: freezed == renewalTermDays ? _self.renewalTermDays : renewalTermDays // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -158,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String tier,  String status,  DateTime? startsAt,  DateTime? endsAt,  int? daysRemaining,  bool autoRenew,  int? deviceId,  int? termDays)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String tier,  String status,  DateTime? startsAt,  DateTime? endsAt,  int? daysRemaining,  bool autoRenew,  int? deviceId,  int? termDays,  String? currency,  int? renewalPriceMinor,  int? renewalTermDays)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Subscription() when $default != null:
-return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_that.daysRemaining,_that.autoRenew,_that.deviceId,_that.termDays);case _:
+return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_that.daysRemaining,_that.autoRenew,_that.deviceId,_that.termDays,_that.currency,_that.renewalPriceMinor,_that.renewalTermDays);case _:
   return orElse();
 
 }
@@ -179,10 +183,10 @@ return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String tier,  String status,  DateTime? startsAt,  DateTime? endsAt,  int? daysRemaining,  bool autoRenew,  int? deviceId,  int? termDays)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String tier,  String status,  DateTime? startsAt,  DateTime? endsAt,  int? daysRemaining,  bool autoRenew,  int? deviceId,  int? termDays,  String? currency,  int? renewalPriceMinor,  int? renewalTermDays)  $default,) {final _that = this;
 switch (_that) {
 case _Subscription():
-return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_that.daysRemaining,_that.autoRenew,_that.deviceId,_that.termDays);case _:
+return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_that.daysRemaining,_that.autoRenew,_that.deviceId,_that.termDays,_that.currency,_that.renewalPriceMinor,_that.renewalTermDays);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +203,10 @@ return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String tier,  String status,  DateTime? startsAt,  DateTime? endsAt,  int? daysRemaining,  bool autoRenew,  int? deviceId,  int? termDays)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String tier,  String status,  DateTime? startsAt,  DateTime? endsAt,  int? daysRemaining,  bool autoRenew,  int? deviceId,  int? termDays,  String? currency,  int? renewalPriceMinor,  int? renewalTermDays)?  $default,) {final _that = this;
 switch (_that) {
 case _Subscription() when $default != null:
-return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_that.daysRemaining,_that.autoRenew,_that.deviceId,_that.termDays);case _:
+return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_that.daysRemaining,_that.autoRenew,_that.deviceId,_that.termDays,_that.currency,_that.renewalPriceMinor,_that.renewalTermDays);case _:
   return null;
 
 }
@@ -214,7 +218,7 @@ return $default(_that.id,_that.tier,_that.status,_that.startsAt,_that.endsAt,_th
 
 
 class _Subscription extends Subscription {
-  const _Subscription({required this.id, this.tier = 'main', this.status = 'active', this.startsAt, this.endsAt, this.daysRemaining, this.autoRenew = false, this.deviceId, this.termDays}): super._();
+  const _Subscription({required this.id, this.tier = 'main', this.status = 'active', this.startsAt, this.endsAt, this.daysRemaining, this.autoRenew = false, this.deviceId, this.termDays, this.currency, this.renewalPriceMinor, this.renewalTermDays}): super._();
   
 
 @override final  int id;
@@ -226,6 +230,10 @@ class _Subscription extends Subscription {
 @override@JsonKey() final  bool autoRenew;
 @override final  int? deviceId;
 @override final  int? termDays;
+@override final  String? currency;
+/// What a renewal costs today and the term it buys (server's commercial price, not this row's snapshot).
+@override final  int? renewalPriceMinor;
+@override final  int? renewalTermDays;
 
 /// Create a copy of Subscription
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +245,16 @@ _$SubscriptionCopyWith<_Subscription> get copyWith => __$SubscriptionCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Subscription&&(identical(other.id, id) || other.id == id)&&(identical(other.tier, tier) || other.tier == tier)&&(identical(other.status, status) || other.status == status)&&(identical(other.startsAt, startsAt) || other.startsAt == startsAt)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.daysRemaining, daysRemaining) || other.daysRemaining == daysRemaining)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.termDays, termDays) || other.termDays == termDays));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Subscription&&(identical(other.id, id) || other.id == id)&&(identical(other.tier, tier) || other.tier == tier)&&(identical(other.status, status) || other.status == status)&&(identical(other.startsAt, startsAt) || other.startsAt == startsAt)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.daysRemaining, daysRemaining) || other.daysRemaining == daysRemaining)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.termDays, termDays) || other.termDays == termDays)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.renewalPriceMinor, renewalPriceMinor) || other.renewalPriceMinor == renewalPriceMinor)&&(identical(other.renewalTermDays, renewalTermDays) || other.renewalTermDays == renewalTermDays));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,tier,status,startsAt,endsAt,daysRemaining,autoRenew,deviceId,termDays);
+int get hashCode => Object.hash(runtimeType,id,tier,status,startsAt,endsAt,daysRemaining,autoRenew,deviceId,termDays,currency,renewalPriceMinor,renewalTermDays);
 
 @override
 String toString() {
-  return 'Subscription(id: $id, tier: $tier, status: $status, startsAt: $startsAt, endsAt: $endsAt, daysRemaining: $daysRemaining, autoRenew: $autoRenew, deviceId: $deviceId, termDays: $termDays)';
+  return 'Subscription(id: $id, tier: $tier, status: $status, startsAt: $startsAt, endsAt: $endsAt, daysRemaining: $daysRemaining, autoRenew: $autoRenew, deviceId: $deviceId, termDays: $termDays, currency: $currency, renewalPriceMinor: $renewalPriceMinor, renewalTermDays: $renewalTermDays)';
 }
 
 
@@ -257,7 +265,7 @@ abstract mixin class _$SubscriptionCopyWith<$Res> implements $SubscriptionCopyWi
   factory _$SubscriptionCopyWith(_Subscription value, $Res Function(_Subscription) _then) = __$SubscriptionCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String tier, String status, DateTime? startsAt, DateTime? endsAt, int? daysRemaining, bool autoRenew, int? deviceId, int? termDays
+ int id, String tier, String status, DateTime? startsAt, DateTime? endsAt, int? daysRemaining, bool autoRenew, int? deviceId, int? termDays, String? currency, int? renewalPriceMinor, int? renewalTermDays
 });
 
 
@@ -274,7 +282,7 @@ class __$SubscriptionCopyWithImpl<$Res>
 
 /// Create a copy of Subscription
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tier = null,Object? status = null,Object? startsAt = freezed,Object? endsAt = freezed,Object? daysRemaining = freezed,Object? autoRenew = null,Object? deviceId = freezed,Object? termDays = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tier = null,Object? status = null,Object? startsAt = freezed,Object? endsAt = freezed,Object? daysRemaining = freezed,Object? autoRenew = null,Object? deviceId = freezed,Object? termDays = freezed,Object? currency = freezed,Object? renewalPriceMinor = freezed,Object? renewalTermDays = freezed,}) {
   return _then(_Subscription(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,tier: null == tier ? _self.tier : tier // ignore: cast_nullable_to_non_nullable
@@ -285,6 +293,9 @@ as DateTime?,daysRemaining: freezed == daysRemaining ? _self.daysRemaining : day
 as int?,autoRenew: null == autoRenew ? _self.autoRenew : autoRenew // ignore: cast_nullable_to_non_nullable
 as bool,deviceId: freezed == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as int?,termDays: freezed == termDays ? _self.termDays : termDays // ignore: cast_nullable_to_non_nullable
+as int?,currency: freezed == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+as String?,renewalPriceMinor: freezed == renewalPriceMinor ? _self.renewalPriceMinor : renewalPriceMinor // ignore: cast_nullable_to_non_nullable
+as int?,renewalTermDays: freezed == renewalTermDays ? _self.renewalTermDays : renewalTermDays // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }

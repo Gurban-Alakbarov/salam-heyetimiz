@@ -254,7 +254,20 @@
   "paymentRecheck": "Check again",
   "paymentDone": "Back to home",
   "paymentOrderNotFound": "Order not found",
-  "subscriptionRenew": "Renew (12 AZN / 30 days)",
+  "subscriptionRenew": "Renew",
+  "subscriptionRenewFor": "Renew ({price})",
+  "@subscriptionRenewFor": {
+    "description": "Renew button with today's renewal price from the server, e.g. 15.00 AZN / year",
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "pricePerYear": "{price} / year",
+  "@pricePerYear": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
   "subscriptionRenewNotEligible": "This subscription cannot be renewed right now.",
   "regTypeTitle": "Registration type",
   "regTypePhysical": "Individual",
@@ -435,7 +448,7 @@
     "placeholders": { "price": { "type": "String" }, "days": { "type": "int" } }
   },
   "cxPriceNote": "A subscription activates your access to this device.",
-  "cxSubscriptionBlock": "Monthly subscription",
+  "cxSubscriptionBlock": "Annual subscription",
   "cxSubscribe": "Subscribe",
   "cxFinishPayment": "Complete payment",
   "cxRenew": "Renew",
@@ -467,7 +480,7 @@
   "famNoMembers": "No family members yet.",
   "famNoInvitations": "No family invitations yet.",
   "famDeviceLabel": "Device",
-  "famInviteIntro": "An invitation valid for 7 days will be emailed for the selected device. Each family member has their own monthly subscription, paid by you or by the member.",
+  "famInviteIntro": "An invitation valid for 7 days will be emailed for the selected device. Each family member has their own annual subscription, paid by you or by the member.",
   "famGranted": "Access to this device was granted to the family member. The subscription awaits payment.",
   "famSubNone": "No subscription",
   "famSubActiveUntil": "Active until {date}",

@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../devices/devices_providers.dart';
 import '../../home/home_providers.dart';
 import '../../payments/payments_providers.dart';
+import '../../subscriptions/presentation/price_label.dart';
 import '../complex_providers.dart';
 import '../domain/complex_entities.dart';
 import 'complex_failure.dart';
@@ -143,7 +144,7 @@ class _PendingTileState extends ConsumerState<_PendingTile> {
             ),
             if (s.termDays != null)
               Text(
-                l.cxPrice(formatMinor(s.priceMinor, s.currency), s.termDays!),
+                termPriceLabel(l, s.priceMinor, s.currency, s.termDays!),
                 style: text.bodySmall,
               ),
             const SizedBox(height: AppSpacing.sm),

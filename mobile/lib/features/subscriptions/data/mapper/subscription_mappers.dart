@@ -14,4 +14,7 @@ Subscription subscriptionDtoToEntity(SubscriptionDto d) => Subscription(
   autoRenew: d.autoRenew ?? false,
   deviceId: d.deviceId,
   termDays: d.termDays,
+  currency: d.currency,
+  renewalPriceMinor: d.renewalPriceMinor,
+  renewalTermDays: d.renewalTermDays,
 );

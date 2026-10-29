@@ -18,6 +18,8 @@ class FamilySubscription {
     this.termDays,
     this.currency,
     this.endsAt,
+    this.renewalPriceMinor,
+    this.renewalTermDays,
   });
 
   final int id;
@@ -27,6 +29,10 @@ class FamilySubscription {
   final int? termDays;
   final String? currency;
   final DateTime? endsAt;
+
+  /// What a renewal costs today and the term it buys (server's commercial price).
+  final int? renewalPriceMinor;
+  final int? renewalTermDays;
 
   bool get isActive => status == 'active';
   bool get isPendingPayment => status == 'pending_payment';
@@ -43,6 +49,8 @@ class FamilySubscription {
         termDays: (j['term_days'] as num?)?.toInt(),
         currency: j['currency'] as String?,
         endsAt: _date(j['ends_at']),
+        renewalPriceMinor: (j['renewal_price_minor'] as num?)?.toInt(),
+        renewalTermDays: (j['renewal_term_days'] as num?)?.toInt(),
       );
 }
 

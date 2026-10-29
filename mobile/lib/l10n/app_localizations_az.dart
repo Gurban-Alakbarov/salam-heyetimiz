@@ -661,7 +661,17 @@ class AppLocalizationsAz extends AppLocalizations {
   String get paymentOrderNotFound => 'Sifariş tapılmadı';
 
   @override
-  String get subscriptionRenew => 'Yenilə (12 AZN / 30 gün)';
+  String get subscriptionRenew => 'Yenilə';
+
+  @override
+  String subscriptionRenewFor(String price) {
+    return 'Yenilə ($price)';
+  }
+
+  @override
+  String pricePerYear(String price) {
+    return '$price / il';
+  }
 
   @override
   String get subscriptionRenewNotEligible =>
@@ -1120,7 +1130,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get cxPriceNote => 'Abunəlik bu cihaza girişinizi aktivləşdirir.';
 
   @override
-  String get cxSubscriptionBlock => 'Aylıq abunəlik';
+  String get cxSubscriptionBlock => 'İllik abunəlik';
 
   @override
   String get cxSubscribe => 'Abunə ol';
@@ -1206,7 +1216,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get famInviteIntro =>
-      'Seçdiyiniz cihaz üçün email ilə 7 gün etibarlı dəvət göndəriləcək. Hər ailə üzvünün öz aylıq abunəliyi olur; onu siz və ya üzvün özü ödəyə bilər.';
+      'Seçdiyiniz cihaz üçün email ilə 7 gün etibarlı dəvət göndəriləcək. Hər ailə üzvünün öz illik abunəliyi olur; onu siz və ya üzvün özü ödəyə bilər.';
 
   @override
   String get famGranted =>

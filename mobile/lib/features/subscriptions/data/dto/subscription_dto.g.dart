@@ -20,6 +20,8 @@ _SubscriptionDto _$SubscriptionDtoFromJson(Map<String, dynamic> json) =>
       termDays: (json['term_days'] as num?)?.toInt(),
       priceMinor: (json['price_minor'] as num?)?.toInt(),
       currency: json['currency'] as String?,
+      renewalPriceMinor: (json['renewal_price_minor'] as num?)?.toInt(),
+      renewalTermDays: (json['renewal_term_days'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SubscriptionDtoToJson(_SubscriptionDto instance) =>
@@ -36,4 +38,6 @@ Map<String, dynamic> _$SubscriptionDtoToJson(_SubscriptionDto instance) =>
       'term_days': instance.termDays,
       'price_minor': instance.priceMinor,
       'currency': instance.currency,
+      'renewal_price_minor': instance.renewalPriceMinor,
+      'renewal_term_days': instance.renewalTermDays,
     };

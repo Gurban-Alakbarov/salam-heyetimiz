@@ -19,6 +19,11 @@ abstract class Subscription with _$Subscription {
     @Default(false) bool autoRenew,
     int? deviceId,
     int? termDays,
+    String? currency,
+
+    /// What a renewal costs today and the term it buys (server's commercial price, not this row's snapshot).
+    int? renewalPriceMinor,
+    int? renewalTermDays,
   }) = _Subscription;
 
   bool get isActive => status == 'active';

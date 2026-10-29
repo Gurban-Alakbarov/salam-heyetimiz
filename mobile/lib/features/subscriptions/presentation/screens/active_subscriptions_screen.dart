@@ -10,6 +10,7 @@ import 'package:salam_mobile/features/devices/devices_providers.dart';
 import 'package:salam_mobile/features/devices/domain/entity/device_entities.dart';
 import 'package:salam_mobile/features/payments/payments_providers.dart';
 import 'package:salam_mobile/features/subscriptions/domain/entity/subscription_entities.dart';
+import 'package:salam_mobile/features/subscriptions/presentation/price_label.dart';
 import 'package:salam_mobile/features/subscriptions/subscriptions_providers.dart';
 import 'package:salam_mobile/l10n/app_localizations.dart';
 import 'package:salam_mobile/shared/failure_message.dart';
@@ -215,7 +216,7 @@ class _SubscriptionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          _RenewButton(subscriptionId: s.id),
+          _RenewButton(subscription: s),
         ],
       ),
     );
@@ -234,12 +235,12 @@ class _SubscriptionCard extends StatelessWidget {
   }
 }
 
-/// B13: user-initiated renewal → order (POST /v1/subscriptions/{id}/renew, server-priced 12 AZN / 30 days,
-/// B2) → hosted checkout. The server decides eligibility; a refusal is shown, never retried silently.
+/// B13: user-initiated renewal → order (POST /v1/subscriptions/{id}/renew, server-priced — the button shows the
+/// server's renewal price, today 15 AZN / year) → hosted checkout. The server decides eligibility; a refusal is shown, never retried silently.
 class _RenewButton extends ConsumerStatefulWidget {
-  const _RenewButton({required this.subscriptionId});
+  const _RenewButton({required this.subscription});
 
-  final int subscriptionId;
+  final Subscription subscription;
 
   @override
   ConsumerState<_RenewButton> createState() => _RenewButtonState();
@@ -251,7 +252,7 @@ class _RenewButtonState extends ConsumerState<_RenewButton> {
   Future<void> _renew() async {
     final l = AppLocalizations.of(context);
     setState(() => _busy = true);
-    final result = await ref.read(paymentsRepositoryProvider).renewSubscription(widget.subscriptionId);
+    final result = await ref.read(paymentsRepositoryProvider).renewSubscription(widget.subscription.id);
     if (!mounted) return;
     setState(() => _busy = false);
     result.fold(
@@ -262,6 +263,15 @@ class _RenewButtonState extends ConsumerState<_RenewButton> {
     );
   }
 
+  /// "Yenilə (15.00 AZN / il)" with the server's renewal price; plain "Yenilə" from an older server.
+  String _label(AppLocalizations l) {
+    final s = widget.subscription;
+    final price = s.renewalPriceMinor;
+    final days = s.renewalTermDays;
+    if (price == null || days == null) return l.subscriptionRenew;
+    return l.subscriptionRenewFor(termPriceLabel(l, price, s.currency, days));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -269,7 +279,7 @@ class _RenewButtonState extends ConsumerState<_RenewButton> {
       width: double.infinity,
       child: _busy
           ? const Center(child: Padding(padding: EdgeInsets.all(AppSpacing.xs), child: CircularProgressIndicator()))
-          : AppSecondaryButton(label: l.subscriptionRenew, icon: Icons.autorenew, onPressed: _renew),
+          : AppSecondaryButton(label: _label(l), icon: Icons.autorenew, onPressed: _renew),
     );
   }
 }

@@ -27,6 +27,26 @@ class AuditController
         if (($action = $request->query('action')) !== null) {
             $query->where('action', $action);
         }
+        // Phase 2 — trace one area / one admin / one object: "device." → every device action.
+        if (($prefix = $request->query('action_prefix')) !== null && $prefix !== '') {
+            $query->where('action', 'like', str_replace(['%', '_'], ['\\%', '\\_'], (string) $prefix).'%');
+        }
+        if (($actorId = $request->query('actor_id')) !== null && ctype_digit((string) $actorId)) {
+            $query->where('actor_id', (int) $actorId);
+        }
+        if (($type = $request->query('auditable_type')) !== null && $type !== '') {
+            // short names from the panel ("Device", "User", …) or the full class
+            $query->where(fn ($w) => $w->where('auditable_type', $type)->orWhere('auditable_type', 'like', '%\\'.$type));
+        }
+        if (($auditableId = $request->query('auditable_id')) !== null && ctype_digit((string) $auditableId)) {
+            $query->where('auditable_id', (int) $auditableId);
+        }
+        if (($q = trim((string) $request->query('q', ''))) !== '') {
+            // free text over who did it and the payload (ids, phones, codes …)
+            $query->where(fn ($w) => $w->where('actor_label', 'like', "%{$q}%")
+                ->orWhere('action', 'like', "%{$q}%")
+                ->orWhere('payload', 'like', "%{$q}%"));
+        }
         if (($actorKind = $request->query('actor_kind')) !== null) {
             $query->where('actor_kind', $actorKind);
         }

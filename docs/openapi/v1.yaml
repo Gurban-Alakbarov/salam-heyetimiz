@@ -2457,6 +2457,21 @@ paths:
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Cursor'
         - in: query
+          name: action_prefix
+          description: 'Area — every action starting with it, e.g. `device.`'
+          schema: { type: string, maxLength: 80 }
+        - in: query
+          name: auditable_type
+          description: 'Object type, short class name (`Device`, `User`, `Complex`, `Order`, `Subscription`, `AdminUser`) or the full class'
+          schema: { type: string, maxLength: 120 }
+        - in: query
+          name: auditable_id
+          schema: { type: integer, format: int64 }
+        - in: query
+          name: q
+          description: Free text over the actor label, action and payload (phone, IMEI, code …)
+          schema: { type: string, maxLength: 120 }
+        - in: query
           name: actor_kind
           schema: { type: string, enum: [user, admin, system] }
         - in: query

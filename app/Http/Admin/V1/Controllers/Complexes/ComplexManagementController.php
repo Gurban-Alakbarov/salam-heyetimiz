@@ -50,6 +50,8 @@ class ComplexManagementController
             'code' => ['required', 'string', 'min:2', 'max:40', 'unique:complexes,code'],
             'region_id' => ['nullable', 'integer', 'exists:regions,id'],
             'address' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         /** @var Complex $complex */
@@ -78,10 +80,12 @@ class ComplexManagementController
             'name' => ['sometimes', 'string', 'min:2', 'max:160'],
             'region_id' => ['sometimes', 'nullable', 'integer', 'exists:regions,id'],
             'address' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'latitude' => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
         $complex->forceFill($v)->save();
-        $this->audit->record('complex.updated', ['code' => $complex->code], Complex::class, (int) $complex->id);
+        $this->audit->record('complex.updated', ['code' => $complex->code, 'changed' => array_keys($v)], Complex::class, (int) $complex->id);
 
         return response()->json($this->detail($complex->refresh()));
     }

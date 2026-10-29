@@ -63,6 +63,7 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::delete('admins/{adminId}/mobile-user', [AdminMobileUserController::class, 'unlink'])->whereNumber('adminId')->name('adminUnlinkMobileUser');
     Route::post('admins/{adminId}/impersonate', [ImpersonationController::class, 'start'])->whereNumber('adminId')->name('adminImpersonate');
     Route::get('audit', [AuditController::class, 'index'])->name('adminListAudit');
+    Route::get('search', \App\Http\Admin\V1\Controllers\Search\AdminSearchController::class)->name('adminGlobalSearch');
 
     // Dynamic access control — roles, permission catalog, per-admin overrides (access.manage)
     Route::get('access/roles', [AccessControlController::class, 'roles'])->name('adminListRoles');
@@ -187,6 +188,7 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
 
     // Relay open/close test through the DeviceComm pipeline (Phase 4)
     Route::post('devices/{deviceId}/relay', [AdminDeviceCommController::class, 'relay'])->whereNumber('deviceId')->name('adminRelayTest');
+    Route::post('devices/{deviceId}/ping', [AdminDeviceCommController::class, 'ping'])->whereNumber('deviceId')->name('adminPingDevice');
 
     // Visitor links — shareable guest access (visitor_links.view / visitor_links.manage; complex-scoped).
     Route::get('visitor-links', [AdminVisitorLinkController::class, 'index'])->name('adminListVisitorLinks');

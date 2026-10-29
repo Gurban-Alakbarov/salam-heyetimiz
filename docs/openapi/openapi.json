@@ -4510,6 +4510,41 @@
           },
           {
             "in": "query",
+            "name": "action_prefix",
+            "description": "Area — every action starting with it, e.g. `device.`",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          {
+            "in": "query",
+            "name": "auditable_type",
+            "description": "Object type, short class name (`Device`, `User`, `Complex`, `Order`, `Subscription`, `AdminUser`) or the full class",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "in": "query",
+            "name": "auditable_id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "description": "Free text over the actor label, action and payload (phone, IMEI, code …)",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "in": "query",
             "name": "actor_kind",
             "schema": {
               "type": "string",
@@ -9223,6 +9258,284 @@
           },
           "422": {
             "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/v1/devices/{deviceId}/ping": {
+      "post": {
+        "tags": [
+          "Admin / Devices"
+        ],
+        "summary": "Is the barrier reachable right now? (support)",
+        "operationId": "adminPingDevice",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Requires `devices.diagnostics.view`; complex-scoped (other complexes → 404). Asks Traccar for the device's live\nstatus by IMEI and stores it as an `admin_ping` diagnostic. A Traccar outage answers `reachable=false` (never 500).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DeviceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Live status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reachable": {
+                      "type": "boolean",
+                      "description": "false = Traccar did not answer"
+                    },
+                    "found": {
+                      "type": "boolean",
+                      "description": "the device exists in Traccar"
+                    },
+                    "status": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": "online"
+                    },
+                    "online": {
+                      "type": "boolean"
+                    },
+                    "last_online_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/admin/v1/devices/lookups": {
+      "get": {
+        "tags": [
+          "Admin / Devices"
+        ],
+        "summary": "Choices for the device form (models, SIM operators, regions)",
+        "operationId": "adminDeviceLookups",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Requires `devices.view`. Active rows only, so the form offers names instead of numeric ids.",
+        "responses": {
+          "200": {
+            "description": "Lookups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "device_models": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "vendor": {
+                            "type": "string"
+                          },
+                          "model_code": {
+                            "type": "string"
+                          },
+                          "default_driver_type": {
+                            "type": "string",
+                            "nullable": true,
+                            "enum": [
+                              "traccar",
+                              "ble",
+                              "sms"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "sim_operators": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "regions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/admin/v1/search": {
+      "get": {
+        "tags": [
+          "Admin / Search"
+        ],
+        "summary": "Global search (panel header)",
+        "operationId": "adminGlobalSearch",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Devices (IMEI / name / SIM), people (name / email / phone), complexes (name / code) and orders (number / bank\nid), at most 5 each. A group is returned only with its view permission (devices.view, residents.view,\ncomplexes.view, orders.view) and stays inside a komendant's complex (their phones masked). Fewer than 2\ncharacters → empty groups.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Grouped hits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "devices": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "serial": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    },
+                    "people": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "email": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "phone": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    },
+                    "complexes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "amount_minor": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
           }
         }
       }

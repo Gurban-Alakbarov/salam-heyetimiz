@@ -2,6 +2,9 @@
 
 namespace App\Http\Admin\V1\Controllers\Devices;
 
+use App\Domain\DeviceComm\Enums\DiagnosticSource;
+use App\Domain\DeviceComm\Models\DeviceDiagnostic;
+use App\Domain\DeviceComm\Contracts\TraccarClient;
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\DeviceComm\Actions\DispatchRelayTest;
 use App\Domain\DeviceComm\Actions\ResyncWhitelist;
@@ -117,5 +120,44 @@ class AdminDeviceCommController
         $command = $action->handle($device, CommandDirection::from($validated['action']), $request->ip());
 
         return response()->json(new OpenCommandResource($command), 202);
+    }
+
+    /**
+     * POST /admin/v1/devices/{deviceId}/ping — adminPingDevice (devices.diagnostics.view; complex-scoped).
+     * "Is the barrier reachable right now?" for support: asks Traccar for the device's live status and stores it as an
+     * admin_ping diagnostic. A Traccar outage is reported as reachable=false, never a 500.
+     */
+    public function ping(Request $request, int $deviceId, TraccarClient $traccar): JsonResponse
+    {
+        $this->requirePermission($request, Permission::DEVICES_DIAGNOSTICS_VIEW);
+        $device = Device::query()->findOrFail($deviceId);
+        $this->assertDeviceInScope($request, $device);
+
+        try {
+            $remote = $traccar->findDeviceByUniqueId((string) $device->serial);
+        } catch (\Throwable) {
+            return response()->json(['reachable' => false, 'found' => false, 'status' => null, 'online' => false,
+                'last_online_at' => optional($device->last_online_at)->toIso8601String()]);
+        }
+
+        $status = $remote?->status;
+        $online = $status === 'online';
+        $now = now();
+        DeviceDiagnostic::query()->create([
+            'partition_key' => (int) $now->format('Ym'),
+            'device_id' => $device->getKey(),
+            'source' => DiagnosticSource::AdminPing->value,
+            'online' => $online,
+            'raw' => ['traccar_found' => $remote !== null, 'traccar_status' => $status],
+            'reported_at' => $now,
+        ]);
+
+        return response()->json([
+            'reachable' => true,
+            'found' => $remote !== null,
+            'status' => $status,
+            'online' => $online,
+            'last_online_at' => optional($device->last_online_at)->toIso8601String(),
+        ]);
     }
 }

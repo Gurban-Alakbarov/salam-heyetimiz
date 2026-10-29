@@ -21,6 +21,8 @@ class OpenCommandResource extends JsonResource
         return [
             'id' => (int) $this->id,
             'device_id' => (int) $this->device_id,
+            // who pressed open (admin support card filters one resident's attempts; mobile only ever sees its own)
+            'user_id' => $this->user_id !== null ? (int) $this->user_id : null,
             'state' => $this->state->value,
             'direction' => $this->direction?->value,
             'source' => $this->source->value,

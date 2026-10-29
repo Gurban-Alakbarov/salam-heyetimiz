@@ -160,6 +160,14 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::get('devices', [AdminDeviceController::class, 'index'])->name('adminListDevices');
     Route::post('devices', [AdminDeviceController::class, 'store'])->name('adminCreateDevice');
     Route::get('devices/lookups', [AdminDeviceController::class, 'lookups'])->name('adminDeviceLookups');
+    // Device catalog (phase 3) — device models / regions / SIM operators, catalog.manage
+    Route::get('catalog', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'index'])->name('adminCatalog');
+    Route::post('catalog/device-models', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'storeModel'])->name('adminCreateDeviceModel');
+    Route::patch('catalog/device-models/{id}', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'updateModel'])->whereNumber('id')->name('adminUpdateDeviceModel');
+    Route::post('catalog/regions', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'storeRegion'])->name('adminCreateRegion');
+    Route::patch('catalog/regions/{id}', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'updateRegion'])->whereNumber('id')->name('adminUpdateRegion');
+    Route::post('catalog/sim-operators', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'storeOperator'])->name('adminCreateSimOperator');
+    Route::patch('catalog/sim-operators/{id}', [\App\Http\Admin\V1\Controllers\Catalog\AdminCatalogController::class, 'updateOperator'])->whereNumber('id')->name('adminUpdateSimOperator');
     Route::post('devices/reconcile', [AdminDeviceController::class, 'reconcile'])->name('adminReconcileDevice');
     Route::get('devices/{deviceId}', [AdminDeviceController::class, 'show'])->whereNumber('deviceId')->name('adminGetDevice');
     Route::patch('devices/{deviceId}', [AdminDeviceController::class, 'update'])->whereNumber('deviceId')->name('adminUpdateDevice');

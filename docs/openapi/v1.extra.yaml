@@ -1939,6 +1939,108 @@ paths:
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  /admin/catalog:
+    get:
+      tags: [Admin / Catalog]
+      summary: Device catalog — device models, regions, SIM operators (inactive included)
+      operationId: adminCatalog
+      security: [{ adminBearerAuth: [] }]
+      description: |
+        Requires `catalog.manage` (super admin by default). Device model fields: vendor, model_code, default_driver_type,
+        fallback_open_driver, whitelist_capacity (max active users per device), sms_open_command, open_command,
+        close_command, command_result_confirm, open_pulse_ms, supports_clip/sms/mqtt, notes, is_active, devices_count.
+      responses:
+        '200': { description: 'device_models[], regions[], sim_operators[]' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/catalog/device-models:
+    post:
+      tags: [Admin / Catalog]
+      summary: Create a device model (vendor + model_code unique)
+      operationId: adminCreateDeviceModel
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `catalog.manage`. Audited.
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+      responses:
+        '201': { description: Created }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /admin/catalog/device-models/{id}:
+    patch:
+      tags: [Admin / Catalog]
+      summary: Update a device model (vendor + model_code unique) (is_active=false hides it from the device form)
+      operationId: adminUpdateDeviceModel
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `catalog.manage`. Audited with old → new values. Rows are never deleted.
+      parameters: [{ in: path, name: id, required: true, schema: { type: integer } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+      responses:
+        '200': { description: Updated }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/catalog/regions:
+    post:
+      tags: [Admin / Catalog]
+      summary: Create a region
+      operationId: adminCreateRegion
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `catalog.manage`. Audited.
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+      responses:
+        '201': { description: Created }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /admin/catalog/regions/{id}:
+    patch:
+      tags: [Admin / Catalog]
+      summary: Update a region (is_active=false hides it from the device form)
+      operationId: adminUpdateRegion
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `catalog.manage`. Audited with old → new values. Rows are never deleted.
+      parameters: [{ in: path, name: id, required: true, schema: { type: integer } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+      responses:
+        '200': { description: Updated }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /admin/catalog/sim-operators:
+    post:
+      tags: [Admin / Catalog]
+      summary: Create a SIM operator
+      operationId: adminCreateSimOperator
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `catalog.manage`. Audited.
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+      responses:
+        '201': { description: Created }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /admin/catalog/sim-operators/{id}:
+    patch:
+      tags: [Admin / Catalog]
+      summary: Update a SIM operator (is_active=false hides it from the device form)
+      operationId: adminUpdateSimOperator
+      security: [{ adminBearerAuth: [] }]
+      description: Requires `catalog.manage`. Audited with old → new values. Rows are never deleted.
+      parameters: [{ in: path, name: id, required: true, schema: { type: integer } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: true } } } }
+      responses:
+        '200': { description: Updated }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
   /admin/search:
     get:
       tags: [Admin / Search]

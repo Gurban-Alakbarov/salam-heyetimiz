@@ -52,6 +52,9 @@ final class Permission
     /** Bind / unbind a device to a complex without the rest of complexes.manage — the technician's install step. */
     public const COMPLEXES_DEVICES_BIND = 'complexes.devices.bind';
 
+    // device catalog — device models (open / close commands, user limit), regions, SIM operators (phase 3)
+    public const CATALOG_MANAGE = 'catalog.manage';
+
     // registration applications (physical / legal — B9)
     public const APPLICATIONS_VIEW = 'applications.view';
 
@@ -176,6 +179,7 @@ final class Permission
             self::COMPLEXES_VIEW => ['group' => 'complexes', 'label' => 'Kompleksləri gör'],
             self::COMPLEXES_MANAGE => ['group' => 'complexes', 'label' => 'Kompleksləri idarə et'],
             self::COMPLEXES_DEVICES_BIND => ['group' => 'complexes', 'label' => 'Cihazı kompleksə qoş / ayır'],
+            self::CATALOG_MANAGE => ['group' => 'system', 'label' => 'Cihaz modelləri, regionlar, SIM operatorları'],
             self::APPLICATIONS_VIEW => ['group' => 'applications', 'label' => 'Müraciətləri gör'],
             self::APPLICATIONS_MANAGE => ['group' => 'applications', 'label' => 'Müraciətləri idarə et (status, təsdiq/rədd)'],
 

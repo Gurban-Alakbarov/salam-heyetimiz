@@ -1,4 +1,4 @@
-import { Bell, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
+import { Bell, Boxes, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PERM } from '@/auth/permissions'
 import type { Permission } from '@/types/api'
@@ -54,6 +54,7 @@ export const navGroups: NavGroup[] = [
       { to: '/admins', label: 'Adminlər', icon: Users, permission: PERM.adminsView },
       { to: '/access', label: 'Admin icazələri', icon: KeyRound, permission: PERM.accessManage },
       { to: '/audit', label: 'Audit jurnalı', icon: ScrollText, permission: PERM.auditView },
+      { to: '/catalog', label: 'Kataloq (modellər)', icon: Boxes, permission: PERM.catalogManage },
       { to: '/settings', label: 'Parametrlər', icon: Settings, permission: PERM.systemSettings },
     ],
   },

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Devices\Services;
 
+use App\Domain\DeviceComm\Models\TraccarDevice;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Devices\DTOs\DeviceRegistrationData;
 use App\Domain\Devices\Enums\DeviceStatus;
@@ -18,6 +19,13 @@ final class DeviceProvisioningService
 {
     public function register(DeviceRegistrationData $data, ?AdminUser $admin): Device
     {
+        // Re-using the IMEI of a decommissioned device (phase 3): its Traccar mapping is history only — release it so
+        // the new device can take the same Traccar uniqueId (the register job adopts the existing Traccar device).
+        $retired = Device::onlyTrashed()->where('serial', $data->serial)->pluck('id');
+        if ($retired->isNotEmpty()) {
+            TraccarDevice::query()->whereIn('device_id', $retired)->delete();
+        }
+
         $device = Device::query()->create([
             'serial' => $data->serial,
             'device_model_id' => $data->deviceModelId,

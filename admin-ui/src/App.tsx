@@ -17,6 +17,7 @@ import { SettingsPage } from '@/pages/settings/SettingsPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { TwoFactorPage } from '@/pages/auth/TwoFactorPage'
 import { DeviceDetailPage } from '@/pages/devices/DeviceDetailPage'
+import { CatalogPage } from '@/pages/catalog/CatalogPage'
 import { InstallWizardPage } from '@/pages/devices/InstallWizardPage'
 import { SupportPage } from '@/pages/support/SupportPage'
 import { DeviceFormPage } from '@/pages/devices/DeviceFormPage'
@@ -71,6 +72,7 @@ export function App() {
           <Route path="/notifications/:id" element={<RequirePermission anyOf={[PERM.notificationsView]}><CampaignDetailPage /></RequirePermission>} />
           <Route path="/admins" element={<RequirePermission anyOf={[PERM.adminsView]}><AdminsPage /></RequirePermission>} />
           <Route path="/audit" element={<RequirePermission anyOf={[PERM.auditView]}><AuditPage /></RequirePermission>} />
+          <Route path="/catalog" element={<RequirePermission anyOf={[PERM.catalogManage]}><CatalogPage /></RequirePermission>} />
           <Route path="/settings" element={<RequirePermission anyOf={[PERM.systemSettings]}><SettingsPage /></RequirePermission>} />
           <Route path="/traccar" element={<RequirePermission anyOf={[PERM.systemSettings]}><SettingsPage defaultTab="traccar" /></RequirePermission>} />
           <Route path="/security" element={<RequirePermission anyOf={[PERM.systemSettings]}><SecurityPage /></RequirePermission>} />

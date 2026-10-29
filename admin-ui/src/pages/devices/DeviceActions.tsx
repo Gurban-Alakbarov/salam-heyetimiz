@@ -122,7 +122,7 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
         open={decommOpen}
         onOpenChange={setDecommOpen}
         title="Cihazı istismardan çıxar"
-        description="Bu, geri qaytarılmayan əməliyyatdır: cihaz həmişəlik bağlanır, bütün istifadəçiləri silinir və bu IMEI/SIM ilə yeni cihaz yaratmaq mümkün olmayacaq. Cihazı sadəcə dayandırmaq üçün «Müvəqqəti söndür»dən istifadə edin."
+        description="Bu, geri qaytarılmayan əməliyyatdır: cihaz həmişəlik bağlanır və bütün istifadəçiləri çıxarılır (tarixçə qalır). IMEI və SIM sonra yeni cihaz qeydiyyatında yenidən istifadə oluna bilər. Cihazı sadəcə dayandırmaq üçün «Müvəqqəti söndür»dən istifadə edin."
         confirmLabel="Həmişəlik çıxar"
         confirmVariant="destructive"
         requireReason

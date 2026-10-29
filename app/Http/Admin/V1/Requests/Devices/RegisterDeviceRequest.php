@@ -2,6 +2,7 @@
 
 namespace App\Http\Admin\V1\Requests\Devices;
 
+use Illuminate\Validation\Rule;
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Devices\DTOs\DeviceRegistrationData;
@@ -24,9 +25,10 @@ class RegisterDeviceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'serial' => ['required', 'string', 'min:4', 'max:64', 'unique:devices,serial'],
+            // unique among ACTIVE devices only — a decommissioned (soft-deleted) device's IMEI / SIM can be reused
+            'serial' => ['required', 'string', 'min:4', 'max:64', Rule::unique('devices', 'serial')->whereNull('deleted_at')],
             'device_model_id' => ['required', 'integer', 'exists:device_models,id'],
-            'sim_phone' => ['required', 'string', 'regex:/^\+994\d{9}$/', 'unique:devices,sim_phone'],
+            'sim_phone' => ['required', 'string', 'regex:/^\+994\d{9}$/', Rule::unique('devices', 'sim_phone')->whereNull('deleted_at')],
             'sim_operator_id' => ['sometimes', 'nullable', 'integer', 'exists:sim_operators,id'],
             'sim_iccid' => ['sometimes', 'nullable', 'string', 'regex:/^\d{19,22}$/'],
             'driver_type' => ['required', 'string', 'in:traccar,ble,sms'],

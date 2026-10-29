@@ -157,6 +157,11 @@ Route::middleware(['auth:user', 'throttle:mobile'])->group(function (): void {
     // Revoke one of the caller's own visitor links.
     Route::post('visitor-links/{id}/revoke', [VisitorLinkController::class, 'revoke'])->whereNumber('id')->name('revokeVisitorLink');
 
+    // Map picker (GoMap.az, 2026-10-29): address search, pin → address, tile URL. GUID stays server-side.
+    Route::get('geo/search', [\App\Http\Api\V1\Controllers\Geo\GeoController::class, 'search'])->middleware('throttle:geo')->name('geoSearch');
+    Route::get('geo/reverse', [\App\Http\Api\V1\Controllers\Geo\GeoController::class, 'reverse'])->middleware('throttle:geo')->name('geoReverse');
+    Route::get('geo/tiles', [\App\Http\Api\V1\Controllers\Geo\GeoController::class, 'tiles'])->name('geoTiles');
+
     // Registration applications (B9) — physical / legal kept apart; the caller's own only.
     Route::prefix('applications')->group(function (): void {
         Route::get('mine', [ApplicationController::class, 'mine'])->name('listMyApplications');

@@ -92,6 +92,11 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('mobile', fn (Request $request) => Limit::perMinute(120)
             ->by(optional($request->user())->getAuthIdentifier() ?? $request->ip()));
 
+        // Map search / reverse geocoding (GoMap is a paid third-party API): 40/min/user — enough for typing with
+        // debounce and dragging a pin, not enough to scrape it.
+        RateLimiter::for('geo', fn (Request $request) => Limit::perMinute(40)
+            ->by('geo:'.(optional($request->user())->getAuthIdentifier() ?? $request->ip())));
+
         // Admin generic: 600/min/admin.
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(600)
             ->by(optional($request->user())->getAuthIdentifier() ?? $request->ip()));

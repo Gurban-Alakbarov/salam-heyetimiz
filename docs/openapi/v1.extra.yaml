@@ -2041,6 +2041,140 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
+  /admin/geo/search:
+    get:
+      tags: [Admin / Geo]
+      summary: Map picker — search addresses / places (GoMap.az)
+      operationId: adminGeoSearch
+      security: [{ adminBearerAuth: [] }]
+      description: GoMap.az searchObj through our server (the GUID never reaches the client). Max 10 rows, cached. **503** `geo_unavailable` when GoMap is down.
+      parameters:
+        - { in: query, name: q, required: true, schema: { type: string, minLength: 2, maxLength: 120 } }
+        - { in: query, name: lang, schema: { type: string, enum: [az, en, ru] } }
+      responses:
+        '200':
+          description: Places
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { type: object, properties: { name: { type: string }, address: { type: string }, lat: { type: number }, lng: { type: number }, kind: { type: string, nullable: true } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '503': { description: geo_unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /admin/geo/reverse:
+    get:
+      tags: [Admin / Geo]
+      summary: Map picker — the address at a pin (with house number)
+      operationId: adminGeoReverse
+      security: [{ adminBearerAuth: [] }]
+      description: GoMap.az getAddressByCoords (x = lng, y = lat), cached per ~1 m. **503** `geo_unavailable` when GoMap is down.
+      parameters:
+        - { in: query, name: lat, required: true, schema: { type: number, minimum: -90, maximum: 90 } }
+        - { in: query, name: lng, required: true, schema: { type: number, minimum: -180, maximum: 180 } }
+        - { in: query, name: lang, schema: { type: string, enum: [az, en, ru] } }
+      responses:
+        '200':
+          description: Address parts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object, properties: { address: { type: string, nullable: true }, street: { type: string, nullable: true }, house: { type: string, nullable: true }, district: { type: string, nullable: true }, city: { type: string, nullable: true }, postal: { type: string, nullable: true } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '503': { description: geo_unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /admin/geo/tiles:
+    get:
+      tags: [Admin / Geo]
+      summary: Map picker — GoMap XYZ tile URL
+      operationId: adminGeoTiles
+      security: [{ adminBearerAuth: [] }]
+      description: 'The XYZ tile URL template ({z}/{x}/{y}), attribution and max zoom. url = null when GoMap is not configured (clients fall back to OpenStreetMap).'
+      parameters:
+        - { in: query, name: lang, schema: { type: string, enum: [az, en, ru] } }
+      responses:
+        '200':
+          description: Tile config
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object, properties: { url: { type: string, nullable: true }, attribution: { type: string }, max_zoom: { type: integer } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /geo/search:
+    get:
+      tags: [Geo]
+      summary: Map picker — search addresses / places (GoMap.az)
+      operationId: geoSearch
+      security: [{ bearerAuth: [] }]
+      description: GoMap.az searchObj through our server (the GUID never reaches the client). Max 10 rows, cached. Rate limit 40/min/user. **503** `geo_unavailable` when GoMap is down.
+      parameters:
+        - { in: query, name: q, required: true, schema: { type: string, minLength: 2, maxLength: 120 } }
+        - { in: query, name: lang, schema: { type: string, enum: [az, en, ru] } }
+      responses:
+        '200':
+          description: Places
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { type: object, properties: { name: { type: string }, address: { type: string }, lat: { type: number }, lng: { type: number }, kind: { type: string, nullable: true } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '503': { description: geo_unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /geo/reverse:
+    get:
+      tags: [Geo]
+      summary: Map picker — the address at a pin (with house number)
+      operationId: geoReverse
+      security: [{ bearerAuth: [] }]
+      description: GoMap.az getAddressByCoords (x = lng, y = lat), cached per ~1 m. Rate limit 40/min/user. **503** `geo_unavailable` when GoMap is down.
+      parameters:
+        - { in: query, name: lat, required: true, schema: { type: number, minimum: -90, maximum: 90 } }
+        - { in: query, name: lng, required: true, schema: { type: number, minimum: -180, maximum: 180 } }
+        - { in: query, name: lang, schema: { type: string, enum: [az, en, ru] } }
+      responses:
+        '200':
+          description: Address parts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object, properties: { address: { type: string, nullable: true }, street: { type: string, nullable: true }, house: { type: string, nullable: true }, district: { type: string, nullable: true }, city: { type: string, nullable: true }, postal: { type: string, nullable: true } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '503': { description: geo_unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /geo/tiles:
+    get:
+      tags: [Geo]
+      summary: Map picker — GoMap XYZ tile URL
+      operationId: geoTiles
+      security: [{ bearerAuth: [] }]
+      description: 'The XYZ tile URL template ({z}/{x}/{y}), attribution and max zoom. url = null when GoMap is not configured (clients fall back to OpenStreetMap).'
+      parameters:
+        - { in: query, name: lang, schema: { type: string, enum: [az, en, ru] } }
+      responses:
+        '200':
+          description: Tile config
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object, properties: { url: { type: string, nullable: true }, attribution: { type: string }, max_zoom: { type: integer } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
   /admin/search:
     get:
       tags: [Admin / Search]

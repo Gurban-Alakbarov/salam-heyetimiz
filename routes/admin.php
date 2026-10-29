@@ -63,6 +63,10 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::delete('admins/{adminId}/mobile-user', [AdminMobileUserController::class, 'unlink'])->whereNumber('adminId')->name('adminUnlinkMobileUser');
     Route::post('admins/{adminId}/impersonate', [ImpersonationController::class, 'start'])->whereNumber('adminId')->name('adminImpersonate');
     Route::get('audit', [AuditController::class, 'index'])->name('adminListAudit');
+    // Map picker (GoMap.az) for device / complex forms — same controller as the mobile /v1/geo/*
+    Route::get('geo/search', [\App\Http\Api\V1\Controllers\Geo\GeoController::class, 'search'])->name('adminGeoSearch');
+    Route::get('geo/reverse', [\App\Http\Api\V1\Controllers\Geo\GeoController::class, 'reverse'])->name('adminGeoReverse');
+    Route::get('geo/tiles', [\App\Http\Api\V1\Controllers\Geo\GeoController::class, 'tiles'])->name('adminGeoTiles');
     Route::get('search', \App\Http\Admin\V1\Controllers\Search\AdminSearchController::class)->name('adminGlobalSearch');
 
     // Dynamic access control — roles, permission catalog, per-admin overrides (access.manage)

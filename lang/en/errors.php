@@ -42,6 +42,7 @@ return [
     'not_family_member' => 'The chosen person is not a member of this family.',
     'family_action_invalid' => 'The family choice is not valid.',
     'feedback_not_applicable' => 'Feedback cannot be given for this command.',
+    'geo_unavailable' => 'Address search is temporarily unavailable. Place the pin on the map yourself or try again shortly.',
     'whitelist_full' => 'This device has reached its user limit (:capacity people). Remove someone before adding a new resident.',
     'complex_inactive' => 'The complex is deactivated: no new invitations, subscriptions or payments.',
     'notification_not_mutable' => 'This notification cannot be switched off.',

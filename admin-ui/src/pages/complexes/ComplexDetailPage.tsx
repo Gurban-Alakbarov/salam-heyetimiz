@@ -69,19 +69,24 @@ export function ComplexDetailPage() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              {/* Title on its own line, actions wrap below it — they never spill into the next card. */}
+              <CardHeader className="space-y-3 pb-2">
                 <CardTitle className="text-base">Kompleks menecerləri (Komendant)</CardTitle>
                 <PermissionGate anyOf={[PERM.complexesManage]}>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <PermissionGate anyOf={[PERM.adminsCreate]}>
                       <Button size="sm" onClick={() => setKomendantOpen(true)}><UserPlus className="h-4 w-4" /> Yeni komendant</Button>
                     </PermissionGate>
-                    <select aria-label="Menecer seç" className="h-9 rounded-md border border-input bg-card px-2 text-sm" value={pick} onChange={(e) => setPick(e.target.value)}>
-                      <option value="">Mövcud admini seç…</option>
-                      {(admins ?? []).filter((a) => a.role !== 'super_admin').map((a) => <option key={a.id} value={a.id}>{a.name} ({a.email})</option>)}
+                    <span className="text-xs text-muted-foreground">və ya</span>
+                    {/* Only komendant (complex_manager) admins can manage a complex — the server refuses other roles. */}
+                    <select aria-label="Mövcud komendantı seç" className="h-9 min-w-0 max-w-full flex-1 rounded-md border border-input bg-card px-2 text-sm sm:max-w-xs" value={pick} onChange={(e) => setPick(e.target.value)}>
+                      <option value="">Mövcud komendantı seç…</option>
+                      {(admins ?? []).filter((a) => a.role === 'complex_manager' && a.status === 'active' && !c.managers.some((m) => m.id === a.id)).map((a) => (
+                        <option key={a.id} value={a.id}>{a.name} ({a.email}){a.complex_id ? ' — başqa kompleksdən köçəcək' : ''}</option>
+                      ))}
                     </select>
-                    <Button size="sm" disabled={!pick || assign.isPending} onClick={() => assign.mutate(Number(pick), { onSuccess: () => { toast({ variant: 'success', title: 'Menecer təyin edildi' }); setPick('') }, onError: err })}>
-                      <UserPlus className="h-4 w-4" /> Təyin et
+                    <Button size="sm" variant="outline" disabled={!pick || assign.isPending} onClick={() => assign.mutate(Number(pick), { onSuccess: () => { toast({ variant: 'success', title: 'Menecer təyin edildi' }); setPick('') }, onError: err })}>
+                      Təyin et
                     </Button>
                   </div>
                 </PermissionGate>

@@ -245,13 +245,6 @@ mixin BarrierCommandMachine on Notifier<BarrierOpenState> {
     );
   }
 
-  /// After a `dispatched` (no actuation feedback) result, the user can confirm.
-  Future<void> sendFeedback(int commandId, {required bool gateMoved}) async {
-    await ref
-        .read(barrierRepositoryProvider)
-        .feedback(commandId, gateMoved: gateMoved);
-  }
-
   /// Return to idle (e.g. after showing a result) so the button is usable again.
   void reset() {
     _stopPolling();

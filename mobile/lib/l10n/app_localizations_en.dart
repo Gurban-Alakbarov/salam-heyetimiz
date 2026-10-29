@@ -335,7 +335,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barrierSuccessOpened => 'The gate opened';
 
   @override
-  String get barrierSuccessSent => 'Command sent';
+  String get barrierSuccessSent => 'Sent';
 
   @override
   String get barrierFailed => 'The gate could not be opened';
@@ -347,9 +347,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String barrierCooldown(int seconds) {
     return 'Too many attempts. Try again in ${seconds}s';
   }
-
-  @override
-  String get barrierGateMovedQuestion => 'Did the gate open?';
 
   @override
   String get barrierClose => 'Close the gate';
@@ -364,7 +361,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barrierCloseSuccessClosed => 'The gate closed';
 
   @override
-  String get barrierCloseSuccessSent => 'Command sent';
+  String get barrierCloseSuccessSent => 'Sent';
 
   @override
   String get barrierCloseFailed => 'The gate could not be closed';

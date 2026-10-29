@@ -335,7 +335,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get barrierSuccessOpened => 'Qapı açıldı';
 
   @override
-  String get barrierSuccessSent => 'Komanda göndərildi';
+  String get barrierSuccessSent => 'Göndərildi';
 
   @override
   String get barrierFailed => 'Qapı açıla bilmədi';
@@ -347,9 +347,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String barrierCooldown(int seconds) {
     return 'Çox sayda cəhd. ${seconds}s sonra yenidən cəhd edin';
   }
-
-  @override
-  String get barrierGateMovedQuestion => 'Qapı açıldımı?';
 
   @override
   String get barrierClose => 'Qapını Bağla';
@@ -364,7 +361,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get barrierCloseSuccessClosed => 'Qapı bağlandı';
 
   @override
-  String get barrierCloseSuccessSent => 'Komanda göndərildi';
+  String get barrierCloseSuccessSent => 'Göndərildi';
 
   @override
   String get barrierCloseFailed => 'Qapı bağlana bilmədi';

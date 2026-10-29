@@ -335,7 +335,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get barrierSuccessOpened => 'Ворота открыты';
 
   @override
-  String get barrierSuccessSent => 'Команда отправлена';
+  String get barrierSuccessSent => 'Отправлено';
 
   @override
   String get barrierFailed => 'Не удалось открыть';
@@ -347,9 +347,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String barrierCooldown(int seconds) {
     return 'Слишком много попыток. Повторите через $secondsс';
   }
-
-  @override
-  String get barrierGateMovedQuestion => 'Ворота открылись?';
 
   @override
   String get barrierClose => 'Закрыть';
@@ -364,7 +361,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get barrierCloseSuccessClosed => 'Ворота закрыты';
 
   @override
-  String get barrierCloseSuccessSent => 'Команда отправлена';
+  String get barrierCloseSuccessSent => 'Отправлено';
 
   @override
   String get barrierCloseFailed => 'Не удалось закрыть';

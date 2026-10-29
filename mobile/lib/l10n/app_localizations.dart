@@ -721,7 +721,7 @@ abstract class AppLocalizations {
   /// No description provided for @barrierSuccessSent.
   ///
   /// In en, this message translates to:
-  /// **'Command sent'**
+  /// **'Sent'**
   String get barrierSuccessSent;
 
   /// No description provided for @barrierFailed.
@@ -741,12 +741,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Too many attempts. Try again in {seconds}s'**
   String barrierCooldown(int seconds);
-
-  /// No description provided for @barrierGateMovedQuestion.
-  ///
-  /// In en, this message translates to:
-  /// **'Did the gate open?'**
-  String get barrierGateMovedQuestion;
 
   /// No description provided for @barrierClose.
   ///
@@ -775,7 +769,7 @@ abstract class AppLocalizations {
   /// No description provided for @barrierCloseSuccessSent.
   ///
   /// In en, this message translates to:
-  /// **'Command sent'**
+  /// **'Sent'**
   String get barrierCloseSuccessSent;
 
   /// No description provided for @barrierCloseFailed.

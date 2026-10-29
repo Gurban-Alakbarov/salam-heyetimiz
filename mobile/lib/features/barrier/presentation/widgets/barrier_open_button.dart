@@ -138,9 +138,6 @@ class _BarrierActionButtonState extends ConsumerState<BarrierActionButton> {
             onPressed: enabled ? trigger : null,
           ),
         ],
-        // Actuation feedback only for open ("did the gate move?").
-        if (_isOpen && state is BarrierSuccess && !state.actuated)
-          _FeedbackRow(commandId: state.commandId, onDark: widget.round),
         // GEOFENCE-3 — permanently-denied location: offer an OS Settings deep-link.
         if (state is BarrierFailed &&
             state.failure is LocationFailure &&
@@ -408,51 +405,5 @@ class _BarrierStatus extends StatelessWidget {
     // Fall back to the typed failure message, else this action's failure label.
     final mapped = deviceFailureMessage(l, state.failure);
     return mapped == l.errUnknown ? labels.failed : mapped;
-  }
-}
-
-class _FeedbackRow extends ConsumerWidget {
-  const _FeedbackRow({required this.commandId, this.onDark = false});
-
-  final int commandId;
-  final bool onDark;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.md),
-      child: Column(
-        children: [
-          Text(
-            l.barrierGateMovedQuestion,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: onDark ? Colors.white : null,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          // Wrap (not Row): on a half-width device card the two answers stack instead of overflowing (B19).
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: AppSpacing.lg,
-            children: [
-              AppTextButton(
-                label: l.yes,
-                onPressed: () => ref
-                    .read(barrierOpenProvider.notifier)
-                    .sendFeedback(commandId, gateMoved: true),
-              ),
-              AppTextButton(
-                label: l.no,
-                onPressed: () => ref
-                    .read(barrierOpenProvider.notifier)
-                    .sendFeedback(commandId, gateMoved: false),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }

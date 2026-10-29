@@ -10,6 +10,13 @@
 	<string>Salam Sesame</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<!-- 1.0.1: the app speaks az / en / ru — the App Store lists them and iOS offers a per-app language. -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>az</string>
+		<string>en</string>
+		<string>ru</string>
+	</array>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>

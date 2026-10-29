@@ -1,4 +1,5 @@
 import { type ReactNode, useState } from 'react'
+import { GeoMapPicker } from '@/components/GeoMap'
 import { Link, useNavigate } from 'react-router-dom'
 import { Check, ChevronLeft, Loader2, LockOpen, Radio } from 'lucide-react'
 import { useComplexDeviceBinding, useComplexList } from '@/api/complexes'
@@ -109,15 +110,19 @@ function StepDevice({ onDone }: { onDone: (id: number, name: string) => void }) 
           <Field id="w-name" label="Cihazın adı" hint="Tətbiqdə görünəcək, məs. «Blok A şlaqbaum»" error={err('location_label')}>
             <Input id="w-name" value={f.name} onChange={(e) => set('name')(e.target.value)} />
           </Field>
-          <Field id="w-addr" label="Ünvan" error={err('address')}>
+          <Field id="w-addr" label="Ünvan" hint="Pin qoyulanda avtomatik dolur, düzəldə bilərsiniz" error={err('address')}>
             <Input id="w-addr" value={f.address} onChange={(e) => set('address')(e.target.value)} placeholder="Küçə, ev, rayon" />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field id="w-lat" label="Enlik" error={err('latitude')}><Input id="w-lat" type="number" step="any" value={f.lat} onChange={(e) => set('lat')(e.target.value)} /></Field>
-            <Field id="w-lng" label="Uzunluq" error={err('longitude')}><Input id="w-lng" type="number" step="any" value={f.lng} onChange={(e) => set('lng')(e.target.value)} /></Field>
-          </div>
         </div>
-        <p className="text-xs text-muted-foreground">Koordinatları Google/AzNav xəritəsində cihazın yerinə basıb götürə bilərsiniz — «Yol göstər» və məsafə məhdudiyyəti üçün lazımdır.</p>
+        <div className="space-y-1.5">
+          <Label>Cihazın yeri</Label>
+          <GeoMapPicker
+            value={f.lat && f.lng ? { lat: Number(f.lat), lng: Number(f.lng) } : null}
+            onChange={(p) => setF((x) => ({ ...x, lat: String(p.lat), lng: String(p.lng), address: p.address ?? x.address }))}
+          />
+          {(err('latitude') || err('longitude')) && <p className="text-xs text-destructive">{err('latitude') ?? err('longitude')}</p>}
+          <p className="text-xs text-muted-foreground">«Yol göstər» və məsafə məhdudiyyəti (geofence) bu nöqtədən işləyir.</p>
+        </div>
         {create.error && !(create.error instanceof ApiError && Object.keys(create.error.fields ?? {}).length > 0) && (
           <p className="text-sm text-destructive">{create.error instanceof ApiError ? create.error.message : 'Xəta'}</p>
         )}

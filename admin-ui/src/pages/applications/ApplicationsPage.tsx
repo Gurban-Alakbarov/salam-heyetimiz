@@ -12,7 +12,7 @@ import { ApiError } from '@/lib/api'
 import { useAssignDevice, useDevices, useGrantSubscription } from '@/api/devices'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { formatDateTime } from '@/lib/format'
-import { OsmMap } from '@/components/OsmMap'
+import { GeoMapView } from '@/components/GeoMap'
 import { EmptyState, ErrorState, TableSkeleton } from '@/components/states'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -155,7 +155,7 @@ function LegalDialog({ application: a, onClose }: { application: LegalApplicatio
           <Field label="Mənzil sayı" value={a.apartments_count} />
           <Field label="Qeyd" value={a.note} />
           {a.rejection_reason && <Field label="Rədd səbəbi" value={a.rejection_reason} />}
-          <div className="sm:col-span-2"><OsmMap latitude={a.location.latitude} longitude={a.location.longitude} height={220} /></div>
+          <div className="sm:col-span-2"><GeoMapView latitude={a.location.latitude} longitude={a.location.longitude} height={220} /></div>
           {complexId && (
             <div className="sm:col-span-2 rounded-md bg-muted p-3 text-sm">
               Kompleks yaradılıb: <Link to={`/complexes/${complexId}`} className="font-medium text-primary hover:underline">kompleksə keç →</Link>
@@ -282,7 +282,7 @@ function IndividualDialog({ application, onClose }: { application: IndividualApp
           <Field label="Qeyd" value={a.note} />
           {a.device_id && <Field label="Quraşdırılmış cihaz" value={<Link to={`/devices/${a.device_id}`} className="text-primary hover:underline">Cihaza keç →</Link>} />}
           {a.rejection_reason && <Field label="Rədd səbəbi" value={a.rejection_reason} />}
-          <div className="sm:col-span-2"><OsmMap latitude={a.location.latitude} longitude={a.location.longitude} height={220} /></div>
+          <div className="sm:col-span-2"><GeoMapView latitude={a.location.latitude} longitude={a.location.longitude} height={220} /></div>
           {a.status === 'installed' && a.device_id && (
             <div className="sm:col-span-2"><InstalledFollowUp deviceId={a.device_id} phone={a.phone} email={a.email} /></div>
           )}

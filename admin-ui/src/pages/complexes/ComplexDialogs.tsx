@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { GeoMapPicker } from '@/components/GeoMap'
 import { Loader2 } from 'lucide-react'
 import { type CreatedAdmin, useCreateAdmin, useLinkMobileUser } from '@/api/admins'
 import { useCreateComplex, useUpdateComplex } from '@/api/complexes'
@@ -64,7 +65,7 @@ export function ComplexFormDialog({ open, onOpenChange, complex }: { open: boole
 
   return (
     <Dialog open={open} onOpenChange={(n) => { if (!pending) onOpenChange(n) }}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <form onSubmit={submit}>
           <DialogHeader>
             <DialogTitle>{isEdit ? 'Kompleksi redaktə et' : 'Yeni kompleks'}</DialogTitle>
@@ -76,10 +77,17 @@ export function ComplexFormDialog({ open, onOpenChange, complex }: { open: boole
               <div className="space-y-2"><Label htmlFor="cx-code">Qısa kod</Label><Input id="cx-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="SEA-BREEZE" required />
                 <p className="text-xs text-muted-foreground">Latın hərfləri, sonra dəyişdirilmir.</p></div>
             )}
-            <div className="space-y-2"><Label htmlFor="cx-addr">Ünvan</Label><Input id="cx-addr" value={address} onChange={(e) => setAddress(e.target.value)} /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2"><Label htmlFor="cx-lat">Enlik</Label><Input id="cx-lat" type="number" step="any" value={lat} onChange={(e) => setLat(e.target.value)} placeholder="40.4093" /></div>
-              <div className="space-y-2"><Label htmlFor="cx-lng">Uzunluq</Label><Input id="cx-lng" type="number" step="any" value={lng} onChange={(e) => setLng(e.target.value)} placeholder="49.8671" /></div>
+            <div className="space-y-2"><Label htmlFor="cx-addr">Ünvan</Label><Input id="cx-addr" value={address} onChange={(e) => setAddress(e.target.value)} />
+              <p className="text-xs text-muted-foreground">Pin qoyulanda avtomatik dolur, düzəldə bilərsiniz.</p></div>
+            <div className="space-y-2">
+              <Label>Kompleksin yeri</Label>
+              {open && (
+                <GeoMapPicker
+                  height={240}
+                  value={lat && lng ? { lat: Number(lat), lng: Number(lng) } : null}
+                  onChange={(p) => { setLat(String(p.lat)); setLng(String(p.lng)); if (p.address) setAddress(p.address) }}
+                />
+              )}
             </div>
             {isEdit && (
               <label className="flex items-start gap-2 text-sm">

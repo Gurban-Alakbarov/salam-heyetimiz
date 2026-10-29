@@ -1,4 +1,5 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
+import { GeoMapPicker } from '@/components/GeoMap'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ChevronLeft, Loader2 } from 'lucide-react'
 import { useCreateDevice, useDevice, useDeviceLookups, useUpdateDevice } from '@/api/devices'
@@ -285,7 +286,7 @@ export function DeviceFormPage() {
                   )}
                 </Field>
               </div>
-              <Field id="address" label="Ünvan" hint="Tam ünvan (könüllü)" error={fieldError('address')}>
+              <Field id="address" label="Ünvan" hint="Pin qoyulanda avtomatik dolur, düzəldə bilərsiniz" error={fieldError('address')}>
                 <Input
                   id="address"
                   value={form.address}
@@ -293,25 +294,15 @@ export function DeviceFormPage() {
                   placeholder="Küçə, ev, rayon"
                 />
               </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field id="latitude" label="Enlik" error={fieldError('latitude')}>
-                  <Input
-                    id="latitude"
-                    type="number"
-                    step="any"
-                    value={form.latitude}
-                    onChange={(e) => set('latitude')(e.target.value)}
-                  />
-                </Field>
-                <Field id="longitude" label="Uzunluq" error={fieldError('longitude')}>
-                  <Input
-                    id="longitude"
-                    type="number"
-                    step="any"
-                    value={form.longitude}
-                    onChange={(e) => set('longitude')(e.target.value)}
-                  />
-                </Field>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Cihazın yeri</Label>
+                <GeoMapPicker
+                  value={form.latitude && form.longitude ? { lat: Number(form.latitude), lng: Number(form.longitude) } : null}
+                  onChange={(p) => setForm((x) => ({ ...x, latitude: String(p.lat), longitude: String(p.lng), address: p.address ?? x.address }))}
+                />
+                {(fieldError('latitude') || fieldError('longitude')) && (
+                  <p className="text-xs text-destructive">{fieldError('latitude') ?? fieldError('longitude')}</p>
+                )}
               </div>
             </div>
 

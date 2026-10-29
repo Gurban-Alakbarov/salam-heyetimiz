@@ -11,7 +11,7 @@ import { useDevices } from '@/api/devices'
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
 import { formatDate, formatDateTime } from '@/lib/format'
-import { OsmMap } from '@/components/OsmMap'
+import { GeoMapView } from '@/components/GeoMap'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { PermissionGate } from '@/components/PermissionGate'
 import { StatusBadge } from '@/components/StatusBadge'
@@ -118,7 +118,7 @@ export function ComplexDetailPage() {
               <CardHeader className="pb-2"><CardTitle className="text-base">Lokasiya</CardTitle></CardHeader>
               <CardContent className="space-y-2">
                 {c.address && <p className="text-sm text-muted-foreground">{c.address}</p>}
-                <OsmMap latitude={c.latitude} longitude={c.longitude} height={220} />
+                <GeoMapView latitude={c.latitude} longitude={c.longitude} height={220} />
               </CardContent>
             </Card>
           </div>

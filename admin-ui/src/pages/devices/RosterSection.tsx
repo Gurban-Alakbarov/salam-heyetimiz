@@ -1,10 +1,11 @@
 import { type FormEvent, useState } from 'react'
-import { ArrowRightLeft, BadgeCheck, Loader2, UserCog, UserMinus, UserPlus } from 'lucide-react'
+import { ArrowRightLeft, BadgeCheck, Loader2, UserCog, UserMinus, UserPlus, UsersRound } from 'lucide-react'
 import {
   useAddDeviceUser,
   useAssignDevice,
   useDevices,
   useGrantSubscription,
+  useInviteFamilyMember,
   useMoveDeviceUser,
   useRemoveDeviceUser,
 } from '@/api/devices'
@@ -49,6 +50,11 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
   const [removeTarget, setRemoveTarget] = useState<DeviceUser | null>(null)
   const [grantTarget, setGrantTarget] = useState<DeviceUser | null>(null)
   const [moveTarget, setMoveTarget] = useState<DeviceUser | null>(null)
+  const [familyHead, setFamilyHead] = useState<DeviceUser | null>(null)
+  // Who may head a family here (server-enforced too): the owner of a private gate; on a complex gate a resident
+  // with their own access (not one granted through someone else's family).
+  const canHeadFamily = (u: DeviceUser) => u.status === 'active' && u.user !== null
+    && (device.ownership_mode === 'complex' ? u.role !== 'owner' && !u.via_family : u.role === 'owner')
 
   const hasOwner = device.owner !== null
   // Y6: a complex gate never has an owner — residents are added straight away (each pays for themselves).
@@ -143,6 +149,19 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
                           </Button>
                         </PermissionGate>
                       )}
+                      {canHeadFamily(u) && (
+                        <PermissionGate anyOf={[PERM.residentsCreate]}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            aria-label="Ailə üzvü dəvət et"
+                            title="Bu şəxsin adından ailə üzvü dəvət et"
+                            onClick={() => setFamilyHead(u)}
+                          >
+                            <UsersRound className="h-4 w-4" />
+                          </Button>
+                        </PermissionGate>
+                      )}
                       {/* Y5: a plain resident moves to another gate with the remaining paid time. */}
                       {u.role !== 'owner' && !u.via_family && u.status === 'active' && u.user !== null && (
                         <PermissionGate anyOf={[PERM.residentsUpdate]}>
@@ -230,6 +249,8 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
           })
         }}
       />
+
+      <FamilyInviteDialog deviceId={device.id} head={familyHead} onClose={() => setFamilyHead(null)} />
 
       <MoveResidentDialog
         device={device}
@@ -601,3 +622,56 @@ function AddResidentDialog({
     </Dialog>
   )
 }
+
+/**
+ * Invite a family member on behalf of the family head (owner decision 2026-10-29, option a). The invitee gets the
+ * same e-mail as from the app and accepts it there; their subscription follows the family rules.
+ */
+function FamilyInviteDialog({ deviceId, head, onClose }: { deviceId: number; head: DeviceUser | null; onClose: () => void }) {
+  const { toast } = useToast()
+  const invite = useInviteFamilyMember(deviceId)
+  const [first, setFirst] = useState('')
+  const [last, setLast] = useState('')
+  const [email, setEmail] = useState('')
+  const headName = head?.user?.full_name ?? head?.user?.email ?? head?.user?.phone_masked ?? ''
+  const close = () => { setFirst(''); setLast(''); setEmail(''); onClose() }
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!head?.user) return
+    invite.mutate({ head_user_id: head.user.id, first_name: first.trim(), last_name: last.trim(), email: email.trim() }, {
+      onSuccess: (res) => {
+        toast({ variant: 'success', title: res.granted ? 'Bu hesab artıq var — ailəyə dərhal əlavə olundu' : 'Dəvət e-poçtla göndərildi' })
+        close()
+      },
+      onError: (err) => toast({ variant: 'destructive', title: 'Dəvət alınmadı', description: err instanceof ApiError ? err.message : undefined }),
+    })
+  }
+  return (
+    <Dialog open={head !== null} onOpenChange={(o) => { if (!o && !invite.isPending) close() }}>
+      <DialogContent>
+        <form onSubmit={submit}>
+          <DialogHeader>
+            <DialogTitle>Ailə üzvü dəvət et</DialogTitle>
+            <DialogDescription>
+              {headName} adından. Dəvət olunan şəxs e-poçtdakı linklə tətbiqdə qəbul edir; abunəliyi ailə qaydası ilə ödənilir.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2"><Label htmlFor="fi-first">Ad</Label><Input id="fi-first" value={first} onChange={(e) => setFirst(e.target.value)} required /></div>
+              <div className="space-y-2"><Label htmlFor="fi-last">Soyad</Label><Input id="fi-last" value={last} onChange={(e) => setLast(e.target.value)} required /></div>
+            </div>
+            <div className="space-y-2"><Label htmlFor="fi-email">E-poçt</Label><Input id="fi-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={close} disabled={invite.isPending}>İmtina</Button>
+            <Button type="submit" disabled={invite.isPending || !first.trim() || !last.trim() || !email.trim()}>
+              {invite.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Dəvət göndər
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+

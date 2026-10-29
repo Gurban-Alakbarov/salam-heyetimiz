@@ -177,6 +177,8 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::delete('devices/{deviceId}/users/{userId}', [AdminDeviceRosterController::class, 'removeUser'])->whereNumber('deviceId')->whereNumber('userId')->name('adminRemoveDeviceUser');
     // Y5 — move a resident to another gate; the remaining paid time moves with them (residents.update)
     Route::post('devices/{deviceId}/users/{userId}/move', [AdminDeviceRosterController::class, 'moveUser'])->whereNumber('deviceId')->whereNumber('userId')->name('adminMoveDeviceUser');
+    // owner decision 2026-10-29 (a): invite a family member on behalf of the family head
+    Route::post('devices/{deviceId}/family-invitations', \App\Http\Admin\V1\Controllers\Devices\AdminFamilyInvitationController::class)->whereNumber('deviceId')->name('adminInviteFamilyMember');
     // Grant entitlement without a payment (subscriptions.manage)
     Route::post('devices/{deviceId}/users/{userId}/subscription', [AdminDeviceRosterController::class, 'grantSubscription'])->whereNumber('deviceId')->whereNumber('userId')->name('adminGrantSubscription');
 

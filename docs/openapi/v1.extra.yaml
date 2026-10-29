@@ -1835,6 +1835,50 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
+  /admin/devices/{deviceId}/family-invitations:
+    post:
+      tags: [Admin / Devices]
+      summary: Invite a family member on behalf of the family head
+      operationId: adminInviteFamilyMember
+      security: [{ adminBearerAuth: [] }]
+      description: |
+        Requires `residents.create`; complex-scoped (other complexes → 404). Same rules and the same invitation e-mail as
+        the head's own invite in the app (FamilyService::invite — head rights on this device, limits, active complex).
+        **422** `not_family_head` when `head_user_id` cannot head a family here (private gate: only the owner; complex
+        gate: a resident with their own access). `granted=true` = an existing account was linked at once.
+        Audited as `family.invited_by_admin`.
+      parameters: [{ $ref: '#/components/parameters/DeviceId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [head_user_id, first_name, last_name, email]
+              properties:
+                head_user_id: { type: integer }
+                first_name: { type: string, maxLength: 60 }
+                last_name: { type: string, maxLength: 60 }
+                email: { type: string, format: email, maxLength: 160 }
+      responses:
+        '201':
+          description: Invited (or granted at once)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      granted: { type: boolean }
+                      invitation_id: { type: integer, nullable: true }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: 'Invitation rule refused (already pending, member limit …)', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
   /admin/devices/{deviceId}/ping:
     post:
       tags: [Admin / Devices]

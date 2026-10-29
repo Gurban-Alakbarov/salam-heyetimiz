@@ -285,6 +285,19 @@ export function useResyncWhitelist(id: number) {
   })
 }
 
+/**
+ * Owner decision 2026-10-29 (a): invite a family member on behalf of the family head — same rules and the same
+ * invitation e-mail as the head's own invite in the app. `granted` = an existing account got access at once.
+ */
+export function useInviteFamilyMember(deviceId: number) {
+  const invalidate = useDeviceInvalidation()
+  return useMutation({
+    mutationFn: async (input: { head_user_id: number; first_name: string; last_name: string; email: string }) =>
+      (await api.post<{ data: { granted: boolean; invitation_id: number | null } }>(`/admin/v1/devices/${deviceId}/family-invitations`, input)).data.data,
+    onSuccess: () => invalidate(deviceId),
+  })
+}
+
 export interface PingResult {
   /** false: Traccar itself did not answer. */
   reachable: boolean

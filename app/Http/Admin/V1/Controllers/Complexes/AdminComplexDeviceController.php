@@ -38,7 +38,7 @@ class AdminComplexDeviceController
     /** POST /admin/v1/complexes/{complexId}/devices/{deviceId} */
     public function bind(Request $request, int $complexId, int $deviceId): JsonResponse
     {
-        $this->requirePermission($request, Permission::COMPLEXES_MANAGE);
+        $this->requireAnyPermission($request, Permission::COMPLEXES_MANAGE, Permission::COMPLEXES_DEVICES_BIND);
         $complex = $this->scopedComplex($request, $complexId);
 
         return $this->locked($deviceId, function (Device $device) use ($complex): JsonResponse {
@@ -55,7 +55,7 @@ class AdminComplexDeviceController
     /** DELETE /admin/v1/complexes/{complexId}/devices/{deviceId} */
     public function unbind(Request $request, int $complexId, int $deviceId): JsonResponse
     {
-        $this->requirePermission($request, Permission::COMPLEXES_MANAGE);
+        $this->requireAnyPermission($request, Permission::COMPLEXES_MANAGE, Permission::COMPLEXES_DEVICES_BIND);
         $complex = $this->scopedComplex($request, $complexId);
 
         return $this->locked($deviceId, function (Device $device) use ($complex): JsonResponse {

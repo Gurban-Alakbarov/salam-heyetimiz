@@ -136,6 +136,7 @@ class AdminComplexPeopleController
         $ids = collect($page->items())->pluck('id');
         $komendants = AdminUser::query()->whereIn('user_id', $ids)->pluck('complex_id', 'user_id');
         $complexes = ComplexMember::query()->whereIn('user_id', $ids)->where('status', 'active')->get(['user_id', 'complex_id'])->groupBy('user_id');
+        $complexNames = Complex::query()->whereIn('id', $complexes->flatten()->pluck('complex_id')->unique())->pluck('name', 'id');
 
         return response()->json([
             'data' => collect($page->items())->map(fn (User $u): array => [
@@ -148,6 +149,11 @@ class AdminComplexPeopleController
                 'email_verified' => $u->email_verified_at !== null,
                 'is_komendant_linked' => $komendants->has($u->id),
                 'complex_ids' => ($complexes->get($u->id) ?? collect())->pluck('complex_id')->map(fn ($c) => (int) $c)->values()->all(),
+                // Names for the panel (ids alone mean nothing to an operator).
+                'complexes' => ($complexes->get($u->id) ?? collect())->map(fn ($m): array => [
+                    'id' => (int) $m->complex_id,
+                    'name' => $complexNames[$m->complex_id] ?? null,
+                ])->values()->all(),
                 'created_at' => optional($u->created_at)->toIso8601String(),
             ])->all(),
             'meta' => ['total' => $page->total(), 'page' => $page->currentPage(), 'per_page' => $page->perPage()],

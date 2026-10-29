@@ -158,6 +158,7 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     // Devices (batch 08)
     Route::get('devices', [AdminDeviceController::class, 'index'])->name('adminListDevices');
     Route::post('devices', [AdminDeviceController::class, 'store'])->name('adminCreateDevice');
+    Route::get('devices/lookups', [AdminDeviceController::class, 'lookups'])->name('adminDeviceLookups');
     Route::post('devices/reconcile', [AdminDeviceController::class, 'reconcile'])->name('adminReconcileDevice');
     Route::get('devices/{deviceId}', [AdminDeviceController::class, 'show'])->whereNumber('deviceId')->name('adminGetDevice');
     Route::patch('devices/{deviceId}', [AdminDeviceController::class, 'update'])->whereNumber('deviceId')->name('adminUpdateDevice');

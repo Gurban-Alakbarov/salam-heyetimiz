@@ -4,6 +4,7 @@ namespace App\Domain\Roster\Services;
 
 use App\Domain\Admin\Exceptions\ComplexInactiveException;
 use App\Domain\Admin\Models\AdminUser;
+use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Roster\Enums\InvitationKind;
 use App\Domain\Roster\Enums\InvitationStatus;
 use App\Domain\Roster\Exceptions\InvitationException;
@@ -27,6 +28,7 @@ final class InvitationService
     public function __construct(
         private readonly InvitationTokens $tokens,
         private readonly Clock $clock,
+        private readonly AuditLogger $audit,
     ) {}
 
     /** @return array{invitation: Invitation, token: string} */
@@ -104,6 +106,7 @@ final class InvitationService
             $this->countLimit($key);
         }
         SendInvitationEmailJob::dispatch((int) $invitation->getKey(), $token['plaintext'])->afterCommit();
+        $this->record('invitation.resent', $invitation);
 
         return $token['plaintext'];
     }
@@ -120,8 +123,27 @@ final class InvitationService
             'revoked_by_user_id' => $byUser?->getKey(),
             'revoked_by_admin_id' => $byAdmin?->getKey(),
         ])->save();
+        $this->record('invitation.revoked', $invitation, ['by_admin_id' => $byAdmin?->getKey()]);
 
         return $invitation;
+    }
+
+    /**
+     * Audit trail for invitations (created / resent / revoked; accept + decline are audited where they happen).
+     * Ids only — the invitee's email and name stay out of the audit log.
+     *
+     * @param  array<string, mixed>  $extra
+     */
+    private function record(string $action, Invitation $invitation, array $extra = []): void
+    {
+        $this->audit->record($action, array_filter([
+            'invitation_id' => (int) $invitation->getKey(),
+            'kind' => $invitation->kind instanceof InvitationKind ? $invitation->kind->value : $invitation->kind,
+            'complex_id' => $invitation->complex_id,
+            'device_id' => $invitation->device_id,
+            'invited_by_admin_id' => $invitation->invited_by_admin_id,
+            'invited_by_user_id' => $invitation->invited_by_user_id,
+        ] + $extra, fn ($v): bool => $v !== null), Invitation::class, (int) $invitation->getKey());
     }
 
     /**
@@ -202,6 +224,8 @@ final class InvitationService
 
         $this->countLimit($inviterLimit[0]);
         SendInvitationEmailJob::dispatch((int) $invitation->getKey(), $token['plaintext'])->afterCommit();
+
+        $this->record('invitation.created', $invitation);
 
         return ['invitation' => $invitation, 'token' => $token['plaintext']];
     }

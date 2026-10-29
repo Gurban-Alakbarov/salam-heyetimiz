@@ -48,6 +48,7 @@ class AccessControlController
                 'is_complex_scoped' => $role->isComplexScoped(),
                 'admin_count' => AdminUser::query()->where('role', $role->value)->count(),
                 'default_permissions' => $this->roleDefaults($role),
+                'grantable' => $role === AdminRole::ComplexManager ? Catalog::complexScopable() : null,
             ];
         }
 
@@ -92,6 +93,7 @@ class AccessControlController
             'permissions.*' => ['string', 'in:'.implode(',', Catalog::all())],
         ]);
         $wantKeys = array_values(array_unique($validated['permissions']));
+        $this->assertKomendantScopable($roleEnum, $wantKeys);
         $idByKey = Permission::query()->pluck('id', 'key')->all();
         $wantIds = array_values(array_filter(array_map(fn (string $k): ?int => isset($idByKey[$k]) ? (int) $idByKey[$k] : null, $wantKeys)));
 
@@ -156,6 +158,9 @@ class AccessControlController
         $validated = $request->validate([
             'permission' => ['required', 'string', 'in:'.implode(',', Catalog::all())],
         ]);
+        if ($effect === 'grant') {
+            $this->assertKomendantScopable($admin->role, [$validated['permission']]);
+        }
         $permissionId = (int) Permission::query()->where('key', $validated['permission'])->value('id');
         if ($permissionId === 0) {
             abort(404);
@@ -187,7 +192,28 @@ class AccessControlController
             'additional' => $admin->grantedKeys(),
             'revoked' => $admin->revokedKeys(),
             'effective' => $admin->permissionKeys(),
+            // A komendant can hold only these (null = any): the panel greys out the rest.
+            'grantable' => $admin->role === AdminRole::ComplexManager ? Catalog::complexScopable() : null,
         ];
+    }
+
+    /**
+     * A komendant must only ever see their own complex, so a permission answered by an endpoint that is not
+     * complex-scoped cannot be given to the complex_manager role or to one komendant.
+     *
+     * @param  array<int, string>  $keys
+     */
+    private function assertKomendantScopable(AdminRole $role, array $keys): void
+    {
+        if ($role !== AdminRole::ComplexManager) {
+            return;
+        }
+        $outside = array_values(array_diff($keys, Catalog::complexScopable()));
+        if ($outside !== []) {
+            throw ValidationException::withMessages([
+                'permission' => 'Kompleks meneceri yalnız öz kompleksinin məlumatını görür; bu icazə(lər) bütün komplekslərə aiddir və ona verilə bilməz: '.implode(', ', $outside),
+            ]);
+        }
     }
 
     /**

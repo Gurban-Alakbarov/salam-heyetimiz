@@ -4,6 +4,7 @@ namespace App\Http\Admin\V1\Controllers\Notifications;
 
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Admin\Models\AdminUser;
+use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Notifications\Models\NotificationCampaign;
 use App\Domain\Notifications\Queries\NotificationCampaignQuery;
 use App\Domain\Notifications\Services\CampaignAudienceResolver;
@@ -71,6 +72,19 @@ class AdminNotificationCampaignController
             scopeComplexId: $this->complexScopeId($request),
             idempotencyKey: $key,
         );
+
+        // Who sent what to whom — once per campaign (an idempotent replay returns the same campaign).
+        if ($campaign->wasRecentlyCreated) {
+            app(AuditLogger::class)->record('notification.campaign_sent', [
+                'campaign_id' => (int) $campaign->getKey(),
+                'title' => $campaign->title,
+                'language' => $campaign->language,
+                'audience_scope' => $campaign->audience_scope?->value,
+                'audience_filter' => $campaign->audience_filter,
+                'total_recipients' => $campaign->total_recipients,
+                'scope_complex_id' => $this->complexScopeId($request),
+            ], NotificationCampaign::class, (int) $campaign->getKey());
+        }
 
         return (new NotificationCampaignResource($campaign))->response()->setStatusCode(202);
     }

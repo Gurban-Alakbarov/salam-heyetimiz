@@ -138,6 +138,12 @@ class AdminUser extends Authenticatable
             $this->revokedKeys(),
         ));
 
+        // A komendant only ever sees their own complex: permissions answered by endpoints that are not
+        // complex-scoped are dropped, whatever a grant or a role-template edit says.
+        if ($this->role === AdminRole::ComplexManager) {
+            $effective = array_values(array_intersect($effective, Permission::complexScopable()));
+        }
+
         return $this->permissionKeyCache = $effective;
     }
 

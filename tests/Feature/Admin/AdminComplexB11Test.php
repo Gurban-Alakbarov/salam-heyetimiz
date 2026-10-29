@@ -164,8 +164,10 @@ it('RBAC + complex isolation on every new endpoint', function () {
     $this->actingAs($fin, 'admin')->getJson('/admin/v1/users')->assertForbidden();
     $this->actingAs($fin, 'admin')->getJson("/admin/v1/subscriptions/{$sub->id}")->assertOk();
     $this->actingAs($fin, 'admin')->postJson("/admin/v1/complexes/{$this->cx->id}/devices/{$theirs->id}")->assertForbidden();
-    // technical: devices.update yes, complexes.manage no
+    // technical: devices.update yes, complexes.manage no — but since 2026-10-29 the technician may bind devices
+    // (complexes.devices.bind), so it passes the permission check and hits the business rule instead (the device
+    // already belongs to another complex → 409).
     $tech = makeAdminRole('technical');
-    $this->actingAs($tech, 'admin')->postJson("/admin/v1/complexes/{$this->cx->id}/devices/{$theirs->id}")->assertForbidden();
+    $this->actingAs($tech, 'admin')->postJson("/admin/v1/complexes/{$this->cx->id}/devices/{$theirs->id}")->assertStatus(409);
     $this->actingAs($tech, 'admin')->postJson("/admin/v1/devices/{$mine->id}/ownership-mode", ['ownership_mode' => 'complex'])->assertOk();
 });

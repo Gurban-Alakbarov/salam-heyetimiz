@@ -67,7 +67,8 @@ final class SubscriptionQuery
      */
     public function adminList(?string $status, ?int $expiresWithinDays, int $limit, ?int $cursor): array
     {
-        $query = Subscription::query()->with('deviceUser');
+        // device: the admin list shows the gate's name, not its id
+        $query = Subscription::query()->with(['deviceUser', 'deviceUser.device:id,serial,location_label']);
 
         if ($status !== null) {
             $query->where('status', $status);

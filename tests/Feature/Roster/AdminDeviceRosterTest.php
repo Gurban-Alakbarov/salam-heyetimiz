@@ -139,3 +139,34 @@ it('requires an admin token', function () {
     $this->postJson("/admin/v1/devices/{$device->id}/assign", ['owner_phone' => '+994700500081'])->assertStatus(401);
     $this->postJson("/admin/v1/devices/{$device->id}/users", ['phone' => '+994700500081'])->assertStatus(401);
 });
+
+it('BR-18: removing a resident cancels their live subscription on that device (no refund)', function () {
+    $admin = makeSuperAdmin();
+    $owner = makeUser('+994700500060');
+    $device = makeOwnedDevice($owner, 'ROS-SUB-1', '+994700500061');
+    $member = makeUser('+994701500062');
+    $subscription = makeSubscription(makeDeviceUser($member, $device, 'user'));
+
+    $this->actingAs($admin, 'admin')
+        ->deleteJson("/admin/v1/devices/{$device->id}/users/{$member->id}")
+        ->assertStatus(204);
+
+    expect($subscription->refresh()->status->value)->toBe('cancelled')
+        ->and(\App\Domain\Audit\Models\AuditLog::query()->where('action', 'subscription.cancelled_on_removal')
+            ->where('auditable_id', $subscription->id)->exists())->toBeTrue();
+});
+
+it('BR-18: a removed then re-added resident does not get the old paid time back', function () {
+    $admin = makeSuperAdmin();
+    $owner = makeUser('+994700500070');
+    $device = makeOwnedDevice($owner, 'ROS-SUB-2', '+994700500071');
+    $member = makeUser('+994701500072');
+    $subscription = makeSubscription(makeDeviceUser($member, $device, 'user'));
+
+    $this->actingAs($admin, 'admin')->deleteJson("/admin/v1/devices/{$device->id}/users/{$member->id}")->assertStatus(204);
+    $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/users", ['phone' => '+994701500072'])->assertStatus(201);
+
+    expect($subscription->refresh()->status->value)->toBe('cancelled')
+        ->and(\App\Domain\Subscriptions\Models\Subscription::query()
+            ->where('device_user_id', $subscription->device_user_id)->where('status', 'active')->exists())->toBeFalse();
+});

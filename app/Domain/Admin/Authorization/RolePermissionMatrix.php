@@ -24,6 +24,10 @@ final class RolePermissionMatrix
                 Permission::DEVICES_VIEW,
                 Permission::DEVICES_CREATE,
                 Permission::DEVICES_UPDATE,
+                // Finish an install end to end: pick the complex, bind the device, assign the owner.
+                Permission::COMPLEXES_VIEW,
+                Permission::COMPLEXES_DEVICES_BIND,
+                Permission::DEVICES_ASSIGN,
                 Permission::DEVICES_RECONCILE,
                 Permission::DEVICES_DIAGNOSTICS_VIEW,
                 Permission::DEVICES_TRACCAR_VIEW,

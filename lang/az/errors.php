@@ -45,7 +45,7 @@ return [
     'not_family_member' => 'Seçilən şəxs bu ailənin üzvü deyil.',
     'family_action_invalid' => 'Ailə üçün seçim düzgün deyil.',
     'feedback_not_applicable' => 'Bu komanda üçün "qapı açıldımı?" cavabı qəbul edilmir.',
-    'whitelist_full' => 'Cihazın whitelist-i doludur (:capacity nömrə). Yeni sakin əlavə etmək üçün əvvəlcə kimisə çıxarın.',
+    'whitelist_full' => 'Bu cihazın istifadəçi limiti doludur (:capacity nəfər). Yeni sakin əlavə etmək üçün əvvəlcə kimisə çıxarın.',
     'complex_inactive' => 'Kompleks deaktivdir: yeni dəvət, abunə və ödəniş qəbul edilmir.',
     'notification_not_mutable' => 'Bu bildirişi söndürmək olmur.',
     'idempotency_key_required' => 'Idempotency-Key başlığı tələb olunur.',

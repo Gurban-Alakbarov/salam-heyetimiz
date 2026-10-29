@@ -49,6 +49,9 @@ final class Permission
 
     public const COMPLEXES_MANAGE = 'complexes.manage';
 
+    /** Bind / unbind a device to a complex without the rest of complexes.manage — the technician's install step. */
+    public const COMPLEXES_DEVICES_BIND = 'complexes.devices.bind';
+
     // registration applications (physical / legal — B9)
     public const APPLICATIONS_VIEW = 'applications.view';
 
@@ -172,6 +175,7 @@ final class Permission
 
             self::COMPLEXES_VIEW => ['group' => 'complexes', 'label' => 'Kompleksləri gör'],
             self::COMPLEXES_MANAGE => ['group' => 'complexes', 'label' => 'Kompleksləri idarə et'],
+            self::COMPLEXES_DEVICES_BIND => ['group' => 'complexes', 'label' => 'Cihazı kompleksə qoş / ayır'],
             self::APPLICATIONS_VIEW => ['group' => 'applications', 'label' => 'Müraciətləri gör'],
             self::APPLICATIONS_MANAGE => ['group' => 'applications', 'label' => 'Müraciətləri idarə et (status, təsdiq/rədd)'],
 
@@ -187,8 +191,8 @@ final class Permission
             self::DEVICES_DIAGNOSTICS_VIEW => ['group' => 'devices', 'label' => 'Diaqnostika'],
             self::DEVICES_TRACCAR_VIEW => ['group' => 'devices', 'label' => 'Traccar statusu / firmware'],
 
-            self::WHITELIST_VIEW => ['group' => 'whitelist', 'label' => 'Whitelist gör'],
-            self::WHITELIST_MANAGE => ['group' => 'whitelist', 'label' => 'Whitelist idarə et'],
+            self::WHITELIST_VIEW => ['group' => 'whitelist', 'label' => 'Whitelist növbəsini gör (köhnə, təsiri yoxdur)'],
+            self::WHITELIST_MANAGE => ['group' => 'whitelist', 'label' => 'Whitelist sinxronlaşdır (köhnə, təsiri yoxdur)'],
 
             self::COMMANDS_VIEW => ['group' => 'commands', 'label' => 'Açılış tarixçəsi'],
             self::COMMANDS_TEST => ['group' => 'commands', 'label' => 'Test açılış göndər'],
@@ -233,9 +237,10 @@ final class Permission
     }
 
     /**
-     * A11 — capabilities defined for features that have no endpoint yet (apartments, vehicles, invoices, OTP
-     * resend by support). Kept in the catalog (role templates, future features) but shown to admins as "not in
-     * use yet" so granting or revoking them is not mistaken for a real change.
+     * A11 — capabilities no endpoint checks (apartments, vehicles, invoices, OTP resend by support, and the
+     * per-area system / payments / reports / Traccar keys that the real endpoints never read). Kept in the catalog
+     * (role templates, future features) but shown to admins as "not in use yet" so granting or revoking them is not
+     * mistaken for a real change.
      *
      * @return list<string>
      */
@@ -246,6 +251,41 @@ final class Permission
             self::VEHICLES_VIEW, self::VEHICLES_MANAGE,
             self::INVOICES_VIEW,
             self::SUPPORT_OTP_RESEND,
+            self::SYSTEM_SMS_MANAGE, self::SYSTEM_PAYMENT_MANAGE, self::SYSTEM_TRACCAR_MANAGE,
+            self::BARRIERS_ASSIGN,
+            self::DEVICES_TRACCAR_VIEW,
+            self::PAYMENTS_VIEW,
+            self::REPORTS_VIEW,
+            // The barrier is never whitelisted (both drivers' whitelistAdd/Remove are no-ops; access is decided on
+            // the server), so the whitelist queue / resync have no effect and are no longer shown in the panel.
+            self::WHITELIST_VIEW, self::WHITELIST_MANAGE,
+        ];
+    }
+
+    /**
+     * The only permissions a complex_manager (komendant) can ever hold — every endpoint behind them limits the
+     * data to the manager's own complex (complexScopeId / assertDeviceInScope). Anything else (orders, refunds,
+     * applications, audit, settings, admins, device registration, free subscriptions — BR-11 …) is answered by
+     * endpoints that are NOT complex-scoped, so granting it would show every complex; it is ignored in the
+     * effective set and refused when granted.
+     *
+     * @return list<string>
+     */
+    public static function complexScopable(): array
+    {
+        return [
+            self::DASHBOARD_VIEW,
+            self::COMPLEXES_VIEW,
+            self::RESIDENTS_VIEW, self::RESIDENTS_CREATE, self::RESIDENTS_UPDATE, self::RESIDENTS_DELETE,
+            self::DEVICES_VIEW,
+            self::DEVICES_DIAGNOSTICS_VIEW,
+            self::COMMANDS_VIEW, self::COMMANDS_TEST,
+            self::WHITELIST_VIEW, self::WHITELIST_MANAGE,
+            self::VISITOR_LINKS_VIEW, self::VISITOR_LINKS_MANAGE,
+            self::NOTIFICATIONS_VIEW, self::NOTIFICATIONS_SEND,
+            self::SUBSCRIPTIONS_VIEW,
+            // not in use, harmless
+            self::APARTMENTS_VIEW, self::APARTMENTS_MANAGE, self::BARRIERS_ASSIGN, self::REPORTS_VIEW,
         ];
     }
 }

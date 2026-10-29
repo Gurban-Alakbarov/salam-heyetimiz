@@ -3,6 +3,7 @@
 namespace App\Http\Admin\V1\Controllers\Orders;
 
 use App\Domain\Admin\Authorization\Permission;
+use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Payments\Actions\RecheckOrder;
 use App\Domain\Payments\Actions\RequestRefund;
 use App\Domain\Payments\Models\Order;
@@ -92,7 +93,15 @@ class AdminOrderController
         $this->requirePermission($request, Permission::ORDERS_VIEW);
 
         $order = Order::query()->findOrFail($orderId);
+        $before = $order->status?->value;
+        $after = $action->handle($order);
 
-        return new OrderResource($action->handle($order)->load('items'));
+        app(AuditLogger::class)->record('order.rechecked', [
+            'order_id' => (int) $order->getKey(),
+            'status_before' => $before,
+            'status_after' => $after->status?->value,
+        ], Order::class, (int) $order->getKey());
+
+        return new OrderResource($after->load('items'));
     }
 }

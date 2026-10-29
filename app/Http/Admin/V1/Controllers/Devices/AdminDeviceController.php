@@ -2,6 +2,9 @@
 
 namespace App\Http\Admin\V1\Controllers\Devices;
 
+use App\Domain\Catalog\Models\DeviceModel;
+use App\Domain\Catalog\Models\Region;
+use App\Domain\Catalog\Models\SimOperator;
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\DeviceComm\Exceptions\TraccarDeviceNotFoundException;
 use App\Domain\DeviceComm\Services\TraccarReconciliationService;
@@ -176,6 +179,7 @@ class AdminDeviceController
         $this->assertDeviceInScope($request, $device);
 
         $images->store($request->file('image'), $device);
+        app(\App\Domain\Audit\Services\AuditLogger::class)->record('device.image_uploaded', ['device_id' => (int) $device->id], Device::class, (int) $device->id);
 
         return $this->adminDevice($device)->response()->setStatusCode(200);
     }
@@ -189,8 +193,33 @@ class AdminDeviceController
         $this->assertDeviceInScope($request, $device);
 
         $images->deleteFor($device);
+        app(\App\Domain\Audit\Services\AuditLogger::class)->record('device.image_deleted', ['device_id' => (int) $device->id], Device::class, (int) $device->id);
 
         return $this->adminDevice($device)->response()->setStatusCode(200);
+    }
+
+    /**
+     * GET /admin/v1/devices/lookups — adminDeviceLookups (devices.view). The active device models, SIM operators
+     * and regions, so the device form offers choices instead of asking for numeric ids.
+     */
+    public function lookups(Request $request): JsonResponse
+    {
+        $this->requirePermission($request, Permission::DEVICES_VIEW);
+
+        return response()->json([
+            'device_models' => DeviceModel::query()->where('is_active', true)->orderBy('vendor')->orderBy('model_code')
+                ->get(['id', 'vendor', 'model_code', 'default_driver_type'])
+                ->map(fn (DeviceModel $m): array => [
+                    'id' => (int) $m->id,
+                    'vendor' => $m->vendor,
+                    'model_code' => $m->model_code,
+                    'default_driver_type' => $m->default_driver_type instanceof \BackedEnum ? $m->default_driver_type->value : $m->default_driver_type,
+                ])->all(),
+            'sim_operators' => SimOperator::query()->where('is_active', true)->orderBy('name')->get(['id', 'name'])
+                ->map(fn (SimOperator $o): array => ['id' => (int) $o->id, 'name' => $o->name])->all(),
+            'regions' => Region::query()->where('is_active', true)->orderBy('name')->get(['id', 'name'])
+                ->map(fn (Region $r): array => ['id' => (int) $r->id, 'name' => $r->name])->all(),
+        ]);
     }
 
     /** DELETE /admin/v1/devices/{deviceId} — adminDecommissionDevice (devices.decommission). */

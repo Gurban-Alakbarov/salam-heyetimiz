@@ -42,7 +42,7 @@ return [
     'not_family_member' => 'The chosen person is not a member of this family.',
     'family_action_invalid' => 'The family choice is not valid.',
     'feedback_not_applicable' => 'Feedback cannot be given for this command.',
-    'whitelist_full' => 'The device whitelist is full (:capacity numbers). Remove someone before adding a new resident.',
+    'whitelist_full' => 'This device has reached its user limit (:capacity people). Remove someone before adding a new resident.',
     'complex_inactive' => 'The complex is deactivated: no new invitations, subscriptions or payments.',
     'notification_not_mutable' => 'This notification cannot be switched off.',
     'idempotency_key_required' => 'The Idempotency-Key header is required.',

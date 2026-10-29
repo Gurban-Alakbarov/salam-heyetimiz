@@ -29,6 +29,11 @@ class SubscriptionResource extends JsonResource
             'auto_renew' => (bool) $this->auto_renew,
             'device_id' => optional($this->deviceUser)->device_id !== null ? (int) $this->deviceUser->device_id : null,
             'user_id' => optional($this->deviceUser)->user_id !== null ? (int) $this->deviceUser->user_id : null,
+            // Only where the caller eager-loaded the device (admin list) — the gate's name instead of a bare id.
+            'device_label' => $this->when(
+                $this->deviceUser !== null && $this->deviceUser->relationLoaded('device') && $this->deviceUser->device !== null,
+                fn (): string => (string) ($this->deviceUser->device->location_label ?: $this->deviceUser->device->serial),
+            ),
             'starts_at' => optional($this->starts_at)->toIso8601String(),
             'price_minor' => (int) $this->price_minor,
             'currency' => $this->currency,

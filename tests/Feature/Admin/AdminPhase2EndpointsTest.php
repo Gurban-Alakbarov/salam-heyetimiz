@@ -84,3 +84,15 @@ it('stores complex coordinates on create and update', function () {
     $c = \App\Domain\Admin\Models\Complex::query()->findOrFail($id);
     expect((float) $c->latitude)->toBe(40.5)->and((float) $c->longitude)->toBe(49.9);
 });
+
+it('finds event-written audit rows by the object id in their payload', function () {
+    $this->actingAs(makeSuperAdmin(), 'admin');
+    // domain-event rows carry the object only in the payload (no auditable_type)
+    app(AuditLogger::class)->record('relay_open_requested', ['device_id' => 30]);
+    app(AuditLogger::class)->record('relay_open_requested', ['device_id' => 31]);
+    app(AuditLogger::class)->record('device.image_uploaded', ['device_id' => 30], 'App\Domain\Devices\Models\Device', 30);
+
+    $rows = $this->getJson('/admin/v1/audit?auditable_type=Device&auditable_id=30')->assertOk()->json('data');
+
+    expect(collect($rows)->pluck('action')->sort()->values()->all())->toBe(['device.image_uploaded', 'relay_open_requested']);
+});

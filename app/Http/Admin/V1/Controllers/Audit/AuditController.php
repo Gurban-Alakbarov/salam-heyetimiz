@@ -15,6 +15,16 @@ class AuditController
     use AuthorizesAdmin;
 
     /** GET /admin/v1/audit — adminListAudit (audit.view). */
+    /** Payload key that names the object for event-written rows (no auditable_type). */
+    private const PAYLOAD_KEYS = [
+        'Device' => 'device_id',
+        'User' => 'user_id',
+        'Complex' => 'complex_id',
+        'Order' => 'order_id',
+        'Subscription' => 'subscription_id',
+        'AdminUser' => 'admin_id',
+    ];
+
     public function index(Request $request): JsonResponse
     {
         $this->requirePermission($request, Permission::AUDIT_VIEW);
@@ -34,12 +44,31 @@ class AuditController
         if (($actorId = $request->query('actor_id')) !== null && ctype_digit((string) $actorId)) {
             $query->where('actor_id', (int) $actorId);
         }
-        if (($type = $request->query('auditable_type')) !== null && $type !== '') {
-            // short names from the panel ("Device", "User", …) or the full class
-            $query->where(fn ($w) => $w->where('auditable_type', $type)->orWhere('auditable_type', 'like', '%\\'.$type));
-        }
-        if (($auditableId = $request->query('auditable_id')) !== null && ctype_digit((string) $auditableId)) {
-            $query->where('auditable_id', (int) $auditableId);
+        // Object filter. Most rows come from domain events (AuditableEvent) that carry the object only in the payload
+        // (e.g. "device_id": 30) with no auditable_type, so the object is matched on BOTH: the auditable columns and
+        // the payload key for that type.
+        $type = trim((string) $request->query('auditable_type', ''));
+        $objectId = $request->query('auditable_id');
+        $objectId = $objectId !== null && ctype_digit((string) $objectId) ? (int) $objectId : null;
+        if ($type !== '' || $objectId !== null) {
+            $payloadKey = self::PAYLOAD_KEYS[$type] ?? null;
+            $query->where(function ($w) use ($type, $objectId, $payloadKey): void {
+                $w->where(function ($x) use ($type, $objectId): void {
+                    if ($type !== '') {
+                        // short names from the panel ("Device", "User", …) or the full class
+                        $x->where(fn ($t) => $t->where('auditable_type', $type)->orWhere('auditable_type', 'like', '%\\\\'.$type));
+                    }
+                    if ($objectId !== null) {
+                        $x->where('auditable_id', $objectId);
+                    }
+                });
+                if ($payloadKey !== null) {
+                    $path = '$.'.$payloadKey;
+                    $objectId !== null
+                        ? $w->orWhereRaw('JSON_UNQUOTE(JSON_EXTRACT(payload, ?)) = ?', [$path, (string) $objectId])
+                        : $w->orWhereRaw('JSON_EXTRACT(payload, ?) IS NOT NULL', [$path]);
+                }
+            });
         }
         if (($q = trim((string) $request->query('q', ''))) !== '') {
             // free text over who did it and the payload (ids, phones, codes …)

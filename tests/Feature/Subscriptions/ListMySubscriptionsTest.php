@@ -28,6 +28,19 @@ it('lists only the caller’s own subscriptions', function () {
         ->assertJsonPath('page.has_more', false);
 });
 
+it('shows what a renewal costs today (15 AZN / 365 days), whatever the row snapshot says', function () {
+    $me = makeUser('+994500000009');
+    $old = makeSubscription(makeDeviceUser($me, makeActiveDevice('SER-RNW', '+994700000019')), ['price_minor' => 1200, 'term_days' => 30]);
+
+    $this->actingAs($me, 'user')->getJson('/v1/subscriptions')
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $old->id)
+        ->assertJsonPath('data.0.price_minor', 1200)
+        ->assertJsonPath('data.0.term_days', 30)
+        ->assertJsonPath('data.0.renewal_price_minor', 1500)
+        ->assertJsonPath('data.0.renewal_term_days', 365);
+});
+
 it('filters by status', function () {
     $me = makeUser('+994500000003');
     $device = makeActiveDevice('SER-S', '+994700000012');

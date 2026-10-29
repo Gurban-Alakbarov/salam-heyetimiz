@@ -10483,7 +10483,7 @@
             "adminBearerAuth": []
           }
         ],
-        "description": "Requires `subscriptions.manage`. Activates (or extends) the active roster member's entitlement — no order,\nno money. A3 — without `tier` a new subscription takes the row's tier (own access → `main`, family grant →\n`additional`) and an existing one keeps its tier; `term_days` defaults to the configured term (30). The grant\nis recorded (`comp_grant` on adminGetSubscription), so it is not shown as a legacy comp.\n**404** `roster_member_not_found` when the user has no active row on the device.\n",
+        "description": "Requires `subscriptions.manage`. Activates (or extends) the active roster member's entitlement — no order,\nno money. A3 — without `tier` a new subscription takes the row's tier (own access → `main`, family grant →\n`additional`) and an existing one keeps its tier; `term_days` defaults to the configured term (365). The grant\nis recorded (`comp_grant` on adminGetSubscription), so it is not shown as a legacy comp.\n**404** `roster_member_not_found` when the user has no active row on the device.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/DeviceId"
@@ -11250,7 +11250,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "Only active, complex-mode devices. Shows the monthly subscription price (never the sale price) and the\nCALLER's own subscription status — never other residents' data. Non-members get **404**.\n",
+        "description": "Only active, complex-mode devices. Shows the subscription price (never the sale price) and the\nCALLER's own subscription status — never other residents' data. Non-members get **404**.\n",
         "parameters": [
           {
             "in": "path",
@@ -12360,7 +12360,7 @@
         "tags": [
           "Komendant"
         ],
-        "summary": "The complex's shared devices (monthly price only)",
+        "summary": "The complex's shared devices (subscription price only)",
         "operationId": "komendantDevices",
         "security": [
           {
@@ -14316,7 +14316,19 @@
                 "example": "AZN"
               },
               "term_days": {
-                "type": "integer"
+                "type": "integer",
+                "description": "This row's own term (snapshot)."
+              },
+              "renewal_price_minor": {
+                "type": "integer",
+                "example": 1500,
+                "description": "What a renewal costs today (commercial price",
+                "minor units)": null
+              },
+              "renewal_term_days": {
+                "type": "integer",
+                "example": 365,
+                "description": "The term a renewal buys today"
               },
               "last_reminder_kind": {
                 "type": "string",
@@ -14584,7 +14596,7 @@
             "properties": {
               "amount_minor": {
                 "type": "integer",
-                "example": 1200
+                "example": 1500
               },
               "flagged_at": {
                 "type": "string",
@@ -19376,6 +19388,15 @@
           },
           "term_days": {
             "type": "integer"
+          },
+          "renewal_price_minor": {
+            "type": "integer",
+            "example": 1500,
+            "description": "What a renewal costs today"
+          },
+          "renewal_term_days": {
+            "type": "integer",
+            "example": 365
           },
           "currency": {
             "type": "string",

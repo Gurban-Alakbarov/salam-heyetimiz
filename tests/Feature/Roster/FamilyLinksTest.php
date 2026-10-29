@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Http;
 
 /*
 | IMPLEMENTATION_PLAN B8 — family links: relation (family_links) / access (device_users.family_link_id) /
-| billing (the member's own 12 AZN / 30-day subscription) are independent layers. Head or member pays; a
+| billing (the member's own 15 AZN / 1-year subscription) are independent layers. Head or member pays; a
 | member never manages, invites or shares; removal cancels with no refund; re-add reopens.
 */
 
@@ -70,7 +70,7 @@ beforeEach(function () {
     $this->device = makeOwnedDevice($this->head, 'SER-B8-1', '+994700080001'); // private: owner = head
 });
 
-it('head invites → member accepts: active link, head-granted row, member\'s own 12 AZN / 30-day additional subscription', function () {
+it('head invites → member accepts: active link, head-granted row, member\'s own 15 AZN / 1-year additional subscription', function () {
     $member = b8User('+994500080002', 'kid@example.test');
     $data = b8InviteAndAccept($this->head, $this->device, $member);
 
@@ -83,13 +83,14 @@ it('head invites → member accepts: active link, head-granted row, member\'s ow
         ->and($row->role)->toBe(DeviceUserRole::User);
 
     $sub = Subscription::query()->findOrFail($data['subscription_id']);
-    expect($sub->tier)->toBe(SubscriptionTier::Additional)->and($sub->price_minor)->toBe(1200)->and($sub->term_days)->toBe(30)
+    expect($sub->tier)->toBe(SubscriptionTier::Additional)->and($sub->price_minor)->toBe(1500)->and($sub->term_days)->toBe(365)
         ->and($sub->status)->toBe(SubscriptionStatus::PendingPayment);
 
     // a second device for an existing member is granted directly (relation already accepted)
     $second = makeOwnedDevice($this->head, 'SER-B8-2', '+994700080002');
     $this->actingAs($this->head, 'user')->postJson("/v1/devices/{$second->id}/invitations", ['first_name' => 'F', 'last_name' => 'M', 'email' => 'kid@example.test'])
-        ->assertCreated()->assertJsonPath('data.granted', true)->assertJsonPath('data.device.subscription.price_minor', 1200);
+        ->assertCreated()->assertJsonPath('data.granted', true)->assertJsonPath('data.device.subscription.price_minor', 1500)
+        ->assertJsonPath('data.device.subscription.renewal_price_minor', 1500)->assertJsonPath('data.device.subscription.renewal_term_days', 365);
     expect(FamilyLink::query()->count())->toBe(1)->and(Subscription::query()->count())->toBe(2);
 
     $this->actingAs($this->head, 'user')->getJson('/v1/family/members')->assertOk()
@@ -104,7 +105,7 @@ it('payment: head or member pays; unrelated users and other members cannot; paye
 
     b8Order(makeUser('+994500080013'), $sub1, 'o-x')->assertForbidden();   // unrelated
     b8Order($kid2, $sub1, 'o-k2')->assertForbidden();                     // another member
-    b8Order($this->head, $sub1, 'o-h')->assertCreated()->assertJsonPath('amount_minor', 1200);
+    b8Order($this->head, $sub1, 'o-h')->assertCreated()->assertJsonPath('amount_minor', 1500);
     b8Order($kid2, $sub2, 'o-self')->assertCreated();
 
     $order = Order::query()->where('payer_user_id', $this->head->id)->firstOrFail();
@@ -129,7 +130,7 @@ it('head + 5 members = 6 separate subscriptions; the head pays 5 × 12 = 60 AZN 
         $members += b8Order($this->head, $sub, 'm-'.$i)->assertCreated()->json('amount_minor');
     }
 
-    expect($members)->toBe(6000)->and($total + $members)->toBe(7200)->and(Subscription::query()->count())->toBe(6)
+    expect($members)->toBe(7500)->and($total + $members)->toBe(9000)->and(Subscription::query()->count())->toBe(6)
         ->and(FamilyLink::query()->where('status', 'active')->count())->toBe(5);
 });
 
@@ -165,8 +166,8 @@ it('removal: link removed, access revoked, subscription cancelled without refund
     $sub = Subscription::query()->findOrFail($data['subscription_id']);
     $sub->forceFill(['status' => 'active', 'starts_at' => now(), 'ends_at' => now()->addDays(30)])->save();
     SubscriptionPeriod::query()->create([
-        'subscription_id' => $sub->id, 'order_id' => makePaidOrder($this->head, 1200, 'KB-B8-1')->id, 'kind' => 'initial',
-        'period_start' => now(), 'period_end' => now()->addDays(30), 'amount_minor' => 1200, 'paid_by_user_id' => $this->head->id,
+        'subscription_id' => $sub->id, 'order_id' => makePaidOrder($this->head, 1500, 'KB-B8-1')->id, 'kind' => 'initial',
+        'period_start' => now(), 'period_end' => now()->addDays(30), 'amount_minor' => 1500, 'paid_by_user_id' => $this->head->id,
     ]);
 
     $this->actingAs($this->head, 'user')->deleteJson("/v1/family/members/{$kid->id}")
@@ -189,8 +190,8 @@ it('re-add: new link, same roster row reactivated, cancelled subscription reopen
     $first = b8InviteAndAccept($this->head, $this->device, $kid);
     $sub = Subscription::query()->findOrFail($first['subscription_id']);
     SubscriptionPeriod::query()->create([
-        'subscription_id' => $sub->id, 'order_id' => makePaidOrder($this->head, 1200, 'KB-B8-2')->id, 'kind' => 'initial',
-        'period_start' => now()->subDays(40), 'period_end' => now()->subDays(10), 'amount_minor' => 1200, 'paid_by_user_id' => $this->head->id,
+        'subscription_id' => $sub->id, 'order_id' => makePaidOrder($this->head, 1500, 'KB-B8-2')->id, 'kind' => 'initial',
+        'period_start' => now()->subDays(40), 'period_end' => now()->subDays(10), 'amount_minor' => 1500, 'paid_by_user_id' => $this->head->id,
     ]);
     $this->actingAs($this->head, 'user')->deleteJson("/v1/family/members/{$kid->id}")->assertOk();
 
@@ -199,7 +200,7 @@ it('re-add: new link, same roster row reactivated, cancelled subscription reopen
     expect($again['family_link_id'])->not->toBe($first['family_link_id'])
         ->and($again['subscription_id'])->toBe($sub->id)
         ->and($sub->refresh()->status)->toBe(SubscriptionStatus::PendingPayment)
-        ->and($sub->price_minor)->toBe(1200)
+        ->and($sub->price_minor)->toBe(1500)
         ->and(SubscriptionPeriod::query()->where('subscription_id', $sub->id)->count())->toBe(1)
         ->and(DeviceUser::query()->where('user_id', $kid->id)->count())->toBe(1)
         ->and((int) DeviceUser::query()->where('user_id', $kid->id)->value('family_link_id'))->toBe($again['family_link_id'])
@@ -230,7 +231,7 @@ it('complex mode: a resident heads a family; the member gets no complex membersh
     $this->actingAs($kid, 'user')->postJson("/v1/devices/{$shared->id}/invitations", ['first_name' => 'A', 'last_name' => 'B', 'email' => 'x@example.test'])->assertForbidden();
 
     // head (resident) pays the member's complex subscription
-    b8Order($resident, Subscription::query()->findOrFail($data['subscription_id']), 'cx-pay')->assertCreated()->assertJsonPath('amount_minor', 1200);
+    b8Order($resident, Subscription::query()->findOrFail($data['subscription_id']), 'cx-pay')->assertCreated()->assertJsonPath('amount_minor', 1500);
 });
 
 it('rejects self-invites, members already on the device and the head\'s own email', function () {

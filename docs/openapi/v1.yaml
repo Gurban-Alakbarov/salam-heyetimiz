@@ -3388,7 +3388,9 @@ components:
             starts_at: { type: string, format: date-time }
             price_minor: { type: integer }
             currency: { type: string, example: AZN }
-            term_days: { type: integer }
+            term_days: { type: integer, description: This row's own term (snapshot). }
+            renewal_price_minor: { type: integer, example: 1500, description: What a renewal costs today (commercial price, minor units) }
+            renewal_term_days: { type: integer, example: 365, description: The term a renewal buys today }
             last_reminder_kind: { type: string, enum: [d30, d15, d7, d1, expired], nullable: true }
             last_reminder_sent_at: { type: string, format: date-time, nullable: true }
 
@@ -3506,7 +3508,7 @@ components:
             or the device is gone), so the subscription was NOT activated. Finance refunds it by hand through the
             normal refund flow (no automatic refunds). Null when there is nothing to refund, and once refunded.
           properties:
-            amount_minor: { type: integer, example: 1200 }
+            amount_minor: { type: integer, example: 1500 }
             flagged_at: { type: string, format: date-time }
             lines:
               type: array

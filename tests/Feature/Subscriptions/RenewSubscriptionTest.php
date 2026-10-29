@@ -11,7 +11,7 @@ it('creates a renewal order for an active subscription', function () {
     $me = makeUser('+994500000030');
     $device = makeActiveDevice('SER-R1', '+994700000030');
     $du = makeDeviceUser($me, $device);
-    $sub = makeSubscription($du); // active, main → 1200
+    $sub = makeSubscription($du); // active, main → 1500
 
     $response = $this->actingAs($me, 'user')->postJson(
         "/v1/subscriptions/{$sub->id}/renew",
@@ -21,7 +21,7 @@ it('creates a renewal order for an active subscription', function () {
 
     $response->assertOk()
         ->assertJsonPath('purpose', 'sub_renewal')
-        ->assertJsonPath('amount_minor', 1200)
+        ->assertJsonPath('amount_minor', 1500)
         ->assertJsonPath('status', 'authorising');
 
     expect($response->json('bank_redirect_url'))->not->toBeNull();

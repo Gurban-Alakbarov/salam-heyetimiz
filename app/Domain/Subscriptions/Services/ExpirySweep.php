@@ -46,8 +46,9 @@ final class ExpirySweep
         $now = $this->clock->now();
         $horizon = $now->addDays(30);
         $sent = 0;
-        // Only the configured thresholds fire (monthly term → D-7 / D-1; B2). Skipped thresholds are not
-        // recorded, so the progression stays intact for the next enabled one.
+        // Only the configured thresholds fire (annual term → D-30 / D-7 / D-1). Skipped thresholds are not
+        // recorded, so the progression stays intact for the next enabled one. A threshold as long as the row's
+        // own term never fires (a 30-day row would get "30 days left" right after payment).
         $enabled = array_map('intval', (array) config('domain.subscriptions.reminder_days', [30, 15, 7, 1]));
 
         Subscription::query()
@@ -60,6 +61,9 @@ final class ExpirySweep
                     $kind = ReminderKind::forDaysRemaining($daysRemaining);
 
                     if ($kind === null || ! in_array($kind->thresholdDays(), $enabled, true)) {
+                        continue;
+                    }
+                    if ((int) $subscription->term_days > 0 && $kind->thresholdDays() >= (int) $subscription->term_days) {
                         continue;
                     }
 

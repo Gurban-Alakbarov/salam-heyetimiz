@@ -10,7 +10,7 @@ use App\Domain\Subscriptions\Models\Subscription;
 /**
  * Single source of the recurring subscription price (IMPLEMENTATION_PLAN B2 / BR-13, BR-17, BR-21).
  *
- *  - commercial(): today's terms for a tier — 12 AZN / 30 days for main AND additional (config).
+ *  - commercial(): today's terms for a tier — 15 AZN / 365 days for main AND additional (config).
  *  - chargeMinorFor(): what an order line for a subscription must cost.
  *      · pending_payment (an initial purchase) → its price snapshot (taken at createPending)
  *      · anything else (a renewal)            → current commercial price — so a legacy comp
@@ -28,7 +28,7 @@ final class SubscriptionPriceResolver
 
         return [
             'price_minor' => (int) ($prices[$tier->priceKey()] ?? 0),
-            'term_days' => (int) config('domain.subscriptions.term_days', 30),
+            'term_days' => (int) config('domain.subscriptions.term_days', 365),
             'currency' => (string) config('domain.subscriptions.currency', 'AZN'),
         ];
     }

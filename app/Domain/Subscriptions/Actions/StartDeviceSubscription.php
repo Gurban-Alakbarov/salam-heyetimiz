@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Gate;
 /**
  * A complex resident subscribes to one shared device (IMPLEMENTATION_PLAN §13 / B7). Under a device row lock:
  * the resident's own roster row (role=user; reactivated if revoked) → their own pending subscription
- * (tier=main, 12 AZN / 30 days; a cancelled/expired row is reopened — B2) → an order paid by themself.
+ * (tier=main, 15 AZN / year; a cancelled/expired row is reopened — B2) → an order paid by themself.
  * The roster row alone grants nothing: open + whitelist need the paid subscription (B4 / B7). Unpaid intents
  * are swept (SweepAbandonedSubscriptionIntents). Idempotent through the order Idempotency-Key and the
  * single in-flight order per subscription.

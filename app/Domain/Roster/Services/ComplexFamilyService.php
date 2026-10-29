@@ -32,8 +32,8 @@ use Illuminate\Support\Facades\DB;
  *  - removeMember: a family member leaves the complex — their family rows there are revoked, the subscriptions
  *    cancelled (no refund, BR-18), and a family link left without any live row ends.
  *  - changeHead: a member takes the family over at once (no consent step): their rows become their own access,
- *    the other members' rows move to links under them, nobody pays again (every subscription is 12 AZN / 30
- *    days, BR-21 — only the tier label follows the role). The old head either stays as a member of the new
+ *    the other members' rows move to links under them, nobody pays again (every subscription is 15 AZN / year,
+ *    BR-21 — only the tier label follows the role). The old head either stays as a member of the new
  *    head's family (default) or leaves the complex.
  *  - endLinksWithoutRows: after a head is removed with the whole family, no link stays "active" without access.
  * Every change is audited and fires ComplexFamilyChanged after commit (the Notifications module tells people).

@@ -95,14 +95,14 @@ it('new user: register pre-flight → verify (no token) → accept → membershi
     $as->getJson("/v1/complexes/{$this->cx->id}/devices")->assertOk()
         ->assertJsonPath('data.0.id', $this->gate->id)
         ->assertJsonPath('data.0.my_subscription_status', 'none')
-        ->assertJsonPath('data.0.subscription_price_minor', 1200);
+        ->assertJsonPath('data.0.subscription_price_minor', 1500);
 
     $orderId = $as->postJson("/v1/complexes/{$this->cx->id}/devices/{$this->gate->id}/subscribe", [], ['Idempotency-Key' => 'b16-sub-1'])
         ->assertCreated()->json('id');
     $as->getJson("/v1/complexes/{$this->cx->id}/devices")->assertJsonPath('data.0.my_subscription_status', 'pending_payment');
     $pending = $as->getJson('/v1/subscriptions?status=pending_payment')->assertOk()->json('data');
     expect($pending)->toHaveCount(1)
-        ->and($pending[0])->toMatchArray(['tier' => 'main', 'status' => 'pending_payment', 'device_id' => $this->gate->id, 'price_minor' => 1200]);
+        ->and($pending[0])->toMatchArray(['tier' => 'main', 'status' => 'pending_payment', 'device_id' => $this->gate->id, 'price_minor' => 1500]);
 
     b16Pay(Order::query()->findOrFail($orderId));
     $as->getJson("/v1/complexes/{$this->cx->id}/devices")->assertJsonPath('data.0.my_subscription_status', 'active');
@@ -170,7 +170,7 @@ it('family invitation (sent by the resident): accept shape, own pending addition
         'items' => [['item_type' => 'sub_additional', 'referenced_id' => $accepted['subscription_id'], 'quantity' => 1]],
     ], ['Idempotency-Key' => $key]);
     $order(b16Verified('+994500160023', 'outsider@example.test'), 'b16-x')->assertForbidden();
-    $order($member, 'b16-self')->assertCreated()->assertJsonPath('amount_minor', 1200);
+    $order($member, 'b16-self')->assertCreated()->assertJsonPath('amount_minor', 1500);
 
     // the member got no complex membership (B8: no escalation), and the same family link cannot be reused
     expect(app(ComplexMembershipService::class)->isMember($this->cx->id, $member->id))->toBeFalse();

@@ -17,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 /**
  * Resident complex browse + subscribe (IMPLEMENTATION_PLAN §13 / B7). Only the complexes the caller is an
  * active resident of are visible (ComplexPolicy::view; others → 404). Devices list the shared complex-mode
- * devices with the monthly subscription price and the CALLER's own status — never the sale price, never other
+ * devices with the subscription price and the CALLER's own status — never the sale price, never other
  * residents' data.
  */
 class ComplexController

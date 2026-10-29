@@ -126,7 +126,7 @@ it('K3: money paid after the Komendant removed the resident never revives the su
         ->and($sub->status)->toBe(SubscriptionStatus::Cancelled)
         ->and($sub->cancellation_reason)->toBe('removed_by_komendant')
         ->and($sub->periods()->count())->toBe(0)
-        ->and($order->metadata['refund_required']['amount_minor'])->toBe(1200)
+        ->and($order->metadata['refund_required']['amount_minor'])->toBe(1500)
         ->and($order->metadata['refund_required']['lines'][0])->toMatchArray(['subscription_id' => $sub->id, 'reason' => 'access_removed'])
         ->and(AuditLog::query()->where('action', 'subscription.payment_undeliverable')->count())->toBe(1)
         ->and(AuditLog::query()->where('action', 'order.refund_required')->count())->toBe(1);
@@ -135,12 +135,12 @@ it('K3: money paid after the Komendant removed the resident never revives the su
     $finance = makeAdminRole('finance');
     $row = collect($this->actingAs($finance, 'admin')->getJson('/admin/v1/orders?needs_refund=1')->assertOk()->json('data'))
         ->firstWhere('id', $order->id);
-    expect($row)->not->toBeNull()->and($row['refund_required']['amount_minor'])->toBe(1200);
+    expect($row)->not->toBeNull()->and($row['refund_required']['amount_minor'])->toBe(1500);
     expect(collect($this->actingAs($finance, 'admin')->getJson('/admin/v1/orders?needs_refund=1')->json('data'))->count())->toBe(1);
 
     // a replayed OrderPaid does not double the flag
-    app(OrderService::class)->flagRefundRequired($order, $sub->id, 1200, 'access_removed');
-    expect($order->fresh()->metadata['refund_required']['amount_minor'])->toBe(1200);
+    app(OrderService::class)->flagRefundRequired($order, $sub->id, 1500, 'access_removed');
+    expect($order->fresh()->metadata['refund_required']['amount_minor'])->toBe(1500);
 
     // once finance refunds it, it leaves the worklist (and the payload no longer asks for it)
     $order->forceFill(['status' => OrderStatus::Refunded->value])->save();

@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Gate;
  * Family links (IMPLEMENTATION_PLAN §14 / B8, BR-1..4, BR-18, BR-19). Three separate layers:
  *  - relation: family_links (head → member, one active per pair);
  *  - access:   device_users(role=user, added_by_user_id=head, family_link_id) per granted device;
- *  - billing:  the member's OWN subscription per device (tier additional, 12 AZN / 30 days) — the head or the
+ *  - billing:  the member's OWN subscription per device (tier additional, 15 AZN / year) — the head or the
  *              member pays (SubscriptionPaymentAuthorizer).
  * Only a family head (DevicePolicy::manageFamily) grants; a member can never grant, invite or share.
  */

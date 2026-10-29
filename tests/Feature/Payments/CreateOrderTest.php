@@ -17,7 +17,7 @@ it('creates a subscription order, prices it server-side, and registers it with t
 
     $response->assertStatus(201)
         ->assertJsonPath('status', 'authorising')
-        ->assertJsonPath('amount_minor', 1200)
+        ->assertJsonPath('amount_minor', 1500)
         ->assertJsonPath('currency', 'AZN');
 
     expect($response->json('bank_redirect_url'))->not->toBeNull();
@@ -26,7 +26,7 @@ it('creates a subscription order, prices it server-side, and registers it with t
     expect($order->status)->toBe(OrderStatus::Authorising)
         ->and($order->bank_order_id)->not->toBeNull()
         ->and($order->items()->count())->toBe(1)
-        ->and((int) $order->items()->first()->total_amount_minor)->toBe(1200)
+        ->and((int) $order->items()->first()->total_amount_minor)->toBe(1500)
         ->and($order->reference)->toStartWith('SH-');
 
     Event::assertDispatched(OrderCreated::class);

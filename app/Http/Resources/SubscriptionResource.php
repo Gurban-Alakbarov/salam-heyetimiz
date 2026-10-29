@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Domain\Subscriptions\Enums\SubscriptionStatus;
 use App\Domain\Subscriptions\Models\Subscription;
+use App\Domain\Subscriptions\Support\SubscriptionPriceResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
@@ -20,6 +21,8 @@ class SubscriptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $renewal = app(SubscriptionPriceResolver::class)->commercial($this->tier);
+
         return [
             'id' => (int) $this->id,
             'tier' => $this->tier->value,
@@ -38,6 +41,10 @@ class SubscriptionResource extends JsonResource
             'price_minor' => (int) $this->price_minor,
             'currency' => $this->currency,
             'term_days' => (int) $this->term_days,
+            // What a renewal costs today (the commercial price, not this row's snapshot) — the app shows it on
+            // the renew button, so a price change never needs an app update.
+            'renewal_price_minor' => $renewal['price_minor'],
+            'renewal_term_days' => $renewal['term_days'],
             'last_reminder_kind' => $this->last_reminder_kind?->value,
             'last_reminder_sent_at' => optional($this->last_reminder_sent_at)->toIso8601String(),
         ];

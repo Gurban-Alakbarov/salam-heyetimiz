@@ -10,7 +10,7 @@ use App\Domain\Subscriptions\Support\SubscriptionPriceResolver;
 /**
  * Server-side pricing for order items (R-DOM-09). Prices are integer minor units (qəpik) sourced
  * from config/domain/subscriptions.php default_prices_minor. Item amounts are never trusted from
- * the client. Subscription lines go through unitPriceFor() → SubscriptionPriceResolver (12 AZN / 30 days, B2).
+ * the client. Subscription lines go through unitPriceFor() → SubscriptionPriceResolver (15 AZN / year).
  */
 final class OrderPricing
 {
@@ -39,9 +39,9 @@ final class OrderPricing
 
         return match ($type) {
             OrderItemType::Device => (int) ($prices['device_sale'] ?? 13500),
-            OrderItemType::SubMain => (int) ($prices['sub_main'] ?? 1200),
-            OrderItemType::SubAdditional => (int) ($prices['sub_additional'] ?? 1200),
-            OrderItemType::SubRenewal => (int) ($prices['sub_main'] ?? 1200),
+            OrderItemType::SubMain => (int) ($prices['sub_main'] ?? 1500),
+            OrderItemType::SubAdditional => (int) ($prices['sub_additional'] ?? 1500),
+            OrderItemType::SubRenewal => (int) ($prices['sub_main'] ?? 1500),
         };
     }
 

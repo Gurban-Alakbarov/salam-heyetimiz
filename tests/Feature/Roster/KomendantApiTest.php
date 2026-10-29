@@ -81,8 +81,8 @@ it('shows only its own complex: devices (subscription price, never sale price), 
     $devices = $as->getJson('/v1/komendant/devices')->assertOk()->json('data');
     expect($devices)->toHaveCount(1)
         ->and($devices[0]['id'])->toBe($mine->id)
-        ->and($devices[0]['subscription_price_minor'])->toBe(1200)
-        ->and($devices[0]['subscription_term_days'])->toBe(30)
+        ->and($devices[0]['subscription_price_minor'])->toBe(1500)
+        ->and($devices[0]['subscription_term_days'])->toBe(365)
         ->and($devices[0])->not->toHaveKey('sale_price_minor');
 
     $residents = $as->getJson('/v1/komendant/residents')->assertOk()->json('data');
@@ -130,8 +130,8 @@ it('removal revokes the resident + their family rows, cancels subscriptions with
     $familyRow = $roster->addMember($device, $family, DeviceUserRole::User, ActorKind::User, $resident->id, 501);
     $sub = makeSubscription($own);
     SubscriptionPeriod::query()->create([
-        'subscription_id' => $sub->id, 'order_id' => makePaidOrder($resident, 1200, 'KB-B5-1')->id, 'kind' => 'initial',
-        'period_start' => now()->subDay(), 'period_end' => now()->addDays(29), 'amount_minor' => 1200, 'paid_by_user_id' => $resident->id,
+        'subscription_id' => $sub->id, 'order_id' => makePaidOrder($resident, 1500, 'KB-B5-1')->id, 'kind' => 'initial',
+        'period_start' => now()->subDay(), 'period_end' => now()->addDays(29), 'amount_minor' => 1500, 'paid_by_user_id' => $resident->id,
     ]);
     makeSubscription($familyRow, ['status' => SubscriptionStatus::PendingPayment]);
 

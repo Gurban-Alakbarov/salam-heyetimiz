@@ -14,6 +14,7 @@ use App\Domain\Roster\Models\Invitation;
 use App\Domain\Roster\Services\FamilyService;
 use App\Domain\Roster\Services\InvitationService;
 use App\Domain\Subscriptions\Models\Subscription;
+use App\Domain\Subscriptions\Support\SubscriptionPriceResolver;
 use App\Domain\Users\Models\User;
 use App\Support\Phone\PhoneNumber;
 use Illuminate\Http\JsonResponse;
@@ -184,6 +185,8 @@ class FamilyController
                 'tier' => $sub->tier->value,
                 'price_minor' => (int) $sub->price_minor,
                 'term_days' => (int) $sub->term_days,
+                'renewal_price_minor' => app(SubscriptionPriceResolver::class)->commercial($sub->tier)['price_minor'],
+                'renewal_term_days' => app(SubscriptionPriceResolver::class)->commercial($sub->tier)['term_days'],
                 'currency' => $sub->currency,
                 'ends_at' => optional($sub->ends_at)->toIso8601String(),
             ],

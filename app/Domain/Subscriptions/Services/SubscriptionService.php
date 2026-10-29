@@ -35,7 +35,7 @@ final class SubscriptionService
 
     /**
      * Create (or return) the single subscription row for a device_user, ready for payment, with a commercial
-     * price/term snapshot (12 AZN / 30 days — B2). device_user_id is UNIQUE, so a member who left and came
+     * price/term snapshot (15 AZN / year — config). device_user_id is UNIQUE, so a member who left and came
      * back reuses their row: a cancelled/expired/refunded one is reopened for payment (history kept);
      * a pending or active one is returned untouched (never re-priced).
      */
@@ -208,7 +208,7 @@ final class SubscriptionService
     /**
      * A paid renewal applies TODAY's commercial terms (B2 / BR-17): the row is re-snapshotted to the current
      * price/term before the new period is computed — so a legacy comp or an old annual row renews as
-     * 12 AZN / 30 days, never at its stale snapshot. Rows are only changed once the renewal is paid.
+     * 15 AZN / year, never at its stale snapshot. Rows are only changed once the renewal is paid.
      */
     public function renew(Subscription $subscription, Order $order, int $amountMinor): Subscription
     {

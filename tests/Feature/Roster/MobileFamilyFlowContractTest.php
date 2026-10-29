@@ -123,7 +123,7 @@ it('member accepts → link + head-granted row + own pending additional; no comp
     $row = DeviceUser::query()->where('user_id', $member->id)->firstOrFail();
     expect([(int) $row->device_id, (int) $row->family_link_id, (int) $row->added_by_user_id])->toBe([$this->gate->id, (int) $link->id, $this->head->id]);
     $sub = Subscription::query()->where('device_user_id', $row->id)->firstOrFail();
-    expect([$sub->id, $sub->tier->value, $sub->status->value, (int) $sub->price_minor])->toBe([$accepted['subscription_id'], 'additional', 'pending_payment', 1200])
+    expect([$sub->id, $sub->tier->value, $sub->status->value, (int) $sub->price_minor])->toBe([$accepted['subscription_id'], 'additional', 'pending_payment', 1500])
         ->and(app(ComplexMembershipService::class)->isMember($this->cx->id, $member->id))->toBeFalse();
 
     // the member is not a head on the device (probe → 403) and the link can never be reused
@@ -191,5 +191,5 @@ it('payment: outsider 403; cancelled checkout keeps pending; head pays → activ
     ])->assertCreated();
     $self = b17Verified('+994500170007', 'self@example.test');
     $selfSub = $this->actingAs($self, 'user')->postJson('/v1/invites/'.b17Token('self@example.test').'/accept')->json('data.subscription_id');
-    b17PayOrder($self, $selfSub, 'b17-self')->assertCreated()->assertJsonPath('amount_minor', 1200);
+    b17PayOrder($self, $selfSub, 'b17-self')->assertCreated()->assertJsonPath('amount_minor', 1500);
 });

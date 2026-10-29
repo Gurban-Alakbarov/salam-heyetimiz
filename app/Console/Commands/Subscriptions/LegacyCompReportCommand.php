@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
  * READ-ONLY reconciliation report for legacy comp subscriptions (IMPLEMENTATION_PLAN B2 / BR-17). A legacy
  * comp is derived — no column: price_minor = 0 AND no paid (positive) subscription_period. The report never
  * writes: it does not re-price, convert, cancel or charge anything. Comps stay as they are until their
- * ends_at; a user-initiated paid renewal is the only thing that moves them onto 12 AZN / 30 days.
+ * ends_at; a user-initiated paid renewal is the only thing that moves them onto 15 AZN / year.
  */
 class LegacyCompReportCommand extends Command
 {

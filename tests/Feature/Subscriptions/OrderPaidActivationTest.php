@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\Event;
 
 function makePaidSubOrder($payer, $sub, string $bankOrderId)
 {
-    $order = makePaidOrder($payer, 1200, $bankOrderId);
+    $order = makePaidOrder($payer, 1500, $bankOrderId);
     $order->items()->create([
         'item_type' => 'sub_main',
         'referenced_id' => $sub->id,
         'description' => 'Main subscription',
         'quantity' => 1,
-        'unit_amount_minor' => 1200,
-        'total_amount_minor' => 1200,
+        'unit_amount_minor' => 1500,
+        'total_amount_minor' => 1500,
     ]);
 
     return $order;
@@ -60,11 +60,11 @@ it('renews an already-active subscription when a further order is paid', functio
     OrderPaid::dispatch($order);
 
     $sub->refresh();
-    // Renewed within term: a paid renewal applies today's commercial terms (B2) — 30 days, 12 AZN.
+    // Renewed within term: a paid renewal applies today's commercial terms (B2) — 365 days, 15 AZN.
     expect($sub->status)->toBe(SubscriptionStatus::Active)
-        ->and((int) round($oldEndsAt->diffInDays($sub->ends_at)))->toBe(30)
-        ->and($sub->term_days)->toBe(30)
-        ->and($sub->price_minor)->toBe(1200)
+        ->and((int) round($oldEndsAt->diffInDays($sub->ends_at)))->toBe(365)
+        ->and($sub->term_days)->toBe(365)
+        ->and($sub->price_minor)->toBe(1500)
         ->and($sub->periods()->where('kind', SubscriptionPeriodKind::Renewal->value)->count())->toBe(1);
 
     Event::assertDispatched(SubscriptionRenewed::class);

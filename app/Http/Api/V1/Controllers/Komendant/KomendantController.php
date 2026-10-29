@@ -63,7 +63,7 @@ class KomendantController
         ]]);
     }
 
-    /** GET /v1/komendant/devices — the complex's shared devices (the monthly subscription price only; never the sale price). */
+    /** GET /v1/komendant/devices — the complex's shared devices (the subscription price only; never the sale price). */
     public function devices(Request $request, SubscriptionPriceResolver $prices): JsonResponse
     {
         $manager = $this->manager($request, Permission::DEVICES_VIEW);

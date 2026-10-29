@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 
 /*
-| IMPLEMENTATION_PLAN B2 — 12 AZN / 30 days per subscription (resident AND each family member), payer ≠
+| IMPLEMENTATION_PLAN B2 — 15 AZN / 365 days per subscription (resident AND each family member), payer ≠
 | beneficiary ledger, legacy comps untouched, reopen after cancel, sale price never a subscription price.
 */
 
@@ -32,19 +32,19 @@ function settle(Order $order, Subscription $sub): void
     OrderPaid::dispatch($order->fresh());
 }
 
-it('creates resident (main) and family (additional) subscriptions at 12 AZN / 30 days each', function () {
+it('creates resident (main) and family (additional) subscriptions at 15 AZN / 365 days each', function () {
     $device = makeActiveDevice('SER-B2-1', '+994700020001');
     $main = app(SubscriptionService::class)->createPending(makeDeviceUser(makeUser('+994500020001'), $device), SubscriptionTier::Main);
     $family = app(SubscriptionService::class)->createPending(makeDeviceUser(makeUser('+994500020002'), $device, 'user'), SubscriptionTier::Additional);
 
     foreach ([$main, $family] as $sub) {
         expect($sub->status)->toBe(SubscriptionStatus::PendingPayment)
-            ->and($sub->price_minor)->toBe(1200)
-            ->and($sub->term_days)->toBe(30);
+            ->and($sub->price_minor)->toBe(1500)
+            ->and($sub->term_days)->toBe(365);
     }
 });
 
-it('head + 5 family members = 6 separate 12 AZN subscriptions; the head may pay a member (payer ≠ beneficiary)', function () {
+it('head + 5 family members = 6 separate 15 AZN subscriptions; the head may pay a member (payer ≠ beneficiary)', function () {
     $device = makeActiveDevice('SER-B2-2', '+994700020002');
     $head = makeUser('+994500020010');
     $headSub = app(SubscriptionService::class)->createPending(makeDeviceUser($head, $device), SubscriptionTier::Main);
@@ -56,14 +56,14 @@ it('head + 5 family members = 6 separate 12 AZN subscriptions; the head may pay 
     }
 
     // Head pays own + member #1..#4; member #5 pays for themselves.
-    subOrder($head, $headSub, 'b2-head')->assertCreated()->assertJsonPath('amount_minor', 1200);
+    subOrder($head, $headSub, 'b2-head')->assertCreated()->assertJsonPath('amount_minor', 1500);
     foreach ($members as $n => [$member, $sub]) {
         $payer = $n < 4 ? $head : $member;
-        subOrder($payer, $sub, 'b2-fam-'.$n, 'sub_additional')->assertCreated()->assertJsonPath('amount_minor', 1200);
+        subOrder($payer, $sub, 'b2-fam-'.$n, 'sub_additional')->assertCreated()->assertJsonPath('amount_minor', 1500);
     }
 
     expect(Subscription::query()->count())->toBe(6)
-        ->and((int) Order::query()->sum('amount_minor'))->toBe(6 * 1200); // 72 AZN / month
+        ->and((int) Order::query()->sum('amount_minor'))->toBe(6 * 1500); // 90 AZN / year
 
     // Settle a head-paid member order: beneficiary = member, payer recorded on the period ledger.
     [$member1, $sub1] = $members[0];
@@ -75,7 +75,7 @@ it('head + 5 family members = 6 separate 12 AZN subscriptions; the head may pay 
     expect($sub1->status)->toBe(SubscriptionStatus::Active)
         ->and((int) $sub1->deviceUser->user_id)->toBe((int) $member1->id)   // beneficiary
         ->and((int) $period->paid_by_user_id)->toBe((int) $head->id)       // payer
-        ->and((int) round($sub1->starts_at->diffInDays($sub1->ends_at)))->toBe(30);
+        ->and((int) round($sub1->starts_at->diffInDays($sub1->ends_at)))->toBe(365);
 });
 
 it('never re-prices, converts or charges a legacy comp subscription', function () {
@@ -94,7 +94,7 @@ it('never re-prices, converts or charges a legacy comp subscription', function (
         ->and(Artisan::output())->toContain('legacy_comp_total=1');
 });
 
-it('a user-initiated renewal of a comp is charged 12 AZN and renews for 30 days', function () {
+it('a user-initiated renewal of a comp is charged 15 AZN and renews for 365 days', function () {
     $me = makeUser('+994500020040');
     $du = makeDeviceUser($me, makeActiveDevice('SER-B2-4', '+994700020004'));
     $comp = makeSubscription($du, ['price_minor' => 0, 'term_days' => 365, 'ends_at' => now()->addDays(5)]);
@@ -102,23 +102,23 @@ it('a user-initiated renewal of a comp is charged 12 AZN and renews for 30 days'
 
     $this->actingAs($me, 'user')
         ->postJson("/v1/subscriptions/{$comp->id}/renew", [], ['Idempotency-Key' => 'b2-renew-comp'])
-        ->assertOk()->assertJsonPath('amount_minor', 1200);
+        ->assertOk()->assertJsonPath('amount_minor', 1500);
 
     // Nothing changes on the comp row until the renewal is actually paid.
     expect($comp->fresh()->price_minor)->toBe(0)->and($comp->fresh()->term_days)->toBe(365);
 
     settle(Order::query()->firstOrFail(), $comp);
     $comp->refresh();
-    expect($comp->price_minor)->toBe(1200)
-        ->and($comp->term_days)->toBe(30)
-        ->and((int) round($endsBefore->diffInDays($comp->ends_at)))->toBe(30);
+    expect($comp->price_minor)->toBe(1500)
+        ->and($comp->term_days)->toBe(365)
+        ->and((int) round($endsBefore->diffInDays($comp->ends_at)))->toBe(365);
 });
 
 it('never charges a 0 amount even when a stale snapshot says 0', function () {
     $me = makeUser('+994500020050');
     $comp = makeSubscription(makeDeviceUser($me, makeActiveDevice('SER-B2-5', '+994700020005')), ['price_minor' => 0]);
 
-    subOrder($me, $comp, 'b2-zero', 'sub_renewal')->assertCreated()->assertJsonPath('amount_minor', 1200);
+    subOrder($me, $comp, 'b2-zero', 'sub_renewal')->assertCreated()->assertJsonPath('amount_minor', 1500);
 });
 
 it('reopens a cancelled subscription for payment with a fresh snapshot, keeping the paid history', function () {
@@ -133,8 +133,8 @@ it('reopens a cancelled subscription for payment with a fresh snapshot, keeping 
 
     expect($reopened->id)->toBe($sub->id) // device_user_id is UNIQUE → same row
         ->and($reopened->status)->toBe(SubscriptionStatus::PendingPayment)
-        ->and($reopened->price_minor)->toBe(1200)
-        ->and($reopened->term_days)->toBe(30)
+        ->and($reopened->price_minor)->toBe(1500)
+        ->and($reopened->term_days)->toBe(365)
         ->and($reopened->periods()->count())->toBe(1); // history preserved
 });
 
@@ -144,8 +144,8 @@ it('keeps the one-off device sale price out of every subscription amount', funct
     $device->forceFill(['sale_price_minor' => 25000, 'sale_recorded_at' => now()])->save();
     $sub = app(SubscriptionService::class)->createPending(makeDeviceUser($me, $device), SubscriptionTier::Main);
 
-    subOrder($me, $sub, 'b2-sale')->assertCreated()->assertJsonPath('amount_minor', 1200);
-    expect($sub->fresh()->price_minor)->toBe(1200);
+    subOrder($me, $sub, 'b2-sale')->assertCreated()->assertJsonPath('amount_minor', 1500);
+    expect($sub->fresh()->price_minor)->toBe(1500);
 
     // The device_sale order line is unchanged (config default), never the per-device sale price.
     $line = app(\App\Domain\Payments\Support\OrderPricing::class)->unitPriceFor(new \App\Domain\Payments\DTOs\OrderItemData(
@@ -162,13 +162,13 @@ it('defaults every device to the private ownership mode (existing behaviour unch
         ->and(DB::table('devices')->where('ownership_mode', '!=', 'private')->count())->toBe(0);
 });
 
-it('monthly reminders fire only at D-7 and D-1', function () {
+it('a legacy 30-day row never gets the D-30 reminder (it would fire right after payment): only D-7 and D-1', function () {
     Event::fake([SubscriptionExpiringSoon::class]);
     $sub = makeSubscription(makeDeviceUser(makeUser('+994500020080'), makeActiveDevice('SER-B2-9', '+994700020009')), [
         'term_days' => 30, 'ends_at' => now()->addDays(30),
     ]);
 
-    app(ExpirySweep::class)->sendReminders();            // D-30 → disabled
+    app(ExpirySweep::class)->sendReminders();            // D-30 → not for a 30-day row
     $this->travel(15)->days();
     app(ExpirySweep::class)->sendReminders();            // D-15 → disabled
     Event::assertNotDispatched(SubscriptionExpiringSoon::class);
@@ -179,5 +179,24 @@ it('monthly reminders fire only at D-7 and D-1', function () {
     app(ExpirySweep::class)->sendReminders();
 
     Event::assertDispatchedTimes(SubscriptionExpiringSoon::class, 2);
+    expect($sub->fresh()->last_reminder_kind?->value)->toBe('d1');
+});
+
+it('annual reminders fire at D-30, D-7 and D-1', function () {
+    Event::fake([SubscriptionExpiringSoon::class]);
+    $sub = makeSubscription(makeDeviceUser(makeUser('+994500020081'), makeActiveDevice('SER-B2-10', '+994700020010')), [
+        'term_days' => 365, 'ends_at' => now()->addDays(29)->addHours(12),
+    ]);
+
+    app(ExpirySweep::class)->sendReminders();            // D-30
+    expect($sub->fresh()->last_reminder_kind?->value)->toBe('d30');
+    $this->travel(15)->days();
+    app(ExpirySweep::class)->sendReminders();            // D-15 → disabled
+    $this->travel(9)->days();
+    app(ExpirySweep::class)->sendReminders();            // D-7
+    $this->travel(5)->days();
+    app(ExpirySweep::class)->sendReminders();            // D-1
+
+    Event::assertDispatchedTimes(SubscriptionExpiringSoon::class, 3);
     expect($sub->fresh()->last_reminder_kind?->value)->toBe('d1');
 });

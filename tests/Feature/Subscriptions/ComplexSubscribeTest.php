@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 
 /*
-| IMPLEMENTATION_PLAN B7 — a complex resident browses the shared devices, subscribes (own 12 AZN / 30 days),
+| IMPLEMENTATION_PLAN B7 — a complex resident browses the shared devices, subscribes (own 15 AZN / 365 days),
 | pays through the fake gateway and may then open. Payer rule enforced server-side; complex whitelist follows
 | the paid subscription; unpaid intents are swept. Private devices keep their behaviour.
 */
@@ -70,7 +70,7 @@ beforeEach(function () {
     app(ComplexMembershipService::class)->join($this->cx->id, $this->resident);
 });
 
-it('lists only member complexes and their shared devices with the 12 AZN / 30-day price (never sale price)', function () {
+it('lists only member complexes and their shared devices with the 15 AZN / 1-year price (never sale price)', function () {
     $other = makeComplex('CX-B7-O', 'Other');
     b7Device($other->id, 'SER-B7-2', '+994700070002');
     $as = $this->actingAs($this->resident, 'user');
@@ -78,7 +78,7 @@ it('lists only member complexes and their shared devices with the 12 AZN / 30-da
     expect($as->getJson('/v1/complexes')->assertOk()->json('data'))->toBe([['id' => $this->cx->id, 'name' => 'Kompleks B7', 'address' => null]]);
     $devices = $as->getJson("/v1/complexes/{$this->cx->id}/devices")->assertOk()->json('data');
     expect($devices)->toHaveCount(1)
-        ->and($devices[0])->toMatchArray(['id' => $this->device->id, 'subscription_price_minor' => 1200, 'subscription_term_days' => 30, 'my_subscription_status' => 'none'])
+        ->and($devices[0])->toMatchArray(['id' => $this->device->id, 'subscription_price_minor' => 1500, 'subscription_term_days' => 365, 'my_subscription_status' => 'none'])
         ->and($devices[0])->not->toHaveKey('sale_price_minor');
 
     $as->getJson("/v1/complexes/{$other->id}")->assertNotFound();
@@ -100,7 +100,7 @@ it('non-members cannot subscribe; members of another complex cannot reach this d
 
 it('subscribe → fake paid → canOpen; idempotent; whitelist only after payment', function () {
     $res = b7Subscribe($this->resident, $this->cx->id, $this->device->id, 'k-1')->assertCreated()
-        ->assertJsonPath('amount_minor', 1200)->assertJsonPath('is_test', true);
+        ->assertJsonPath('amount_minor', 1500)->assertJsonPath('is_test', true);
     expect($res->json('bank_redirect_url'))->toContain('/v1/payments/fake-checkout/');
     $orderId = $res->json('id');
 
@@ -163,7 +163,7 @@ it('payer rule: beneficiary or family head only; never another resident or anoth
     [$kid2, $sub2] = $kids[1];
     $pay($neighbour, $sub1, 'p-n')->assertForbidden();   // another resident
     $pay($kid2, $sub1, 'p-k')->assertForbidden();        // another family member
-    $pay($head, $sub1, 'p-h')->assertCreated()->assertJsonPath('amount_minor', 1200); // head pays member #1
+    $pay($head, $sub1, 'p-h')->assertCreated()->assertJsonPath('amount_minor', 1500); // head pays member #1
     $pay($kid1, $sub1, 'p-k1')->assertStatus(422);       // member's own attempt while head's checkout is open
     $pay($kid2, $sub2, 'p-k2')->assertCreated();         // member #2 pays themself
 
@@ -180,7 +180,7 @@ it('payer rule: beneficiary or family head only; never another resident or anoth
     expect($headRow->refresh()->status)->toBe(DeviceUserStatus::Revoked);
 });
 
-it('5 family members = 5 × 12 AZN paid by the head (+ the head\'s own 12 AZN)', function () {
+it('5 family members = 5 × 15 AZN paid by the head (+ the head\'s own 15 AZN)', function () {
     $roster = app(RosterService::class);
     $head = $this->resident;
     $orders = [b7Subscribe($head, $this->cx->id, $this->device->id, 'h-own')->assertCreated()->json('amount_minor')];
@@ -193,8 +193,8 @@ it('5 family members = 5 × 12 AZN paid by the head (+ the head\'s own 12 AZN)',
         ], ['Idempotency-Key' => 'h-fam-'.$i])->assertCreated()->json('amount_minor');
     }
 
-    expect(array_sum(array_slice($orders, 1)))->toBe(5 * 1200)
-        ->and(array_sum($orders))->toBe(6 * 1200)
+    expect(array_sum(array_slice($orders, 1)))->toBe(5 * 1500)
+        ->and(array_sum($orders))->toBe(6 * 1500)
         ->and(Subscription::query()->count())->toBe(6);
 });
 

@@ -2222,7 +2222,7 @@ paths:
       description: |
         Requires `subscriptions.manage`. Activates (or extends) the active roster member's entitlement — no order,
         no money. A3 — without `tier` a new subscription takes the row's tier (own access → `main`, family grant →
-        `additional`) and an existing one keeps its tier; `term_days` defaults to the configured term (30). The grant
+        `additional`) and an existing one keeps its tier; `term_days` defaults to the configured term (365). The grant
         is recorded (`comp_grant` on adminGetSubscription), so it is not shown as a legacy comp.
         **404** `roster_member_not_found` when the user has no active row on the device.
       parameters:
@@ -2552,7 +2552,7 @@ paths:
       operationId: listComplexDevices
       security: [{ bearerAuth: [] }]
       description: |
-        Only active, complex-mode devices. Shows the monthly subscription price (never the sale price) and the
+        Only active, complex-mode devices. Shows the subscription price (never the sale price) and the
         CALLER's own subscription status — never other residents' data. Non-members get **404**.
       parameters:
         - { in: path, name: complexId, required: true, schema: { type: integer, format: int64, minimum: 1 } }
@@ -3051,7 +3051,7 @@ paths:
   /komendant/devices:
     get:
       tags: [Komendant]
-      summary: The complex's shared devices (monthly price only)
+      summary: The complex's shared devices (subscription price only)
       operationId: komendantDevices
       security: [{ bearerAuth: [] }]
       description: Requires `devices.view`. Complex-mode devices only, ordered by label; never the sale price.
@@ -4258,6 +4258,8 @@ components:
         tier: { type: string, enum: [main, additional] }
         price_minor: { type: integer }
         term_days: { type: integer }
+        renewal_price_minor: { type: integer, example: 1500, description: What a renewal costs today }
+        renewal_term_days: { type: integer, example: 365 }
         currency: { type: string, example: AZN }
         ends_at: { type: string, format: date-time, nullable: true }
 

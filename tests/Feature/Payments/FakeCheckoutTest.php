@@ -67,7 +67,7 @@ it('renders the simulated hosted page with an explicit TEST ÖDƏNİŞ banner', 
         ->assertOk()
         ->assertSee('TEST ÖDƏNİŞ')
         ->assertSee($order->reference)
-        ->assertSee('12.00');
+        ->assertSee('15.00');
 });
 
 it('rejects unsigned or tampered checkout links', function () {

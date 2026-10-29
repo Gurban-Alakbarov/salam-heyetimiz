@@ -7,6 +7,7 @@ use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\DTOs\RosterMemberData;
 use App\Domain\Roster\Models\DeviceUser;
 use App\Domain\Roster\Services\RosterService;
+use App\Domain\Subscriptions\Actions\EnsurePayableSubscription;
 use App\Domain\Users\Enums\UserStatus;
 use App\Domain\Users\Models\User;
 use App\Domain\Users\Services\AccountEmailService;
@@ -24,6 +25,7 @@ final class AddDeviceMember
     public function __construct(
         private readonly RosterService $roster,
         private readonly AccountEmailService $emails,
+        private readonly EnsurePayableSubscription $payable,
     ) {}
 
     public function handle(Device $device, RosterMemberData $data, AdminUser $admin): DeviceUser
@@ -37,7 +39,11 @@ final class AddDeviceMember
             // K1 — the resident registers with this email later; the email OTP proves the account is theirs.
             $this->emails->recordIfUnverified($user, $data->email);
 
-            return $this->roster->addMember($device, $user, $data->role, ActorKind::Admin, (int) $admin->getKey());
+            $row = $this->roster->addMember($device, $user, $data->role, ActorKind::Admin, (int) $admin->getKey());
+            // 2026-10-30 — always a way to pay in the app (or the admin makes it free with "Abunəlik ver").
+            $this->payable->handle($row);
+
+            return $row;
         });
     }
 }

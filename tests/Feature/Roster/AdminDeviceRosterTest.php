@@ -4,6 +4,7 @@ use App\Domain\DeviceComm\Models\WhitelistChange;
 use App\Domain\Devices\Enums\DeviceStatus;
 use App\Domain\Devices\Models\Device;
 use App\Domain\Roster\Models\DeviceUser;
+use App\Domain\Subscriptions\Models\Subscription;
 use App\Domain\Users\Models\User;
 
 /*
@@ -166,7 +167,41 @@ it('BR-18: a removed then re-added resident does not get the old paid time back'
     $this->actingAs($admin, 'admin')->deleteJson("/admin/v1/devices/{$device->id}/users/{$member->id}")->assertStatus(204);
     $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/users", ['phone' => '+994701500072'])->assertStatus(201);
 
-    expect($subscription->refresh()->status->value)->toBe('cancelled')
-        ->and(\App\Domain\Subscriptions\Models\Subscription::query()
+    // 2026-10-30 — re-added: the old row is reopened for PAYMENT (fresh price, no paid time), never re-activated.
+    expect($subscription->refresh()->status->value)->toBe('pending_payment')
+        ->and($subscription->ends_at->lessThanOrEqualTo(now()))->toBeTrue()
+        ->and(Subscription::query()
             ->where('device_user_id', $subscription->device_user_id)->where('status', 'active')->exists())->toBeFalse();
+});
+
+it('a resident or owner the admin adds always gets a payable subscription (pay in the app, or "Abunəlik ver")', function () {
+    $admin = makeSuperAdmin();
+    $owner = makeUser('+994700500080');
+    $device = makeOwnedDevice($owner, 'ROS-SUB-3', '+994700500081');
+
+    $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/users", ['phone' => '+994701500082'])->assertStatus(201);
+    $member = User::query()->where('phone', '+994701500082')->firstOrFail();
+    $row = DeviceUser::query()->where('device_id', $device->id)->where('user_id', $member->id)->firstOrFail();
+    $sub = Subscription::query()->where('device_user_id', $row->id)->firstOrFail();
+    expect($sub->status->value)->toBe('pending_payment')->and($sub->price_minor)->toBe(1500)->and($sub->term_days)->toBe(365);
+
+    // the member pays it from the app …
+    $this->actingAs($member, 'user')->postJson('/v1/orders', [
+        'purpose' => 'sub_main',
+        'items' => [['item_type' => 'sub_main', 'referenced_id' => $sub->id, 'quantity' => 1]],
+    ], ['Idempotency-Key' => 'ros-pay-1'])->assertCreated()->assertJsonPath('amount_minor', 1500);
+
+    // … or the admin makes it free: the same row becomes active
+    $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/users/{$member->id}/subscription", ['term_days' => 365])->assertSuccessful();
+    expect($sub->refresh()->status->value)->toBe('active');
+});
+
+it('the owner an admin assigns gets a payable subscription too', function () {
+    $admin = makeSuperAdmin();
+    $device = makeUnassignedDevice('ROS-SUB-4', '+994700500091');
+
+    $this->actingAs($admin, 'admin')->postJson("/admin/v1/devices/{$device->id}/assign", ['owner_phone' => '+994701500092'])->assertSuccessful();
+    $owner = User::query()->where('phone', '+994701500092')->firstOrFail();
+    $row = DeviceUser::query()->where('device_id', $device->id)->where('user_id', $owner->id)->firstOrFail();
+    expect(Subscription::query()->where('device_user_id', $row->id)->value('status')?->value)->toBe('pending_payment');
 });

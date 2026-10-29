@@ -92,10 +92,22 @@ export function useDeactivateAdmin() {
   })
 }
 
-export function useAudit(cursor: string | null) {
+export interface AuditFilters {
+  /** area, e.g. "device." / "resident." */
+  action_prefix?: string
+  actor_id?: number
+  /** short class name: Device, User, Complex, Order, Subscription, AdminUser … */
+  auditable_type?: string
+  auditable_id?: number
+  q?: string
+  since?: string
+  until?: string
+}
+
+export function useAudit(cursor: string | null, filters: AuditFilters = {}) {
   return useQuery({
-    queryKey: ['audit', cursor],
+    queryKey: ['audit', cursor, filters],
     queryFn: async () =>
-      (await api.get<Paginated<AuditEntry>>('/admin/v1/audit', { params: cleanParams({ cursor, limit: 30 }) })).data,
+      (await api.get<Paginated<AuditEntry>>('/admin/v1/audit', { params: cleanParams({ cursor, limit: 30, ...filters }) })).data,
   })
 }

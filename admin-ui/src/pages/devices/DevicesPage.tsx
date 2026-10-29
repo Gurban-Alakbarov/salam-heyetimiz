@@ -61,12 +61,17 @@ export function DevicesPage() {
         description="Cihazların idarə edilməsi və axtarışı"
         actions={
           <PermissionGate anyOf={[PERM.devicesCreate]}>
-            <Button asChild>
-              <Link to="/devices/new">
-                <Plus className="h-4 w-4" />
-                Yeni cihaz
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" asChild>
+                <Link to="/devices/new">Sadə forma</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/devices/install">
+                  <Plus className="h-4 w-4" />
+                  Cihaz quraşdır
+                </Link>
+              </Button>
+            </div>
           </PermissionGate>
         }
       />

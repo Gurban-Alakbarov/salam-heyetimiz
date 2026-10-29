@@ -78,6 +78,7 @@ export function useDeviceCommands(id: number, cursor: string | null) {
         })
       ).data,
     placeholderData: keepPreviousData,
+    enabled: id > 0,
     // While a command is still in flight (queued/dispatching), poll so the Test Relay card and
     // history update live as the pipeline reaches opened/failed with the device's response.
     refetchInterval: (query) => {
@@ -281,6 +282,25 @@ export function useResyncWhitelist(id: number) {
       await api.post(`/admin/v1/devices/${id}/whitelist/resync`)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['device-whitelist', id] }),
+  })
+}
+
+export interface PingResult {
+  /** false: Traccar itself did not answer. */
+  reachable: boolean
+  /** the device exists in Traccar (by IMEI) */
+  found: boolean
+  status: string | null
+  online: boolean
+  last_online_at: string | null
+}
+
+/** "Is the barrier reachable right now?" — asks Traccar live and records an admin_ping diagnostic. */
+export function usePingDevice(id: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async () => (await api.post<PingResult>(`/admin/v1/devices/${id}/ping`)).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['device-diagnostics', id] }),
   })
 }
 

@@ -17,6 +17,8 @@ import { SettingsPage } from '@/pages/settings/SettingsPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { TwoFactorPage } from '@/pages/auth/TwoFactorPage'
 import { DeviceDetailPage } from '@/pages/devices/DeviceDetailPage'
+import { InstallWizardPage } from '@/pages/devices/InstallWizardPage'
+import { SupportPage } from '@/pages/support/SupportPage'
 import { DeviceFormPage } from '@/pages/devices/DeviceFormPage'
 import { DevicesPage } from '@/pages/devices/DevicesPage'
 import { CampaignDetailPage } from '@/pages/notifications/CampaignDetailPage'
@@ -49,6 +51,8 @@ export function App() {
           <Route path="/residents" element={<RequirePermission anyOf={[PERM.residentsView]}><ResidentsPage /></RequirePermission>} />
           <Route path="/access" element={<RequirePermission anyOf={[PERM.accessManage]}><AccessControlPage /></RequirePermission>} />
           <Route path="/devices" element={<RequirePermission anyOf={[PERM.devicesView]}><DevicesPage /></RequirePermission>} />
+          <Route path="/devices/install" element={<RequirePermission anyOf={[PERM.devicesCreate]}><InstallWizardPage /></RequirePermission>} />
+          <Route path="/support" element={<RequirePermission anyOf={[PERM.residentsView]}><SupportPage /></RequirePermission>} />
           <Route path="/devices/new" element={<RequirePermission anyOf={[PERM.devicesCreate]}><DeviceFormPage /></RequirePermission>} />
           <Route path="/devices/:id" element={<RequirePermission anyOf={[PERM.devicesView]}><DeviceDetailPage /></RequirePermission>} />
           <Route path="/devices/:id/edit" element={<RequirePermission anyOf={[PERM.devicesUpdate]}><DeviceFormPage /></RequirePermission>} />

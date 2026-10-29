@@ -83,6 +83,8 @@ export interface ComplexInput {
   code?: string
   region_id?: number | null
   address?: string | null
+  latitude?: number | null
+  longitude?: number | null
   is_active?: boolean
 }
 

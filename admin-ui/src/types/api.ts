@@ -259,6 +259,8 @@ export type OpenCommandSource = 'mobile' | 'admin' | 'automation'
 export interface OpenCommand {
   id: number
   device_id: number
+  /** who pressed open (null for admin relay tests) */
+  user_id?: number | null
   state: OpenCommandState
   direction: CommandDirection | null
   source: OpenCommandSource

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import {
@@ -8,7 +9,7 @@ import {
 import { useAuth } from '@/auth/useAuth'
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
-import { useDevices } from '@/api/devices'
+import { useAssignDevice, useDevices, useGrantSubscription } from '@/api/devices'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { formatDateTime } from '@/lib/format'
 import { OsmMap } from '@/components/OsmMap'
@@ -75,7 +76,8 @@ function LegalTab() {
   const [q, setQ] = useState('')
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState<LegalApplication | null>(null)
-  const { data, isLoading, isError, error, refetch } = useLegalApplications({ status, q, page })
+  const dq = useDebouncedValue(q)
+  const { data, isLoading, isError, error, refetch } = useLegalApplications({ status, q: dq, page })
 
   return (
     <Card className="overflow-hidden">
@@ -207,7 +209,8 @@ function IndividualTab() {
   const [q, setQ] = useState('')
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState<IndividualApplication | null>(null)
-  const { data, isLoading, isError, error, refetch } = useIndividualApplications({ status, q, page })
+  const dq = useDebouncedValue(q)
+  const { data, isLoading, isError, error, refetch } = useIndividualApplications({ status, q: dq, page })
 
   return (
     <Card className="overflow-hidden">
@@ -241,9 +244,11 @@ function IndividualTab() {
   )
 }
 
-function IndividualDialog({ application: a, onClose }: { application: IndividualApplication; onClose: () => void }) {
+function IndividualDialog({ application, onClose }: { application: IndividualApplication; onClose: () => void }) {
   const { hasPermission } = useAuth()
   const { toast } = useToast()
+  // The dialog stays open across steps (new → contacted → … → installed) and shows the saved state each time.
+  const [a, setA] = useState(application)
   const update = useUpdateIndividualApplication(a.id)
   const [next, setNext] = useState<IndividualStatus | ''>('')
   const [note, setNote] = useState(a.admin_note ?? '')
@@ -257,7 +262,7 @@ function IndividualDialog({ application: a, onClose }: { application: Individual
     update.mutate(
       { status: next, admin_note: note.trim() || null, rejection_reason: next === 'rejected' ? reason.trim() : null, device_id: next === 'installed' && deviceId ? Number(deviceId) : null },
       {
-        onSuccess: () => { toast({ variant: 'success', title: 'Status yeniləndi' }); onClose() },
+        onSuccess: (saved) => { toast({ variant: 'success', title: 'Status yeniləndi' }); if (saved) setA(saved); setNext(''); setReason('') },
         onError: (e) => toast({ variant: 'destructive', title: 'Xəta', description: e instanceof ApiError ? e.message : undefined }),
       },
     )
@@ -278,6 +283,9 @@ function IndividualDialog({ application: a, onClose }: { application: Individual
           {a.device_id && <Field label="Quraşdırılmış cihaz" value={<Link to={`/devices/${a.device_id}`} className="text-primary hover:underline">Cihaza keç →</Link>} />}
           {a.rejection_reason && <Field label="Rədd səbəbi" value={a.rejection_reason} />}
           <div className="sm:col-span-2"><OsmMap latitude={a.location.latitude} longitude={a.location.longitude} height={220} /></div>
+          {a.status === 'installed' && a.device_id && (
+            <div className="sm:col-span-2"><InstalledFollowUp deviceId={a.device_id} phone={a.phone} email={a.email} /></div>
+          )}
           {canManage && a.next_statuses.length > 0 && (
             <div className="grid gap-3 sm:col-span-2 sm:grid-cols-2">
               <div className="space-y-1">
@@ -335,6 +343,53 @@ function DevicePicker({ id, value, onChange }: { id: string; value: string; onCh
         </select>
       )}
       {picked && <p className="text-xs text-muted-foreground">Seçildi: {picked.location_label ?? picked.serial}</p>}
+    </div>
+  )
+}
+
+/**
+ * After "Quraşdırılıb": finish the job here instead of on 2–3 other screens — make the applicant the owner of the
+ * installed device (their phone + email from the application) and, if agreed, give a free subscription.
+ */
+function InstalledFollowUp({ deviceId, phone, email }: { deviceId: number; phone: string; email: string | null }) {
+  const { hasPermission } = useAuth()
+  const { toast } = useToast()
+  const assign = useAssignDevice(deviceId)
+  const grant = useGrantSubscription(deviceId)
+  const [ownerId, setOwnerId] = useState<number | null>(null)
+  const [days, setDays] = useState('365')
+  const [granted, setGranted] = useState(false)
+  const fail = (e: unknown) => toast({ variant: 'destructive', title: 'Alınmadı', description: e instanceof ApiError ? e.message : undefined })
+
+  return (
+    <div className="space-y-2 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+      <p className="font-medium">Növbəti addımlar</p>
+      {hasPermission(PERM.devicesAssign) && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>1) {phone}{email ? ` · ${email}` : ''} — cihazın sahibi olsun</span>
+          {ownerId ? <Badge variant="success">Sahib təyin edildi</Badge> : (
+            <Button size="sm" disabled={assign.isPending} onClick={() => assign.mutate({ owner_phone: phone, owner_email: email ?? undefined }, {
+              onSuccess: (d) => { setOwnerId(d.owner?.id ?? null); toast({ variant: 'success', title: 'Sahib təyin edildi' }) },
+              onError: fail,
+            })}>{assign.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Sahib et</Button>
+          )}
+        </div>
+      )}
+      {hasPermission(PERM.subscriptionsManage) && ownerId && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>2) Pulsuz abunəlik (istəyə bağlı):</span>
+          <select aria-label="Müddət" className="h-8 rounded-md border border-input bg-card px-2 text-sm" value={days} onChange={(e) => setDays(e.target.value)}>
+            <option value="30">1 ay</option><option value="90">3 ay</option><option value="180">6 ay</option><option value="365">1 il</option>
+          </select>
+          {granted ? <Badge variant="success">Verildi</Badge> : (
+            <Button size="sm" variant="outline" disabled={grant.isPending} onClick={() => grant.mutate({ userId: ownerId, term_days: Number(days) }, {
+              onSuccess: () => { setGranted(true); toast({ variant: 'success', title: 'Abunəlik verildi' }) },
+              onError: fail,
+            })}>{grant.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Ver</Button>
+          )}
+        </div>
+      )}
+      <p className="text-xs text-muted-foreground">Sakin tətbiqə bu e-poçtla daxil olub qapını aça biləcək. <Link to={`/devices/${deviceId}`} className="text-primary hover:underline">Cihaz səhifəsi →</Link></p>
     </div>
   )
 }

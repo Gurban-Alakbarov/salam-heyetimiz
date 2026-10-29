@@ -1,4 +1,4 @@
-import { Bell, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, ReceiptText, RotateCcw, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
+import { Bell, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PERM } from '@/auth/permissions'
 import type { Permission } from '@/types/api'
@@ -32,6 +32,7 @@ export const navGroups: NavGroup[] = [
       { to: '/complexes', label: 'Komplekslər', icon: Building2, permission: PERM.complexesView },
       { to: '/residents', label: 'Sakinlər', icon: UsersRound, permission: PERM.residentsView },
       { to: '/devices', label: 'Cihazlar', icon: HardDrive, permission: PERM.devicesView },
+      { to: '/support', label: 'Qapı açılmır (dəstək)', icon: LifeBuoy, permission: PERM.residentsView },
     ],
   },
   {

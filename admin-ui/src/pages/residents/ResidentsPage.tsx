@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { Link } from 'react-router-dom'
 import { Loader2, Mail, Search, Trash2, Wifi, WifiOff } from 'lucide-react'
 import { useComplexList } from '@/api/complexes'
@@ -67,7 +68,8 @@ function ResidentsDirectory() {
   const [emailTarget, setEmailTarget] = useState<Resident | null>(null)
   const { cursor, next, prev, reset, canPrev, pageIndex } = useCursor()
   const { data: complexes } = useComplexList()
-  const query = useResidents({ q: q || undefined, complex_id: complexId ? Number(complexId) : undefined, cursor })
+  const dq = useDebouncedValue(q)
+  const query = useResidents({ q: dq || undefined, complex_id: complexId ? Number(complexId) : undefined, cursor })
   const deleteResident = useDeleteResident()
   const { toast } = useToast()
 

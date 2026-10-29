@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, CornerDownRight, Crown, Link2, Trash2, Unlink, UserPlus, X } from 'lucide-react'
+import { ChevronLeft, CornerDownRight, Crown, Link2, Pencil, Trash2, Unlink, UserPlus, X } from 'lucide-react'
 import { useAdmins } from '@/api/admins'
 import {
   type ComplexFamilyMember, type ComplexMemberRow,
@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/toast'
 import { FamilyHeadDialog, personName } from './ComplexFamilyDialogs'
+import { ComplexFormDialog, KomendantSetupDialog } from './ComplexDialogs'
 
 export function ComplexDetailPage() {
   const { id } = useParams()
@@ -34,6 +35,8 @@ export function ComplexDetailPage() {
   const binding = useComplexDeviceBinding()
   const { toast } = useToast()
   const [pick, setPick] = useState('')
+  const [editOpen, setEditOpen] = useState(false)
+  const [komendantOpen, setKomendantOpen] = useState(false)
   // Removing a manager / unbinding a device changes who runs this complex — ask first.
   const [managerTarget, setManagerTarget] = useState<{ id: number; name: string } | null>(null)
   const [unbindTarget, setUnbindTarget] = useState<{ id: number; serial: string; label: string | null } | null>(null)
@@ -50,7 +53,12 @@ export function ComplexDetailPage() {
             <code className="text-sm text-muted-foreground">{c.code}</code>
             {!c.is_active && <Badge variant="muted">Deaktiv</Badge>}
             {c.legal_entity_application_id && <Badge variant="outline">Hüquqi müraciət #{c.legal_entity_application_id}</Badge>}
+            <PermissionGate anyOf={[PERM.complexesManage]}>
+              <Button size="sm" variant="outline" className="ml-auto" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /> Redaktə et</Button>
+            </PermissionGate>
           </div>
+          <ComplexFormDialog open={editOpen} onOpenChange={setEditOpen}
+            complex={{ id: c.id, name: c.name, code: c.code, address: c.address ?? null, latitude: c.latitude ?? null, longitude: c.longitude ?? null, is_active: c.is_active }} />
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard label="Cihaz" value={c.stats.devices} />
@@ -65,8 +73,11 @@ export function ComplexDetailPage() {
                 <CardTitle className="text-base">Kompleks menecerləri (Komendant)</CardTitle>
                 <PermissionGate anyOf={[PERM.complexesManage]}>
                   <div className="flex items-center gap-2">
+                    <PermissionGate anyOf={[PERM.adminsCreate]}>
+                      <Button size="sm" onClick={() => setKomendantOpen(true)}><UserPlus className="h-4 w-4" /> Yeni komendant</Button>
+                    </PermissionGate>
                     <select aria-label="Menecer seç" className="h-9 rounded-md border border-input bg-card px-2 text-sm" value={pick} onChange={(e) => setPick(e.target.value)}>
-                      <option value="">Admin seç…</option>
+                      <option value="">Mövcud admini seç…</option>
                       {(admins ?? []).filter((a) => a.role !== 'super_admin').map((a) => <option key={a.id} value={a.id}>{a.name} ({a.email})</option>)}
                     </select>
                     <Button size="sm" disabled={!pick || assign.isPending} onClick={() => assign.mutate(Number(pick), { onSuccess: () => { toast({ variant: 'success', title: 'Menecer təyin edildi' }); setPick('') }, onError: err })}>
@@ -93,7 +104,8 @@ export function ComplexDetailPage() {
                     </div>
                   )
                 })}
-                <p className="pt-2 text-xs text-muted-foreground">Komendantın mobil hesabı «Adminlər» səhifəsində əlaqələndirilir.</p>
+                <p className="pt-2 text-xs text-muted-foreground">«Yeni komendant» admin hesabını və mobil hesab əlaqəsini birlikdə qurur.</p>
+                <KomendantSetupDialog open={komendantOpen} onOpenChange={setKomendantOpen} complexId={complexId} complexName={c.name} />
               </CardContent>
             </Card>
 

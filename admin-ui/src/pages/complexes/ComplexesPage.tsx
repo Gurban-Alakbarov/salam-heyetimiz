@@ -1,20 +1,14 @@
-import { type FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Building2, Loader2, Plus } from 'lucide-react'
-import { useComplexList, useCreateComplex } from '@/api/complexes'
+import { Building2, Plus } from 'lucide-react'
+import { useComplexList } from '@/api/complexes'
 import { PERM } from '@/auth/permissions'
-import { ApiError } from '@/lib/api'
 import { PermissionGate } from '@/components/PermissionGate'
 import { ErrorState, LoadingState } from '@/components/states'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useToast } from '@/components/ui/toast'
+import { ComplexFormDialog } from './ComplexDialogs'
 
 export function ComplexesPage() {
   const { data, isLoading, isError, error, refetch } = useComplexList()
@@ -58,7 +52,7 @@ export function ComplexesPage() {
         </div>
       )}
 
-      <CreateComplexDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <ComplexFormDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }
@@ -69,46 +63,5 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
       <span className="text-xs uppercase tracking-wide text-muted-foreground">{label}</span>
       <span className="truncate">{value}</span>
     </div>
-  )
-}
-
-function CreateComplexDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
-  const { toast } = useToast()
-  const create = useCreateComplex()
-  const [name, setName] = useState('')
-  const [code, setCode] = useState('')
-  const [address, setAddress] = useState('')
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault()
-    create.mutate(
-      { name: name.trim(), code: code.trim(), address: address.trim() || undefined },
-      {
-        onSuccess: () => { toast({ variant: 'success', title: 'Kompleks yaradıldı' }); onOpenChange(false); setName(''); setCode(''); setAddress('') },
-        onError: (err) => toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
-      },
-    )
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={(n) => { if (!create.isPending) onOpenChange(n) }}>
-      <DialogContent>
-        <form onSubmit={submit}>
-          <DialogHeader>
-            <DialogTitle>Yeni kompleks</DialogTitle>
-            <DialogDescription>Yaşayış kompleksi yaradın. Cihazlar və sakinlər bu komplekslə əlaqələndirilir.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-4">
-            <div className="space-y-2"><Label htmlFor="cx-name">Ad</Label><Input id="cx-name" value={name} onChange={(e) => setName(e.target.value)} required /></div>
-            <div className="space-y-2"><Label htmlFor="cx-code">Kod</Label><Input id="cx-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="SEA-BREEZE" required /></div>
-            <div className="space-y-2"><Label htmlFor="cx-addr">Ünvan (istəyə bağlı)</Label><Input id="cx-addr" value={address} onChange={(e) => setAddress(e.target.value)} /></div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={create.isPending}>İmtina</Button>
-            <Button type="submit" disabled={create.isPending || !name.trim() || !code.trim()}>{create.isPending && <Loader2 className="h-4 w-4 animate-spin" />}Yarat</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   )
 }

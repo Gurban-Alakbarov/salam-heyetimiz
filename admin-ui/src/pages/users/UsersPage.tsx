@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { Link } from 'react-router-dom'
 import { type AccountType, useMobileUsers } from '@/api/users'
 import { formatDate } from '@/lib/format'
@@ -20,7 +21,8 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
   const [q, setQ] = useState('')
   const [type, setType] = useState<AccountType | 'none' | ''>('')
   const [page, setPage] = useState(1)
-  const { data, isLoading, isError, error, refetch } = useMobileUsers({ q, account_type: type, page })
+  const dq = useDebouncedValue(q)
+  const { data, isLoading, isError, error, refetch } = useMobileUsers({ q: dq, account_type: type, page })
   const pages = data ? Math.max(1, Math.ceil(data.meta.total / data.meta.per_page)) : 1
 
   return (

@@ -96,7 +96,14 @@ export function DeviceDetailPage() {
               </div>
               <StatusBadge kind="device" value={device.status} />
             </div>
-            <DeviceActions device={device} />
+            <div className="flex flex-col items-end gap-2">
+              <DeviceActions device={device} />
+              <PermissionGate anyOf={[PERM.auditView]}>
+                <Link to={`/audit?auditable_type=Device&auditable_id=${device.id}`} className="text-xs text-muted-foreground hover:text-foreground hover:underline">
+                  Bu cihazla edilən əməliyyatlar (audit) →
+                </Link>
+              </PermissionGate>
+            </div>
           </div>
 
           <Overview device={device} />

@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
+import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronRight, Download } from 'lucide-react'
 import { type AdminRefund, fetchRefundsForExport, useRefunds } from '@/api/refunds'
@@ -32,9 +33,10 @@ export function RefundsPage() {
   const [open, setOpen] = useState<number | null>(null)
   const { cursor, next, prev, reset, canPrev, pageIndex } = useCursor()
 
-  const filters = { status: status || undefined, q: q || undefined, since: since || undefined, until: until || undefined }
+  const dq = useDebouncedValue(q)
+  const filters = { status: status || undefined, q: dq || undefined, since: since || undefined, until: until || undefined }
 
-  useEffect(() => { reset() }, [status, q, since, until, reset])
+  useEffect(() => { reset() }, [status, dq, since, until, reset])
 
   const query = useRefunds({ ...filters, cursor, limit: 25 })
   const rows = query.data?.data ?? []

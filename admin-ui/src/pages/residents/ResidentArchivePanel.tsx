@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { type ResidentArchiveEntry, useResidentArchive } from '@/api/residents'
@@ -26,7 +27,8 @@ export function ResidentArchivePanel() {
   const [q, setQ] = useState('')
   const [open, setOpen] = useState<ResidentArchiveEntry | null>(null)
   const { cursor, next, prev, reset, canPrev, pageIndex } = useCursor()
-  const query = useResidentArchive({ q: q || undefined, cursor })
+  const dq = useDebouncedValue(q)
+  const query = useResidentArchive({ q: dq || undefined, cursor })
 
   useEffect(() => {
     reset()

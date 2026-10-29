@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GlobalSearch } from './GlobalSearch'
 import { Link, useNavigate } from 'react-router-dom'
 import { LogOut, Menu, User } from 'lucide-react'
 import { useAuth } from '@/auth/useAuth'
@@ -47,7 +48,9 @@ export function Header({ onMenu }: { onMenu: () => void }) {
       <Button variant="ghost" size="icon" className="md:hidden" onClick={onMenu} aria-label="Menyu">
         <Menu className="h-5 w-5" />
       </Button>
-      <div className="flex-1" />
+      <div className="flex flex-1 justify-center md:justify-start">
+        <GlobalSearch />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="gap-2">

@@ -70,7 +70,7 @@ Future<void> bootstrap(AppConfig config) async {
     // Persisted app locale (W5 D2) — hydrate so a chosen language survives restart.
     // + the "send usage statistics" choice (1.0.1, default on), applied before any event is sent.
     Locale? savedLocale;
-    var widgetLocaleCode = 'az';
+    var widgetLocaleCode = deviceLanguageCode();
     var analyticsEnabled = true;
     try {
       final prefs = await SharedPreferences.getInstance();

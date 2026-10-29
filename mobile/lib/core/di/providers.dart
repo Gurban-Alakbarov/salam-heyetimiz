@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,7 +72,7 @@ final apiClientProvider = Provider<ApiClient>(
     config: ref.watch(appConfigProvider),
     sessionManager: ref.watch(sessionManagerProvider),
     logger: ref.watch(loggerProvider),
-    localeCode: () => ref.read(localeProvider)?.languageCode ?? 'az',
+    localeCode: () => ref.read(effectiveLocaleProvider).languageCode,
   ),
 );
 
@@ -115,7 +117,7 @@ final analyticsEnabledProvider =
     );
 
 /// Initial app locale, hydrated from persisted `locale_code` in bootstrap and injected
-/// via a ProviderScope override (null = system/first-launch → app defaults to az).
+/// via a ProviderScope override (null = no choice yet → the phone's language, see [effectiveLocaleProvider]).
 final initialLocaleProvider = Provider<Locale?>((ref) => null);
 
 /// App locale (null = system). Sent as Accept-Language to the API. Now PERSISTED
@@ -142,4 +144,21 @@ class LocaleNotifier extends Notifier<Locale?> {
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(
   LocaleNotifier.new,
+);
+
+const _appLanguages = {'az', 'en', 'ru'};
+
+/// The phone's language when the app speaks it (az / en / ru), otherwise Azerbaijani — what the app uses
+/// until the user picks a language in Settings (owner request 2026-10-30).
+String deviceLanguageCode() {
+  final code = PlatformDispatcher
+      .instance
+      .locale
+      .languageCode; // safe before the binding exists
+  return _appLanguages.contains(code) ? code : 'az';
+}
+
+/// The language the app actually shows: the user's choice, else the phone's language (az fallback).
+final effectiveLocaleProvider = Provider<Locale>(
+  (ref) => ref.watch(localeProvider) ?? Locale(deviceLanguageCode()),
 );

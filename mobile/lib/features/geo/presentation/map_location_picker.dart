@@ -54,7 +54,7 @@ class _MapLocationPickerState extends ConsumerState<MapLocationPicker> {
   /// The pin while it is being dragged (the parent only hears about it when the drag ends).
   LatLng? _dragging;
 
-  String get _lang => ref.read(localeProvider)?.languageCode ?? 'az';
+  String get _lang => ref.read(effectiveLocaleProvider).languageCode;
 
   @override
   void dispose() {
@@ -131,7 +131,7 @@ class _MapLocationPickerState extends ConsumerState<MapLocationPicker> {
     final pin = _dragging ?? (v == null ? null : LatLng(v.latitude, v.longitude));
     final center = pin ?? MapLocationPicker.defaultCenter;
     final outside = v != null && !v.inServiceArea;
-    final lang = ref.watch(localeProvider)?.languageCode ?? 'az';
+    final lang = ref.watch(effectiveLocaleProvider).languageCode;
     final gomapUrl = ref.watch(geoTileUrlProvider(lang)).value;
 
     return Column(

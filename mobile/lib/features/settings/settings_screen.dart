@@ -132,7 +132,7 @@ class _LangTile extends ConsumerWidget {
         // refresh all instances so they re-render in the new language (W5 D2/K).
         await ref
             .read(doorWidgetServiceProvider)
-            .setLocale(locale?.languageCode ?? 'az');
+            .setLocale(locale?.languageCode ?? deviceLanguageCode());
       },
     );
   }

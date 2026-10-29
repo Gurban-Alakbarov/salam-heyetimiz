@@ -4,6 +4,10 @@
          <queries> <package> entry below, so they are stripped from the merged manifest. -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:node="remove"/>
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" tools:node="remove"/>
+    <!-- 1.0.1: no ads, so no advertising ID — Firebase Analytics would add these; the Play declaration says "no". -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove"/>
     <!-- Android 13+ runtime notification permission (FCM push). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Declared for the home-screen door widget's future background network call (W3). Release builds
@@ -89,6 +93,9 @@
             android:value="false" />
         <meta-data
             android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
             android:value="false" />
 
         <!-- Home-screen "Qapını aç" widget (W1 static shell). exported=false: the OS AppWidget framework

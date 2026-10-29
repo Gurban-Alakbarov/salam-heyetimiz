@@ -213,9 +213,9 @@ class _SalamAppState extends ConsumerState<SalamApp> {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ref.watch(themeModeProvider),
-      // Default to Azerbaijani on first launch (no explicit choice yet). Once the
+      // No choice yet → the phone's language if it is az / en / ru, else az. Once the
       // user picks a language in Settings the provider holds it and wins here.
-      locale: ref.watch(localeProvider) ?? const Locale('az'),
+      locale: ref.watch(effectiveLocaleProvider),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: ref.watch(routerProvider),

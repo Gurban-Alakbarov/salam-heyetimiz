@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:salam_mobile/core/di/providers.dart';
 import 'package:salam_mobile/core/error/failure.dart';
 import 'package:salam_mobile/features/applications/domain/application_entities.dart';
 import 'package:salam_mobile/features/geo/geo_repository.dart';
@@ -28,6 +29,8 @@ void main() {
       ProviderScope(
         overrides: [
           geoRepositoryProvider.overrideWithValue(geo),
+          // the app follows the phone language; pin it so the GoMap calls use az
+          effectiveLocaleProvider.overrideWithValue(const Locale('az')),
           // no tile network in tests: the map falls back to its default (tiles fail quietly)
           geoTileUrlProvider.overrideWith((ref, lang) async => null),
         ],

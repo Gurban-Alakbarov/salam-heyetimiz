@@ -87,7 +87,7 @@ export function SubscriptionsPage() {
                     <TableCell>
                       {s.device_id ? (
                         <Link to={`/devices/${s.device_id}`} className="text-primary hover:underline">
-                          #{s.device_id}
+                          {s.device_label ?? `#${s.device_id}`}
                         </Link>
                       ) : (
                         '—'

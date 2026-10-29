@@ -8,6 +8,8 @@ import {
 import { useAuth } from '@/auth/useAuth'
 import { PERM } from '@/auth/permissions'
 import { ApiError } from '@/lib/api'
+import { useDevices } from '@/api/devices'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { formatDateTime } from '@/lib/format'
 import { OsmMap } from '@/components/OsmMap'
 import { EmptyState, ErrorState, TableSkeleton } from '@/components/states'
@@ -125,6 +127,7 @@ function LegalDialog({ application: a, onClose }: { application: LegalApplicatio
   const [reason, setReason] = useState('')
   const [rejecting, setRejecting] = useState(false)
   const [approvedComplex, setApprovedComplex] = useState<LegalApplication['complex'] | null>(null)
+  const [confirmApprove, setConfirmApprove] = useState(false)
   // Approval creates a complex → applications.manage AND complexes.manage (server-enforced too).
   const canApprove = hasPermission(PERM.applicationsManage) && hasPermission(PERM.complexesManage)
   const canReject = hasPermission(PERM.applicationsManage)
@@ -154,7 +157,7 @@ function LegalDialog({ application: a, onClose }: { application: LegalApplicatio
           {complexId && (
             <div className="sm:col-span-2 rounded-md bg-muted p-3 text-sm">
               Kompleks yaradılıb: <Link to={`/complexes/${complexId}`} className="font-medium text-primary hover:underline">kompleksə keç →</Link>
-              <p className="mt-1 text-xs text-muted-foreground">Növbəti addımlar: Komendant (complex_manager) təyin edin və mobil hesabını "Adminlər"dən bağlayın, cihazları kompleksə bağlayın.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Növbəti addımlar: 1) «Adminlər»də komendant yaradın (rol: Kompleks Meneceri) və mobil hesabını əlaqələndirin; 2) kompleks səhifəsində cihazları qoşun və «Kompleks rejiminə keçir» edin; 3) sakinləri komendant mobil tətbiqdən dəvət edir.</p>
             </div>
           )}
           {rejecting && (
@@ -174,7 +177,7 @@ function LegalDialog({ application: a, onClose }: { application: LegalApplicatio
                 </Button>
               ) : <Button variant="outline" onClick={() => setRejecting(true)}>Rədd et…</Button>)}
               {canApprove && !rejecting && (
-                <Button disabled={approve.isPending} onClick={() => approve.mutate(undefined, { onSuccess: (res) => { setApprovedComplex(res.complex ?? null); toast({ variant: 'success', title: 'Təsdiqləndi — kompleks yaradıldı' }) }, onError: fail })}>
+                <Button disabled={approve.isPending} onClick={() => setConfirmApprove(true)}>
                   {approve.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Təsdiqlə və kompleks yarat
                 </Button>
               )}
@@ -182,6 +185,18 @@ function LegalDialog({ application: a, onClose }: { application: LegalApplicatio
           )}
           <Button variant="ghost" onClick={onClose}>Bağla</Button>
         </DialogFooter>
+        <ConfirmDialog
+          open={confirmApprove}
+          onOpenChange={setConfirmApprove}
+          title="Müraciət təsdiqlənsin?"
+          description={`«${a.complex_name}» adlı yeni kompleks yaradılacaq və ərizəçiyə təsdiq e-poçtu göndəriləcək. Bunu geri qaytarmaq olmur.`}
+          confirmLabel="Təsdiqlə və yarat"
+          loading={approve.isPending}
+          onConfirm={() => approve.mutate(undefined, {
+            onSuccess: (res) => { setApprovedComplex(res.complex ?? null); setConfirmApprove(false); toast({ variant: 'success', title: 'Təsdiqləndi — kompleks yaradıldı' }) },
+            onError: (e) => { setConfirmApprove(false); fail(e) },
+          })}
+        />
       </DialogContent>
     </Dialog>
   )
@@ -260,7 +275,7 @@ function IndividualDialog({ application: a, onClose }: { application: Individual
           <Field label="E-poçt" value={a.email} />
           <Field label="Ünvan" value={a.address} />
           <Field label="Qeyd" value={a.note} />
-          {a.device_id && <Field label="Quraşdırılmış cihaz" value={<Link to={`/devices/${a.device_id}`} className="text-primary hover:underline">#{a.device_id}</Link>} />}
+          {a.device_id && <Field label="Quraşdırılmış cihaz" value={<Link to={`/devices/${a.device_id}`} className="text-primary hover:underline">Cihaza keç →</Link>} />}
           {a.rejection_reason && <Field label="Rədd səbəbi" value={a.rejection_reason} />}
           <div className="sm:col-span-2"><OsmMap latitude={a.location.latitude} longitude={a.location.longitude} height={220} /></div>
           {canManage && a.next_statuses.length > 0 && (
@@ -274,9 +289,10 @@ function IndividualDialog({ application: a, onClose }: { application: Individual
               </div>
               {next === 'installed' && (
                 <div className="space-y-1">
-                  <Label htmlFor="inst-device">Quraşdırılan cihaz ID (şəxsi rejim, opsional)</Label>
-                  <Input id="inst-device" inputMode="numeric" value={deviceId} onChange={(e) => setDeviceId(e.target.value.replace(/\D/g, ''))} />
+                  <Label htmlFor="inst-device">Quraşdırılan cihaz (könüllü)</Label>
+                  <DevicePicker id="inst-device" value={deviceId} onChange={setDeviceId} />
                   {fieldErr('device_id') && <p className="text-xs text-destructive">{fieldErr('device_id')}</p>}
+                  <p className="text-xs text-muted-foreground">Sonra cihaz səhifəsində «Sahib təyin et» ilə {a.phone} nömrəsini sahib edin.</p>
                 </div>
               )}
               {next === 'rejected' && (
@@ -301,5 +317,24 @@ function IndividualDialog({ application: a, onClose }: { application: Individual
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/** Pick a device by IMEI / name instead of typing its numeric id. `value` is the device id as a string. */
+function DevicePicker({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) {
+  const [q, setQ] = useState('')
+  const { data } = useDevices({ q: q.trim() || undefined, limit: 10 })
+  const picked = (data?.data ?? []).find((d) => String(d.id) === value)
+  return (
+    <div className="space-y-1">
+      <Input id={id} placeholder="IMEI və ya cihaz adı…" value={q} onChange={(e) => setQ(e.target.value)} />
+      {q.trim().length >= 2 && (
+        <select aria-label="Cihaz" className="h-9 w-full rounded-md border border-input bg-card px-2 text-sm" value={value} onChange={(e) => onChange(e.target.value)}>
+          <option value="">Cihaz seçin…</option>
+          {(data?.data ?? []).map((d) => <option key={d.id} value={d.id}>{d.location_label ? `${d.location_label} — ` : ''}{d.serial}</option>)}
+        </select>
+      )}
+      {picked && <p className="text-xs text-muted-foreground">Seçildi: {picked.location_label ?? picked.serial}</p>}
+    </div>
   )
 }

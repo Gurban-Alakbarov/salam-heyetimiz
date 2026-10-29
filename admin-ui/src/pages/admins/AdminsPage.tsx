@@ -35,6 +35,8 @@ export function AdminsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<AdminUser | null>(null)
   const [impersonatingId, setImpersonatingId] = useState<number | null>(null)
+  // "Daxil ol" acts as another admin (audited) — ask first.
+  const [impersonateTarget, setImpersonateTarget] = useState<AdminUser | null>(null)
   const [linkTarget, setLinkTarget] = useState<AdminUser | null>(null)
   const [unlinkTarget, setUnlinkTarget] = useState<AdminUser | null>(null)
   const unlink = useUnlinkMobileUser()
@@ -95,7 +97,7 @@ export function AdminsPage() {
                     <TableCell>{a.name}</TableCell>
                     <TableCell>{roleLabels[a.role] ?? a.role}</TableCell>
                     <TableCell>
-                      <Badge variant={a.status === 'active' ? 'success' : 'muted'}>{a.status}</Badge>
+                      <Badge variant={a.status === 'active' ? 'success' : 'muted'}>{a.status === 'active' ? 'Aktiv' : 'Deaktiv'}</Badge>
                     </TableCell>
                     <TableCell>
                       {a.role !== 'complex_manager' ? <span className="text-muted-foreground">—</span> : a.mobile_user ? (
@@ -104,14 +106,14 @@ export function AdminsPage() {
                           {canLink && <Button size="sm" variant="ghost" className="h-7 text-destructive" onClick={() => setUnlinkTarget(a)}>Ayır</Button>}
                         </span>
                       ) : canLink ? (
-                        <Button size="sm" variant="outline" onClick={() => setLinkTarget(a)}><Link2 className="h-4 w-4" /> Bağla</Button>
-                      ) : <Badge variant="muted">Bağlı deyil</Badge>}
+                        <Button size="sm" variant="outline" onClick={() => setLinkTarget(a)}><Link2 className="h-4 w-4" /> Mobil hesabı əlaqələndir</Button>
+                      ) : <Badge variant="muted">Əlaqələndirilməyib</Badge>}
                     </TableCell>
                     <TableCell className="space-x-1 pr-4 text-right">
                       {hasPermission(PERM.adminsImpersonate) && a.id !== me?.id && a.status === 'active' && (
-                        <Button size="sm" variant="outline" disabled={impersonatingId === a.id} onClick={() => onImpersonate(a.id)}>
+                        <Button size="sm" variant="outline" disabled={impersonatingId === a.id} onClick={() => setImpersonateTarget(a)}>
                           {impersonatingId === a.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-                          Daxil ol
+                          Onun adından daxil ol
                         </Button>
                       )}
                       {a.id !== me?.id && a.status === 'active' && (
@@ -133,6 +135,19 @@ export function AdminsPage() {
       <CreateAdminDialog open={createOpen} onOpenChange={setCreateOpen} />
       <LinkMobileDialog admin={linkTarget} onClose={() => setLinkTarget(null)} />
 
+      <ConfirmDialog
+        open={impersonateTarget !== null}
+        onOpenChange={(o) => !o && setImpersonateTarget(null)}
+        title="Bu adminin adından daxil olunsun?"
+        description={`Paneli ${impersonateTarget?.name ?? ''} (${impersonateTarget?.email ?? ''}) kimi görəcəksiniz; etdiyiniz hər şey audit jurnalına sizin adınızla da yazılır. Yuxarıdakı zolaqdan geri qayıda bilərsiniz.`}
+        confirmLabel="Daxil ol"
+        loading={impersonatingId !== null}
+        onConfirm={() => {
+          const target = impersonateTarget
+          setImpersonateTarget(null)
+          if (target) void onImpersonate(target.id)
+        }}
+      />
       <ConfirmDialog
         open={unlinkTarget !== null}
         onOpenChange={(n) => { if (!n) setUnlinkTarget(null) }}
@@ -184,7 +199,7 @@ function LinkMobileDialog({ admin, onClose }: { admin: AdminUser | null; onClose
         <form onSubmit={(e) => {
           e.preventDefault()
           if (!admin) return
-          link.mutate({ adminId: admin.id, email: email.trim() }, { onSuccess: () => { toast({ variant: 'success', title: 'Mobil hesab bağlandı' }); close() } })
+          link.mutate({ adminId: admin.id, email: email.trim() }, { onSuccess: () => { toast({ variant: 'success', title: 'Mobil hesab əlaqələndirildi' }); close() } })
         }}>
           <DialogHeader>
             <DialogTitle>Komendant mobil hesabı</DialogTitle>
@@ -197,7 +212,7 @@ function LinkMobileDialog({ admin, onClose }: { admin: AdminUser | null; onClose
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={close} disabled={link.isPending}>İmtina</Button>
-            <Button type="submit" disabled={link.isPending || !email.trim()}>{link.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Bağla</Button>
+            <Button type="submit" disabled={link.isPending || !email.trim()}>{link.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Əlaqələndir</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -266,7 +281,7 @@ function CreateAdminDialog({ open, onOpenChange }: { open: boolean; onOpenChange
               </div>
               <div className="space-y-2">
                 <Label htmlFor="a-pass">Parol (≥12 simvol)</Label>
-                <Input id="a-pass" type="text" value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} required />
+                <Input id="a-pass" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="a-role">Rol</Label>

@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
 import type { DeviceAdminDetail } from '@/types/api'
@@ -18,12 +19,13 @@ import type { DeviceAdminDetail } from '@/types/api'
 /**
  * B11 — device access model, complex binding and the one-off sale price. All rules (B4 invariants) are
  * enforced server-side; the UI only offers the actions the admin's permissions allow and surfaces the 409s.
- *  - complex bind/unbind: complexes.manage · mode switch + sale price: devices.update
+ *  - complex bind/unbind: complexes.manage or complexes.devices.bind (technician) · mode switch + sale price: devices.update
+ * Unbinding and switching the access mode change who can open the gate, so both ask first.
  */
 export function DeviceOwnershipCard({ device }: { device: DeviceAdminDetail }) {
   const { hasPermission } = useAuth()
   const { toast } = useToast()
-  const canBind = hasPermission(PERM.complexesManage)
+  const canBind = hasPermission(PERM.complexesManage) || hasPermission(PERM.complexesDevicesBind)
   const canUpdate = hasPermission(PERM.devicesUpdate)
   const mode = device.ownership_mode ?? 'private'
   const complexId = device.complex_id ?? null
@@ -34,6 +36,7 @@ export function DeviceOwnershipCard({ device }: { device: DeviceAdminDetail }) {
   const update = useUpdateDevice(device.id)
   const [pickComplex, setPickComplex] = useState('')
   const [price, setPrice] = useState('')
+  const [confirm, setConfirm] = useState<null | 'unbind' | 'mode'>(null)
 
   useEffect(() => {
     setPrice(device.sale_price_minor != null ? (device.sale_price_minor / 100).toFixed(2) : '')
@@ -43,7 +46,7 @@ export function DeviceOwnershipCard({ device }: { device: DeviceAdminDetail }) {
   const complexName = complexes?.find((c) => c.id === complexId)?.name
 
   const bindTo = (id: number) =>
-    binding.mutate({ complexId: id, deviceId: device.id, bind: true }, { onSuccess: () => { toast({ variant: 'success', title: 'Cihaz kompleksə bağlandı' }); setPickComplex('') }, onError: fail })
+    binding.mutate({ complexId: id, deviceId: device.id, bind: true }, { onSuccess: () => { toast({ variant: 'success', title: 'Cihaz kompleksə qoşuldu' }); setPickComplex('') }, onError: fail })
 
   const savePrice = () => {
     const trimmed = price.trim().replace(',', '.')
@@ -67,16 +70,15 @@ export function DeviceOwnershipCard({ device }: { device: DeviceAdminDetail }) {
             <div className="flex items-center gap-2 text-sm">
               <Link to={`/complexes/${complexId}`} className="font-medium hover:underline">{complexName ?? `#${complexId}`}</Link>
               {canBind && (
-                <Button size="sm" variant="outline" disabled={binding.isPending}
-                  onClick={() => binding.mutate({ complexId, deviceId: device.id, bind: false }, { onSuccess: () => toast({ variant: 'success', title: 'Cihaz kompleksdən ayrıldı' }), onError: fail })}>
-                  Ayır
+                <Button size="sm" variant="outline" disabled={binding.isPending} onClick={() => setConfirm('unbind')}>
+                  Kompleksdən ayır
                 </Button>
               )}
             </div>
           ) : canBind ? (
             <BindPicker complexes={complexes ?? []} value={pickComplex} onChange={setPickComplex} pending={binding.isPending} onBind={bindTo} />
           ) : (
-            <p className="text-sm text-muted-foreground">Bağlı deyil</p>
+            <p className="text-sm text-muted-foreground">Heç bir kompleksə qoşulmayıb</p>
           )}
         </div>
 
@@ -85,8 +87,7 @@ export function DeviceOwnershipCard({ device }: { device: DeviceAdminDetail }) {
           <div className="flex items-center gap-2">
             {mode === 'complex' ? <Badge variant="secondary">Kompleks (ortaq)</Badge> : <Badge variant="muted">Şəxsi</Badge>}
             {canUpdate && (
-              <Button size="sm" variant="outline" disabled={changeMode.isPending}
-                onClick={() => changeMode.mutate(mode === 'complex' ? 'private' : 'complex', { onSuccess: () => toast({ variant: 'success', title: 'Rejim dəyişdirildi' }), onError: fail })}>
+              <Button size="sm" variant="outline" disabled={changeMode.isPending} onClick={() => setConfirm('mode')}>
                 {changeMode.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                 {mode === 'complex' ? 'Şəxsi rejimə keçir' : 'Kompleks rejiminə keçir'}
               </Button>
@@ -116,6 +117,34 @@ export function DeviceOwnershipCard({ device }: { device: DeviceAdminDetail }) {
           </p>
         </div>
       </CardContent>
+
+      <ConfirmDialog
+        open={confirm === 'unbind'}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        title="Cihaz kompleksdən ayrılsın?"
+        description={`«${complexName ?? 'Kompleks'}» bu cihazı artıq görməyəcək; komendant onu idarə edə bilməyəcək.`}
+        confirmLabel="Ayır"
+        confirmVariant="destructive"
+        loading={binding.isPending}
+        onConfirm={() => complexId && binding.mutate({ complexId, deviceId: device.id, bind: false }, {
+          onSuccess: () => { toast({ variant: 'success', title: 'Cihaz kompleksdən ayrıldı' }); setConfirm(null) },
+          onError: fail,
+        })}
+      />
+      <ConfirmDialog
+        open={confirm === 'mode'}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        title={mode === 'complex' ? 'Şəxsi rejimə keçilsin?' : 'Kompleks rejiminə keçilsin?'}
+        description={mode === 'complex'
+          ? 'Cihaz bir sahibə məxsus olacaq; kompleks sakinləri artıq ondan istifadə edə bilməyəcək.'
+          : 'Cihaz kompleksin ortaq qapısı olacaq: sahibi olmayacaq, hər sakin öz abunəliyi ilə açacaq.'}
+        confirmLabel="Keçir"
+        loading={changeMode.isPending}
+        onConfirm={() => changeMode.mutate(mode === 'complex' ? 'private' : 'complex', {
+          onSuccess: () => { toast({ variant: 'success', title: 'Rejim dəyişdirildi' }); setConfirm(null) },
+          onError: fail,
+        })}
+      />
     </Card>
   )
 }
@@ -133,7 +162,7 @@ function BindPicker({ complexes, value, onChange, pending, onBind }: {
         <option value="">Kompleks seç…</option>
         {complexes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
       </select>
-      <Button size="sm" disabled={!value || pending} onClick={() => onBind(Number(value))}>Bağla</Button>
+      <Button size="sm" disabled={!value || pending} onClick={() => onBind(Number(value))}>Kompleksə qoş</Button>
     </div>
   )
 }

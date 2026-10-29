@@ -38,9 +38,9 @@ function SectionCard({
 
 function fmtDur(seconds: number | null): string {
   if (seconds == null) return '—'
-  if (seconds < 60) return `${seconds}s`
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}d ${seconds % 60}s`
-  return `${Math.floor(seconds / 3600)}s ${Math.floor((seconds % 3600) / 60)}d`
+  if (seconds < 60) return `${seconds} san`
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} dəq ${seconds % 60} san`
+  return `${Math.floor(seconds / 3600)} saat ${Math.floor((seconds % 3600) / 60)} dəq`
 }
 
 function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
@@ -78,8 +78,8 @@ function PaymentStatsBlock({ stats }: { stats: PaymentStats }) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="Ümumi ödənilmiş" value={formatMoney(t.total_paid_minor, 'AZN')} sub={`${t.paid} sifariş`} accent="text-emerald-600" />
         <Kpi label="Ümumi qaytarılmış" value={formatMoney(t.total_refunded_minor, 'AZN')} sub={`${t.refunded + t.partially_refunded} geri qaytarma`} accent="text-amber-600" />
-        <Kpi label="Uğur faizi" value={stats.rates.success_rate != null ? `${stats.rates.success_rate}%` : '—'} sub="paid / yekun" />
-        <Kpi label="Geri qaytarma faizi" value={stats.rates.refund_rate != null ? `${stats.rates.refund_rate}%` : '—'} sub="refunded / paid" />
+        <Kpi label="Uğur faizi" value={stats.rates.success_rate != null ? `${stats.rates.success_rate}%` : '—'} sub="tamamlanan sifarişlərdən ödənilənlər" />
+        <Kpi label="Geri qaytarma faizi" value={stats.rates.refund_rate != null ? `${stats.rates.refund_rate}%` : '—'} sub="ödənilənlərdən geri qaytarılanlar" />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         <Kpi label="Gözləyir" value={String(t.pending + t.authorising)} />
@@ -148,7 +148,7 @@ export function DashboardPage() {
             <ul className="divide-y">
               {subscriptions.data.data.map((s) => (
                 <li key={s.id} className="flex items-center justify-between py-2.5 text-sm">
-                  <span className="font-medium">#{s.id}</span>
+                  <Link to={`/subscriptions/${s.id}`} className="font-medium hover:underline">{s.device_label ?? `Abunəlik #${s.id}`}</Link>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">
                       {s.days_remaining !== null ? `${s.days_remaining} gün qalıb` : '—'}

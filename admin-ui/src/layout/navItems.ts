@@ -1,4 +1,4 @@
-import { Bell, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, ReceiptText, RotateCcw, Satellite, ScrollText, Settings, UserRound, UsersRound, Users } from 'lucide-react'
+import { Bell, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, ReceiptText, RotateCcw, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PERM } from '@/auth/permissions'
 import type { Permission } from '@/types/api'
@@ -12,23 +12,51 @@ export interface NavItem {
   permission: Permission
 }
 
-// Enterprise menu order: operations first (complexes → residents → devices → billing),
-// then administration (admins → access), then platform (traccar → audit → settings).
-export const navItems: NavItem[] = [
-  { to: '/', label: 'İdarə paneli', icon: LayoutDashboard, end: true, permission: PERM.dashboardView },
-  { to: '/applications', label: 'Müraciətlər', icon: ClipboardList, permission: PERM.applicationsView },
-  { to: '/complexes', label: 'Komplekslər', icon: Building2, permission: PERM.complexesView },
-  { to: '/residents', label: 'Sakinlər', icon: UsersRound, permission: PERM.residentsView },
-  { to: '/users', label: 'İstifadəçilər', icon: UserRound, permission: PERM.residentsView },
-  { to: '/devices', label: 'Cihazlar', icon: HardDrive, permission: PERM.devicesView },
-  { to: '/subscriptions', label: 'Abunəliklər', icon: CreditCard, permission: PERM.subscriptionsView },
-  { to: '/orders', label: 'Sifarişlər', icon: ReceiptText, permission: PERM.ordersView },
-  { to: '/refunds', label: 'Geri qaytarmalar', icon: RotateCcw, permission: PERM.refundsView },
-  { to: '/payment-logs', label: 'Ödəniş logları', icon: FileText, permission: PERM.ordersView },
-  { to: '/notifications', label: 'Bildirişlər', icon: Bell, permission: PERM.notificationsView },
-  { to: '/admins', label: 'Adminlər', icon: Users, permission: PERM.adminsView },
-  { to: '/access', label: 'Giriş nəzarəti', icon: KeyRound, permission: PERM.accessManage },
-  { to: '/traccar', label: 'Traccar', icon: Satellite, permission: PERM.systemSettings },
-  { to: '/audit', label: 'Audit jurnalı', icon: ScrollText, permission: PERM.auditView },
-  { to: '/settings', label: 'Parametrlər', icon: Settings, permission: PERM.systemSettings },
+export interface NavGroup {
+  /** Section heading; null = no heading (the dashboard on top). */
+  label: string | null
+  items: NavItem[]
+}
+
+// Menu in sections, in the order people work: daily operations, money, messages, then system administration.
+// "İstifadəçilər" lives as a tab inside Sakinlər and Traccar inside Parametrlər (same pages, one way in each).
+export const navGroups: NavGroup[] = [
+  {
+    label: null,
+    items: [{ to: '/', label: 'İdarə paneli', icon: LayoutDashboard, end: true, permission: PERM.dashboardView }],
+  },
+  {
+    label: 'Əməliyyat',
+    items: [
+      { to: '/applications', label: 'Müraciətlər', icon: ClipboardList, permission: PERM.applicationsView },
+      { to: '/complexes', label: 'Komplekslər', icon: Building2, permission: PERM.complexesView },
+      { to: '/residents', label: 'Sakinlər', icon: UsersRound, permission: PERM.residentsView },
+      { to: '/devices', label: 'Cihazlar', icon: HardDrive, permission: PERM.devicesView },
+    ],
+  },
+  {
+    label: 'Maliyyə',
+    items: [
+      { to: '/subscriptions', label: 'Abunəliklər', icon: CreditCard, permission: PERM.subscriptionsView },
+      { to: '/orders', label: 'Sifarişlər', icon: ReceiptText, permission: PERM.ordersView },
+      { to: '/refunds', label: 'Geri qaytarmalar', icon: RotateCcw, permission: PERM.refundsView },
+      { to: '/payment-logs', label: 'Bank sorğuları (texniki)', icon: FileText, permission: PERM.ordersView },
+    ],
+  },
+  {
+    label: 'Bildirişlər',
+    items: [{ to: '/notifications', label: 'Bildirişlər', icon: Bell, permission: PERM.notificationsView }],
+  },
+  {
+    label: 'Sistem',
+    items: [
+      { to: '/admins', label: 'Adminlər', icon: Users, permission: PERM.adminsView },
+      { to: '/access', label: 'Admin icazələri', icon: KeyRound, permission: PERM.accessManage },
+      { to: '/audit', label: 'Audit jurnalı', icon: ScrollText, permission: PERM.auditView },
+      { to: '/settings', label: 'Parametrlər', icon: Settings, permission: PERM.systemSettings },
+    ],
+  },
 ]
+
+/** Flat list (header title lookup, tests). */
+export const navItems: NavItem[] = navGroups.flatMap((g) => g.items)

@@ -32,6 +32,7 @@ import { formatDateTime } from '@/lib/format'
 import { useCursor } from '@/lib/useCursor'
 import type { DeviceUserRole } from '@/types/api'
 import { ResidentArchivePanel } from './ResidentArchivePanel'
+import { UsersPage } from '@/pages/users/UsersPage'
 
 const roleLabels: Record<DeviceUserRole, string> = { owner: 'Sahib', user: 'İstifadəçi' }
 
@@ -41,18 +42,17 @@ export function ResidentsPage() {
   return (
     <div className="space-y-5">
       <PageHeader title="Sakinlər" description="Bütün sakinlər — kompleks, cihaz statusu və abunəlik" />
-      {hasPermission(PERM.residentsArchiveView) ? (
-        <Tabs defaultValue="residents">
-          <TabsList>
-            <TabsTrigger value="residents">Sakinlər</TabsTrigger>
-            <TabsTrigger value="archive">Arxiv (silinənlər)</TabsTrigger>
-          </TabsList>
-          <TabsContent value="residents"><ResidentsDirectory /></TabsContent>
-          <TabsContent value="archive"><ResidentArchivePanel /></TabsContent>
-        </Tabs>
-      ) : (
-        <ResidentsDirectory />
-      )}
+      {/* One place for people: gate users, every account (former "İstifadəçilər" menu), deleted archive. */}
+      <Tabs defaultValue="residents">
+        <TabsList>
+          <TabsTrigger value="residents">Cihaz istifadəçiləri</TabsTrigger>
+          <TabsTrigger value="accounts">Bütün hesablar</TabsTrigger>
+          {hasPermission(PERM.residentsArchiveView) && <TabsTrigger value="archive">Arxiv (silinənlər)</TabsTrigger>}
+        </TabsList>
+        <TabsContent value="residents"><ResidentsDirectory /></TabsContent>
+        <TabsContent value="accounts"><UsersPage embedded /></TabsContent>
+        {hasPermission(PERM.residentsArchiveView) && <TabsContent value="archive"><ResidentArchivePanel /></TabsContent>}
+      </Tabs>
     </div>
   )
 }
@@ -162,8 +162,8 @@ function ResidentsDirectory() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          aria-label={complexScoped ? 'Sakini kompleksdən çıxar' : 'Sakini sistemdən sil'}
-                          title={complexScoped ? 'Kompleksdən çıxar' : 'Sistemdən sil'}
+                          aria-label={complexScoped ? 'Sakini kompleksdən çıxar' : 'Hesabı tamamilə sil'}
+                          title={complexScoped ? 'Kompleksdən çıxar' : 'Hesabı tamamilə sil (bütün cihazlardan)'}
                           onClick={() => setDeleteTarget(r)}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -191,17 +191,17 @@ function ResidentsDirectory() {
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null)
         }}
-        title={complexScoped ? 'Sakini kompleksdən çıxar' : 'Sakini sistemdən sil'}
+        title={complexScoped ? 'Sakini kompleksdən çıxar' : 'Hesab tamamilə silinsin?'}
         description={
           complexScoped
             ? `${deleteTarget?.email ?? deleteTarget?.phone_masked ?? ''} — sakin kompleksinizdən çıxarılacaq: ` +
-              'kompleksin cihazlarından (whitelist-dən də) çıxarılacaq və bu cihazlardakı abunəlikləri ləğv ediləcək. ' +
+              'kompleksin cihazlarından çıxarılacaq və bu cihazlardakı abunəlikləri ləğv ediləcək. ' +
               'Hesabı sistemdə qalır.'
-            : `${deleteTarget?.email ?? deleteTarget?.phone_masked ?? ''} — hesab sistemdən silinəcək: bütün cihazlardan ` +
-              'çıxarılacaq (whitelist-dən də), abunəlikləri ləğv ediləcək və sessiyaları bağlanacaq. ' +
+            : `${deleteTarget?.email ?? deleteTarget?.phone_masked ?? ''} — hesab SİSTEMDƏN silinəcək: BÜTÜN cihazlardan ` +
+              'çıxarılacaq, abunəlikləri ləğv ediləcək və sessiyaları bağlanacaq. Yalnız bir cihazdan çıxarmaq üçün cihaz səhifəsindən istifadə edin. ' +
               'Məlumatları 5 il arxivdə saxlanılacaq. Cihaz sahibi olan sakini silmək olmaz — əvvəlcə cihazı köçürün.'
         }
-        confirmLabel={complexScoped ? 'Kompleksdən çıxar' : 'Sistemdən sil'}
+        confirmLabel={complexScoped ? 'Kompleksdən çıxar' : 'Hesabı tamamilə sil'}
         confirmVariant="destructive"
         loading={deleteResident.isPending}
         onConfirm={() => {

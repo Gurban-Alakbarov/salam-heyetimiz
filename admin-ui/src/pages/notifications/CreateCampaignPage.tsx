@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Loader2, Send } from 'lucide-react'
 import { usePreviewAudience, useSendCampaign } from '@/api/campaigns'
+import { useComplexList } from '@/api/complexes'
+import { useMobileUsers } from '@/api/users'
 import { PageHeader } from '@/components/PageHeader'
 import { ApiError } from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -196,14 +198,14 @@ export function CreateCampaignPage() {
 
           {scope === 'user_ids' && (
             <div className="space-y-2">
-              <Label htmlFor="c-uids">İstifadəçi ID-ləri (vergül və ya boşluqla)</Label>
-              <Textarea id="c-uids" value={userIdsText} rows={2} placeholder="məs. 12, 34, 56" onChange={(e) => setUserIdsText(e.target.value)} />
+              <Label htmlFor="c-users">Kimlərə göndərilsin</Label>
+              <UserPicker id="c-users" idsText={userIdsText} onChange={setUserIdsText} />
             </div>
           )}
           {scope === 'complex' && (
             <div className="space-y-2 sm:w-56">
-              <Label htmlFor="c-cx">Kompleks ID</Label>
-              <Input id="c-cx" type="number" value={complexId} onChange={(e) => setComplexId(e.target.value)} />
+              <Label htmlFor="c-cx">Kompleks</Label>
+              <ComplexPicker id="c-cx" value={complexId} onChange={setComplexId} />
             </div>
           )}
           {scope === 'filter' && (
@@ -213,8 +215,8 @@ export function CreateCampaignPage() {
                 <Input id="f-q" value={fq} onChange={(e) => setFq(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="f-cx">Kompleks ID</Label>
-                <Input id="f-cx" type="number" value={fcomplex} onChange={(e) => setFcomplex(e.target.value)} />
+                <Label htmlFor="f-cx">Kompleks</Label>
+                <ComplexPicker id="f-cx" value={fcomplex} onChange={setFcomplex} allowAny />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="f-role">Rol</Label>
@@ -311,6 +313,64 @@ export function CreateCampaignPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  )
+}
+
+/** Complex by name (falls back to typing the id when this admin may not list complexes). */
+function ComplexPicker({ id, value, onChange, allowAny = false }: { id: string; value: string; onChange: (v: string) => void; allowAny?: boolean }) {
+  const { data: complexes, isError } = useComplexList()
+  if (isError || !complexes) {
+    return <Input id={id} type="number" placeholder="Kompleks ID" value={value} onChange={(e) => onChange(e.target.value)} />
+  }
+  return (
+    <Select id={id} value={value} onChange={(e) => onChange(e.target.value)}>
+      <option value="">{allowAny ? 'Hamısı' : 'Kompleks seçin…'}</option>
+      {complexes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+    </Select>
+  )
+}
+
+/**
+ * Recipients by search (name / email / phone) instead of user ids. The selection is still kept as the id list the
+ * API takes (`idsText`), so the rest of the form is unchanged.
+ */
+function UserPicker({ id, idsText, onChange }: { id: string; idsText: string; onChange: (v: string) => void }) {
+  const [q, setQ] = useState('')
+  const [names, setNames] = useState<Record<number, string>>({})
+  const { data } = useMobileUsers({ q: q.trim(), page: 1 })
+  const ids = idsText.split(/[\s,]+/).map(Number).filter((n) => Number.isInteger(n) && n > 0)
+  const add = (uid: number, label: string) => {
+    if (!ids.includes(uid)) onChange([...ids, uid].join(', '))
+    setNames((n) => ({ ...n, [uid]: label }))
+    setQ('')
+  }
+  const remove = (uid: number) => onChange(ids.filter((x) => x !== uid).join(', '))
+  return (
+    <div className="space-y-2">
+      <Input id={id} placeholder="Ad, e-poçt və ya telefonla axtarın…" value={q} onChange={(e) => setQ(e.target.value)} />
+      {q.trim().length >= 2 && (data?.data ?? []).length > 0 && (
+        <div className="max-h-48 overflow-y-auto rounded-md border bg-card p-1">
+          {(data?.data ?? []).slice(0, 10).map((u) => {
+            const label = u.full_name ?? u.email ?? u.phone ?? `#${u.id}`
+            return (
+              <button key={u.id} type="button" className="flex w-full justify-between rounded px-2 py-1.5 text-left text-sm hover:bg-muted"
+                onClick={() => add(u.id, label)}>
+                <span>{label}</span>
+                <span className="text-xs text-muted-foreground">{u.email ?? u.phone ?? ''}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-1.5">
+        {ids.length === 0 ? <span className="text-xs text-muted-foreground">Hələ heç kim seçilməyib.</span> : ids.map((uid) => (
+          <span key={uid} className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs">
+            {names[uid] ?? `#${uid}`}
+            <button type="button" aria-label="Sil" className="text-muted-foreground hover:text-destructive" onClick={() => remove(uid)}>×</button>
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

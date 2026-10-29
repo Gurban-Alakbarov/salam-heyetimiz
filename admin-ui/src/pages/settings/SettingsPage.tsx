@@ -344,7 +344,7 @@ function TraccarStatusPanel() {
     <div className="space-y-2 border-t pt-4">
       <div className="flex items-center gap-2">
         <p className="text-sm font-medium">Traccar statusu</p>
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Badge variant={online ? 'success' : 'destructive'}>{online ? 'Connected' : 'Offline'}</Badge>}
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Badge variant={online ? 'success' : 'destructive'}>{online ? 'Qoşulub' : 'Qoşulmayıb'}</Badge>}
       </div>
       {data && (
         <div className="grid gap-1 text-sm sm:grid-cols-2">
@@ -445,7 +445,7 @@ function HealthCards({ h }: { h: SystemHealth }) {
       <HCard title="Disk"><Row k="İstifadə" v={`${h.disk.used_percent}%`} /><Row k="Boş" v={`${h.disk.free_gb} GB`} /><Row k="Ümumi" v={`${h.disk.total_gb} GB`} /></HCard>
       <HCard title="Resurslar"><Row k="PHP yaddaş" v={`${h.memory.php_used_mb} MB`} /><Row k="Limit" v={h.memory.php_limit} /><Row k="CPU yük (1d)" v={h.cpu.load_1m === null ? '—' : String(h.cpu.load_1m)} /></HCard>
       <HCard title="Traccar" badge={ok(traccarOnline)}>
-        <Row k="Status" v={traccarOnline ? 'Connected' : 'Offline'} />
+        <Row k="Status" v={traccarOnline ? 'Qoşulub' : 'Qoşulmayıb'} />
         <Row k="Versiya" v={h.traccar.version ?? '—'} />
         <Row k="Cihaz sayı" v={String(h.traccar.device_count)} />
         <Row k="Növbə" v={String(h.traccar.queue_size)} />

@@ -185,6 +185,8 @@ export interface Subscription {
   days_remaining: number | null
   auto_renew: boolean
   device_id: number | null
+  /** Admin list: the gate's name (or IMEI). */
+  device_label?: string
   user_id: number | null
   starts_at: string | null
   price_minor: number

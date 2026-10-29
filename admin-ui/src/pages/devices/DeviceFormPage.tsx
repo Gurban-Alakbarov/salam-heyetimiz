@@ -1,7 +1,8 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ChevronLeft, Loader2 } from 'lucide-react'
-import { useCreateDevice, useDevice, useUpdateDevice } from '@/api/devices'
+import { useCreateDevice, useDevice, useDeviceLookups, useUpdateDevice } from '@/api/devices'
+import { PERM } from '@/auth/permissions'
 import { useAuth } from '@/auth/useAuth'
 import { ApiError } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -79,7 +80,8 @@ export function DeviceFormPage() {
   const deviceId = Number(id)
   const navigate = useNavigate()
   const { toast } = useToast()
-  const { hasRole } = useAuth()
+  const { hasPermission } = useAuth()
+  const lookups = useDeviceLookups()
 
   const existing = useDevice(isEdit ? deviceId : Number.NaN)
   const create = useCreateDevice()
@@ -111,7 +113,8 @@ export function DeviceFormPage() {
     }
   }, [isEdit, existing.data])
 
-  if (!hasRole('technical', 'super_admin')) {
+  // Same rule as the backend: creating needs devices.create, editing devices.update (no hidden role check).
+  if (!hasPermission(isEdit ? PERM.devicesUpdate : PERM.devicesCreate)) {
     return <Navigate to="/devices" replace />
   }
 
@@ -198,7 +201,7 @@ export function DeviceFormPage() {
         <CardContent>
           <form onSubmit={submit} className="space-y-4" noValidate>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field id="serial" label="Serial" error={fieldError('serial')}>
+              <Field id="serial" label="IMEI" hint="Cihazın üzərindəki 15 rəqəmli IMEI (Traccar da bu nömrə ilə tanıyır)" error={fieldError('serial')}>
                 <Input
                   id="serial"
                   value={form.serial}
@@ -207,20 +210,19 @@ export function DeviceFormPage() {
                   required={!isEdit}
                 />
               </Field>
-              <Field
-                id="device_model_id"
-                label="Model ID"
-                hint="Cihaz modelinin ID-si"
-                error={fieldError('device_model_id')}
-              >
-                <Input
+              <Field id="device_model_id" label="Cihaz modeli" error={fieldError('device_model_id')}>
+                <Select
                   id="device_model_id"
-                  type="number"
                   value={form.device_model_id}
                   onChange={(e) => set('device_model_id')(e.target.value)}
                   disabled={isEdit}
                   required={!isEdit}
-                />
+                >
+                  <option value="">Model seçin…</option>
+                  {(lookups.data?.device_models ?? []).map((m) => (
+                    <option key={m.id} value={m.id}>{m.vendor} {m.model_code}</option>
+                  ))}
+                </Select>
               </Field>
               <Field id="sim_phone" label="SIM nömrəsi" error={fieldError('sim_phone')}>
                 <Input
@@ -232,44 +234,40 @@ export function DeviceFormPage() {
                   required={!isEdit}
                 />
               </Field>
-              <Field id="driver_type" label="Sürücü" error={fieldError('driver_type')}>
+              <Field id="driver_type" label="Bağlantı növü" hint="Adətən GPS (Traccar)" error={fieldError('driver_type')}>
                 <Select
                   id="driver_type"
                   value={form.driver_type}
                   onChange={(e) => set('driver_type')(e.target.value)}
                 >
-                  <option value="traccar">Traccar</option>
+                  <option value="traccar">GPS (Traccar)</option>
                   <option value="sms">SMS</option>
-                  <option value="ble">BLE</option>
+                  <option value="ble">Bluetooth</option>
                 </Select>
               </Field>
-              <Field id="sim_operator_id" label="Operator ID" hint="Könüllü" error={fieldError('sim_operator_id')}>
-                <Input
-                  id="sim_operator_id"
-                  type="number"
-                  value={form.sim_operator_id}
-                  onChange={(e) => set('sim_operator_id')(e.target.value)}
-                />
+              <Field id="sim_operator_id" label="SIM operatoru" hint="Könüllü" error={fieldError('sim_operator_id')}>
+                <Select id="sim_operator_id" value={form.sim_operator_id} onChange={(e) => set('sim_operator_id')(e.target.value)}>
+                  <option value="">—</option>
+                  {(lookups.data?.sim_operators ?? []).map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+                </Select>
               </Field>
-              <Field id="region_id" label="Region ID" hint="Könüllü" error={fieldError('region_id')}>
-                <Input
-                  id="region_id"
-                  type="number"
-                  value={form.region_id}
-                  onChange={(e) => set('region_id')(e.target.value)}
-                />
+              <Field id="region_id" label="Region" hint="Könüllü" error={fieldError('region_id')}>
+                <Select id="region_id" value={form.region_id} onChange={(e) => set('region_id')(e.target.value)}>
+                  <option value="">—</option>
+                  {(lookups.data?.regions ?? []).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </Select>
               </Field>
-              <Field id="firmware_version" label="Firmware" hint="Könüllü" error={fieldError('firmware_version')}>
+              <Field id="firmware_version" label="Proqram versiyası (firmware)" hint="Könüllü" error={fieldError('firmware_version')}>
                 <Input
                   id="firmware_version"
                   value={form.firmware_version}
                   onChange={(e) => set('firmware_version')(e.target.value)}
                 />
               </Field>
-              <Field id="sim_iccid" label="SIM ICCID" hint="Könüllü" error={fieldError('sim_iccid')}>
+              <Field id="sim_iccid" label="SIM kartın seriya nömrəsi (ICCID)" hint="Könüllü" error={fieldError('sim_iccid')}>
                 <Input id="sim_iccid" value={form.sim_iccid} onChange={(e) => set('sim_iccid')(e.target.value)} />
               </Field>
-              <Field id="location_label" label="Ünvan etiketi" hint="Könüllü" error={fieldError('location_label')}>
+              <Field id="location_label" label="Cihazın adı" hint="Tətbiqdə və siyahıda görünən ad, məs. «Blok A şlaqbaum»" error={fieldError('location_label')}>
                 <Input
                   id="location_label"
                   value={form.location_label}
@@ -282,7 +280,7 @@ export function DeviceFormPage() {
                     <ImageUploadField deviceId={deviceId} currentUrl={existing.data?.image_url ?? null} />
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Şəkli cihaz yaradıldıqdan sonra redaktə səhifəsindən yükləyə bilərsiniz.
+                      Cihazı yaratdıqdan sonra açılan redaktə səhifəsində şəkil yükləyə və məsafə məhdudiyyətini (geofence) aça bilərsiniz.
                     </p>
                   )}
                 </Field>
@@ -322,7 +320,7 @@ export function DeviceFormPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-0.5">
                     <Label htmlFor="geofence_enabled" className="text-sm font-medium">
-                      Geofence aktivdir
+                      Məsafə məhdudiyyəti (geofence)
                     </Label>
                     <p className="text-xs text-muted-foreground">
                       Açıq olduqda istifadəçi yalnız cihaza yaxın olduqda qapını aça bilər.

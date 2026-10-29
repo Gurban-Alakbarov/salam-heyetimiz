@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { ArrowRightLeft, BadgeCheck, Loader2, Trash2, UserCog, UserPlus } from 'lucide-react'
+import { ArrowRightLeft, BadgeCheck, Loader2, UserCog, UserMinus, UserPlus } from 'lucide-react'
 import {
   useAddDeviceUser,
   useAssignDevice,
@@ -162,11 +162,11 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
                           <Button
                             size="icon"
                             variant="ghost"
-                            aria-label="Sakini çıxar"
-                            title="Cihazdan çıxar"
+                            aria-label="Bu cihazdan çıxar"
+                            title="Bu cihazdan çıxar (hesab qalır)"
                             onClick={() => setRemoveTarget(u)}
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <UserMinus className="h-4 w-4 text-destructive" />
                           </Button>
                         </PermissionGate>
                       )}
@@ -214,9 +214,9 @@ export function RosterSection({ device }: { device: DeviceAdminDetail }) {
         onOpenChange={(next) => {
           if (!next) setRemoveTarget(null)
         }}
-        title="Sakini çıxar"
-        description={`${removeTarget?.user?.phone_masked ?? ''} — cihazın istifadəçiləri siyahısından çıxarılacaq və whitelist-dən silinəcək.`}
-        confirmLabel="Çıxar"
+        title="Sakin bu cihazdan çıxarılsın?"
+        description={`${removeTarget?.user?.phone_masked ?? ''} artıq bu qapını aça bilməyəcək və bu cihazdakı abunəliyi ləğv olunacaq (pul avtomatik qaytarılmır). Hesabı və digər cihazları dəyişmir. Başqa cihaza keçirmək üçün «Başqa cihaza köçür»dən istifadə edin — onda abunəlik saxlanılır.`}
+        confirmLabel="Bu cihazdan çıxar"
         confirmVariant="destructive"
         loading={removeUser.isPending}
         onConfirm={() => {

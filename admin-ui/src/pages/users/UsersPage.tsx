@@ -10,9 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 const typeLabel: Record<AccountType, string> = { physical: 'Fiziki', legal: 'Hüquqi' }
+const statusLabel: Record<string, string> = { active: 'Aktiv', blocked: 'Bloklanıb', self_deleted: 'Hesabını silib' }
 
-/** Mobile users directory (B11) — account type, verification, Komendant link, complex membership. */
-export function UsersPage() {
+/**
+ * Mobile users directory (B11) — every account (also those without a device), account type, verification, Komendant
+ * link, complex membership. Shown as the "Bütün hesablar" tab of Sakinlər (`embedded`) and at /users.
+ */
+export function UsersPage({ embedded = false }: { embedded?: boolean }) {
   const [q, setQ] = useState('')
   const [type, setType] = useState<AccountType | 'none' | ''>('')
   const [page, setPage] = useState(1)
@@ -21,7 +25,7 @@ export function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">İstifadəçilər</h1>
+      {!embedded && <h1 className="text-2xl font-semibold tracking-tight">Bütün hesablar</h1>}
       <Card className="overflow-hidden">
         <div className="flex flex-wrap items-center gap-2 p-3">
           <Input placeholder="Ad, e-poçt, telefon…" value={q} onChange={(e) => { setQ(e.target.value); setPage(1) }} className="max-w-xs" />
@@ -48,9 +52,11 @@ export function UsersPage() {
                       <TableCell>{u.email ?? '—'} {u.email && !u.email_verified && <Badge variant="warning" className="ml-1">təsdiqlənməyib</Badge>}</TableCell>
                       <TableCell className="text-muted-foreground">{u.phone ?? '—'}</TableCell>
                       <TableCell>{u.account_type ? <Badge variant="default">{typeLabel[u.account_type]}</Badge> : <Badge variant="muted">—</Badge>}</TableCell>
-                      <TableCell><Badge variant={u.status === 'active' ? 'success' : 'muted'}>{u.status}</Badge></TableCell>
+                      <TableCell><Badge variant={u.status === 'active' ? 'success' : 'muted'}>{statusLabel[u.status] ?? u.status}</Badge></TableCell>
                       <TableCell className="space-x-1">
-                        {u.complex_ids.length === 0 ? '—' : u.complex_ids.map((c) => <Link key={c} to={`/complexes/${c}`} className="text-primary hover:underline">#{c}</Link>)}
+                        {u.complex_ids.length === 0 ? '—' : (u.complexes ?? u.complex_ids.map((id) => ({ id, name: null }))).map((c) => (
+                          <Link key={c.id} to={`/complexes/${c.id}`} className="text-primary hover:underline">{c.name ?? `#${c.id}`}</Link>
+                        ))}
                       </TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(u.created_at)}</TableCell>
                     </TableRow>

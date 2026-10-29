@@ -32,6 +32,21 @@ export function useDevices(params: DeviceListParams) {
   })
 }
 
+export interface DeviceLookups {
+  device_models: { id: number; vendor: string; model_code: string; default_driver_type: string | null }[]
+  sim_operators: { id: number; name: string }[]
+  regions: { id: number; name: string }[]
+}
+
+/** Choices for the device form (models, SIM operators, regions) — no numeric ids to type. */
+export function useDeviceLookups() {
+  return useQuery({
+    queryKey: ['device-lookups'],
+    queryFn: async () => (await api.get<DeviceLookups>('/admin/v1/devices/lookups')).data,
+    staleTime: 5 * 60_000,
+  })
+}
+
 export function useDevice(id: number) {
   return useQuery({
     queryKey: ['device', id],

@@ -86,8 +86,8 @@ function Summary({ order }: { order: OrderDetailExtra }) {
         <Cell label="Məbləğ" value={formatMoney(order.amount_minor, order.currency)} />
         <Cell label="Ödənilib" value={formatDateTime(order.paid_at)} />
         <Cell label="Yaradılıb" value={formatDateTime(order.created_at)} />
-        {order.bank_order_id && <Cell label="Bank Payment ID" value={<code className="text-xs">{order.bank_order_id}</code>} />}
-        {isPaidLike && order.captured_minor != null && <Cell label="Tutulmuş (captured)" value={formatMoney(order.captured_minor, order.currency)} />}
+        {order.bank_order_id && <Cell label="Bankdakı ödəniş nömrəsi" value={<code className="text-xs">{order.bank_order_id}</code>} />}
+        {isPaidLike && order.captured_minor != null && <Cell label="Kartdan tutulan" value={formatMoney(order.captured_minor, order.currency)} />}
         {isPaidLike && order.refunded_minor != null && <Cell label="Geri qaytarılmış" value={formatMoney(order.refunded_minor, order.currency)} />}
         {isPaidLike && order.refundable_minor != null && <Cell label="Qalan geri qaytarıla bilən" value={<strong>{formatMoney(order.refundable_minor, order.currency)}</strong>} />}
         {order.failed_reason && <Cell label="Uğursuzluq səbəbi" value={order.failed_reason} />}
@@ -119,21 +119,16 @@ function PaymentInfo({ order }: { order: OrderDetailExtra }) {
     <Card>
       <CardHeader className="pb-2"><CardTitle className="text-base">Ödəniş məlumatı</CardTitle></CardHeader>
       <CardContent className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3">
-        <Cell label="Merchant" value={d.merchant_name ?? d.merchant_id} />
-        <Cell label="Merchant ID" value={d.merchant_id ? <code className="text-xs">{d.merchant_id}</code> : null} />
+        <Cell label="Satıcı (bankda)" value={d.merchant_name ?? d.merchant_id} />
+        <Cell label="Satıcı ID" value={d.merchant_id ? <code className="text-xs">{d.merchant_id}</code> : null} />
         <Cell label="Terminal ID" value={d.terminal_id ? <code className="text-xs">{d.terminal_id}</code> : null} />
-        <Cell label="Ödəniş metodu" value={d.payment_method ? `${d.payment_method}${d.card_last4 ? ' ••' + d.card_last4 : ''}` : null} />
-        <Cell label="Approval Code" value={d.approval_code} />
-        <Cell label="RRN" value={d.rrn ? <code className="text-xs">{d.rrn}</code> : null} />
-        <Cell label="Bank Transaction ID" value={d.bank_transaction_id ? <code className="text-xs">{d.bank_transaction_id}</code> : null} />
-        <Cell label="BirPay Payment ID" value={d.bank_order_id ? <code className="text-xs">{d.bank_order_id}</code> : null} />
-        <Cell label="Idempotency Key" value={d.idempotency_key ? <code className="break-all text-xs">{d.idempotency_key}</code> : null} />
-        <Cell label="Webhook statusu" value={d.webhook_status} />
-        <Cell label="Son sinxronizasiya" value={formatDateTime(d.last_sync_at ?? null)} />
-        <Cell
-          label="Qalan geri qaytarıla bilən"
-          value={order.refundable_minor != null ? <strong>{formatMoney(order.refundable_minor, order.currency)}</strong> : null}
-        />
+        <Cell label="Ödəniş üsulu" value={d.payment_method ? `${d.payment_method}${d.card_last4 ? ' ••' + d.card_last4 : ''}` : null} />
+        <Cell label="Təsdiq kodu (Approval)" value={d.approval_code} />
+        <Cell label="Bank əməliyyat nömrəsi (RRN)" value={d.rrn ? <code className="text-xs">{d.rrn}</code> : null} />
+        <Cell label="Bank tranzaksiya ID" value={d.bank_transaction_id ? <code className="text-xs">{d.bank_transaction_id}</code> : null} />
+        <Cell label="Bankın cavabı" value={d.webhook_status} />
+        <Cell label="Bankla son yoxlama" value={formatDateTime(d.last_sync_at ?? null)} />
+        <Cell label="Texniki açar (idempotency)" value={d.idempotency_key ? <code className="break-all text-xs">{d.idempotency_key}</code> : null} />
       </CardContent>
     </Card>
   )

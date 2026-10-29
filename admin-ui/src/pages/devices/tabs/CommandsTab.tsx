@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Lock, LockOpen, RefreshCw } from 'lucide-react'
 import { useDeviceCommands, useRelayTest } from '@/api/devices'
 import { PERM } from '@/auth/permissions'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { CursorPagination } from '@/components/CursorPagination'
 import { PermissionGate } from '@/components/PermissionGate'
 import { StatusBadge } from '@/components/StatusBadge'
@@ -107,13 +109,15 @@ function TestRelayCard({
 }) {
   const relay = useRelayTest(deviceId)
   const { toast } = useToast()
+  // The test really opens the gate on site — ask first.
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const fire = (action: CommandDirection) => {
     relay.mutate(action, {
       onSuccess: () =>
         toast({
           variant: 'success',
-          title: action === 'open' ? 'Relay aç əmri göndərildi' : 'Relay bağla əmri göndərildi',
+          title: action === 'open' ? 'Sınaq açılışı göndərildi' : 'Bağlama əmri göndərildi',
         }),
       onError: (err) =>
         toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
@@ -124,9 +128,9 @@ function TestRelayCard({
     <Card className="space-y-3 p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h3 className="font-medium">Relay testi</h3>
+          <h3 className="font-medium">Sınaq açılışı</h3>
           <p className="text-sm text-muted-foreground">
-            Əmr DeviceComm pipeline-ından keçir (mənbə: admin) və cihazın cavabı ilə təsdiqlənir.
+            Qapını uzaqdan bir dəfə açır və cihazın cavabını göstərir. Quraşdırmadan sonra yoxlamaq üçündür.
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={onRefresh} disabled={refreshing}>
@@ -143,9 +147,9 @@ function TestRelayCard({
       */}
       <PermissionGate anyOf={[PERM.commandsTest]}>
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => fire('open')} disabled={relay.isPending}>
+          <Button size="sm" onClick={() => setConfirmOpen(true)} disabled={relay.isPending}>
             <LockOpen className="h-4 w-4" />
-            Relay Aç
+            Qapını sınaq üçün aç
           </Button>
           {SHOW_CLOSE_BUTTON && (
             <Button size="sm" variant="outline" onClick={() => fire('close')} disabled={relay.isPending}>
@@ -154,6 +158,18 @@ function TestRelayCard({
             </Button>
           )}
         </div>
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Qapı həqiqətən açılsın?"
+          description="Bu əmr yerdəki şlaqbaumu/qapını dərhal açır. Yalnız orada kimsə yoxlayırsa və ya buna əminsinizsə davam edin."
+          confirmLabel="Bəli, aç"
+          loading={relay.isPending}
+          onConfirm={() => {
+            setConfirmOpen(false)
+            fire('open')
+          }}
+        />
       </PermissionGate>
 
       {latest && (

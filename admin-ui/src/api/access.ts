@@ -10,6 +10,8 @@ export interface RoleInfo {
   is_complex_scoped: boolean
   admin_count: number
   default_permissions: Permission[]
+  /** complex_manager: the only permissions it may hold (its endpoints are complex-scoped); null = any. */
+  grantable?: Permission[] | null
 }
 export interface PermissionGroup {
   group: string
@@ -22,6 +24,8 @@ export interface UserPermissions {
   additional: Permission[]
   revoked: Permission[]
   effective: Permission[]
+  /** A komendant can hold only these (null = any). */
+  grantable?: Permission[] | null
 }
 
 export function useRoles() {

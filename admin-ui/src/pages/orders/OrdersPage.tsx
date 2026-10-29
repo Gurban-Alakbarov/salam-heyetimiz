@@ -29,14 +29,14 @@ const STATUS_OPTIONS = [
 
 /** Derived bank-side status label for the back-office view (the bank's lifecycle, not our order state). */
 const BANK_STATUS: Record<string, string> = {
-  paid: 'CAPTURED',
-  partially_refunded: 'PARTIALLY REFUNDED',
-  refunded: 'REFUNDED',
-  authorising: 'PENDING',
-  pending: 'PENDING',
-  cancelled: 'VOIDED',
-  failed: 'DECLINED',
-  expired: 'EXPIRED',
+  paid: 'Pul tutulub',
+  partially_refunded: 'Qismən qaytarılıb',
+  refunded: 'Qaytarılıb',
+  authorising: 'Bankda gözləyir',
+  pending: 'Bankda gözləyir',
+  cancelled: 'Bank ləğv edib',
+  failed: 'Bank rədd edib',
+  expired: 'Vaxtı bitib',
 }
 
 export function OrdersPage() {
@@ -138,8 +138,11 @@ export function OrdersPage() {
                           <StatusBadge kind="order" value={o.status as OrderStatus} />
                           {o.refund_required && (
                             <Badge variant="destructive" title="Ödəniş gəlib, amma giriş artıq yoxdur — pulu geri qaytarın">
-                              Refund gözləyir
+                              Pul qaytarılmalıdır
                             </Badge>
+                          )}
+                          {o.is_test && (
+                            <Badge variant="destructive" title="Test ödənişi — real pul deyil">TEST</Badge>
                           )}
                           {o.late_captured_at && (
                             <Badge variant="warning" title="Bank sifarişin vaxtı bitdikdən sonra ödənişi təsdiqləyib">

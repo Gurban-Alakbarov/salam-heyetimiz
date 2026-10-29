@@ -34,7 +34,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
       <AlertCircle className="h-8 w-8 text-destructive" />
       <div>
         <p className="text-sm font-medium">{message}</p>
-        {requestId && <p className="mt-1 text-xs text-muted-foreground">request_id: {requestId}</p>}
+        {requestId && <p className="mt-1 text-xs text-muted-foreground">Xəta kodu (dəstək üçün): {requestId}</p>}
       </div>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>

@@ -15,6 +15,8 @@ export interface MobileUser {
   email_verified: boolean
   is_komendant_linked: boolean
   complex_ids: number[]
+  /** Same complexes with their names (older API: absent → fall back to complex_ids). */
+  complexes?: { id: number; name: string | null }[]
   created_at: string | null
 }
 export interface UserListParams {

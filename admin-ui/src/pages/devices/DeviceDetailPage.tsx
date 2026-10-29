@@ -15,7 +15,6 @@ import { RosterSection } from './RosterSection'
 import { CommandsTab } from './tabs/CommandsTab'
 import { DiagnosticsTab } from './tabs/DiagnosticsTab'
 import { VisitorLinksTab } from './tabs/VisitorLinksTab'
-import { WhitelistTab } from './tabs/WhitelistTab'
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -26,6 +25,9 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
   )
 }
 
+/** How the server reaches the barrier — the technical driver code in words. */
+const driverLabel: Record<string, string> = { traccar: 'GPS (Traccar)', sms: 'SMS', ble: 'Bluetooth' }
+
 function Overview({ device }: { device: DeviceAdminDetail }) {
   return (
     <Card>
@@ -33,8 +35,9 @@ function Overview({ device }: { device: DeviceAdminDetail }) {
         <CardTitle className="text-base">Ümumi məlumat</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-4">
+        <DetailRow label="IMEI" value={<span className="select-all font-mono">{device.serial}</span>} />
         <DetailRow label="Model" value={device.device_model ? `${device.device_model.vendor} ${device.device_model.model_code}` : '—'} />
-        <DetailRow label="Sürücü" value={<span className="uppercase">{device.driver_type}</span>} />
+        <DetailRow label="Bağlantı növü" value={driverLabel[device.driver_type] ?? device.driver_type} />
         <DetailRow label="SIM" value={device.sim_phone} />
         <DetailRow label="Operator" value={device.sim_operator?.name} />
         <DetailRow label="Sahib" value={device.owner?.phone_masked} />
@@ -54,14 +57,14 @@ function Overview({ device }: { device: DeviceAdminDetail }) {
           }
         />
         <DetailRow label="Son onlayn" value={formatDateTime(device.last_online_at)} />
-        <DetailRow label="Whitelist (aktiv)" value={device.whitelist_capacity_used} />
+        <DetailRow label="Aktiv istifadəçilər" value={device.whitelist_capacity_used} />
         <DetailRow label="Yaradılıb" value={formatDateTime(device.created_at)} />
       </CardContent>
     </Card>
   )
 }
 
-const VALID_TABS = ['diagnostics', 'commands', 'whitelist', 'visitor-links']
+const VALID_TABS = ['diagnostics', 'commands', 'visitor-links']
 
 export function DeviceDetailPage() {
   const { id } = useParams()
@@ -87,7 +90,10 @@ export function DeviceDetailPage() {
         <>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold tracking-tight">{device.serial}</h1>
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight">{device.location_label || device.serial}</h1>
+                {device.location_label && <p className="font-mono text-xs text-muted-foreground">IMEI {device.serial}</p>}
+              </div>
               <StatusBadge kind="device" value={device.status} />
             </div>
             <DeviceActions device={device} />
@@ -99,22 +105,27 @@ export function DeviceDetailPage() {
 
           <Tabs defaultValue={defaultTab}>
             <TabsList>
-              <TabsTrigger value="diagnostics">Diaqnostika</TabsTrigger>
-              <TabsTrigger value="commands">Açılış əmrləri</TabsTrigger>
-              <TabsTrigger value="whitelist">Whitelist növbəsi</TabsTrigger>
+              <PermissionGate anyOf={[PERM.devicesDiagnostics]}>
+                <TabsTrigger value="diagnostics">Diaqnostika</TabsTrigger>
+              </PermissionGate>
+              <PermissionGate anyOf={[PERM.commandsView]}>
+                <TabsTrigger value="commands">Açılış tarixçəsi</TabsTrigger>
+              </PermissionGate>
               <PermissionGate anyOf={[PERM.visitorLinksView]}>
                 <TabsTrigger value="visitor-links">Qonaq linkləri</TabsTrigger>
               </PermissionGate>
             </TabsList>
-            <TabsContent value="diagnostics">
-              <DiagnosticsTab deviceId={device.id} />
-            </TabsContent>
-            <TabsContent value="commands">
-              <CommandsTab deviceId={device.id} />
-            </TabsContent>
-            <TabsContent value="whitelist">
-              <WhitelistTab deviceId={device.id} />
-            </TabsContent>
+            {/* The barrier is never whitelisted (access is checked on the server), so there is no whitelist tab. */}
+            <PermissionGate anyOf={[PERM.devicesDiagnostics]}>
+              <TabsContent value="diagnostics">
+                <DiagnosticsTab deviceId={device.id} />
+              </TabsContent>
+            </PermissionGate>
+            <PermissionGate anyOf={[PERM.commandsView]}>
+              <TabsContent value="commands">
+                <CommandsTab deviceId={device.id} />
+              </TabsContent>
+            </PermissionGate>
             <PermissionGate anyOf={[PERM.visitorLinksView]}>
               <TabsContent value="visitor-links">
                 <VisitorLinksTab device={device} />

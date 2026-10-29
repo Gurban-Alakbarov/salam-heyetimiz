@@ -1,4 +1,5 @@
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
+import { az } from 'date-fns/locale'
 
 export function formatMoney(minor: number, currency = 'AZN'): string {
   try {
@@ -33,7 +34,7 @@ export function formatDate(iso?: string | null): string {
 export function relativeTime(iso?: string | null): string {
   if (!iso) return '—'
   try {
-    return formatDistanceToNow(parseISO(iso), { addSuffix: true })
+    return formatDistanceToNow(parseISO(iso), { addSuffix: true, locale: az })
   } catch {
     return '—'
   }

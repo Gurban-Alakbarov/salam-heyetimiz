@@ -40,8 +40,8 @@ export function PaymentLogsPage() {
           <div className="flex flex-wrap gap-2 pt-2">
             <Select value={direction} onChange={(e) => { setDirection(e.target.value); reset() }} className="w-40">
               <option value="">Bütün istiqamət</option>
-              <option value="outbound">Outbound (BirPay)</option>
-              <option value="inbound">Inbound (webhook)</option>
+              <option value="outbound">Bizdən banka gedən sorğular</option>
+              <option value="inbound">Bankdan gələn bildirişlər</option>
             </Select>
             <Select value={signature} onChange={(e) => { setSignature(e.target.value); reset() }} className="w-44">
               <option value="">İmza: hamısı</option>

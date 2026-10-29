@@ -36,6 +36,7 @@ export const PERM = {
   accessManage: 'access.manage',
   complexesView: 'complexes.view',
   complexesManage: 'complexes.manage',
+  complexesDevicesBind: 'complexes.devices.bind',
   notificationsView: 'notifications.view',
   notificationsSend: 'notifications.send',
   adminsUpdate: 'admins.update',

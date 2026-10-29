@@ -36,7 +36,7 @@ export function SubscriptionDetailPage() {
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-semibold tracking-tight">Abunəlik #{s.id}</h1>
             <StatusBadge kind="subscription" value={s.status} />
-            {s.is_legacy_comp && <Badge variant="secondary" title="Köhnə pulsuz (comp) abunəlik — avtomatik ödənişə çevrilmir (BR-17)">Legacy comp</Badge>}
+            {s.is_legacy_comp && <Badge variant="secondary" title="Köhnə pulsuz (comp) abunəlik — avtomatik ödənişə çevrilmir (BR-17)">Köhnə pulsuz abunəlik</Badge>}
             {s.comp_grant && <Badge variant="outline" title={`Admin tərəfindən pulsuz verilib: ${formatDateTime(s.comp_grant.granted_at)}`}>Admin pulsuz verib</Badge>}
             {s.family_link_id !== null && <Badge variant="outline">Ailə üzvü</Badge>}
           </div>
@@ -47,7 +47,7 @@ export function SubscriptionDetailPage() {
               <Row label="Qiymət" value={`${formatMoney(s.price_minor, s.currency)} / ${s.term_days} gün`} />
               <Row label="Başlama" value={formatDateTime(s.starts_at)} />
               <Row label="Bitmə" value={formatDateTime(s.ends_at)} />
-              <Row label="İstifadəçi (beneficiary)" value={s.beneficiary ? `${s.beneficiary.full_name ?? '—'} · ${s.beneficiary.phone ?? ''}` : '—'} />
+              <Row label="Kimin üçündür" value={s.beneficiary ? `${s.beneficiary.full_name ?? '—'} · ${s.beneficiary.phone ?? ''}` : '—'} />
               <Row label="Cihaz" value={s.device ? <Link to={`/devices/${s.device.id}`} className="text-primary hover:underline">{s.device.serial}</Link> : '—'} />
               <Row label="Cihaz rejimi" value={s.device ? (s.device.ownership_mode === 'complex' ? 'Kompleks' : 'Şəxsi') : '—'} />
               {s.status === 'cancelled' && (
@@ -72,7 +72,7 @@ export function SubscriptionDetailPage() {
                         <TableCell className="text-muted-foreground">{formatDateTime(p.period_start)} → {formatDateTime(p.period_end)}</TableCell>
                         <TableCell>{formatMoney(p.amount_minor, s.currency)}</TableCell>
                         <TableCell>
-                          {p.paid_by_user_id === null ? '—' : p.paid_by_user_id === s.beneficiary?.id ? 'Özü' : <Badge variant="outline">İstifadəçi #{p.paid_by_user_id}</Badge>}
+                          {p.paid_by_user_id === null ? '—' : p.paid_by_user_id === s.beneficiary?.id ? 'Özü' : <Badge variant="outline" title={`İstifadəçi #${p.paid_by_user_id}`}>Başqası ödəyib</Badge>}
                         </TableCell>
                         <TableCell>{p.order_id ? <Link to={`/orders/${p.order_id}`} className="text-primary hover:underline">#{p.order_id}</Link> : '—'}</TableCell>
                       </TableRow>

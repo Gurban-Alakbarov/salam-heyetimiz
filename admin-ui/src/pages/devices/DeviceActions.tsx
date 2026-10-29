@@ -76,7 +76,7 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
         )}
         {isActive && (
           <Button variant="outline" onClick={() => setDisableOpen(true)}>
-            Bağla
+            Müvəqqəti söndür
           </Button>
         )}
       </PermissionGate>
@@ -85,7 +85,7 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
       <PermissionGate anyOf={[PERM.devicesTransfer]}>
         {!isDecommissioned && device.ownership_mode !== 'complex' && (
           <Button variant="outline" onClick={() => setTransferOpen(true)}>
-            Köçür
+            Sahibliyi köçür
           </Button>
         )}
       </PermissionGate>
@@ -93,7 +93,7 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
       <PermissionGate anyOf={[PERM.devicesDecommission]}>
         {!isDecommissioned && (
           <Button variant="destructive" onClick={() => setDecommOpen(true)}>
-            Çıxar
+            İstismardan çıxar
           </Button>
         )}
       </PermissionGate>
@@ -101,16 +101,16 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
       <ConfirmDialog
         open={disableOpen}
         onOpenChange={setDisableOpen}
-        title="Cihazı bağla"
-        description="Bağlandıqdan sonra cihaz açıla bilməz."
-        confirmLabel="Bağla"
+        title="Cihazı müvəqqəti söndür"
+        description="Söndürülmüş cihazla heç kim qapını aça bilməz. Sonra «Aktivləşdir» ilə geri açmaq olar."
+        confirmLabel="Söndür"
         confirmVariant="destructive"
         requireReason
         loading={disable.isPending}
         onConfirm={(reason) =>
           disable.mutate(reason, {
             onSuccess: () => {
-              toast({ variant: 'success', title: 'Cihaz bağlandı' })
+              toast({ variant: 'success', title: 'Cihaz söndürüldü' })
               setDisableOpen(false)
             },
             onError: notifyError,
@@ -121,16 +121,16 @@ export function DeviceActions({ device }: { device: DeviceAdminDetail }) {
       <ConfirmDialog
         open={decommOpen}
         onOpenChange={setDecommOpen}
-        title="Cihazı çıxar"
-        description="Bu əməliyyat cihazı istismardan çıxarır və rosteri ləğv edir."
-        confirmLabel="Çıxar"
+        title="Cihazı istismardan çıxar"
+        description="Bu, geri qaytarılmayan əməliyyatdır: cihaz həmişəlik bağlanır, bütün istifadəçiləri silinir və bu IMEI/SIM ilə yeni cihaz yaratmaq mümkün olmayacaq. Cihazı sadəcə dayandırmaq üçün «Müvəqqəti söndür»dən istifadə edin."
+        confirmLabel="Həmişəlik çıxar"
         confirmVariant="destructive"
         requireReason
         loading={decommission.isPending}
         onConfirm={(reason) =>
           decommission.mutate(reason, {
             onSuccess: () => {
-              toast({ variant: 'success', title: 'Cihaz çıxarıldı' })
+              toast({ variant: 'success', title: 'Cihaz istismardan çıxarıldı' })
               setDecommOpen(false)
             },
             onError: notifyError,

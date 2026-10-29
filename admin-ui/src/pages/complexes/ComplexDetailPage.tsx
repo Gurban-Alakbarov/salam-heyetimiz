@@ -34,6 +34,9 @@ export function ComplexDetailPage() {
   const binding = useComplexDeviceBinding()
   const { toast } = useToast()
   const [pick, setPick] = useState('')
+  // Removing a manager / unbinding a device changes who runs this complex — ask first.
+  const [managerTarget, setManagerTarget] = useState<{ id: number; name: string } | null>(null)
+  const [unbindTarget, setUnbindTarget] = useState<{ id: number; serial: string; label: string | null } | null>(null)
   const err = (e: unknown) => toast({ variant: 'destructive', title: 'Xəta', description: e instanceof ApiError ? e.message : undefined })
 
   return (
@@ -83,14 +86,14 @@ export function ComplexDetailPage() {
                         {admins && (linked ? <Badge variant="success" className="ml-2">Mobil: {linked.email}</Badge> : <Badge variant="muted" className="ml-2">Mobil hesab bağlı deyil</Badge>)}
                       </span>
                       <PermissionGate anyOf={[PERM.complexesManage]}>
-                        <Button size="icon" variant="ghost" aria-label="Çıxar" onClick={() => unassign.mutate(m.id, { onSuccess: () => toast({ variant: 'success', title: 'Menecer çıxarıldı' }), onError: err })}>
+                        <Button size="icon" variant="ghost" aria-label="Menecerlikdən çıxar" title="Menecerlikdən çıxar" onClick={() => setManagerTarget({ id: m.id, name: m.name })}>
                           <X className="h-4 w-4 text-destructive" />
                         </Button>
                       </PermissionGate>
                     </div>
                   )
                 })}
-                <p className="pt-2 text-xs text-muted-foreground">Mobil hesab "Adminlər" səhifəsində bağlanır.</p>
+                <p className="pt-2 text-xs text-muted-foreground">Komendantın mobil hesabı «Adminlər» səhifəsində əlaqələndirilir.</p>
               </CardContent>
             </Card>
 
@@ -106,27 +109,28 @@ export function ComplexDetailPage() {
           <Card className="overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-base">Cihazlar ({c.devices.length})</CardTitle>
-              <PermissionGate anyOf={[PERM.complexesManage]}>
+              <PermissionGate anyOf={[PERM.complexesManage, PERM.complexesDevicesBind]}>
                 <BindDevice complexId={complexId} />
               </PermissionGate>
+
             </CardHeader>
             <CardContent className="px-0 pb-0">
               {c.devices.length === 0 ? <p className="px-6 pb-6 text-sm text-muted-foreground">Cihaz yoxdur.</p> : (
                 <Table>
-                  <TableHeader><TableRow><TableHead>Serial</TableHead><TableHead>Status</TableHead><TableHead>Rejim</TableHead><TableHead>Bağlantı</TableHead><TableHead>Sahib</TableHead><TableHead>Yer</TableHead><TableHead className="w-0" /></TableRow></TableHeader>
+                  <TableHeader><TableRow><TableHead>Cihaz</TableHead><TableHead>Status</TableHead><TableHead>Rejim</TableHead><TableHead>Bağlantı</TableHead><TableHead>Sahib</TableHead><TableHead>IMEI</TableHead><TableHead className="w-0" /></TableRow></TableHeader>
                   <TableBody>
                     {c.devices.map((d) => (
                       <TableRow key={d.id}>
-                        <TableCell className="font-medium"><Link to={`/devices/${d.id}`} className="hover:underline">{d.serial}</Link></TableCell>
+                        <TableCell className="font-medium"><Link to={`/devices/${d.id}`} className="hover:underline">{d.location_label || d.serial}</Link></TableCell>
                         <TableCell><StatusBadge kind="device" value={d.status} /></TableCell>
                         <TableCell>{d.ownership_mode === 'complex' ? <Badge variant="secondary">Kompleks</Badge> : <Badge variant="muted">Şəxsi</Badge>}</TableCell>
                         <TableCell>{d.online ? <Badge variant="success">Onlayn</Badge> : <Badge variant="muted">Oflayn</Badge>}</TableCell>
                         <TableCell className="text-muted-foreground">{d.owner ?? '—'}</TableCell>
-                        <TableCell className="text-muted-foreground">{d.location_label ?? '—'}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{d.serial}</TableCell>
                         <TableCell className="pr-4">
-                          <PermissionGate anyOf={[PERM.complexesManage]}>
+                          <PermissionGate anyOf={[PERM.complexesManage, PERM.complexesDevicesBind]}>
                             <Button size="icon" variant="ghost" aria-label="Kompleksdən ayır" title="Kompleksdən ayır"
-                              onClick={() => binding.mutate({ complexId, deviceId: d.id, bind: false }, { onSuccess: () => toast({ variant: 'success', title: 'Cihaz ayrıldı' }), onError: err })}>
+                              onClick={() => setUnbindTarget({ id: d.id, serial: d.serial, label: d.location_label ?? null })}>
                               <Unlink className="h-4 w-4 text-destructive" />
                             </Button>
                           </PermissionGate>
@@ -143,6 +147,33 @@ export function ComplexDetailPage() {
             <MembersCard complexId={complexId} />
             <InvitationsCard complexId={complexId} />
           </PermissionGate>
+
+          <ConfirmDialog
+            open={managerTarget !== null}
+            onOpenChange={(o) => !o && setManagerTarget(null)}
+            title="Menecer bu kompleksdən çıxarılsın?"
+            description={`${managerTarget?.name ?? ''} bu kompleksi artıq idarə edə bilməyəcək (panel və mobil tətbiqdə). Admin hesabı silinmir.`}
+            confirmLabel="Çıxar"
+            confirmVariant="destructive"
+            loading={unassign.isPending}
+            onConfirm={() => managerTarget && unassign.mutate(managerTarget.id, {
+              onSuccess: () => { toast({ variant: 'success', title: 'Menecer çıxarıldı' }); setManagerTarget(null) },
+              onError: err,
+            })}
+          />
+          <ConfirmDialog
+            open={unbindTarget !== null}
+            onOpenChange={(o) => !o && setUnbindTarget(null)}
+            title="Cihaz kompleksdən ayrılsın?"
+            description={`«${unbindTarget?.label || unbindTarget?.serial || ''}» artıq bu kompleksə aid olmayacaq; komendant onu görməyəcək.`}
+            confirmLabel="Ayır"
+            confirmVariant="destructive"
+            loading={binding.isPending}
+            onConfirm={() => unbindTarget && binding.mutate({ complexId, deviceId: unbindTarget.id, bind: false }, {
+              onSuccess: () => { toast({ variant: 'success', title: 'Cihaz kompleksdən ayrıldı' }); setUnbindTarget(null) },
+              onError: err,
+            })}
+          />
         </>
       )}
     </div>
@@ -152,20 +183,21 @@ export function ComplexDetailPage() {
 /** Find an unbound device by serial and bind it to this complex (complexes.manage). */
 function BindDevice({ complexId }: { complexId: number }) {
   const [q, setQ] = useState('')
-  const { data } = useDevices({ q: q.trim() || undefined, limit: 5 })
+  // Fetch enough rows that bound devices filtered out below still leave candidates.
+  const { data } = useDevices({ q: q.trim() || undefined, limit: 25 })
   const binding = useComplexDeviceBinding()
   const { toast } = useToast()
-  const candidates = q.trim().length >= 2 ? (data?.data ?? []).filter((d) => (d.complex_id ?? null) === null) : []
+  const candidates = q.trim().length >= 2 ? (data?.data ?? []).filter((d) => (d.complex_id ?? null) === null).slice(0, 8) : []
 
   return (
     <div className="relative">
-      <Input placeholder="Cihaz bağla: serial…" value={q} onChange={(e) => setQ(e.target.value)} className="h-9 w-56" />
+      <Input placeholder="Cihaz qoş: IMEI və ya ad…" value={q} onChange={(e) => setQ(e.target.value)} className="h-9 w-56" />
       {candidates.length > 0 && (
         <div className="absolute right-0 z-10 mt-1 w-72 rounded-md border bg-card p-1 shadow-md">
           {candidates.map((d) => (
             <button key={d.id} type="button" className="flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm hover:bg-muted"
               onClick={() => binding.mutate({ complexId, deviceId: d.id, bind: true }, {
-                onSuccess: () => { toast({ variant: 'success', title: 'Cihaz kompleksə bağlandı' }); setQ('') },
+                onSuccess: () => { toast({ variant: 'success', title: 'Cihaz kompleksə qoşuldu' }); setQ('') },
                 onError: (e) => toast({ variant: 'destructive', title: 'Xəta', description: e instanceof ApiError ? e.message : undefined }),
               })}>
               <span>{d.serial} <span className="text-muted-foreground">{d.location_label ?? ''}</span></span>

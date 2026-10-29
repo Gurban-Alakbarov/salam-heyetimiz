@@ -60,7 +60,7 @@ dependencies:
   installed_apps: ^2.1.1
   android_intent_plus: ^6.1.0
   firebase_core: ^4.13.0
-  firebase_messaging: ^16.5.0
+  firebase_messaging: ^16.7.1
   # 1.0.1 — crash reports + usage analytics (release builds only; analytics can be switched off in Profile).
   firebase_crashlytics: ^5.4.1
   firebase_analytics: ^12.6.1

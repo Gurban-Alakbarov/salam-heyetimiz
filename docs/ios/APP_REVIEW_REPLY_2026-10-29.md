@@ -1,4 +1,7 @@
-# App Review reply — Guideline 2.1 Information Needed (2026-10-29)
+# App Review reply — Guideline 2.1 Information Needed (2026-10-29, updated 2026-10-30 for 1.0.1)
+
+The reply goes with **version 1.0.1 (build 4)**: the App Store version 1.0 is renamed to 1.0.1 and build 4 is
+attached before sending. The recording must be made with build 4 from TestFlight.
 
 Paste the **Reply** into App Store Connect → App Review (the message thread) and attach the screen recording.
 The same text (without point 1) also goes into **App Review Information → Notes**.
@@ -44,16 +47,20 @@ managers in Azerbaijan.
 7. Account deletion: Profil (Profile) → Hesabı sil (Delete account) → Hesabı həmişəlik sil (confirm). The account is
    erased.
 
-The app is available in Azerbaijani, English and Russian (Profile → Tətbiq ayarları / App settings → Language).
+The app is available in Azerbaijani, English and Russian. It opens in the phone's language (Azerbaijani if the
+phone uses another language); Profile → Tətbiq ayarları / App settings → Language changes it.
 
 **4. External services**
 - Our own backend (api.sezam.salam.az): accounts, access rules, gate commands.
 - Traccar, self-hosted on our servers: communicates with the GSM barrier controllers.
 - Firebase Cloud Messaging with Apple Push Notification service: notifications such as "your guest opened the gate"
   or a subscription reminder.
+- Firebase Crashlytics and Firebase Analytics: crash reports and usage statistics, not used for advertising or
+  tracking; usage statistics can be turned off in Profile → App settings → Privacy.
 - Kapital Bank BirPay: card payment gateway (hosted checkout page) for subscriptions.
 - Brevo: sends the e-mail one-time sign-in codes.
-- OpenStreetMap: map tiles for choosing an address in the installation request form.
+- GoMap.az (through our own server): the map, address search and the address under a picked point in the
+  installation request form. Only the searched address and the picked point are sent, never the user's details.
 - AzNav: the "Directions" button opens the AzNav navigation app or its App Store page.
 
 There is no third-party sign-in, no advertising, no tracking and no AI service.
@@ -93,3 +100,24 @@ Turn on recording: Control Center → Screen Recording.
 7. **Subscription:** Ana səhifə → Aktiv abunəliklər → Yenilə → the test checkout page → back to the result.
 8. Profil → Tətbiq ayarları: switch the language briefly.
 9. Sign out, sign in again with the account from step 2, Profil → **Hesabı sil** → Hesabı həmişəlik sil.
+
+
+---
+
+## What's New in 1.0.1 (App Store)
+
+**en-US**
+- New device card: a round Open button that turns red while the command is sent
+- Simpler guest invite and Directions buttons
+- GoMap map in the installation request: address search, pin, address filled in automatically
+- Subscription is 15 AZN / year, shown on the Renew button
+- The app opens in your phone's language (Azerbaijani, English, Russian)
+- Crash reports for a more stable app; usage statistics can be turned off in Settings → Privacy
+
+**ru**
+- Новая карточка: круглая кнопка «Открыть», красная во время отправки команды
+- Упрощены кнопки «Пригласить» и «Маршрут»
+- Карта GoMap в заявке: поиск адреса, метка, адрес заполняется сам
+- Подписка 15 AZN / год, цена на кнопке «Продлить»
+- Приложение открывается на языке телефона (азербайджанский, английский, русский)
+- Отчёты о сбоях; статистику можно отключить в Настройки → Конфиденциальность

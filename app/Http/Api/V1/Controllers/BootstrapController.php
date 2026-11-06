@@ -52,7 +52,6 @@ class BootstrapController
                 'default_locale' => $this->str('general', 'default_language') ?: 'az',
                 'default_timezone' => $this->str('general', 'timezone') ?: 'Asia/Baku',
                 'currency' => 'AZN',
-                'logo_url' => $this->str('general', 'logo_url'),
             ],
             'feature_flags' => $this->featureFlags(),
             'support' => [
@@ -119,8 +118,6 @@ class BootstrapController
         return [
             'maintenance_mode' => (bool) $this->settings->value('general', 'maintenance_mode'),
             'min_version' => $this->str('general', 'min_version') ?: '1.0.0',
-            'latest_version' => $this->str('general', 'latest_version') ?: '1.0.0',
-            'force_update' => (bool) $this->settings->value('general', 'force_update'),
         ];
     }
 

@@ -17612,13 +17612,6 @@
           "min_version": {
             "type": "string",
             "example": "1.0.0"
-          },
-          "latest_version": {
-            "type": "string",
-            "example": "1.0.0"
-          },
-          "force_update": {
-            "type": "boolean"
           }
         }
       },
@@ -17672,9 +17665,6 @@
                   "currency": {
                     "type": "string",
                     "example": "AZN"
-                  },
-                  "logo_url": {
-                    "type": "string"
                   }
                 }
               },

@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\Admin\Models\Setting;
+use App\Domain\Admin\Settings\SettingsCatalog;
 use App\Domain\Users\Models\User;
 use Illuminate\Support\Str;
 
@@ -29,7 +31,7 @@ it('serves guest bootstrap without authentication', function () {
         ->assertJsonStructure([
             'success', 'message',
             'data' => [
-                'app' => ['maintenance_mode', 'min_version', 'latest_version', 'force_update'],
+                'app' => ['maintenance_mode', 'min_version'],
                 'otp' => ['length', 'ttl_seconds', 'resend_seconds'],
                 'public_settings' => ['brand', 'default_locale', 'default_timezone', 'currency'],
                 'feature_flags',
@@ -59,7 +61,7 @@ it('serves the authenticated current-user bootstrap in one shot', function () {
                 'user' => ['id', 'phone', 'email', 'email_verified_at'],
                 'registration_completed', 'email_verified', 'phone', 'has_password', 'avatar',
                 'locale', 'timezone',
-                'app' => ['maintenance_mode', 'min_version', 'latest_version', 'force_update'],
+                'app' => ['maintenance_mode', 'min_version'],
                 'feature_flags', 'permissions', 'unread_notifications_count',
                 'user_devices' => [['id', 'platform', 'device_model', 'app_version', 'biometric_enrolled']],
                 'active_subscriptions',
@@ -67,6 +69,20 @@ it('serves the authenticated current-user bootstrap in one shot', function () {
         ]);
 
     expect($res->json('data.user_devices'))->toHaveCount(1);
+});
+
+it('keeps version gating on the minimum version alone', function () {
+    Setting::query()->updateOrCreate(['key' => 'general.force_update'], ['value' => '1']);
+
+    test()->getJson('/v1/bootstrap')
+        ->assertOk()
+        ->assertJsonMissingPath('data.app.force_update')
+        ->assertJsonMissingPath('data.app.latest_version')
+        ->assertJsonMissingPath('data.public_settings.logo_url');
+
+    expect(array_keys(SettingsCatalog::groups()['general']))
+        ->not->toContain('force_update', 'latest_version', 'logo_url', 'favicon_url')
+        ->toContain('maintenance_mode', 'min_version');
 });
 
 it('requires authentication for /v1/me', function () {

@@ -1108,6 +1108,31 @@ paths:
       security: [{ adminBearerAuth: [] }]
       responses:
         '200': { description: ok }
+  /admin/site/media:
+    get:
+      tags: [Site]
+      summary: Images available to the website, uploaded first (site.manage)
+      operationId: adminListSiteMedia
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200': { description: ok }
+    post:
+      tags: [Site]
+      summary: Upload an image, redrawn as a web-sized WebP (site.manage)
+      operationId: adminUploadSiteMedia
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image: { type: string, format: binary, description: 'JPEG, PNG or WebP, up to 8 MB' }
+      responses:
+        '201': { description: stored }
+        '422': { description: not an image }
   /admin/site/documents:
     get:
       tags: [Site]

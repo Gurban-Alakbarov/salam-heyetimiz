@@ -5,6 +5,7 @@ namespace App\Http\Admin\V1\Controllers\Site;
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Site\Content\SiteDocumentService;
+use App\Domain\Site\Content\SiteMediaService;
 use App\Domain\Site\Content\TranslationState;
 use App\Domain\Site\Models\SiteDocument;
 use App\Domain\Site\Models\SiteRevision;
@@ -21,6 +22,7 @@ class AdminSiteContentController
 
     public function __construct(
         private readonly SiteDocumentService $documents,
+        private readonly SiteMediaService $media,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -34,7 +36,8 @@ class AdminSiteContentController
             'section_types' => SectionCatalog::types(),
             'page_fields' => SectionCatalog::pageFields(),
             'shared_fields' => SectionCatalog::sharedFields(),
-            'icons' => SiteDocumentService::iconNames(),
+            'icons' => SiteDocumentService::icons(),
+            'site_url' => rtrim((string) config('app.url'), '/'),
         ]]);
     }
 
@@ -118,6 +121,26 @@ class AdminSiteContentController
         }
 
         return response()->json(['data' => $this->full($document->load('updatedBy'))]);
+    }
+
+    /** GET /admin/v1/site/media */
+    public function media(Request $request): JsonResponse
+    {
+        $this->requirePermission($request, Permission::SITE_MANAGE);
+
+        return response()->json(['data' => $this->media->all()]);
+    }
+
+    /** POST /admin/v1/site/media (multipart: image) */
+    public function upload(Request $request): JsonResponse
+    {
+        $this->requirePermission($request, Permission::SITE_MANAGE);
+        $request->validate(['image' => ['required', 'file', 'mimes:jpeg,png,webp', 'max:8192']]);
+
+        $stored = $this->media->store($request->file('image'));
+        $this->audit->record('site_media.uploaded', ['path' => $stored['path']]);
+
+        return response()->json(['data' => $stored], 201);
     }
 
     private function find(string $key): SiteDocument

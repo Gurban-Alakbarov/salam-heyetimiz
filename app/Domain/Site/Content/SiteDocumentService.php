@@ -19,10 +19,10 @@ final class SiteDocumentService
         return base_path('site/content/icons.json');
     }
 
-    /** @return list<string> */
-    public static function iconNames(): array
+    /** @return array<string, string> Icon name => drawing */
+    public static function icons(): array
     {
-        return array_keys((array) json_decode((string) file_get_contents(self::iconsFile()), true));
+        return (array) json_decode((string) file_get_contents(self::iconsFile()), true);
     }
 
     /** First fill from the repository's files. The website already shows this content, so it counts as published. */
@@ -45,7 +45,7 @@ final class SiteDocumentService
     {
         return DB::transaction(function () use ($key, $input, $expectedVersion, $admin): SiteDocument {
             $document = $this->lock($key, $expectedVersion);
-            $normalizer = new ContentNormalizer(self::iconNames());
+            $normalizer = new ContentNormalizer(array_keys(self::icons()));
             $content = $key === SiteDocument::SHARED
                 ? $normalizer->shared($input, $document->content)
                 : $normalizer->page($input, $key, $document->content);

@@ -1,4 +1,4 @@
-import { Bell, Boxes, Building2, Inbox, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, Tag, UsersRound, Users } from 'lucide-react'
+import { Bell, Boxes, Building2, Inbox, ClipboardList, CreditCard, FileText, Globe, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, Tag, UsersRound, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PERM } from '@/auth/permissions'
 import type { InboxCounts } from '@/api/inboxCounts'
@@ -52,6 +52,10 @@ export const navGroups: NavGroup[] = [
   {
     label: 'Bildirişlər',
     items: [{ to: '/notifications', label: 'Bildirişlər', icon: Bell, permission: PERM.notificationsView }],
+  },
+  {
+    label: 'Sayt',
+    items: [{ to: '/site', label: 'Sayt məzmunu', icon: Globe, permission: PERM.siteManage }],
   },
   {
     label: 'Sistem',

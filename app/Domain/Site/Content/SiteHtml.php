@@ -17,6 +17,9 @@ final class SiteHtml
 
     private const RICH = [...self::INLINE, 'p', 'ul', 'ol', 'li', 'h3'];
 
+    /** What browsers write for bold and italic in an edited area. */
+    private const RENAME = ['b' => 'strong', 'i' => 'em'];
+
     /** Removed with everything inside; other unknown tags keep their text. */
     private const DROP = ['script', 'style', 'iframe', 'object', 'embed', 'svg', 'math', 'template', 'noscript', 'head', 'title'];
 
@@ -86,6 +89,16 @@ final class SiteHtml
             }
 
             self::walk($node, $allowed);
+
+            if (isset(self::RENAME[$tag])) {
+                $renamed = $node->ownerDocument->createElement(self::RENAME[$tag]);
+                while ($node->firstChild !== null) {
+                    $renamed->appendChild($node->firstChild);
+                }
+                $parent->replaceChild($renamed, $node);
+
+                continue;
+            }
 
             if (! in_array($tag, $allowed, true)) {
                 while ($node->firstChild !== null) {

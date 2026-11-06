@@ -5,7 +5,9 @@ use App\Domain\Site\Models\SiteDocument;
 use App\Domain\Site\Models\SiteRevision;
 use App\Domain\Site\Publishing\SiteBuilder;
 use App\Domain\Site\Publishing\SiteContent;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     seedRbac();
@@ -176,6 +178,71 @@ it('keeps what the content uses when cleaning', function () {
     expect(SiteHtml::inline('Bir<br>iki <a href="/privacy">link</a> <a href="mailto:a@b.co?subject=x%20y">m</a>'))
         ->toBe('Bir<br>iki <a href="/privacy">link</a> <a href="mailto:a@b.co?subject=x%20y">m</a>');
     expect(SiteHtml::inline('a &amp; b <em>c</em>'))->toBe('a &amp; b <em>c</em>');
+});
+
+it('stores an upload as a web-sized WebP without the original file data', function () {
+    Storage::fake('public');
+    config(['app.url' => 'https://sezam.test']);
+
+    $response = $this->actingAs($this->admin, 'admin')
+        ->post('/admin/v1/site/media', ['image' => UploadedFile::fake()->image('photo.jpg', 3000, 1500)], ['Accept' => 'application/json'])
+        ->assertCreated();
+
+    $path = $response->json('data.path');
+    expect($path)->toStartWith('/landing/media/')->toEndWith('.webp');
+    expect($response->json('data.url'))->toStartWith('https://sezam.test/storage/site-media/');
+
+    $stored = Storage::disk('public')->path('site-media/'.basename($path));
+    expect(getimagesize($stored)[0])->toBe(1920)->and(getimagesize($stored)['mime'])->toBe('image/webp');
+    $this->assertDatabaseHas('audit_logs', ['action' => 'site_media.uploaded']);
+
+    $list = $this->actingAs($this->admin, 'admin')->getJson('/admin/v1/site/media')->assertOk()->json('data');
+    expect($list[0]['path'])->toBe($path);
+    expect(array_column($list, 'path'))->toContain('/landing/img-02.webp');
+});
+
+it('accepts an uploaded image in content, and the build carries it', function () {
+    Storage::fake('public');
+    $path = $this->actingAs($this->admin, 'admin')
+        ->post('/admin/v1/site/media', ['image' => UploadedFile::fake()->image('a.png', 400, 300)], ['Accept' => 'application/json'])
+        ->json('data.path');
+
+    $doc = siteDoc($this, 'contact');
+    $content = $doc['content'];
+    $content['sections'][0]['image'] = $path;
+    saveDoc($this, 'contact', $content, 1)->assertOk();
+
+    $dir = sys_get_temp_dir().'/site-media-test-'.uniqid();
+    (new SiteBuilder(base_path('site')))->build(SiteContent::fromDatabase(base_path('site/content/icons.json')), $dir);
+
+    expect(file_get_contents($dir.'/contact.html'))->toContain('src="'.$path.'"');
+    expect(File::exists($dir.$path))->toBeTrue();
+    File::deleteDirectory($dir);
+});
+
+it('refuses a file that is not an image', function (string $name, string $body) {
+    Storage::fake('public');
+
+    $this->actingAs($this->admin, 'admin')
+        ->post('/admin/v1/site/media', ['image' => UploadedFile::fake()->createWithContent($name, $body)], ['Accept' => 'application/json'])
+        ->assertStatus(422);
+
+    expect(Storage::disk('public')->allFiles())->toBe([]);
+})->with([
+    'svg' => ['x.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'],
+    'renamed text' => ['x.jpg', 'not an image'],
+]);
+
+it('only lets admins with the permission upload', function () {
+    Storage::fake('public');
+
+    $this->actingAs(makeAdminRole('finance'), 'admin')
+        ->post('/admin/v1/site/media', ['image' => UploadedFile::fake()->image('a.png')], ['Accept' => 'application/json'])
+        ->assertForbidden();
+});
+
+it('turns what a browser editor writes into the allowed tags', function () {
+    expect(SiteHtml::inline('<b>a</b> <i>b</i>'))->toBe('<strong>a</strong> <em>b</em>');
 });
 
 it('allows only safe link addresses', function (string $href, bool $safe) {

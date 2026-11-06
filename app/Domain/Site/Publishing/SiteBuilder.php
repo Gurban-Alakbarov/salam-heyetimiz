@@ -2,7 +2,9 @@
 
 namespace App\Domain\Site\Publishing;
 
+use App\Domain\Site\Content\SiteMediaService;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 /**
@@ -28,6 +30,10 @@ final class SiteBuilder
         }
         File::ensureDirectoryExists($out);
         File::copyDirectory($this->source.'/'.self::ASSETS, $out.'/'.self::ASSETS);
+        $media = Storage::disk('public')->path(SiteMediaService::FOLDER);
+        if (is_dir($media)) {
+            File::copyDirectory($media, $out.'/'.ltrim(SiteMediaService::PUBLISHED_PREFIX, '/'));
+        }
 
         $written = [];
         foreach (self::LANGS as $lang) {

@@ -86,6 +86,8 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     // Requests from the website's contact form
     // The public website's content (site.manage)
     Route::get('site/catalog', [AdminSiteContentController::class, 'catalog'])->name('adminSiteCatalog');
+    Route::get('site/media', [AdminSiteContentController::class, 'media'])->name('adminListSiteMedia');
+    Route::post('site/media', [AdminSiteContentController::class, 'upload'])->name('adminUploadSiteMedia');
     Route::get('site/documents', [AdminSiteContentController::class, 'index'])->name('adminListSiteDocuments');
     Route::get('site/documents/{key}', [AdminSiteContentController::class, 'show'])->where('key', '[a-z-]+')->name('adminGetSiteDocument');
     Route::put('site/documents/{key}', [AdminSiteContentController::class, 'update'])->where('key', '[a-z-]+')->name('adminUpdateSiteDocument');

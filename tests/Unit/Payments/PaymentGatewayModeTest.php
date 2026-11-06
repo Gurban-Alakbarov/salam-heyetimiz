@@ -18,6 +18,11 @@ it('keeps the real BirPay gateway by default (no config change = unchanged behav
         ->and(PaymentGatewayMode::decide('local', ['gateway' => 'birpay', 'fake_enabled' => true]))->toBe(PaymentGatewayMode::BIRPAY);
 });
 
+it('selects the Kapital e-commerce gateway explicitly', function () {
+    expect(PaymentGatewayMode::decide('production', ['gateway' => 'kapital']))->toBe(PaymentGatewayMode::KAPITAL)
+        ->and(PaymentGatewayMode::decide('testing', ['gateway' => 'kapital']))->toBe(PaymentGatewayMode::FAKE);
+});
+
 it('requires the fake_enabled feature flag before the fake gateway is used', function () {
     expect(PaymentGatewayMode::decide('local', ['gateway' => 'fake', 'fake_enabled' => false]))->toBe(PaymentGatewayMode::DISABLED)
         ->and(PaymentGatewayMode::decide('local', ['gateway' => 'fake', 'fake_enabled' => true]))->toBe(PaymentGatewayMode::FAKE)

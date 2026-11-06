@@ -74,7 +74,7 @@ export function OrdersPage() {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="pl-9"
-            placeholder="Referans / BirPay ID / telefon / email üzrə axtar…"
+            placeholder="Referans / Bank ID / telefon / email üzrə axtar…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -115,7 +115,7 @@ export function OrdersPage() {
                     <TableHead>Müştəri</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Bank statusu</TableHead>
-                    <TableHead>BirPay ID</TableHead>
+                    <TableHead>Bank ID</TableHead>
                     <TableHead className="text-right">Məbləğ</TableHead>
                     <TableHead className="text-right">Qaytarılıb</TableHead>
                     <TableHead className="text-right">Qalan</TableHead>

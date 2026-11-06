@@ -230,7 +230,7 @@ function PaymentsStatus() {
   return (
     <div className="space-y-3 border-t pt-4">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm font-medium">Kapital / BirPay vəziyyəti</p>
+        <p className="text-sm font-medium">Kapital vəziyyəti</p>
         <Button variant="outline" size="sm" onClick={check} disabled={diag.isPending}>
           {diag.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlugZap className="mr-2 h-4 w-4" />}Vəziyyəti yoxla
         </Button>
@@ -241,10 +241,10 @@ function PaymentsStatus() {
 
       {d && (
         <div className="grid gap-2 sm:grid-cols-2">
-          <Indicator ok={d.oauth.ok} label="OAuth token" value={d.oauth.ok ? `${d.oauth.expires_in}s` : d.oauth.message} />
+          <Indicator ok={d.oauth.ok} label={d.provider === 'kapital' ? 'Login' : 'OAuth token'} value={d.oauth.ok && d.provider !== 'kapital' ? `${d.oauth.expires_in}s` : d.oauth.message} />
           <Indicator ok={d.authenticated.ok} label="Autentifikasiya" value={d.authenticated.message} />
           <Indicator ok={d.ok} label="Bağlantı" value={d.ok ? 'OK' : '—'} />
-          <Indicator ok={d.merchant_id !== ''} label="Merchant" value={d.merchant_id || '—'} />
+          <Indicator ok={d.merchant_id !== ''} label={d.provider === 'kapital' ? 'Hesab' : 'Merchant'} value={d.merchant_id || '—'} />
           <Indicator ok={null} label="Terminal" value={d.terminal_id || '—'} />
           <Indicator ok={null} label="Rejim" value={d.mode} />
           <Indicator ok={null} label="API host" value={d.host.replace('https://', '')} />

@@ -31,7 +31,7 @@ export function PaymentLogsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Ödəniş logları</h1>
-        <p className="text-sm text-muted-foreground">BirPay çağırışları (outbound) + webhook-lar (inbound) — maskalı, şifrəli saxlanılır.</p>
+        <p className="text-sm text-muted-foreground">Bank çağırışları (outbound) + webhook-lar (inbound) — maskalı, şifrəli saxlanılır.</p>
       </div>
 
       <Card className="overflow-hidden">

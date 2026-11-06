@@ -3,8 +3,10 @@
 namespace App\Domain\Payments\Services;
 
 use App\Domain\Payments\Adapters\BirPay\BirPayTokenService;
+use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomClient;
 use App\Domain\Payments\Exceptions\BirPayAuthException;
 use App\Domain\Payments\Exceptions\PaymentSettingsInvalidException;
+use App\Domain\Payments\Support\PaymentGatewayMode;
 use App\Domain\Payments\Support\PaymentSettings;
 use Illuminate\Support\Facades\Http;
 
@@ -13,13 +15,28 @@ use Illuminate\Support\Facades\Http;
  * reachability check. On failure nothing is persisted and the EXACT upstream reason is surfaced (never a
  * generic "Unknown error"). No payment is created and no card is charged.
  *
- * @phpstan-type Diagnostics array{ok: bool, oauth: array<string,mixed>, authenticated: array<string,mixed>, host: string, mode: string, merchant_id: string, terminal_id: string}
+ * @phpstan-type Diagnostics array{ok: bool, provider: string, oauth: array<string,mixed>, authenticated: array<string,mixed>, host: string, mode: string, merchant_id: string, terminal_id: string}
  */
 final class PaymentSettingsValidator
 {
     private const ALLOWED_CURRENCIES = ['AZN'];
 
-    public function __construct(private readonly BirPayTokenService $token) {}
+    public function __construct(
+        private readonly BirPayTokenService $token,
+        private readonly KapitalEcomClient $kapital,
+    ) {}
+
+    /**
+     * The e-commerce API is the provider when it is the active gateway, or once its login is set (it can be saved
+     * and tested while the app still runs on the test gateway).
+     *
+     * @param  array<string, mixed>  $s
+     */
+    public function usesKapitalEcom(array $s): bool
+    {
+        return PaymentGatewayMode::current() === PaymentGatewayMode::KAPITAL
+            || trim((string) ($s['kapital_ecom_username'] ?? '')) !== '';
+    }
 
     /**
      * Validate effective settings (already merged: incoming over existing, secrets resolved).
@@ -30,6 +47,12 @@ final class PaymentSettingsValidator
      */
     public function validate(array $s): void
     {
+        if ($this->usesKapitalEcom($s)) {
+            $this->validateKapitalEcom($s);
+
+            return;
+        }
+
         $mode = ($s['kapital_mode'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
         $base = $this->baseUrl($s, $mode);
         $clientId = trim((string) ($s['kapital_client_id'] ?? ''));
@@ -94,6 +117,10 @@ final class PaymentSettingsValidator
      */
     public function diagnose(array $s): array
     {
+        if ($this->usesKapitalEcom($s)) {
+            return $this->diagnoseKapitalEcom($s);
+        }
+
         $mode = ($s['kapital_mode'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
         $base = $this->baseUrl($s, $mode);
 
@@ -120,6 +147,7 @@ final class PaymentSettingsValidator
 
         return [
             'ok' => $oauth['ok'] && $authenticated['ok'],
+            'provider' => PaymentGatewayMode::BIRPAY,
             'oauth' => $oauth,
             'authenticated' => $authenticated,
             'host' => $base,
@@ -127,6 +155,75 @@ final class PaymentSettingsValidator
             'merchant_id' => (string) ($s['kapital_merchant_id'] ?? ''),
             'terminal_id' => (string) ($s['kapital_terminal_id'] ?? ''),
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $s
+     *
+     * @throws PaymentSettingsInvalidException
+     */
+    private function validateKapitalEcom(array $s): void
+    {
+        $fields = [];
+        $username = trim((string) ($s['kapital_ecom_username'] ?? ''));
+        $password = (string) ($s['kapital_ecom_password'] ?? '');
+        if ($username === '') {
+            $fields['kapital_ecom_username'] = 'Login tələb olunur.';
+        }
+        if ($password === '') {
+            $fields['kapital_ecom_password'] = 'Şifrə tələb olunur.';
+        }
+        $currency = strtoupper(trim((string) ($s['kapital_currency'] ?? 'AZN')));
+        if (! in_array($currency, self::ALLOWED_CURRENCIES, true)) {
+            $fields['kapital_currency'] = 'Dəstəklənməyən valyuta: '.$currency;
+        }
+        $returnUrl = trim((string) ($s['kapital_return_url'] ?? ''));
+        if ($returnUrl !== '' && ! $this->isUrl($returnUrl)) {
+            $fields['kapital_return_url'] = 'Return URL düzgün deyil.';
+        }
+        if ($fields !== []) {
+            throw new PaymentSettingsInvalidException('Ödəniş parametrləri düzgün deyil.', $fields);
+        }
+
+        $probe = $this->kapital->probe($this->ecomBase($s), $username, $password);
+        if (! $probe['ok']) {
+            throw new PaymentSettingsInvalidException('Giriş uğursuz: '.$probe['message'], [
+                'kapital_ecom_password' => $probe['message'],
+            ]);
+        }
+    }
+
+    /**
+     * Same panel shape as BirPay. Nothing is created at the bank.
+     *
+     * @param  array<string, mixed>  $s
+     * @return Diagnostics
+     */
+    private function diagnoseKapitalEcom(array $s): array
+    {
+        $mode = ($s['kapital_mode'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
+        $base = $this->ecomBase($s);
+        $username = trim((string) ($s['kapital_ecom_username'] ?? ''));
+        $probe = $this->kapital->probe($base, $username, (string) ($s['kapital_ecom_password'] ?? ''));
+
+        return [
+            'ok' => $probe['ok'],
+            'provider' => PaymentGatewayMode::KAPITAL,
+            'oauth' => ['ok' => $probe['ok'], 'message' => $probe['ok'] ? 'Login qəbul olundu.' : $probe['message'], 'expires_in' => null, 'token_type' => null, 'scope' => null],
+            'authenticated' => $probe,
+            'host' => $base,
+            'mode' => $mode,
+            'merchant_id' => $username,
+            'terminal_id' => '',
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $s
+     */
+    private function ecomBase(array $s): string
+    {
+        return PaymentSettings::ecomHostForMode((string) ($s['kapital_mode'] ?? 'sandbox'));
     }
 
     /**

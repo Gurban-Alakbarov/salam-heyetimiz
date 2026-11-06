@@ -106,7 +106,7 @@ function Cell({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 const ACTOR_LABEL: Record<string, string> = { system: 'Sistem', admin: 'Admin', customer: 'Müştəri', bank: 'Bank' }
-const SOURCE_LABEL: Record<string, string> = { app: 'Tətbiq', birpay: 'BirPay', webhook: 'Webhook', admin: 'Admin' }
+const SOURCE_LABEL: Record<string, string> = { app: 'Tətbiq', birpay: 'Bank', webhook: 'Webhook', admin: 'Admin' }
 const DOT_COLOR: Record<string, string> = {
   blue: 'bg-blue-500', indigo: 'bg-indigo-500', purple: 'bg-purple-500',
   green: 'bg-emerald-500', amber: 'bg-amber-500', red: 'bg-red-500',

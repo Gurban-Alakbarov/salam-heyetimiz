@@ -7,6 +7,7 @@ namespace App\Domain\Payments\Support;
  * production guard is unit-testable without booting a production environment.
  *
  *  - testing                                         → fake (in-memory test double; tests drive the bank)
+ *  - gateway=kapital                                 → kapital (the bank's e-commerce API)
  *  - gateway=birpay (default)                        → birpay
  *  - gateway=fake + fake_enabled (+ allow_fake_in_production in production) → fake
  *  - gateway=fake but not permitted                  → disabled (never falls through to the real bank)
@@ -14,6 +15,8 @@ namespace App\Domain\Payments\Support;
 final class PaymentGatewayMode
 {
     public const BIRPAY = 'birpay';
+
+    public const KAPITAL = 'kapital';
 
     public const FAKE = 'fake';
 
@@ -26,6 +29,10 @@ final class PaymentGatewayMode
     {
         if ($environment === 'testing') {
             return self::FAKE;
+        }
+
+        if (($config['gateway'] ?? self::BIRPAY) === self::KAPITAL) {
+            return self::KAPITAL;
         }
 
         if (($config['gateway'] ?? self::BIRPAY) !== self::FAKE) {

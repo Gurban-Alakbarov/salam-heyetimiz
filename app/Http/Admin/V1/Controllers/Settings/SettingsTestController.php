@@ -8,9 +8,13 @@ use App\Domain\Admin\Settings\RuntimeMailer;
 use App\Domain\Auth\Models\RefreshToken;
 use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Payments\Adapters\BirPay\BirPayClient;
+use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomClient;
+use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomGateway;
 use App\Domain\Payments\DTOs\BirPay\CreatePaymentData;
 use App\Domain\Payments\Exceptions\BirPayApiException;
+use App\Domain\Payments\Exceptions\KapitalEcomApiException;
 use App\Domain\Payments\Services\PaymentSettingsValidator;
+use App\Domain\Payments\Support\PaymentGatewayMode;
 use App\Domain\Payments\Support\PaymentSettings;
 use App\Http\Concerns\AuthorizesAdmin;
 use Illuminate\Http\JsonResponse;
@@ -34,6 +38,7 @@ class SettingsTestController
         private readonly PaymentSettingsValidator $paymentValidator,
         private readonly PaymentSettings $paymentSettings,
         private readonly BirPayClient $birpay,
+        private readonly KapitalEcomClient $kapital,
     ) {}
 
     /** POST /admin/v1/settings/{group}/test — connection test (traccar/email/payments). */
@@ -214,6 +219,10 @@ class SettingsTestController
     private function testPayments(): array
     {
         $d = $this->paymentValidator->diagnose($this->settings->group('payments'));
+        if ($d['provider'] === PaymentGatewayMode::KAPITAL) {
+            return array_merge($d, ['message' => $d['ok'] ? 'Bank bağlantısı OK.' : 'Giriş uğursuz: '.$d['oauth']['message']]);
+        }
+
         $message = $d['oauth']['ok']
             ? ($d['authenticated']['ok']
                 ? 'OAuth + autentifikasiya OK (token '.$d['oauth']['expires_in'].'s).'
@@ -231,6 +240,11 @@ class SettingsTestController
     public function testCreatePayment(Request $request): JsonResponse
     {
         $this->requirePermission($request, Permission::SYSTEM_SETTINGS_MANAGE);
+
+        if ($this->paymentValidator->usesKapitalEcom($this->settings->group('payments'))) {
+            return $this->testCreateKapitalOrder();
+        }
+
         $idempotencyKey = (string) Str::uuid();
 
         try {
@@ -259,6 +273,32 @@ class SettingsTestController
             return response()->json(['ok' => false, 'code' => $e->bankCode(), 'message' => $e->getMessage(), 'errors' => $e->errors()]);
         } catch (\Throwable $e) {
             return response()->json(['ok' => false, 'message' => substr($e->getMessage(), 0, 200)]);
+        }
+    }
+
+    /** One unpaid order at the bank: no card is entered and it expires by itself. */
+    private function testCreateKapitalOrder(): JsonResponse
+    {
+        try {
+            $order = $this->kapital->createOrder(
+                100,
+                $this->paymentSettings->currency(),
+                'Salam Sesame',
+                'Test connection (no charge)',
+                'az',
+                $this->paymentSettings->returnUrl(),
+            );
+            $this->audit->record('settings.payment_test_create', ['payment_id' => (string) $order['id'], 'status' => $order['status'] ?? null]);
+
+            return response()->json([
+                'ok' => true,
+                'payment_id' => (string) $order['id'],
+                'status' => $order['status'] ?? null,
+                'confirm_url' => KapitalEcomGateway::hostedPageUrl($order),
+                'has_confirm_url' => true,
+            ]);
+        } catch (KapitalEcomApiException $e) {
+            return response()->json(['ok' => false, 'code' => $e->bankCode(), 'message' => $e->getMessage()]);
         }
     }
 

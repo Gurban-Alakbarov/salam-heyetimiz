@@ -85,6 +85,8 @@ final class SettingsCatalog
             'payments' => [
                 'kapital_enabled' => ['type' => 'bool', 'default' => false, 'label' => 'Kapital Bank aktiv'],
                 'kapital_mode' => ['type' => 'select', 'default' => 'sandbox', 'label' => 'Rejim', 'options' => ['sandbox', 'production']],
+                'kapital_ecom_username' => ['type' => 'string', 'default' => '', 'label' => 'E-commerce login'],
+                'kapital_ecom_password' => ['type' => 'secret', 'default' => '', 'label' => 'E-commerce şifrə'],
                 'kapital_api_base_url' => ['type' => 'string', 'default' => '', 'label' => 'API Base URL (boş = rejimə görə)'],
                 'kapital_client_id' => ['type' => 'string', 'default' => '', 'label' => 'Client ID'],
                 'kapital_client_secret' => ['type' => 'secret', 'default' => '', 'label' => 'Client Secret'],
@@ -100,7 +102,7 @@ final class SettingsCatalog
                 'kapital_connect_timeout_seconds' => ['type' => 'int', 'default' => 5, 'label' => 'Connect timeout (san)'],
                 'kapital_retries' => ['type' => 'int', 'default' => 3, 'label' => 'Təkrar sayı'],
                 'kapital_callback_timeout_minutes' => ['type' => 'int', 'default' => 30, 'label' => 'Sifariş gözləmə (dəq)'],
-                'kapital_authorising_recheck_minutes' => ['type' => 'int', 'default' => 30, 'label' => 'Recheck pəncərəsi (dəq)'],
+                'kapital_authorising_recheck_minutes' => ['type' => 'int', 'default' => 3, 'label' => 'Recheck pəncərəsi (dəq)'],
                 'kapital_refund_window_days' => ['type' => 'int', 'default' => 365, 'label' => 'Refund pəncərəsi (gün)'],
                 'enable_logging' => ['type' => 'bool', 'default' => true, 'label' => 'Loqlama aktiv'],
                 'enable_webhook_logging' => ['type' => 'bool', 'default' => true, 'label' => 'Webhook loqlama aktiv'],

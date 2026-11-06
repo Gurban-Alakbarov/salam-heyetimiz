@@ -10,7 +10,7 @@ use App\Support\Time\Clock;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Hourly reconciliation (R-PAY-13; Tech Spec §14.4): resolve `authorising` orders that have gone
+ * Reconciliation every five minutes (R-PAY-13; Tech Spec §14.4): resolve `authorising` orders that have gone
  * quiet via getOrderStatus, then expire in-flight orders past their TTL.
  *
  * K2 — no captured payment is ever lost to the TTL: an order past its TTL is asked at the bank BEFORE it is

@@ -17,12 +17,39 @@ final class PaymentSettings
         'production' => 'https://api.birpay.az',
     ];
 
+    /** Kapital e-commerce API base URLs by mode (the only place these URLs live). */
+    private const ECOM_HOST = [
+        'sandbox' => 'https://txpgtst.kapitalbank.az/api',
+        'production' => 'https://e-commerce.kapitalbank.az/api',
+    ];
+
     public function __construct(private readonly SettingsService $settings) {}
 
     /** The documented BirPay API host for a mode (the single place these URLs are defined). */
     public static function hostForMode(string $mode): string
     {
         return self::HOST[$mode === 'production' ? 'production' : 'sandbox'];
+    }
+
+    /** The Kapital e-commerce API base URL for a mode. */
+    public static function ecomHostForMode(string $mode): string
+    {
+        return self::ECOM_HOST[$mode === 'production' ? 'production' : 'sandbox'];
+    }
+
+    public function ecomBaseUrl(): string
+    {
+        return self::ecomHostForMode($this->mode());
+    }
+
+    public function ecomUsername(): string
+    {
+        return trim((string) $this->settings->value('payments', 'kapital_ecom_username'));
+    }
+
+    public function ecomPassword(): string
+    {
+        return (string) $this->settings->value('payments', 'kapital_ecom_password');
     }
 
     public function enabled(): bool

@@ -18,8 +18,9 @@ $scheduleTimezone = config('app.schedule_timezone', 'Asia/Baku');
 */
 
 // Payments (batch 05)
+// The Kapital e-commerce API has no webhook: a customer who pays and closes the page is found here.
 Schedule::command('payments:reconcile-orders')
-    ->hourly()
+    ->everyFiveMinutes()
     ->withoutOverlapping()
     ->onOneServer();
 

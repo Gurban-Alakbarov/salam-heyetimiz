@@ -7,21 +7,16 @@ use App\Domain\Admin\Services\SettingsService;
 use App\Domain\Admin\Settings\RuntimeMailer;
 use App\Domain\Auth\Models\RefreshToken;
 use App\Domain\Audit\Services\AuditLogger;
-use App\Domain\Payments\Adapters\BirPay\BirPayClient;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomClient;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomGateway;
-use App\Domain\Payments\DTOs\BirPay\CreatePaymentData;
-use App\Domain\Payments\Exceptions\BirPayApiException;
 use App\Domain\Payments\Exceptions\KapitalEcomApiException;
 use App\Domain\Payments\Services\PaymentSettingsValidator;
-use App\Domain\Payments\Support\PaymentGatewayMode;
 use App\Domain\Payments\Support\PaymentSettings;
 use App\Http\Concerns\AuthorizesAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 
 /**
  * Settings operational actions (system.settings.manage): connection tests, real test email/OTP sends, live
@@ -37,7 +32,6 @@ class SettingsTestController
         private readonly AuditLogger $audit,
         private readonly PaymentSettingsValidator $paymentValidator,
         private readonly PaymentSettings $paymentSettings,
-        private readonly BirPayClient $birpay,
         private readonly KapitalEcomClient $kapital,
     ) {}
 
@@ -211,74 +205,23 @@ class SettingsTestController
     }
 
     /**
-     * Real payments Test Connection: acquire an OAuth token + verify authenticated reachability. Never creates
-     * a payment, never charges a card. Returns full diagnostics for the admin status panel.
+     * Real payments Test Connection: checks the login at the bank. Never creates a payment, never charges a card.
+     * Returns full diagnostics for the admin status panel.
      *
      * @return array<string, mixed>
      */
     private function testPayments(): array
     {
         $d = $this->paymentValidator->diagnose($this->settings->group('payments'));
-        if ($d['provider'] === PaymentGatewayMode::KAPITAL) {
-            return array_merge($d, ['message' => $d['ok'] ? 'Bank bağlantısı OK.' : 'Giriş uğursuz: '.$d['oauth']['message']]);
-        }
 
-        $message = $d['oauth']['ok']
-            ? ($d['authenticated']['ok']
-                ? 'OAuth + autentifikasiya OK (token '.$d['oauth']['expires_in'].'s).'
-                : 'OAuth OK, autentifikasiya: '.$d['authenticated']['message'])
-            : ('OAuth uğursuz: '.$d['oauth']['message']);
-
-        return array_merge($d, ['message' => $message]);
+        return array_merge($d, ['message' => $d['ok'] ? 'Bank bağlantısı OK.' : 'Giriş uğursuz: '.$d['login']['message']]);
     }
 
-    /**
-     * POST /admin/v1/settings/payments/test-create — adminTestCreatePayment. Creates ONE test payment to
-     * verify the create-payment wiring returns a confirmUrl. No card is entered, nothing is charged; the
-     * pending payment auto-expires. For sandbox verification only.
-     */
+    /** POST /admin/v1/settings/payments/test-create — one unpaid order at the bank: no card is entered, it expires by itself. */
     public function testCreatePayment(Request $request): JsonResponse
     {
         $this->requirePermission($request, Permission::SYSTEM_SETTINGS_MANAGE);
 
-        if ($this->paymentValidator->usesKapitalEcom($this->settings->group('payments'))) {
-            return $this->testCreateKapitalOrder();
-        }
-
-        $idempotencyKey = (string) Str::uuid();
-
-        try {
-            $payment = $this->birpay->createPayment(new CreatePaymentData(
-                amountMinor: 100, // 1.00 — no card entered, auto-expires, no charge
-                currency: $this->paymentSettings->currency(),
-                capture: true,
-                description: 'Test connection (no charge)',
-                paymentMethodType: '', // omit → hosted REDIRECT page
-                confirmationType: 'REDIRECT',
-                returnUrl: $this->paymentSettings->returnUrl(),
-                metadata: ['orderNo' => 'TEST-'.substr($idempotencyKey, 0, 8)],
-                posDetail: $this->paymentSettings->posDetail(),
-            ), $idempotencyKey);
-
-            $this->audit->record('settings.payment_test_create', ['payment_id' => $payment->id, 'status' => $payment->status]);
-
-            return response()->json([
-                'ok' => ($payment->confirmUrl ?? '') !== '',
-                'payment_id' => $payment->id,
-                'status' => $payment->status,
-                'confirm_url' => $payment->confirmUrl,
-                'has_confirm_url' => ($payment->confirmUrl ?? '') !== '',
-            ]);
-        } catch (BirPayApiException $e) {
-            return response()->json(['ok' => false, 'code' => $e->bankCode(), 'message' => $e->getMessage(), 'errors' => $e->errors()]);
-        } catch (\Throwable $e) {
-            return response()->json(['ok' => false, 'message' => substr($e->getMessage(), 0, 200)]);
-        }
-    }
-
-    /** One unpaid order at the bank: no card is entered and it expires by itself. */
-    private function testCreateKapitalOrder(): JsonResponse
-    {
         try {
             $order = $this->kapital->createOrder(
                 100,

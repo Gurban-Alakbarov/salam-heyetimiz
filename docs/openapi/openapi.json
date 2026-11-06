@@ -137,11 +137,11 @@
     },
     {
       "name": "Admin / Payment Logs",
-      "description": "Outbound BirPay calls + inbound webhooks + statistics"
+      "description": "Outbound bank calls + statistics"
     },
     {
       "name": "Kapital Bank",
-      "description": "BirPay (Kapital) payment integration — create, redirect, webhook, refund, sync"
+      "description": "Kapital e-commerce payment integration — create, redirect, webhook, refund, sync"
     },
     {
       "name": "Traccar",
@@ -6569,7 +6569,7 @@
         "tags": [
           "Admin / Payment Logs"
         ],
-        "summary": "BirPay outbound calls + inbound webhooks (decrypted, masked)",
+        "summary": "Outbound bank calls (decrypted, masked)",
         "operationId": "adminListPaymentLogs",
         "security": [
           {
@@ -7707,57 +7707,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
-    "/v1/payments/webhook": {
-      "post": {
-        "tags": [
-          "Kapital Bank",
-          "Webhooks"
-        ],
-        "summary": "Inbound BirPay (Kapital) payment webhook",
-        "operationId": "birpayWebhook",
-        "security": [],
-        "description": "Inbound, **signature-authenticated** (no JWT). `X-Signature` = Base64(HMAC-SHA256(rawBody, sharedSecret))\nwith the secret from Settings (`payments.webhook_secret`). Invalid/duplicate signatures are rejected.\nThe webhook is treated as a *hint*: `getOrderStatus` is the authoritative source of truth. Idempotent.\nEvents: `payment_succeeded`, `payment_canceled`.\n",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "X-Signature",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Base64 HMAC-SHA256 of the raw request body."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BirPayWebhookEvent"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Accepted (idempotent)"
-          },
-          "401": {
-            "description": "Invalid or missing signature",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "$ref": "#/components/responses/ValidationError"
           }
         }
       }
@@ -13086,7 +13035,7 @@
         "tags": [
           "Orders & Payments"
         ],
-        "summary": "Simulated BirPay hosted payment page (HTML)",
+        "summary": "Simulated hosted payment page (HTML)",
         "operationId": "fakeCheckout",
         "security": [],
         "description": "Exists **only while the fake gateway is active** (otherwise **404**). Reached via the signed, expiring\n`bank_redirect_url` of a test order (`is_test=true`) — never call it by hand. Renders a \"TEST ÖDƏNİŞ\" page\nwhose buttons POST to the signed action URLs. Missing / invalid / expired signature → **403**.\n",
@@ -17847,36 +17796,6 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          }
-        }
-      },
-      "BirPayWebhookEvent": {
-        "type": "object",
-        "properties": {
-          "event": {
-            "type": "string",
-            "enum": [
-              "payment_succeeded",
-              "payment_canceled"
-            ],
-            "example": "payment_succeeded"
-          },
-          "paymentId": {
-            "type": "string",
-            "example": "0eb9510b-f8cd-48e1-9d35-8c609398253b"
-          },
-          "status": {
-            "type": "string",
-            "example": "PAID"
-          },
-          "metadata": {
-            "type": "object",
-            "properties": {
-              "orderNo": {
-                "type": "string",
-                "example": "SH-E2E-001"
-              }
-            }
           }
         }
       },

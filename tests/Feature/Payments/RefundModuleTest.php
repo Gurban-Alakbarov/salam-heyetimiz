@@ -71,7 +71,7 @@ it('enforces RBAC: finance can refund, operator/support cannot (backend)', funct
     expect($order2->refresh()->status)->toBe(OrderStatus::Paid);
 });
 
-it('maps a BirPay refund failure to a failed refund (order unchanged) + audit', function () {
+it('maps a bank refund failure to a failed refund (order unchanged) + audit', function () {
     $order = makePaidOrder(makeUser(), 1000, 'bp-fail');
     app(FakeKapitalGateway::class)->willDeclineRefund();
 

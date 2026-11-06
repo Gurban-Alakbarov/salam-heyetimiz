@@ -5,7 +5,6 @@ namespace App\Http\Resources;
 use App\Domain\Payments\Enums\PaymentType;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Models\Payment;
-use App\Domain\Payments\Support\PaymentSettings;
 use Illuminate\Http\Request;
 
 /**
@@ -44,22 +43,17 @@ class OrderDetailResource extends OrderResource
      */
     private function paymentDetail(Order $order): array
     {
-        $settings = app(PaymentSettings::class);
         /** @var Payment|null $charge */
         $charge = $order->payments->where('type', PaymentType::Charge)->sortByDesc('id')->first();
         $lastCallback = $order->callbacks->sortByDesc('id')->first();
 
         return [
-            'merchant_name' => $settings->merchantName(),
-            'merchant_id' => $settings->merchantId(),
-            'terminal_id' => $settings->terminalId(),
             'payment_method' => $charge?->card_brand ?? 'BANK_CARD',
             'card_last4' => $charge?->card_last4,
             'approval_code' => $charge?->approval_code,
             'rrn' => $charge?->bank_transaction_id,
             'bank_transaction_id' => $charge?->bank_transaction_id,
             'bank_order_id' => $order->bank_order_id,
-            'idempotency_key' => $order->bank_idempotency_key,
             'webhook_status' => $lastCallback !== null ? $lastCallback->bank_status.' / '.$lastCallback->outcome->value : null,
             'last_sync_at' => optional($order->updated_at)->toIso8601String(),
         ];
@@ -74,7 +68,7 @@ class OrderDetailResource extends OrderResource
         $e[] = $this->entry($order->created_at, 'order_created', 'Sifariş yaradıldı', $order->reference, 'customer', 'app', 'created', 'blue');
 
         if ($order->bank_order_id !== null) {
-            $e[] = $this->entry($order->created_at, 'checkout_opened', 'Checkout açıldı', $order->bank_order_id, 'system', 'birpay', 'authorising', 'indigo');
+            $e[] = $this->entry($order->created_at, 'checkout_opened', 'Checkout açıldı', $order->bank_order_id, 'system', 'bank', 'authorising', 'indigo');
         }
         foreach ($order->callbacks as $cb) {
             $e[] = $this->entry($cb->created_at, 'webhook_received', 'Webhook alındı', $cb->bank_status, 'bank', 'webhook', $cb->outcome->value, 'purple');
@@ -84,21 +78,21 @@ class OrderDetailResource extends OrderResource
             $e[] = $this->entry(
                 $p->occurred_at, $isRefund ? 'payment_refund' : 'payment_charge',
                 $isRefund ? 'Geri qaytarma əməliyyatı' : 'Ödəniş təsdiqləndi',
-                $p->bank_transaction_id, 'bank', 'birpay', $p->status->value, $isRefund ? 'amber' : 'green',
+                $p->bank_transaction_id, 'bank', 'bank', $p->status->value, $isRefund ? 'amber' : 'green',
             );
         }
         if ($order->paid_at !== null) {
-            $e[] = $this->entry($order->paid_at, 'paid', 'Ödəniş tamamlandı', null, 'system', 'birpay', 'paid', 'green');
+            $e[] = $this->entry($order->paid_at, 'paid', 'Ödəniş tamamlandı', null, 'system', 'bank', 'paid', 'green');
         }
         if ($order->failed_at !== null) {
-            $e[] = $this->entry($order->failed_at, $order->status->value, 'Sifariş bağlandı', $order->failed_reason, 'system', 'birpay', $order->status->value, 'red');
+            $e[] = $this->entry($order->failed_at, $order->status->value, 'Sifariş bağlandı', $order->failed_reason, 'system', 'bank', $order->status->value, 'red');
         }
         foreach ($order->refunds as $r) {
             $e[] = $this->entry($r->created_at, 'refund_requested', 'Geri qaytarma sorğusu', number_format($r->amount_minor / 100, 2), 'admin', 'admin', $r->status->value, 'amber');
             if ($r->completed_at !== null) {
-                $e[] = $this->entry($r->completed_at, 'refund_completed', 'Geri qaytarma tamamlandı', $r->bank_refund_id, 'system', 'birpay', 'approved', 'green');
+                $e[] = $this->entry($r->completed_at, 'refund_completed', 'Geri qaytarma tamamlandı', $r->bank_refund_id, 'system', 'bank', 'approved', 'green');
             } elseif ($r->status->value === 'failed') {
-                $e[] = $this->entry($r->created_at, 'refund_failed', 'Geri qaytarma uğursuz', $r->error_message, 'system', 'birpay', 'failed', 'red');
+                $e[] = $this->entry($r->created_at, 'refund_failed', 'Geri qaytarma uğursuz', $r->error_message, 'system', 'bank', 'failed', 'red');
             }
         }
 

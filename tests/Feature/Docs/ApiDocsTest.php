@@ -14,7 +14,7 @@ it('serves the merged OpenAPI 3.1 spec as JSON', function () {
         ->and($spec['info']['version'])->toBe('1.3.0')
         ->and($spec['servers'][0]['url'])->toBe('https://api.sezam.salam.az');
 
-    // Real endpoints (mobile + admin + webhook + new) are all present and absolutely pathed.
+    // Real endpoints (mobile + admin + new) are all present and absolutely pathed.
     expect($spec['paths'])->toHaveKeys([
         '/v1/auth/otp/request',
         '/v1/auth/refresh',
@@ -28,7 +28,6 @@ it('serves the merged OpenAPI 3.1 spec as JSON', function () {
         '/admin/v1/complexes',
         '/admin/v1/residents',
         '/admin/v1/system/health',
-        '/v1/payments/webhook',
         '/v1/traccar/forward',
     ]);
 });

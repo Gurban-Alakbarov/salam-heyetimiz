@@ -49,16 +49,12 @@ interface OrderTimelineEntry {
   color?: string
 }
 interface PaymentDetail {
-  merchant_name?: string | null
-  merchant_id?: string | null
-  terminal_id?: string | null
   payment_method?: string | null
   card_last4?: string | null
   approval_code?: string | null
   rrn?: string | null
   bank_transaction_id?: string | null
   bank_order_id?: string | null
-  idempotency_key?: string | null
   webhook_status?: string | null
   last_sync_at?: string | null
 }
@@ -106,7 +102,7 @@ function Cell({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 const ACTOR_LABEL: Record<string, string> = { system: 'Sistem', admin: 'Admin', customer: 'Müştəri', bank: 'Bank' }
-const SOURCE_LABEL: Record<string, string> = { app: 'Tətbiq', birpay: 'Bank', webhook: 'Webhook', admin: 'Admin' }
+const SOURCE_LABEL: Record<string, string> = { app: 'Tətbiq', bank: 'Bank', webhook: 'Webhook', admin: 'Admin' }
 const DOT_COLOR: Record<string, string> = {
   blue: 'bg-blue-500', indigo: 'bg-indigo-500', purple: 'bg-purple-500',
   green: 'bg-emerald-500', amber: 'bg-amber-500', red: 'bg-red-500',
@@ -119,16 +115,12 @@ function PaymentInfo({ order }: { order: OrderDetailExtra }) {
     <Card>
       <CardHeader className="pb-2"><CardTitle className="text-base">Ödəniş məlumatı</CardTitle></CardHeader>
       <CardContent className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3">
-        <Cell label="Satıcı (bankda)" value={d.merchant_name ?? d.merchant_id} />
-        <Cell label="Satıcı ID" value={d.merchant_id ? <code className="text-xs">{d.merchant_id}</code> : null} />
-        <Cell label="Terminal ID" value={d.terminal_id ? <code className="text-xs">{d.terminal_id}</code> : null} />
         <Cell label="Ödəniş üsulu" value={d.payment_method ? `${d.payment_method}${d.card_last4 ? ' ••' + d.card_last4 : ''}` : null} />
         <Cell label="Təsdiq kodu (Approval)" value={d.approval_code} />
         <Cell label="Bank əməliyyat nömrəsi (RRN)" value={d.rrn ? <code className="text-xs">{d.rrn}</code> : null} />
         <Cell label="Bank tranzaksiya ID" value={d.bank_transaction_id ? <code className="text-xs">{d.bank_transaction_id}</code> : null} />
         <Cell label="Bankın cavabı" value={d.webhook_status} />
         <Cell label="Bankla son yoxlama" value={formatDateTime(d.last_sync_at ?? null)} />
-        <Cell label="Texniki açar (idempotency)" value={d.idempotency_key ? <code className="break-all text-xs">{d.idempotency_key}</code> : null} />
       </CardContent>
     </Card>
   )

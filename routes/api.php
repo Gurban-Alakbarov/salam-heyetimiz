@@ -42,7 +42,7 @@ Route::get('health/ready', [HealthController::class, 'ready'])->name('getHealthR
 // Guest app bootstrap (one-shot config for a logged-out client) — public, rate-limited.
 Route::get('bootstrap', [BootstrapController::class, 'guest'])->middleware('throttle:public')->name('guestBootstrap');
 
-// Payment return (browser redirect-back from the BirPay hosted page) — public; verifies via getOrderStatus.
+// Payment return (browser redirect-back from the hosted page) — public; verifies via getOrderStatus.
 Route::get('payments/return', PaymentReturnController::class)->name('paymentReturn');
 
 // Simulated hosted payment page ("TEST ÖDƏNİŞ") — only while the fake gateway is active (404 otherwise);

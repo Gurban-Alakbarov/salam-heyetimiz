@@ -30,11 +30,11 @@ it('records a rich audit entry (old→new + ip) and a version snapshot on update
 it('redacts secrets in the audit diff', function () {
     seedRbac();
     $this->actingAs(makeSuperAdmin(), 'admin')
-        ->patchJson('/admin/v1/settings/payments', ['kapital_client_secret' => 'sk_SECRET'])
+        ->patchJson('/admin/v1/settings/payments', ['kapital_ecom_password' => 'sk_SECRET'])
         ->assertOk();
 
     $log = AuditLog::query()->where('action', 'settings.updated')->latest('id')->first();
-    $change = collect($log->payload['changes'])->firstWhere('key', 'kapital_client_secret');
+    $change = collect($log->payload['changes'])->firstWhere('key', 'kapital_ecom_password');
     expect($change['new'])->not->toContain('sk_SECRET')->and($change['old'])->toBe('••••••');
 });
 

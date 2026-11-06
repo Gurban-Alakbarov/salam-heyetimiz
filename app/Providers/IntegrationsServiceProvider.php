@@ -14,7 +14,6 @@ use App\Domain\DeviceComm\Adapters\HttpDeviceSmsGateway;
 use App\Domain\DeviceComm\Adapters\HttpTraccarClient;
 use App\Domain\DeviceComm\Contracts\DeviceSmsGateway;
 use App\Domain\DeviceComm\Contracts\TraccarClient;
-use App\Domain\Payments\Adapters\BirPay\BirPayGateway;
 use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomGateway;
 use App\Domain\Payments\Adapters\PaymentGateway;
@@ -37,8 +36,7 @@ class IntegrationsServiceProvider extends ServiceProvider
         //  - testing  → in-memory FakeKapitalGateway singleton (tests drive the bank; default APPROVED)
         //  - fake     → FakeKapitalGateway simulated hosted checkout (default PENDING; flags required)
         //  - disabled → fake requested but not permitted: always-unavailable (never the real bank)
-        //  - kapital  → real Kapital e-commerce gateway
-        //  - birpay   → real BirPay gateway (default; unchanged behaviour)
+        //  - kapital  → real Kapital e-commerce gateway (default)
         $mode = PaymentGatewayMode::current();
         if ($this->app->environment('testing')) {
             $this->app->singleton(FakeKapitalGateway::class);
@@ -48,10 +46,8 @@ class IntegrationsServiceProvider extends ServiceProvider
             $this->app->alias(FakeKapitalGateway::class, PaymentGateway::class);
         } elseif ($mode === PaymentGatewayMode::DISABLED) {
             $this->app->singleton(PaymentGateway::class, UnavailablePaymentGateway::class);
-        } elseif ($mode === PaymentGatewayMode::KAPITAL) {
-            $this->app->singleton(PaymentGateway::class, KapitalEcomGateway::class);
         } else {
-            $this->app->singleton(PaymentGateway::class, BirPayGateway::class);
+            $this->app->singleton(PaymentGateway::class, KapitalEcomGateway::class);
         }
 
         // OTP transport (R-ARCH-08): the in-memory fake in testing / when SMS_PROVIDER=fake;

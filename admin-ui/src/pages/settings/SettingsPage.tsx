@@ -220,9 +220,9 @@ function PaymentsStatus() {
     onError: (err) => toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
   })
   const testCreate = () => {
-    if (!window.confirm('Test ödəniş yaradılsın? Kart daxil edilmir, heç nə tutulmur (sandbox, avto-bitir) — yalnız confirmUrl yoxlanır.')) return
+    if (!window.confirm('Test sifarişi yaradılsın? Kart daxil edilmir, heç nə tutulmur, sifariş özü bitir — yalnız ödəniş səhifəsinin açılması yoxlanır.')) return
     create.mutate(undefined, {
-      onSuccess: (r) => toast({ variant: r.ok ? 'success' : 'destructive', title: r.ok ? 'confirmUrl alındı' : 'Uğursuz', description: r.confirm_url ?? r.message }),
+      onSuccess: (r) => toast({ variant: r.ok ? 'success' : 'destructive', title: r.ok ? 'Ödəniş səhifəsi yaradıldı' : 'Uğursuz', description: r.confirm_url ?? r.message }),
       onError: (err) => toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
     })
   }
@@ -235,24 +235,21 @@ function PaymentsStatus() {
           {diag.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlugZap className="mr-2 h-4 w-4" />}Vəziyyəti yoxla
         </Button>
         <Button variant="outline" size="sm" onClick={testCreate} disabled={create.isPending || !d?.ok}>
-          {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}Test ödəniş (confirmUrl)
+          {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}Test sifarişi
         </Button>
       </div>
 
       {d && (
         <div className="grid gap-2 sm:grid-cols-2">
-          <Indicator ok={d.oauth.ok} label={d.provider === 'kapital' ? 'Login' : 'OAuth token'} value={d.oauth.ok && d.provider !== 'kapital' ? `${d.oauth.expires_in}s` : d.oauth.message} />
-          <Indicator ok={d.authenticated.ok} label="Autentifikasiya" value={d.authenticated.message} />
-          <Indicator ok={d.ok} label="Bağlantı" value={d.ok ? 'OK' : '—'} />
-          <Indicator ok={d.merchant_id !== ''} label={d.provider === 'kapital' ? 'Hesab' : 'Merchant'} value={d.merchant_id || '—'} />
-          <Indicator ok={null} label="Terminal" value={d.terminal_id || '—'} />
+          <Indicator ok={d.login.ok} label="Bank girişi" value={d.login.ok ? 'OK' : d.login.message} />
+          <Indicator ok={d.username !== ''} label="Login" value={d.username || '—'} />
           <Indicator ok={null} label="Rejim" value={d.mode} />
           <Indicator ok={null} label="API host" value={d.host.replace('https://', '')} />
         </div>
       )}
       {create.data?.confirm_url && (
         <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Son test confirmUrl (yalnız oxu — açmayın)</Label>
+          <Label className="text-xs text-muted-foreground">Son test ödəniş səhifəsi (yalnız oxu)</Label>
           <Input value={create.data.confirm_url} readOnly className="bg-muted font-mono text-xs" />
         </div>
       )}

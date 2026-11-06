@@ -141,14 +141,6 @@ function makePaidOrder(User $payer, int $amountMinor = 1200, string $bankOrderId
     return $order;
 }
 
-/** Sign a raw webhook body with the BirPay X-Signature scheme (Base64 HMAC-SHA256) using the Settings secret. */
-function signBirPay(string $rawBody): string
-{
-    $secret = (string) app(\App\Domain\Admin\Services\SettingsService::class)->value('payments', 'kapital_webhook_secret');
-
-    return base64_encode(hash_hmac('sha256', $rawBody, $secret, true));
-}
-
 /** Mint a real mobile access token (fp = install_uuid) for guard/end-to-end auth tests. */
 function userAccessToken(User $user, string $installUuid = TEST_INSTALL_UUID): string
 {

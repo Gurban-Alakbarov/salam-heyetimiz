@@ -17,10 +17,10 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
 
 /**
- * Simulated BirPay hosted payment page — "TEST ÖDƏNİŞ" (IMPLEMENTATION_PLAN B1 / BR-16). Reachable only
+ * Simulated hosted payment page — "TEST ÖDƏNİŞ" (IMPLEMENTATION_PLAN B1 / BR-16). Reachable only
  * through a signed link minted by FakeKapitalGateway::registerOrder and only while the fake gateway is
  * active (404 otherwise). The customer's choice is persisted as the simulated bank status and then fed
- * through the SAME callback pipeline a BirPay webhook uses (PaymentCallbackService::receive →
+ * through the SAME callback pipeline a bank callback uses (PaymentCallbackService::receive →
  * HandlePaymentCallbackReceived → getOrderStatus verify) before redirecting to the existing
  * /v1/payments/return page — so no business logic is fake-specific.
  */
@@ -74,7 +74,7 @@ class FakeCheckoutController
 
         $this->gateway()->simulate($bankOrderId, $status, (int) $order->amount_minor);
 
-        // Same shape + pipeline as the BirPay webhook (signature check is the only step a fake skips;
+        // Same shape + pipeline as a bank callback (signature check is the only step a fake skips;
         // the authoritative getOrderStatus re-check still decides the order state — R-PAY-04).
         $raw = (string) json_encode(['event' => 'fake.checkout', 'payload' => ['id' => $bankOrderId, 'status' => $status->value]]);
         $callback = $callbacks->receive(

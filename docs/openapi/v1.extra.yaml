@@ -25,9 +25,9 @@ tags:
   - name: Admin / System
     description: Live system health
   - name: Admin / Payment Logs
-    description: Outbound BirPay calls + inbound webhooks + statistics
+    description: Outbound bank calls + statistics
   - name: Kapital Bank
-    description: BirPay (Kapital) payment integration — create, redirect, webhook, refund, sync
+    description: Kapital e-commerce payment integration — create, redirect, webhook, refund, sync
   - name: Traccar
     description: Traccar telemetry forward + integration status
   - name: Auth / Registration
@@ -619,7 +619,7 @@ paths:
   /admin/payment-logs:
     get:
       tags: [Admin / Payment Logs]
-      summary: BirPay outbound calls + inbound webhooks (decrypted, masked)
+      summary: Outbound bank calls (decrypted, masked)
       operationId: adminListPaymentLogs
       security: [{ adminBearerAuth: [] }]
       description: Requires `orders.view`. Request/response bodies are stored encrypted + allowlisted, decrypted server-side for display.
@@ -1091,36 +1091,7 @@ paths:
         '200': { description: Verified — redirect / status page }
         '404': { $ref: '#/components/responses/NotFound' }
 
-  /payments/webhook:
-    post:
-      tags: [Kapital Bank, Webhooks]
-      summary: Inbound BirPay (Kapital) payment webhook
-      operationId: birpayWebhook
-      security: []
-      description: |
-        Inbound, **signature-authenticated** (no JWT). `X-Signature` = Base64(HMAC-SHA256(rawBody, sharedSecret))
-        with the secret from Settings (`payments.webhook_secret`). Invalid/duplicate signatures are rejected.
-        The webhook is treated as a *hint*: `getOrderStatus` is the authoritative source of truth. Idempotent.
-        Events: `payment_succeeded`, `payment_canceled`.
-      parameters:
-        - in: header
-          name: X-Signature
-          required: true
-          schema: { type: string }
-          description: Base64 HMAC-SHA256 of the raw request body.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/BirPayWebhookEvent' }
-      responses:
-        '200': { description: Accepted (idempotent) }
-        '401': { description: Invalid or missing signature, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
-        '422': { $ref: '#/components/responses/ValidationError' }
 
-  # ===========================================================================
-  # Traccar — telemetry event-forward
-  # ===========================================================================
   /traccar/forward:
     post:
       tags: [Traccar, Webhooks]
@@ -3297,7 +3268,7 @@ paths:
   /payments/fake-checkout/{reference}:
     get:
       tags: [Orders & Payments]
-      summary: Simulated BirPay hosted payment page (HTML)
+      summary: Simulated hosted payment page (HTML)
       operationId: fakeCheckout
       security: []
       description: |
@@ -3709,16 +3680,6 @@ components:
         last_ack_at: { type: string, format: date-time, nullable: true }
         last_sync_at: { type: string, format: date-time, nullable: true }
 
-    BirPayWebhookEvent:
-      type: object
-      properties:
-        event: { type: string, enum: [payment_succeeded, payment_canceled], example: payment_succeeded }
-        paymentId: { type: string, example: '0eb9510b-f8cd-48e1-9d35-8c609398253b' }
-        status: { type: string, example: PAID }
-        metadata:
-          type: object
-          properties:
-            orderNo: { type: string, example: SH-E2E-001 }
 
     TraccarForwardPayload:
       type: object

@@ -8,10 +8,8 @@ use App\Domain\Payments\DTOs\GatewayStatusResult;
 use App\Domain\Payments\Models\Order;
 
 /**
- * Payment provider boundary (R-ARCH-08; BACKEND §14.8). Impls: KapitalEcom\KapitalEcomGateway (the bank's
- * e-commerce API, hosted page) and BirPay\BirPayGateway (BirPay/Kapital Checkout V1.3, hosted page). Test impl:
- * FakeKapitalGateway. Transport failures throw PaymentProviderUnavailableException; BirPay API errors throw
- * BirPayApiException.
+ * Payment provider boundary (R-ARCH-08; BACKEND §14.8). Impl: KapitalEcom\KapitalEcomGateway (the bank's e-commerce
+ * API, hosted page). Test impl: FakeKapitalGateway. Bank failures throw PaymentProviderUnavailableException.
  */
 interface PaymentGateway
 {

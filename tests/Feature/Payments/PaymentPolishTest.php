@@ -32,7 +32,7 @@ it('enriches order detail with payment_detail + professional timeline + balances
         ->assertOk()
         ->assertJsonStructure([
             'bank_order_id', 'captured_minor', 'refunded_minor', 'refundable_minor',
-            'payment_detail' => ['merchant_id', 'terminal_id', 'bank_order_id', 'idempotency_key', 'webhook_status', 'last_sync_at', 'rrn', 'approval_code'],
+            'payment_detail' => ['bank_order_id', 'webhook_status', 'last_sync_at', 'rrn', 'approval_code'],
             'timeline' => [['at', 'event', 'description', 'actor', 'source', 'status', 'color']],
         ])->json();
 

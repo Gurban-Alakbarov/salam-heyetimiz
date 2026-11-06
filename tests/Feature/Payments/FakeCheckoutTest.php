@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\URL;
 /*
 | IMPLEMENTATION_PLAN B1 — simulated hosted checkout ("TEST ÖDƏNİŞ"). The order goes through the real
 | OrderService → FakeKapitalGateway::registerOrder → signed checkout page → simulated bank outcome →
-| the SAME callback pipeline as the BirPay webhook → authoritative getOrderStatus → existing return page.
+| the SAME callback pipeline as a bank callback → authoritative getOrderStatus → existing return page.
 | Runtime fake mode defaults to PENDING (nothing is paid until simulated); mirrored here.
 */
 

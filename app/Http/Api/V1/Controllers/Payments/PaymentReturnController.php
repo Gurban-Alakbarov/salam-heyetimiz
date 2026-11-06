@@ -11,7 +11,7 @@ use Illuminate\Http\Response;
 
 /**
  * GET /v1/payments/return — paymentReturn. Where the bank redirects the customer's browser after the hosted page
- * (BirPay sends `paymentId`, the Kapital e-commerce API sends `ID` and a temporary `STATUS`).
+ * (it sends `ID` and a temporary `STATUS`; the simulated checkout sends `paymentId`).
  * Query params are NOT trusted: the id is used only to locate our order; the authoritative status comes
  * from getOrderStatus (R-PAY-04). Renders a result page and deep-links back into the app.
  */

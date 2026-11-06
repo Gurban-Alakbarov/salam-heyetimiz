@@ -49,7 +49,6 @@ class SettingsController
             'groups' => $groups,
             'readonly' => [
                 'payments' => [
-                    'webhook_url' => url('/v1/payments/webhook'),
                     'return_url' => url('/v1/payments/return'),
                 ],
                 'traccar' => [
@@ -75,7 +74,7 @@ class SettingsController
             ], 422);
         }
 
-        // Payments: when the gateway is being enabled, validate (format + live OAuth) BEFORE persisting.
+        // Payments: when the gateway is being enabled, validate (format + live login) BEFORE persisting.
         // On failure nothing is saved and the exact upstream reason is returned (never a generic error).
         if ($group === 'payments') {
             $effective = $this->effectivePayments($input);

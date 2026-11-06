@@ -13,7 +13,6 @@ use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Models\PaymentLog;
 use App\Domain\Payments\Services\OrderReconciler;
 use App\Domain\Payments\Services\PaymentSettingsValidator;
-use App\Domain\Payments\Support\PaymentGatewayMode;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -320,13 +319,13 @@ it('accepts a login the bank knows and shows the exact reason otherwise', functi
     expect(fn () => $validator->validate($settings))->toThrow(PaymentSettingsInvalidException::class, 'InvalidLogin');
 });
 
-it('reports the e-commerce provider in the diagnostics without creating anything', function () {
+it('reports the login check in the diagnostics without creating anything', function () {
     Http::fake(['*/order/999999999' => Http::response(['errorCode' => 'ServiceError', 'errorDescription' => 'no order found'], 404)]);
 
     $d = app(PaymentSettingsValidator::class)->diagnose(['kapital_ecom_username' => 'merchant/login', 'kapital_ecom_password' => 'pw']);
 
     expect($d['ok'])->toBeTrue()
-        ->and($d['provider'])->toBe(PaymentGatewayMode::KAPITAL)
+        ->and($d['username'])->toBe('merchant/login')
         ->and($d['host'])->toBe(KAPITAL_HOST);
     Http::assertNotSent(fn (Request $r) => $r->method() === 'POST');
 });

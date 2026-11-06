@@ -30,13 +30,13 @@ return [
     'always_verify_with_get_order_status' => true,
 
     /*
-    | Gateway selection (IMPLEMENTATION_PLAN B1 / BR-16). `birpay` (default) keeps the real BirPay gateway.
+    | Gateway selection (IMPLEMENTATION_PLAN B1 / BR-16). `kapital` (default) is the bank's e-commerce gateway.
     | `fake` serves the simulated hosted checkout ("TEST ÖDƏNİŞ") through the SAME order → callback →
     | getOrderStatus → return pipeline, and only when `fake_enabled` is on — plus, in production,
     | `allow_fake_in_production`. A requested-but-not-permitted fake binds an always-unavailable gateway,
     | so a misconfiguration can never fall through to a real bank request. `testing` is always fake.
     */
-    'gateway' => env('PAYMENT_GATEWAY', 'birpay'),
+    'gateway' => env('PAYMENT_GATEWAY', 'kapital'),
     'fake_enabled' => (bool) env('PAYMENT_FAKE_ENABLED', false),
     'allow_fake_in_production' => (bool) env('PAYMENT_ALLOW_FAKE_IN_PRODUCTION', false),
     // Lifetime of the signed fake-checkout links.

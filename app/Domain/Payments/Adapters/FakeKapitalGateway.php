@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
  *  - **Simulated hosted checkout** (PAYMENT_GATEWAY=fake + feature flags): registerOrder returns a signed
  *    "TEST ÖDƏNİŞ" checkout URL instead of the bank page; the customer's choice there is persisted via
  *    simulate() and read back by getOrderStatus — so the order → callback → getOrderStatus → return
- *    pipeline runs exactly as with BirPay. Default status PENDING (nothing is paid until simulated).
+ *    pipeline runs exactly as with the bank. Default status PENDING (nothing is paid until simulated).
  *
  * Never performs a network request. Fake bank order ids carry BANK_ORDER_PREFIX so orders can be
  * recognised as test payments (OrderResource.is_test, return-page banner).
@@ -133,7 +133,7 @@ final class FakeKapitalGateway implements PaymentGateway
 
         return new GatewayRefundResult(
             approved: $this->refundApproved,
-            // unique per refund (mirrors the real BirPay refund id), keyed off the idempotency key
+            // unique per refund (mirrors the real bank refund id), keyed off the idempotency key
             bankTransactionId: $this->refundApproved ? 'RFND-'.$idempotencyKey : null,
             failureReason: $this->refundApproved ? null : 'refund_declined',
             raw: ['status' => $this->refundApproved ? 'REFUNDED' : 'DECLINED', 'test' => true],

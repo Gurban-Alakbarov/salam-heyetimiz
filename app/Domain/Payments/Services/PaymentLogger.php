@@ -20,7 +20,7 @@ final class PaymentLogger
         'orderId', 'id', 'reference', 'status', 'amount', 'currency',
         'rrn', 'approvalCode', 'pan', 'cardBrand', 'redirectUrl', 'paymentUrl',
         'transactionId', 'bankTransactionId', 'message', 'code',
-        // BirPay V1.3 payment/refund object (none carry PAN/CVV)
+        // earlier BirPay rows, kept readable (none carry PAN/CVV)
         'type', 'paid', 'captured', 'settled', 'refunded', 'description', 'createdAt', 'expiresAt',
         'confirmation', 'confirmUrl', 'confirmData', 'returnUrl', 'paymentMethod', 'paymentMethodData',
         'authorizationDetail', 'threeDsSecure', 'cancelationReason', 'cancellationReason', 'cancelationParty',

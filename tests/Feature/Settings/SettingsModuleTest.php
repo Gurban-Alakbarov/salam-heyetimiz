@@ -33,17 +33,17 @@ it('encrypts secrets, masks them on read, and keeps them on a blank update', fun
     $super = makeSuperAdmin();
 
     $this->actingAs($super, 'admin')->patchJson('/admin/v1/settings/payments', [
-        'kapital_client_secret' => 'sk_live_TOPSECRET',
-    ])->assertOk()->assertJsonPath('values.kapital_client_secret', '')->assertJsonPath('secrets_set.kapital_client_secret', true);
+        'kapital_ecom_password' => 'sk_live_TOPSECRET',
+    ])->assertOk()->assertJsonPath('values.kapital_ecom_password', '')->assertJsonPath('secrets_set.kapital_ecom_password', true);
 
     // stored value is encrypted (not the plaintext), but decrypts back via the service
-    $stored = DB::table('settings')->where('key', 'payments.kapital_client_secret')->value('value');
+    $stored = DB::table('settings')->where('key', 'payments.kapital_ecom_password')->value('value');
     expect($stored)->not->toBe('sk_live_TOPSECRET')
-        ->and(app(SettingsService::class)->value('payments', 'kapital_client_secret'))->toBe('sk_live_TOPSECRET');
+        ->and(app(SettingsService::class)->value('payments', 'kapital_ecom_password'))->toBe('sk_live_TOPSECRET');
 
     // a blank secret on the next save keeps the existing one
-    $this->actingAs($super, 'admin')->patchJson('/admin/v1/settings/payments', ['kapital_client_secret' => ''])->assertOk();
-    expect(app(SettingsService::class)->value('payments', 'kapital_client_secret'))->toBe('sk_live_TOPSECRET');
+    $this->actingAs($super, 'admin')->patchJson('/admin/v1/settings/payments', ['kapital_ecom_password' => ''])->assertOk();
+    expect(app(SettingsService::class)->value('payments', 'kapital_ecom_password'))->toBe('sk_live_TOPSECRET');
 });
 
 it('rejects an unknown settings group with 404', function () {

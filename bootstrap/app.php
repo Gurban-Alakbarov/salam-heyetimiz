@@ -63,15 +63,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'enforce.json' => EnforceJson::class,
-            'verify.birpay' => \App\Http\Middleware\VerifyBirPaySignature::class,
             'admin.tfa' => \App\Http\Middleware\RequireAdminTfaVerified::class,
             'docs.access' => \App\Http\Middleware\DocsAccess::class,
             'komendant' => \App\Http\Middleware\EnsureKomendant::class,
         ]);
 
         // Webhook stack. CaptureRawBody runs FIRST so HMAC verifiers hash the exact raw bytes
-        // before any JSON parsing (CRIT-07 / R-PAY-03); per-route verify.kapital validates the
-        // signature before the controller.
+        // before any JSON parsing (CRIT-07 / R-PAY-03).
         $middleware->group('webhook', [
             \App\Http\Middleware\CaptureRawBody::class,
             RequestId::class,

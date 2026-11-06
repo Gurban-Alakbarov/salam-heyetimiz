@@ -10,17 +10,12 @@ use App\Domain\Payments\Support\PaymentGatewayMode;
 */
 
 it('always uses the fake gateway in the testing environment', function () {
-    expect(PaymentGatewayMode::decide('testing', ['gateway' => 'birpay']))->toBe(PaymentGatewayMode::FAKE);
+    expect(PaymentGatewayMode::decide('testing', ['gateway' => 'kapital']))->toBe(PaymentGatewayMode::FAKE);
 });
 
-it('keeps the real BirPay gateway by default (no config change = unchanged behaviour)', function () {
-    expect(PaymentGatewayMode::decide('production', []))->toBe(PaymentGatewayMode::BIRPAY)
-        ->and(PaymentGatewayMode::decide('local', ['gateway' => 'birpay', 'fake_enabled' => true]))->toBe(PaymentGatewayMode::BIRPAY);
-});
-
-it('selects the Kapital e-commerce gateway explicitly', function () {
-    expect(PaymentGatewayMode::decide('production', ['gateway' => 'kapital']))->toBe(PaymentGatewayMode::KAPITAL)
-        ->and(PaymentGatewayMode::decide('testing', ['gateway' => 'kapital']))->toBe(PaymentGatewayMode::FAKE);
+it('uses the real Kapital gateway by default', function () {
+    expect(PaymentGatewayMode::decide('production', []))->toBe(PaymentGatewayMode::KAPITAL)
+        ->and(PaymentGatewayMode::decide('local', ['gateway' => 'kapital', 'fake_enabled' => true]))->toBe(PaymentGatewayMode::KAPITAL);
 });
 
 it('requires the fake_enabled feature flag before the fake gateway is used', function () {
@@ -35,10 +30,10 @@ it('keeps fake payments OFF in production unless allow_fake_in_production is als
         ->and(PaymentGatewayMode::decide('production', ['gateway' => 'fake', 'fake_enabled' => true, 'allow_fake_in_production' => true]))->toBe(PaymentGatewayMode::FAKE);
 });
 
-it('ships the safe defaults in config (birpay, fake disabled, production fake disallowed)', function () {
+it('ships the safe defaults in config (kapital, fake disabled, production fake disallowed)', function () {
     $cfg = require base_path('config/domain/payments.php');
 
-    expect($cfg['gateway'])->toBe('birpay')
+    expect($cfg['gateway'])->toBe('kapital')
         ->and($cfg['fake_enabled'])->toBeFalse()
         ->and($cfg['allow_fake_in_production'])->toBeFalse();
 });

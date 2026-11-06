@@ -41,7 +41,7 @@ class SystemHealthController
             'smtp' => ['configured' => (string) $this->settings->value('email', 'smtp_host') !== ''],
             'payment' => [
                 'enabled' => (bool) $this->settings->value('payments', 'kapital_enabled'),
-                'configured' => (string) $this->settings->value('payments', 'kapital_merchant_id') !== '',
+                'configured' => (string) $this->settings->value('payments', 'kapital_ecom_username') !== '',
             ],
             'cloudflare' => ['proxied' => $request->hasHeader('CF-RAY'), 'ray' => $request->header('CF-RAY')],
             'traccar' => $this->traccar(),

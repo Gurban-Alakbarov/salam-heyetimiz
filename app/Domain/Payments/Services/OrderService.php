@@ -121,12 +121,6 @@ final class OrderService
 
         OrderCreated::dispatch($order);
 
-        // A stable per-order bank idempotency key, persisted before registration so create-payment retries
-        // (after a 5xx) reuse the same X-Idempotency-Key and never double-charge (FINAL_IMPLEMENTATION_SPEC §11).
-        if (empty($order->bank_idempotency_key)) {
-            $order->forceFill(['bank_idempotency_key' => (string) Str::uuid()])->save();
-        }
-
         // Register with the bank OUTSIDE the transaction (network call). On failure the order stays
         // `pending` and the controller returns 503; the expiry sweep reclaims stale pending orders.
         $result = $this->gateway->registerOrder($order);

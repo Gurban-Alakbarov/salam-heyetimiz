@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * GET /admin/v1/payment-logs — adminListPaymentLogs (orders.view). Outbound BirPay calls + inbound webhooks,
+ * GET /admin/v1/payment-logs — adminListPaymentLogs (orders.view). Outbound bank calls,
  * with the (already allowlisted) request/response decrypted server-side. Filter by order / direction /
  * signature validity; cursor-paginated. Powers the Payment Logs + Webhook Logs admin views.
  */

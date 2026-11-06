@@ -149,17 +149,14 @@ export async function exportSettings(): Promise<Record<string, unknown>> {
   return (await api.get('/admin/v1/settings/export')).data
 }
 
-// ---- payments (Kapital / BirPay) diagnostics ----
+// ---- payments (Kapital) diagnostics ----
 export interface PaymentsDiagnostics {
   ok: boolean
-  provider: 'kapital' | 'birpay'
   message: string
-  oauth: { ok: boolean; message: string; expires_in: number | null; token_type: string | null; scope: string | null }
-  authenticated: { ok: boolean; http_status: number | null; message: string }
+  login: { ok: boolean; http_status: number | null; message: string }
   host: string
   mode: string
-  merchant_id: string
-  terminal_id: string
+  username: string
 }
 export interface CreatePaymentTestResult {
   ok: boolean

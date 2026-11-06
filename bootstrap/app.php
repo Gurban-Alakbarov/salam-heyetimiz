@@ -6,6 +6,7 @@ use App\Http\Middleware\RequestId;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,10 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // The front nginx (IT) is the only hop before this server. Trusting it makes $request->ip() the real
+        // visitor: it appends that address to X-Forwarded-For, so anything a client sent itself is ignored.
+        $middleware->trustProxies(at: ['10.10.210.10'], headers: Request::HEADER_X_FORWARDED_FOR);
+
         // Mobile/public + admin both run through the "api" group.
         $middleware->api(prepend: [
             RequestId::class,        // X-Request-Id (ULID) + log/Context correlation

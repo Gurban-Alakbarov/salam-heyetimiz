@@ -101,8 +101,8 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(600)
             ->by(optional($request->user())->getAuthIdentifier() ?? $request->ip()));
 
-        // The website contact form: 3 per 10 minutes per e-mail address, 30 per minute overall. Not per IP: behind
-        // the front proxy every visitor reaches Laravel from the same address.
+        // The website contact form: 3 per 10 minutes per e-mail address, 30 per minute overall, so one person with
+        // many addresses and a burst of bots are both held back.
         RateLimiter::for('site-contact', fn (Request $request) => [
             Limit::perMinutes(10, 3)->by('site-contact:'.mb_strtolower(trim((string) $request->input('email')))),
             Limit::perMinute(30)->by('site-contact-all'),

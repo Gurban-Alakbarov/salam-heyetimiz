@@ -1,0 +1,194 @@
+{
+  "key": "how-it-works",
+  "title": {
+    "az": "Necə işləyir?",
+    "en": "How it works",
+    "ru": "Как это работает?"
+  },
+  "description": {
+    "az": "Müraciətdən mobil idarəetməyə qədər dörd addımda Salam Sesame.",
+    "en": "Salam Sesame in four steps, from request to mobile control.",
+    "ru": "Salam Sesame за четыре шага — от заявки до мобильного управления."
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "NECƏ İŞLƏYİR?",
+        "en": "HOW IT WORKS",
+        "ru": "КАК ЭТО РАБОТАЕТ?"
+      },
+      "title": {
+        "az": "Sadə başlanğıc. <em>Rahat istifadə.</em>",
+        "en": "Simple start. <em>Effortless use.</em>",
+        "ru": "Простой старт. <em>Удобное использование.</em>"
+      },
+      "text": {
+        "az": "Müraciətdən mobil idarəetməyə qədər dörd addımda Salam Sesame.",
+        "en": "Salam Sesame in four steps, from request to mobile control.",
+        "ru": "Salam Sesame за четыре шага — от заявки до мобильного управления."
+      },
+      "image": "/landing/img-02.webp",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "process",
+      "kicker": {
+        "az": "4 ADDIM",
+        "en": "4 STEPS",
+        "ru": "4 ШАГА"
+      },
+      "title": {
+        "az": "Başlamaq düşündüyünüzdən asandır.",
+        "en": "Getting started is easier than you think.",
+        "ru": "Начать проще, чем кажется."
+      },
+      "text": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      },
+      "items": [
+        {
+          "title": {
+            "az": "Müraciət edin",
+            "en": "Submit a request",
+            "ru": "Оставьте заявку"
+          },
+          "text": {
+            "az": "Məkanınızı və ehtiyacınızı bildirin. Uyğun həll və qiymət fərdi razılaşdırılır.",
+            "en": "Tell us about your location and needs. The right solution and price are agreed individually.",
+            "ru": "Расскажите о вашем объекте и задачах. Подходящее решение и цена согласовываются индивидуально."
+          },
+          "link": {
+            "label": {
+              "az": "Fərdi təklif alın",
+              "en": "Get a personalized quote",
+              "ru": "Получите индивидуальное предложение"
+            },
+            "href": "/contact"
+          },
+          "image": "/landing/img-02.webp",
+          "image_alt": {
+            "az": "Müraciət edin",
+            "en": "Submit a request",
+            "ru": "Оставьте заявку"
+          }
+        },
+        {
+          "title": {
+            "az": "Quraşdırma",
+            "en": "Installation",
+            "ru": "Установка"
+          },
+          "text": {
+            "az": "Texniki uyğunluq yoxlanılır və cihaz mövcud avtomatik giriş sisteminə qoşulur.",
+            "en": "Technical compatibility is checked and the device is connected to your existing automatic access system.",
+            "ru": "Мы проверяем техническую совместимость и подключаем устройство к существующей автоматической системе доступа."
+          },
+          "link": {
+            "label": {
+              "az": "Giriş sistemləri",
+              "en": "Access systems",
+              "ru": "Системы доступа"
+            },
+            "href": "/services"
+          },
+          "image": "/landing/img-04.webp",
+          "image_alt": {
+            "az": "Quraşdırma",
+            "en": "Installation",
+            "ru": "Установка"
+          }
+        },
+        {
+          "title": {
+            "az": "Qoşulma və aktivləşdirmə",
+            "en": "Connection and activation",
+            "ru": "Подключение и активация"
+          },
+          "text": {
+            "az": "Sakinlər və digər səlahiyyətli şəxslər e-poçt vasitəsilə qeydiyyatdan keçir və giriş icazəsi alır.",
+            "en": "Residents and other authorized people register by e-mail and receive access permission.",
+            "ru": "Жители и другие уполномоченные лица регистрируются по электронной почте и получают разрешение на доступ."
+          },
+          "link": {
+            "label": {
+              "az": "Qeydiyyat haqqında",
+              "en": "About registration",
+              "ru": "О регистрации"
+            },
+            "href": "/faq"
+          },
+          "image": "/landing/img-03.webp",
+          "image_alt": {
+            "az": "Qoşulma və aktivləşdirmə",
+            "en": "Connection and activation",
+            "ru": "Подключение и активация"
+          }
+        },
+        {
+          "title": {
+            "az": "İstifadəyə başlayın",
+            "en": "Start using it",
+            "ru": "Начните пользоваться"
+          },
+          "text": {
+            "az": "Tətbiqdə pult düyməsinə toxunaraq giriş qurğusuna komanda göndərin.",
+            "en": "Tap the remote button in the app to send a command to the access device.",
+            "ru": "Нажмите кнопку пульта в приложении, чтобы отправить команду устройству доступа."
+          },
+          "link": {
+            "label": {
+              "az": "Mobil idarəetmə",
+              "en": "Mobile control",
+              "ru": "Мобильное управление"
+            },
+            "href": "/services"
+          },
+          "image": "/landing/img-05.webp",
+          "image_alt": {
+            "az": "İstifadəyə başlayın",
+            "en": "Start using it",
+            "ru": "Начните пользоваться"
+          }
+        }
+      ],
+      "note": {
+        "az": "<strong>Qeyd:</strong> Tətbiq giriş qurğusuna komanda göndərir. Qurğunun faktiki açıq və ya bağlı vəziyyətinin təsdiqi cihazın texniki imkanlarından asılıdır.",
+        "en": "<strong>Note:</strong> The app sends a command to the access device. Confirmation of whether the device is actually open or closed depends on the technical capabilities of the device.",
+        "ru": "<strong>Примечание:</strong> Приложение отправляет команду устройству доступа. Подтверждение фактического открытого или закрытого состояния устройства зависит от его технических возможностей."
+      }
+    },
+    {
+      "type": "cta-dark",
+      "kicker": {
+        "az": "SALAM SESAME",
+        "en": "SALAM SESAME",
+        "ru": "SALAM SESAME"
+      },
+      "title": {
+        "az": "Giriş sisteminiz üçün başlayaq.",
+        "en": "Get started with your access system.",
+        "ru": "Начнём с вашей системы доступа."
+      },
+      "text": {
+        "az": "Şlaqbaum və ya qapı barədə məlumat verməyiniz kifayətdir.",
+        "en": "Just tell us about your barrier or gate.",
+        "ru": "Достаточно рассказать нам о шлагбауме или воротах."
+      },
+      "button": {
+        "label": {
+          "az": "Müraciət et",
+          "en": "Submit a request",
+          "ru": "Оставить заявку"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

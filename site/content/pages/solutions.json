@@ -1,0 +1,137 @@
+{
+  "key": "solutions",
+  "title": {
+    "az": "Kimlər üçün?",
+    "en": "Who is it for?",
+    "ru": "Для кого?"
+  },
+  "description": {
+    "az": "Yaşayış kompleksləri, fərdi evlər və digər obyektlər üçün uyğun giriş idarəetməsi.",
+    "en": "Suitable access management for residential complexes, private homes and other facilities.",
+    "ru": "Подходящее управление доступом для жилых комплексов, частных домов и других объектов."
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "KİMLƏR ÜÇÜN?",
+        "en": "WHO IS IT FOR?",
+        "ru": "ДЛЯ КОГО?"
+      },
+      "title": {
+        "az": "Bir həll. <em>Fərqli məkanlar.</em>",
+        "en": "One solution. <em>Many places.</em>",
+        "ru": "Одно решение. <em>Разные объекты.</em>"
+      },
+      "text": {
+        "az": "Yaşayış kompleksləri, fərdi evlər və digər obyektlər üçün uyğun giriş idarəetməsi.",
+        "en": "Suitable access management for residential complexes, private homes and other facilities.",
+        "ru": "Подходящее управление доступом для жилых комплексов, частных домов и других объектов."
+      },
+      "image": "/landing/img-05.webp",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "audience-cards",
+      "kicker": {
+        "az": "İSTİFADƏ SAHƏLƏRİ",
+        "en": "USE CASES",
+        "ru": "СФЕРЫ ПРИМЕНЕНИЯ"
+      },
+      "title": {
+        "az": "Hər məkanın öz ehtiyacına uyğun.",
+        "en": "Tailored to the needs of every location.",
+        "ru": "С учётом потребностей каждого объекта."
+      },
+      "text": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      },
+      "items": [
+        {
+          "image": "/landing/img-03.webp",
+          "image_alt": {
+            "az": "Yaşayış kompleksləri",
+            "en": "Residential complexes",
+            "ru": "Жилые комплексы"
+          },
+          "title": {
+            "az": "Yaşayış kompleksləri",
+            "en": "Residential complexes",
+            "ru": "Жилые комплексы"
+          },
+          "text": {
+            "az": "Sakinlərin girişini rahatlaşdırın. Komendantlar dəvət və icazələri idarə etsinlər.",
+            "en": "Make entry easier for residents. Let building managers handle invitations and permissions.",
+            "ru": "Сделайте въезд удобнее для жителей, а коменданты пусть управляют приглашениями и разрешениями."
+          },
+          "link": {
+            "label": {
+              "az": "Təklif al",
+              "en": "Get a quote",
+              "ru": "Получить предложение"
+            },
+            "href": "/contact"
+          }
+        },
+        {
+          "image": "/landing/img-05.webp",
+          "image_alt": {
+            "az": "Fərdi evlər",
+            "en": "Private homes",
+            "ru": "Частные дома"
+          },
+          "title": {
+            "az": "Fərdi evlər",
+            "en": "Private homes",
+            "ru": "Частные дома"
+          },
+          "text": {
+            "az": "Darvaza və qaraj girişinizi telefonla idarə edin, ailə üzvlərinizlə paylaşın.",
+            "en": "Control your gate and garage entrance by phone and share access with your family members.",
+            "ru": "Управляйте воротами и въездом в гараж с телефона и делитесь доступом с членами семьи."
+          },
+          "link": {
+            "label": {
+              "az": "Təklif al",
+              "en": "Get a quote",
+              "ru": "Получить предложение"
+            },
+            "href": "/contact"
+          }
+        },
+        {
+          "image": "/landing/img-06.webp",
+          "image_alt": {
+            "az": "Digər obyektlər",
+            "en": "Other facilities",
+            "ru": "Другие объекты"
+          },
+          "title": {
+            "az": "Digər obyektlər",
+            "en": "Other facilities",
+            "ru": "Другие объекты"
+          },
+          "text": {
+            "az": "Ofis, parkinq və digər uyğun giriş nöqtələri üçün fərdi həll müəyyən edin.",
+            "en": "Define a custom solution for offices, parking lots and other compatible access points.",
+            "ru": "Подберите индивидуальное решение для офиса, парковки и других подходящих точек доступа."
+          },
+          "link": {
+            "label": {
+              "az": "Təklif al",
+              "en": "Get a quote",
+              "ru": "Получить предложение"
+            },
+            "href": "/contact"
+          }
+        }
+      ]
+    }
+  ]
+}

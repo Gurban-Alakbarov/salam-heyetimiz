@@ -1,0 +1,194 @@
+{
+  "key": "faq",
+  "title": {
+    "az": "Suallar",
+    "en": "FAQ",
+    "ru": "Вопросы"
+  },
+  "description": {
+    "az": "Xidmətin işləmə prinsipi, quraşdırma və istifadə haqqında.",
+    "en": "About how the service works, installation and use.",
+    "ru": "О принципе работы сервиса, установке и использовании."
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "SUALLAR VƏ CAVABLAR",
+        "en": "QUESTIONS AND ANSWERS",
+        "ru": "ВОПРОСЫ И ОТВЕТЫ"
+      },
+      "title": {
+        "az": "Suallarınıza <em>aydın cavablar.</em>",
+        "en": "Clear answers <em>to your questions.</em>",
+        "ru": "Понятные ответы <em>на ваши вопросы.</em>"
+      },
+      "text": {
+        "az": "Xidmətin işləmə prinsipi, quraşdırma və istifadə haqqında.",
+        "en": "About how the service works, installation and use.",
+        "ru": "О принципе работы сервиса, установке и использовании."
+      },
+      "image": "",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "faq-full",
+      "items": [
+        {
+          "q": {
+            "az": "Salam Sesame nədir?",
+            "en": "What is Salam Sesame?",
+            "ru": "Что такое Salam Sesame?"
+          },
+          "a": {
+            "az": "Salam Sesame şlaqbaum, qaraj və uyğun avtomatik giriş qapılarını mobil tətbiq vasitəsilə idarə etməyə imkan verən xidmətdir.",
+            "en": "Salam Sesame is a service that lets you control barriers, garage doors and compatible automatic entrance gates through a mobile app.",
+            "ru": "Salam Sesame — это сервис, который позволяет управлять шлагбаумами, гаражными и совместимыми автоматическими въездными воротами через мобильное приложение."
+          }
+        },
+        {
+          "q": {
+            "az": "Hansı giriş sistemlərində istifadə oluna bilər?",
+            "en": "Which access systems can it be used with?",
+            "ru": "С какими системами доступа его можно использовать?"
+          },
+          "a": {
+            "az": "Texniki uyğunluğu olan mövcud şlaqbaum, qaraj, avtomatik darvaza və giriş sistemlərinə qoşula bilər. Uyğunluq müraciətdən sonra yoxlanılır.",
+            "en": "It can be connected to existing barriers, garage doors, automatic gates and access systems that are technically compatible. Compatibility is checked after you submit a request.",
+            "ru": "Сервис можно подключить к существующим шлагбаумам, гаражным и автоматическим воротам, а также системам доступа при наличии технической совместимости. Совместимость проверяется после получения заявки."
+          }
+        },
+        {
+          "q": {
+            "az": "Quraşdırma necə həyata keçirilir?",
+            "en": "How is installation carried out?",
+            "ru": "Как проходит установка?"
+          },
+          "a": {
+            "az": "Müraciət əsasında texniki uyğunluq yoxlanılır və uyğun cihaz mövcud giriş sisteminə quraşdırılır.",
+            "en": "Upon request, technical compatibility is checked and a suitable device is installed on the existing access system.",
+            "ru": "На основании заявки проверяется техническая совместимость, и подходящее устройство устанавливается в существующую систему доступа."
+          }
+        },
+        {
+          "q": {
+            "az": "Xidmətin qiyməti necə müəyyən edilir?",
+            "en": "How is the price of the service determined?",
+            "ru": "Как определяется стоимость сервиса?"
+          },
+          "a": {
+            "az": "Qiymət cihaz növü, obyektin xüsusiyyətləri və razılaşdırılan xidmət şərtlərinə görə müraciətdən və danışıqdan sonra fərdi müəyyənləşdirilir.",
+            "en": "The price is determined individually after your request and our discussion, based on the device type, the characteristics of the facility and the agreed service terms.",
+            "ru": "Цена определяется индивидуально после заявки и переговоров — в зависимости от типа устройства, особенностей объекта и согласованных условий обслуживания."
+          }
+        },
+        {
+          "q": {
+            "az": "Abunəlik müddəti nə qədərdir?",
+            "en": "How long is the subscription?",
+            "ru": "Какой срок подписки?"
+          },
+          "a": {
+            "az": "Salam Sesame üçün illik abunəlik nəzərdə tutulur. Aktual ödəniş şərtləri mobil tətbiqdə təqdim olunur.",
+            "en": "Salam Sesame is offered on an annual subscription. Current payment terms are shown in the mobile app.",
+            "ru": "Для Salam Sesame предусмотрена годовая подписка. Актуальные условия оплаты указаны в мобильном приложении."
+          }
+        },
+        {
+          "q": {
+            "az": "Ailə üzvlərimi əlavə edə bilərəm?",
+            "en": "Can I add my family members?",
+            "ru": "Могу ли я добавить членов семьи?"
+          },
+          "a": {
+            "az": "Bəli. Səlahiyyətli abunəçi öz ailə üzvlərinə giriş icazəsi vermək üçün onları dəvət edə bilər.",
+            "en": "Yes. An authorized subscriber can invite their family members to give them access permission.",
+            "ru": "Да. Уполномоченный подписчик может пригласить членов своей семьи, чтобы предоставить им разрешение на доступ."
+          }
+        },
+        {
+          "q": {
+            "az": "Qonaq üçün giriş yaratmaq olar?",
+            "en": "Can I create access for a guest?",
+            "ru": "Можно ли создать доступ для гостя?"
+          },
+          "a": {
+            "az": "Bəli. Müvafiq giriş hüququ olan istifadəçi birdəfəlik və ya müddətli qonaq linkləri yarada bilər.",
+            "en": "Yes. A user with the appropriate access rights can create one-time or time-limited guest links.",
+            "ru": "Да. Пользователь с соответствующими правами доступа может создавать одноразовые или временные гостевые ссылки."
+          }
+        },
+        {
+          "q": {
+            "az": "Komendant nə edə bilər?",
+            "en": "What can a building manager do?",
+            "ru": "Что может комендант?"
+          },
+          "a": {
+            "az": "Komendant öz kompleksində sakinlərin dəvət və giriş hüquqlarını səlahiyyətlərinə uyğun idarə edə bilər.",
+            "en": "Within their complex, a building manager can manage invitations and access rights of residents in line with their authority.",
+            "ru": "Комендант может в пределах своих полномочий управлять приглашениями и правами доступа жителей своего комплекса."
+          }
+        },
+        {
+          "q": {
+            "az": "İnternet olmadıqda qapını idarə edə bilərəm?",
+            "en": "Can I control the gate without internet?",
+            "ru": "Можно ли управлять воротами без интернета?"
+          },
+          "a": {
+            "az": "Mobil tətbiqdən əmr göndərilməsi şəbəkə əlaqəsindən asılıdır. İnternet və ya cihaz bağlantısı olmadıqda komanda gecikə və ya yerinə yetirilməyə bilər.",
+            "en": "Sending commands from the mobile app depends on a network connection. Without internet or a device connection, a command may be delayed or may not be executed.",
+            "ru": "Отправка команд из мобильного приложения зависит от сетевого подключения. При отсутствии интернета или связи с устройством команда может быть выполнена с задержкой или не выполнена."
+          }
+        },
+        {
+          "q": {
+            "az": "Abunəliyin yenilənməsini dayandırsam nə olacaq?",
+            "en": "What happens if I stop my subscription renewal?",
+            "ru": "Что будет, если я отключу продление подписки?"
+          },
+          "a": {
+            "az": "Avtomatik yenilənmə dayandırıldıqda giriş hüququ artıq ödənilmiş abunəlik müddətinin sonunadək davam edir.",
+            "en": "When auto-renewal is stopped, access continues until the end of the subscription period already paid for.",
+            "ru": "После отключения автопродления право доступа сохраняется до конца уже оплаченного периода подписки."
+          }
+        },
+        {
+          "q": {
+            "az": "Hesabımı necə idarə edə bilərəm?",
+            "en": "How can I manage my account?",
+            "ru": "Как управлять своим аккаунтом?"
+          },
+          "a": {
+            "az": "Hesabın idarə edilməsi və şəxsi məlumatlarla bağlı müraciət üçün dəstək bölməsindən istifadə edə bilərsiniz.",
+            "en": "For account management and requests about personal data, you can use the support section.",
+            "ru": "По вопросам управления аккаунтом и персональных данных вы можете обратиться через раздел поддержки."
+          }
+        }
+      ],
+      "side_title": {
+        "az": "Əlavə sualınız var?",
+        "en": "Have more questions?",
+        "ru": "Есть ещё вопросы?"
+      },
+      "side_text": {
+        "az": "Giriş sisteminizlə bağlı ətraflı məlumat və fərdi təklif üçün bizə müraciət edin.",
+        "en": "Contact us for detailed information about your access system and a personalized quote.",
+        "ru": "Свяжитесь с нами, чтобы получить подробную информацию о вашей системе доступа и индивидуальное предложение."
+      },
+      "side_button": {
+        "label": {
+          "az": "Bizimlə əlaqə saxla",
+          "en": "Contact us",
+          "ru": "Связаться с нами"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

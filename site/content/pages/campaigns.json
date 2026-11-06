@@ -1,0 +1,48 @@
+{
+  "key": "campaigns",
+  "title": {
+    "az": "Kampaniyalar",
+    "en": "Campaigns",
+    "ru": "Акции"
+  },
+  "description": {
+    "az": "Salam Sesame üzrə aktual kampaniyalar, endirimlər və xüsusi təkliflər.",
+    "en": "Current Salam Sesame campaigns, discounts and special offers.",
+    "ru": "Актуальные акции, скидки и специальные предложения Salam Sesame."
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "KAMPANİYALAR",
+        "en": "CAMPAIGNS",
+        "ru": "АКЦИИ"
+      },
+      "title": {
+        "az": "Aktual <em>kampaniyalar.</em>",
+        "en": "Current <em>campaigns.</em>",
+        "ru": "Актуальные <em>акции.</em>"
+      },
+      "text": {
+        "az": "Endirimlər və xüsusi təkliflər.",
+        "en": "Discounts and special offers.",
+        "ru": "Скидки и специальные предложения."
+      },
+      "image": "",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "campaign-list",
+      "until_label": {
+        "az": "Son tarix:",
+        "en": "Valid until:",
+        "ru": "Действует до:"
+      },
+      "items": []
+    }
+  ]
+}

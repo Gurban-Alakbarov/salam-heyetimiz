@@ -1,0 +1,105 @@
+{
+  "key": "account",
+  "title": {
+    "az": "Hesabın idarə edilməsi",
+    "en": "Account management",
+    "ru": "Управление аккаунтом"
+  },
+  "description": {
+    "az": "İstifadəçi hesabını müvəqqəti olaraq deaktiv etdirmək üçün dəstək xidmətinə müraciət edə bilər. Deaktivasiya hesabın məlumatlarını və qüvvədə olan…",
+    "en": "A user may contact support to have their account temporarily deactivated. Deactivation does not automatically cancel the account data or an active…",
+    "ru": "Пользователь может обратиться в службу поддержки, чтобы временно деактивировать свой аккаунт. Деактивация не удаляет автоматически данные аккаунта и не…"
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "HESAB",
+        "en": "ACCOUNT",
+        "ru": "АККАУНТ"
+      },
+      "title": {
+        "az": "Hesabın idarə edilməsi",
+        "en": "Account management",
+        "ru": "Управление аккаунтом"
+      },
+      "text": {
+        "az": "Salam Sesame istifadəçiləri üçün məlumat və qaydalar.",
+        "en": "Information and rules for Salam Sesame users.",
+        "ru": "Информация и правила для пользователей Salam Sesame."
+      },
+      "image": "",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "legal",
+      "company": {
+        "az": "Alkin Group MMC",
+        "en": "Alkin Group MMC",
+        "ru": "Alkin Group MMC"
+      },
+      "items": [
+        {
+          "title": {
+            "az": "Hesabın deaktiv edilməsi",
+            "en": "Account deactivation",
+            "ru": "Деактивация аккаунта"
+          },
+          "body": {
+            "az": "<p>İstifadəçi hesabını müvəqqəti olaraq deaktiv etdirmək üçün dəstək xidmətinə müraciət edə bilər. Deaktivasiya hesabın məlumatlarını və qüvvədə olan abunəliyi avtomatik ləğv etmir. İstifadəçi eyni e-poçtla yenidən daxil olduqda hesabından istifadəni bərpa edə bilər.</p>",
+            "en": "<p>A user may contact support to have their account temporarily deactivated. Deactivation does not automatically cancel the account data or an active subscription. The user can restore use of their account by signing in again with the same e-mail.</p>",
+            "ru": "<p>Пользователь может обратиться в службу поддержки, чтобы временно деактивировать свой аккаунт. Деактивация не удаляет автоматически данные аккаунта и не отменяет действующую подписку. При повторном входе с тем же адресом электронной почты пользователь может возобновить использование аккаунта.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "Bildirişlərin dayandırılması",
+            "en": "Stopping notifications",
+            "ru": "Приостановка уведомлений"
+          },
+          "body": {
+            "az": "<p>Deaktivasiya ilə bağlı müraciətdə bildirişlərin dayandırılması nəzərdə tutulur. Bu, giriş icazələrinin və ya abunəliyin avtomatik silinməsi demək deyil.</p>",
+            "en": "<p>A deactivation request includes stopping notifications. This does not mean that access permissions or the subscription are automatically deleted.</p>",
+            "ru": "<p>Обращение о деактивации предусматривает приостановку уведомлений. Это не означает автоматического удаления разрешений на доступ или подписки.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "Hesabın silinməsi",
+            "en": "Account deletion",
+            "ru": "Удаление аккаунта"
+          },
+          "body": {
+            "az": "<p>Hesabın silinməsi deaktivasiyadan fərqlidir: silinmiş hesab bərpa edilmir.</p><h3>Mobil tətbiqdən</h3><p>Salam Sesame tətbiqində <strong>Profil → Hesabı sil</strong> bölməsini açın və silinməni təsdiqləyin. Hesab dərhal silinir.</p><h3>Tətbiqə daxil ola bilmirsinizsə</h3><p>Qeydiyyatdan keçdiyiniz e-poçt ünvanından <a href=\"mailto:support@sezam.salam.az?subject=Hesab%C4%B1n%20silinm%C9%99si\">support@sezam.salam.az</a> ünvanına “Hesabın silinməsi” mövzusu ilə yazın. Müraciəti hesabın sahibi olduğunuzu təsdiqlədikdən sonra icra edirik.</p><h3>Nə silinir</h3><ul><li>Ad, soyad, telefon nömrəsi və e-poçt ünvanı;</li><li>Bildiriş (push) məlumatları və son giriş IP ünvanı;</li><li>Bütün cihazlara giriş icazələri — giriş dərhal dayanır;</li><li>Aktiv abunəliklər ləğv olunur (qalan müddət üçün geri ödəniş edilmir);</li><li>Ailə üzvlərinə sizin vasitənizlə verilmiş girişlər də götürülür.</li></ul><h3>Nə saxlanılır</h3><p>Ödəniş və əməliyyat qeydləri qanunvericiliyin tələb etdiyi müddət ərzində şəxsi məlumatlar olmadan saxlanılır. Təhlükəsizlik jurnalında telefon nömrəsi və e-poçt ünvanının yalnız geri çevrilə bilməyən şifrəli izi qalır.</p><h3>Cihaz sahibləri</h3><p>Cihazın sahibisinizsə, hesabı silməzdən əvvəl sahibliyi başqa istifadəçiyə ötürməlisiniz.</p><p>Silinmədən sonra eyni telefon nömrəsi və e-poçt ilə yenidən qeydiyyatdan keçmək olar.</p>",
+            "en": "<p>Account deletion is different from deactivation: a deleted account cannot be restored.</p><h3>From the mobile app</h3><p>In the Salam Sesame app, open <strong>Profile → Delete account</strong> and confirm the deletion. The account is deleted immediately.</p><h3>If you cannot sign in to the app</h3><p>From the e-mail address you registered with, write to <a href=\"mailto:support@sezam.salam.az?subject=Hesab%C4%B1n%20silinm%C9%99si\">support@sezam.salam.az</a> with the subject “Account deletion”. We process the request after confirming that you are the account owner.</p><h3>What is deleted</h3><ul><li>First name, last name, phone number and e-mail address;</li><li>Notification (push) data and the last sign-in IP address;</li><li>All device access permissions — access stops immediately;</li><li>Active subscriptions are cancelled (no refund is given for the remaining period);</li><li>Access granted to family members through you is also revoked.</li></ul><h3>What is retained</h3><p>Payment and transaction records are kept without personal data for the period required by law. The security log retains only an irreversible encrypted trace of the phone number and e-mail address.</p><h3>Device owners</h3><p>If you are the owner of a device, you must transfer ownership to another user before deleting your account.</p><p>After deletion, you can register again with the same phone number and e-mail.</p>",
+            "ru": "<p>Удаление аккаунта отличается от деактивации: удалённый аккаунт не восстанавливается.</p><h3>Из мобильного приложения</h3><p>В приложении Salam Sesame откройте раздел <strong>Профиль → Удалить аккаунт</strong> и подтвердите удаление. Аккаунт удаляется сразу.</p><h3>Если вы не можете войти в приложение</h3><p>Напишите с адреса электронной почты, указанного при регистрации, на адрес <a href=\"mailto:support@sezam.salam.az?subject=Hesab%C4%B1n%20silinm%C9%99si\">support@sezam.salam.az</a> с темой «Удаление аккаунта». Мы выполняем запрос после подтверждения того, что вы являетесь владельцем аккаунта.</p><h3>Что удаляется</h3><ul><li>Имя, фамилия, номер телефона и адрес электронной почты;</li><li>Данные для уведомлений (push) и IP-адрес последнего входа;</li><li>Разрешения на доступ ко всем устройствам — доступ прекращается немедленно;</li><li>Активные подписки отменяются (возврат средств за оставшийся период не производится);</li><li>Доступ, предоставленный через вас членам семьи, также отзывается.</li></ul><h3>Что сохраняется</h3><p>Записи о платежах и операциях хранятся без персональных данных в течение срока, установленного законодательством. В журнале безопасности остаётся только необратимый зашифрованный след номера телефона и адреса электронной почты.</p><h3>Владельцы устройств</h3><p>Если вы являетесь владельцем устройства, перед удалением аккаунта необходимо передать право владения другому пользователю.</p><p>После удаления можно повторно зарегистрироваться с тем же номером телефона и адресом электронной почты.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "Necə müraciət etmək olar?",
+            "en": "How to submit a request",
+            "ru": "Как подать обращение?"
+          },
+          "body": {
+            "az": "<p>Deaktivasiya və silinmə müraciətləri üçün <a href=\"mailto:support@sezam.salam.az\">support@sezam.salam.az</a> ünvanına yazın və ya saytın <a href=\"/contact\">Əlaqə</a> səhifəsindən istifadə edin. Müraciətdə hesabınızın e-poçt ünvanını və müraciətin növünü göstərin.</p>",
+            "en": "<p>For deactivation and deletion requests, write to <a href=\"mailto:support@sezam.salam.az\">support@sezam.salam.az</a> or use the <a href=\"/contact\">Contact</a> page of the website. In your request, state your account e-mail address and the type of request.</p>",
+            "ru": "<p>По вопросам деактивации и удаления аккаунта пишите на адрес <a href=\"mailto:support@sezam.salam.az\">support@sezam.salam.az</a> или воспользуйтесь страницей <a href=\"/contact\">Контакты</a> на сайте. В обращении укажите адрес электронной почты вашего аккаунта и тип обращения.</p>"
+          }
+        }
+      ],
+      "button": {
+        "label": {
+          "az": "Əlaqə və müraciət",
+          "en": "Contact and requests",
+          "ru": "Контакты и обращения"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

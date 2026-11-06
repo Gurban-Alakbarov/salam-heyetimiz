@@ -1,0 +1,564 @@
+{
+  "key": "index",
+  "title": {
+    "az": "Ana səhifə",
+    "en": "Home",
+    "ru": "Главная"
+  },
+  "description": {
+    "az": "Salam Sesame: şlaqbaum, qaraj və avtomatik giriş qapılarını telefonunuzdan idarə edin.",
+    "en": "Salam Sesame: control barriers, garage doors and automatic entrance gates from your phone.",
+    "ru": "Salam Sesame: управляйте шлагбаумами, гаражными и автоматическими въездными воротами со своего телефона."
+  },
+  "share_title": {
+    "az": "Salam Sesame — girişiniz bir toxunuş uzaqlığında",
+    "en": "Salam Sesame — your access is just a tap away",
+    "ru": "Salam Sesame — ваш въезд в одном касании от вас"
+  },
+  "share_text": {
+    "az": "Şlaqbaum, qaraj və avtomatik giriş qapılarını telefonunuzdan idarə edin.",
+    "en": "Control barriers, garage doors and automatic entrance gates from your phone.",
+    "ru": "Управляйте шлагбаумами, гаражными и автоматическими въездными воротами со своего телефона."
+  },
+  "sections": [
+    {
+      "type": "home-hero",
+      "kicker": {
+        "az": "AĞILLI GİRİŞ SİSTEMLƏRİ",
+        "en": "SMART ACCESS SYSTEMS",
+        "ru": "УМНЫЕ СИСТЕМЫ ДОСТУПА"
+      },
+      "title": {
+        "az": "Girişiniz<br/><em>bir toxunuş</em><br/>uzaqlığında.",
+        "en": "Your access is<br/><em>just a tap</em><br/>away.",
+        "ru": "Ваш въезд<br/><em>в одном касании</em><br/>от вас."
+      },
+      "text": {
+        "az": "Salam Sesame ilə şlaqbaum, qaraj və avtomatik giriş qapılarınızı telefonunuzdan idarə edin. Fiziki pultu bir tətbiqlə əvəz edin.",
+        "en": "With Salam Sesame, control your barriers, garage doors and automatic entrance gates from your phone. Replace physical remotes with a single app.",
+        "ru": "С Salam Sesame вы управляете шлагбаумами, гаражными и автоматическими въездными воротами прямо со своего телефона. Замените физический пульт одним приложением."
+      },
+      "primary": {
+        "label": {
+          "az": "Təklif al",
+          "en": "Get a quote",
+          "ru": "Получить предложение"
+        },
+        "href": "/contact"
+      },
+      "secondary": {
+        "label": {
+          "az": "Necə işləyir?",
+          "en": "How it works",
+          "ru": "Как это работает?"
+        },
+        "href": "/how-it-works"
+      },
+      "smallprint": {
+        "az": "Mövcud giriş sistemlərinə uyğun həll · Fərdi quraşdırma",
+        "en": "Works with existing access systems · Custom installation",
+        "ru": "Решение для существующих систем доступа · Индивидуальная установка"
+      },
+      "image": "/landing/img-02.webp",
+      "image_alt": {
+        "az": "Müasir yaşayış binasının şlaqbaumu",
+        "en": "Barrier of a modern residential building",
+        "ru": "Шлагбаум современного жилого дома"
+      },
+      "phone": {
+        "aria": {
+          "az": "Salam Sesame tətbiqinin illüstrativ interfeysi",
+          "en": "Illustrative interface of the Salam Sesame app",
+          "ru": "Иллюстративный интерфейс приложения Salam Sesame"
+        },
+        "title": {
+          "az": "Cihazlar",
+          "en": "Devices",
+          "ru": "Устройства"
+        },
+        "list_label": {
+          "az": "Girişlərim",
+          "en": "My access",
+          "ru": "Мои доступы"
+        },
+        "device_image_alt": {
+          "az": "Yaşayış kompleksinin şlaqbaumu",
+          "en": "Residential complex barrier",
+          "ru": "Шлагбаум жилого комплекса"
+        },
+        "device_image": "/landing/img-03.webp",
+        "online": {
+          "az": "Online",
+          "en": "Online",
+          "ru": "Онлайн"
+        },
+        "device_name": {
+          "az": "Həyət şlaqbaumu",
+          "en": "Courtyard barrier",
+          "ru": "Шлагбаум во двор"
+        },
+        "device_place": {
+          "az": "Yaşayış kompleksi",
+          "en": "Residential complex",
+          "ru": "Жилой комплекс"
+        },
+        "invite": {
+          "az": "Dəvət et",
+          "en": "Invite",
+          "ru": "Пригласить"
+        },
+        "directions": {
+          "az": "Yol göstər",
+          "en": "Directions",
+          "ru": "Маршрут"
+        },
+        "remote": {
+          "az": "Pult",
+          "en": "Remote",
+          "ru": "Пульт"
+        },
+        "response": {
+          "az": "Demo: əmr göndərildi",
+          "en": "Demo: command sent",
+          "ru": "Демо: команда отправлена"
+        },
+        "small_name": {
+          "az": "Qaraj qapısı",
+          "en": "Garage door",
+          "ru": "Гаражные ворота"
+        },
+        "small_place": {
+          "az": "İcazəli giriş",
+          "en": "Authorized access",
+          "ru": "Доступ по разрешению"
+        },
+        "tab_home": {
+          "az": "Ana səhifə",
+          "en": "Home",
+          "ru": "Главная"
+        },
+        "tab_devices": {
+          "az": "Cihazlar",
+          "en": "Devices",
+          "ru": "Устройства"
+        },
+        "tab_profile": {
+          "az": "Profil",
+          "en": "Profile",
+          "ru": "Профиль"
+        }
+      },
+      "badge_title": {
+        "az": "Rəqəmsal pult",
+        "en": "Digital remote",
+        "ru": "Цифровой пульт"
+      },
+      "badge_text": {
+        "az": "Girişləriniz bir tətbiqdə",
+        "en": "All your entrances in one app",
+        "ru": "Все ваши доступы в одном приложении"
+      }
+    },
+    {
+      "type": "benefit-bar",
+      "items": [
+        {
+          "icon": "phone",
+          "title": {
+            "az": "Mobil pult",
+            "en": "Mobile remote",
+            "ru": "Мобильный пульт"
+          },
+          "text": {
+            "az": "Əlavə fiziki pult daşımadan istifadə.",
+            "en": "No need to carry an extra physical remote.",
+            "ru": "Пользуйтесь без лишнего физического пульта."
+          }
+        },
+        {
+          "icon": "users",
+          "title": {
+            "az": "Ailə və qonaqlar",
+            "en": "Family and guests",
+            "ru": "Семья и гости"
+          },
+          "text": {
+            "az": "Səlahiyyətli şəxslərlə giriş paylaşımı.",
+            "en": "Share access with authorized people.",
+            "ru": "Делитесь доступом с уполномоченными лицами."
+          }
+        },
+        {
+          "icon": "sliders",
+          "title": {
+            "az": "Komendant üçün",
+            "en": "For building managers",
+            "ru": "Для коменданта"
+          },
+          "text": {
+            "az": "Sakin və dəvətlərin idarə olunması.",
+            "en": "Manage residents and invitations.",
+            "ru": "Управление жителями и приглашениями."
+          }
+        },
+        {
+          "icon": "shield",
+          "title": {
+            "az": "İcazələr",
+            "en": "Permissions",
+            "ru": "Разрешения"
+          },
+          "text": {
+            "az": "Hər giriş üçün hüquqların idarəsi.",
+            "en": "Manage rights for each entrance.",
+            "ru": "Управление правами для каждой точки доступа."
+          }
+        }
+      ]
+    },
+    {
+      "type": "product-grid",
+      "id": "offer",
+      "kicker": {
+        "az": "NƏ TƏKLİF EDİRİK?",
+        "en": "WHAT WE OFFER",
+        "ru": "ЧТО МЫ ПРЕДЛАГАЕМ?"
+      },
+      "title": {
+        "az": "Bir tətbiq. Fərqli girişlər.",
+        "en": "One app. Many entrances.",
+        "ru": "Одно приложение. Разные точки доступа."
+      },
+      "text": {
+        "az": "Yaşayış kompleksindən şəxsi qaraja qədər mövcud giriş sistemlərinizi rahat idarə edin.",
+        "en": "From residential complexes to private garages, manage your existing access systems with ease.",
+        "ru": "Удобно управляйте своими системами доступа — от жилого комплекса до личного гаража."
+      },
+      "items": [
+        {
+          "image": "/landing/img-03.webp",
+          "image_alt": {
+            "az": "Şlaqbaumlar",
+            "en": "Barriers",
+            "ru": "Шлагбаумы"
+          },
+          "href": "/services",
+          "title": {
+            "az": "Şlaqbaumlar",
+            "en": "Barriers",
+            "ru": "Шлагбаумы"
+          },
+          "text": {
+            "az": "Yaşayış kompleksləri və parkinq girişləri",
+            "en": "Residential complexes and parking entrances",
+            "ru": "Въезды в жилые комплексы и на парковки"
+          }
+        },
+        {
+          "image": "/landing/img-04.webp",
+          "image_alt": {
+            "az": "Qaraj qapıları",
+            "en": "Garage doors",
+            "ru": "Гаражные ворота"
+          },
+          "href": "/services",
+          "title": {
+            "az": "Qaraj qapıları",
+            "en": "Garage doors",
+            "ru": "Гаражные ворота"
+          },
+          "text": {
+            "az": "Şəxsi və ortaq qarajların idarə olunması",
+            "en": "Management of private and shared garages",
+            "ru": "Управление личными и общими гаражами"
+          }
+        },
+        {
+          "image": "/landing/img-05.webp",
+          "image_alt": {
+            "az": "Giriş qapıları",
+            "en": "Entrance gates",
+            "ru": "Въездные ворота"
+          },
+          "href": "/services",
+          "title": {
+            "az": "Giriş qapıları",
+            "en": "Entrance gates",
+            "ru": "Въездные ворота"
+          },
+          "text": {
+            "az": "Avtomatik darvaza və giriş sistemləri",
+            "en": "Automatic gates and access systems",
+            "ru": "Автоматические ворота и системы доступа"
+          }
+        },
+        {
+          "image": "/landing/img-06.webp",
+          "image_alt": {
+            "az": "Kompleks və obyektlər",
+            "en": "Complexes and facilities",
+            "ru": "Комплексы и объекты"
+          },
+          "href": "/services",
+          "title": {
+            "az": "Kompleks və obyektlər",
+            "en": "Complexes and facilities",
+            "ru": "Комплексы и объекты"
+          },
+          "text": {
+            "az": "Fərqli istifadəçi qrupları üçün giriş",
+            "en": "Access for different user groups",
+            "ru": "Доступ для разных групп пользователей"
+          }
+        }
+      ],
+      "link": {
+        "label": {
+          "az": "Xidmətlərə ətraflı bax",
+          "en": "View services in detail",
+          "ru": "Подробнее об услугах"
+        },
+        "href": "/services"
+      }
+    },
+    {
+      "type": "steps",
+      "kicker": {
+        "az": "NECƏ İŞLƏYİR?",
+        "en": "HOW IT WORKS",
+        "ru": "КАК ЭТО РАБОТАЕТ?"
+      },
+      "title": {
+        "az": "Dörd addımda daha rahat giriş.",
+        "en": "Easier access in four steps.",
+        "ru": "Удобный доступ за четыре шага."
+      },
+      "text": {
+        "az": "Müraciətdən istifadəyə qədər sadə və aydın proses.",
+        "en": "A simple, clear process from request to everyday use.",
+        "ru": "Простой и понятный процесс — от заявки до использования."
+      },
+      "items": [
+        {
+          "title": {
+            "az": "Müraciət edin",
+            "en": "Submit a request",
+            "ru": "Оставьте заявку"
+          },
+          "text": {
+            "az": "Məkanınızı və ehtiyacınızı bildirin. Uyğun həll və qiymət fərdi razılaşdırılır.",
+            "en": "Tell us about your location and needs. The right solution and price are agreed individually.",
+            "ru": "Расскажите о вашем объекте и задачах. Подходящее решение и цена согласовываются индивидуально."
+          }
+        },
+        {
+          "title": {
+            "az": "Quraşdırma",
+            "en": "Installation",
+            "ru": "Установка"
+          },
+          "text": {
+            "az": "Texniki uyğunluq yoxlanılır və cihaz mövcud avtomatik giriş sisteminə qoşulur.",
+            "en": "Technical compatibility is checked and the device is connected to your existing automatic access system.",
+            "ru": "Мы проверяем техническую совместимость и подключаем устройство к существующей автоматической системе доступа."
+          }
+        },
+        {
+          "title": {
+            "az": "Qoşulma və aktivləşdirmə",
+            "en": "Connection and activation",
+            "ru": "Подключение и активация"
+          },
+          "text": {
+            "az": "Sakinlər və digər səlahiyyətli şəxslər e-poçt vasitəsilə qeydiyyatdan keçir və giriş icazəsi alır.",
+            "en": "Residents and other authorized people register by e-mail and receive access permission.",
+            "ru": "Жители и другие уполномоченные лица регистрируются по электронной почте и получают разрешение на доступ."
+          }
+        },
+        {
+          "title": {
+            "az": "İstifadəyə başlayın",
+            "en": "Start using it",
+            "ru": "Начните пользоваться"
+          },
+          "text": {
+            "az": "Tətbiqdə pult düyməsinə toxunaraq giriş qurğusuna komanda göndərin.",
+            "en": "Tap the remote button in the app to send a command to the access device.",
+            "ru": "Нажмите кнопку пульта в приложении, чтобы отправить команду устройству доступа."
+          }
+        }
+      ],
+      "link": {
+        "label": {
+          "az": "Bütün prosesi öyrən",
+          "en": "Learn the full process",
+          "ru": "Узнать весь процесс"
+        },
+        "href": "/how-it-works"
+      }
+    },
+    {
+      "type": "split",
+      "image": "/landing/img-03.webp",
+      "image_alt": {
+        "az": "Müasir yaşayış kompleksində avtomatik giriş",
+        "en": "Automatic access in a modern residential complex",
+        "ru": "Автоматический въезд в современном жилом комплексе"
+      },
+      "kicker": {
+        "az": "KİMLƏR ÜÇÜN?",
+        "en": "WHO IS IT FOR?",
+        "ru": "ДЛЯ КОГО?"
+      },
+      "title": {
+        "az": "Komendant üçün nəzarət.<br/><em>Sakin üçün rahatlıq.</em>",
+        "en": "Control for the building manager.<br/><em>Convenience for residents.</em>",
+        "ru": "Контроль для коменданта.<br/><em>Удобство для жителя.</em>"
+      },
+      "text": {
+        "az": "Yaşayış kompleksləri, fərdi evlər və müxtəlif obyektlər üçün çevik giriş idarəetməsi. Giriş hüquqlarını səlahiyyətli şəxslərlə paylaşın, idarəni sadələşdirin.",
+        "en": "Flexible access management for residential complexes, private homes and various facilities. Share access rights with authorized people and simplify management.",
+        "ru": "Гибкое управление доступом для жилых комплексов, частных домов и различных объектов. Делитесь правами доступа с уполномоченными лицами и упрощайте управление."
+      },
+      "checks": [
+        {
+          "text": {
+            "az": "Yaşayış kompleksləri",
+            "en": "Residential complexes",
+            "ru": "Жилые комплексы"
+          }
+        },
+        {
+          "text": {
+            "az": "Fərdi ev və qarajlar",
+            "en": "Private homes and garages",
+            "ru": "Частные дома и гаражи"
+          }
+        },
+        {
+          "text": {
+            "az": "Müxtəlif giriş obyektləri",
+            "en": "Various access facilities",
+            "ru": "Различные объекты доступа"
+          }
+        }
+      ],
+      "button": {
+        "label": {
+          "az": "Kimlər üçün?",
+          "en": "Who is it for?",
+          "ru": "Для кого?"
+        },
+        "href": "/solutions"
+      }
+    },
+    {
+      "type": "cta-dark",
+      "kicker": {
+        "az": "SALAM SESAME",
+        "en": "SALAM SESAME",
+        "ru": "SALAM SESAME"
+      },
+      "title": {
+        "az": "Giriş sisteminizə uyğun<br/>təklif hazırlayaq.",
+        "en": "A quote tailored<br/>to your access system.",
+        "ru": "Подготовим предложение<br/>под вашу систему доступа."
+      },
+      "text": {
+        "az": "Qiymət və quraşdırma şərtləri müraciətdən sonra fərdi olaraq razılaşdırılır.",
+        "en": "Pricing and installation terms are agreed individually after you submit a request.",
+        "ru": "Цена и условия установки согласовываются индивидуально после получения заявки."
+      },
+      "button": {
+        "label": {
+          "az": "Fərdi təklif al",
+          "en": "Get a personalized quote",
+          "ru": "Получить индивидуальное предложение"
+        },
+        "href": "/contact"
+      }
+    },
+    {
+      "type": "faq-short",
+      "kicker": {
+        "az": "SUALLAR",
+        "en": "FAQ",
+        "ru": "ВОПРОСЫ"
+      },
+      "title": {
+        "az": "Bilmək istədikləriniz.",
+        "en": "What you want to know.",
+        "ru": "Всё, что вы хотели узнать."
+      },
+      "text": {
+        "az": "Salam Sesame haqqında ən çox verilən suallara qısa cavablar.",
+        "en": "Short answers to the most frequently asked questions about Salam Sesame.",
+        "ru": "Краткие ответы на самые частые вопросы о Salam Sesame."
+      },
+      "items": [
+        {
+          "q": {
+            "az": "Salam Sesame nədir?",
+            "en": "What is Salam Sesame?",
+            "ru": "Что такое Salam Sesame?"
+          },
+          "a": {
+            "az": "Şlaqbaum, qaraj və uyğun avtomatik qapıları mobil tətbiqdən idarə etməyə imkan verən xidmətdir.",
+            "en": "It is a service that lets you control barriers, garage doors and compatible automatic gates from a mobile app.",
+            "ru": "Это сервис, который позволяет управлять шлагбаумами, гаражными и совместимыми автоматическими воротами из мобильного приложения."
+          }
+        },
+        {
+          "q": {
+            "az": "Qonaq girişi necə işləyir?",
+            "en": "How does guest access work?",
+            "ru": "Как работает гостевой доступ?"
+          },
+          "a": {
+            "az": "Səlahiyyətli istifadəçi birdəfəlik və ya müddətli giriş linki paylaşa bilər.",
+            "en": "An authorized user can share a one-time or time-limited access link.",
+            "ru": "Уполномоченный пользователь может поделиться одноразовой или временной ссылкой доступа."
+          }
+        },
+        {
+          "q": {
+            "az": "Xidmətin qiyməti nə qədərdir?",
+            "en": "How much does the service cost?",
+            "ru": "Сколько стоит сервис?"
+          },
+          "a": {
+            "az": "Qiymət obyekt və ehtiyaclara əsasən müraciətdən sonra fərdi müəyyən edilir.",
+            "en": "The price is set individually after you submit a request, based on the facility and your needs.",
+            "ru": "Цена определяется индивидуально после заявки, с учётом объекта и ваших задач."
+          }
+        }
+      ],
+      "side_title": {
+        "az": "Sualınız qaldı?",
+        "en": "Still have questions?",
+        "ru": "Остались вопросы?"
+      },
+      "side_text": {
+        "az": "Bizə müraciət edin, uyğun həll barədə danışaq.",
+        "en": "Contact us to discuss the right solution.",
+        "ru": "Свяжитесь с нами — обсудим подходящее решение."
+      },
+      "side_button": {
+        "label": {
+          "az": "Əlaqə saxla",
+          "en": "Get in touch",
+          "ru": "Связаться"
+        },
+        "href": "/contact"
+      },
+      "link": {
+        "label": {
+          "az": "Bütün sual-cavablar",
+          "en": "All questions and answers",
+          "ru": "Все вопросы и ответы"
+        },
+        "href": "/faq"
+      }
+    }
+  ]
+}

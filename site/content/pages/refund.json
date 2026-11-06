@@ -1,0 +1,153 @@
+{
+  "key": "refund",
+  "title": {
+    "az": "Geri qaytarma siyasəti",
+    "en": "Refund Policy",
+    "ru": "Политика возврата"
+  },
+  "description": {
+    "az": "Bu siyasət Salam Sesame mobil tətbiqi vasitəsilə ödənilən xidmətlərə, abunəliklərə və Alkin Group MMC tərəfindən təqdim edilən cihazlara aid ləğvetmə və…",
+    "en": "This policy governs cancellation and refund requests relating to services and subscriptions paid for through the Salam Sesame mobile app and to devices…",
+    "ru": "Настоящая политика регулирует обращения об отмене и возврате в отношении услуг и подписок, оплаченных через мобильное приложение Salam Sesame, а также…"
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "ÖDƏNİŞLƏR",
+        "en": "PAYMENTS",
+        "ru": "ПЛАТЕЖИ"
+      },
+      "title": {
+        "az": "Geri qaytarma siyasəti",
+        "en": "Refund Policy",
+        "ru": "Политика возврата"
+      },
+      "text": {
+        "az": "Salam Sesame istifadəçiləri üçün məlumat və qaydalar.",
+        "en": "Information and rules for Salam Sesame users.",
+        "ru": "Информация и правила для пользователей Salam Sesame."
+      },
+      "image": "",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "legal",
+      "company": {
+        "az": "Alkin Group MMC",
+        "en": "Alkin Group MMC",
+        "ru": "Alkin Group MMC"
+      },
+      "items": [
+        {
+          "title": {
+            "az": "1. Ümumi müddəalar",
+            "en": "1. General provisions",
+            "ru": "1. Общие положения"
+          },
+          "body": {
+            "az": "<p>Bu siyasət Salam Sesame mobil tətbiqi vasitəsilə ödənilən xidmətlərə, abunəliklərə və Alkin Group MMC tərəfindən təqdim edilən cihazlara aid ləğvetmə və geri qaytarma müraciətlərini tənzimləyir.</p>",
+            "en": "<p>This policy governs cancellation and refund requests relating to services and subscriptions paid for through the Salam Sesame mobile app and to devices provided by Alkin Group MMC.</p>",
+            "ru": "<p>Настоящая политика регулирует обращения об отмене и возврате в отношении услуг и подписок, оплаченных через мобильное приложение Salam Sesame, а также устройств, предоставляемых Alkin Group MMC.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "2. Xidmətlərin qiymətləndirilməsi",
+            "en": "2. Pricing of services",
+            "ru": "2. Определение стоимости услуг"
+          },
+          "body": {
+            "az": "<p>Cihaz, quraşdırma və xidmətlərin qiyməti müraciətdən və fərdi danışıqlardan sonra müəyyən edilir. Müştəriyə təqdim olunan kommersiya şərtləri müvafiq təklifdə, abunəlik şərtləri isə ödənişdən əvvəl mobil tətbiqdə göstərilir.</p>",
+            "en": "<p>The price of devices, installation and services is determined after a request and individual negotiations. The commercial terms offered to the customer are stated in the relevant quote, and the subscription terms are shown in the mobile app before payment.</p>",
+            "ru": "<p>Стоимость устройств, установки и услуг определяется после заявки и индивидуальных переговоров. Коммерческие условия для клиента указываются в соответствующем предложении, а условия подписки — в мобильном приложении до оплаты.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "3. Abunəliyin müddəti və avtomatik yenilənmə",
+            "en": "3. Subscription period and auto-renewal",
+            "ru": "3. Срок подписки и автоматическое продление"
+          },
+          "body": {
+            "az": "<p>Salam Sesame üçün abunəlik modeli illik əsasda nəzərdə tutulur. Abunəliyin avtomatik yenilənməsi istifadəçinin ayrıca razılığı və müvafiq ödəniş funksiyası aktiv olduqda tətbiq ediləcək. Avtomatik yenilənmə dayandırıldıqda istifadəçi ödəniş etdiyi müddətin sonunadək xidmətə giriş hüququnu saxlayır.</p>",
+            "en": "<p>The Salam Sesame subscription model is intended to be on an annual basis. Auto-renewal of the subscription will apply when the user has given separate consent and the relevant payment feature is active. When auto-renewal is stopped, the user retains the right to access the service until the end of the paid period.</p>",
+            "ru": "<p>Для Salam Sesame предусмотрена подписка на годовой основе. Автоматическое продление подписки будет применяться при наличии отдельного согласия пользователя и активной соответствующей платёжной функции. При отключении автоматического продления пользователь сохраняет право доступа к сервису до конца оплаченного периода.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "4. Abunəliyin ləğvi",
+            "en": "4. Cancellation of the subscription",
+            "ru": "4. Отмена подписки"
+          },
+          "body": {
+            "az": "<p>İstifadəçinin öz istəyi ilə abunəliyin yenilənməsini dayandırması əvvəlki ödənişin avtomatik qaytarılması demək deyil. Qanunla nəzərdə tutulmuş qaytarma hüquqları saxlanılır. Cihaz və ya kompleks üzrə verilmiş giriş icazəsinin ayrıca geri götürülməsi abunəliyin yenilənməsini dayandırmaqdan fərqli əməliyyatdır.</p>",
+            "en": "<p>A user stopping subscription renewal at their own request does not mean that the previous payment is automatically refunded. Refund rights provided by law are preserved. Separately revoking an access permission granted for a device or complex is a different operation from stopping subscription renewal.</p>",
+            "ru": "<p>Отключение пользователем продления подписки по собственному желанию не означает автоматического возврата предыдущего платежа. Права на возврат, предусмотренные законодательством, сохраняются. Отдельный отзыв разрешения на доступ, предоставленного в отношении устройства или комплекса, является операцией, отличной от отключения продления подписки.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "5. Geri qaytarma müraciətləri",
+            "en": "5. Refund requests",
+            "ru": "5. Обращения о возврате"
+          },
+          "body": {
+            "az": "<p>İstifadəçi ödənişdən dərhal sonra xidmətdən imtina etdikdə, səhvən və ya təkrar ödəniş həyata keçirildikdə və ya xidmətlə bağlı əsaslı narazılığı yarandıqda geri qaytarma üçün dəstək xidmətinə müraciət edə bilər.</p><p>Müraciətlər əməliyyat məlumatları, xidmətin göstərilmə vəziyyəti, razılaşdırılmış şərtlər və tətbiq olunan qanunvericilik nəzərə alınmaqla fərdi qaydada araşdırılır. Geri qaytarma qərarı barədə istifadəçiyə məlumat verilir.</p>",
+            "en": "<p>The user may contact support for a refund if they cancel the service immediately after payment, if a payment was made in error or more than once, or if they have a substantiated complaint about the service.</p><p>Requests are reviewed individually, taking into account the transaction details, the status of service delivery, the agreed terms and the applicable law. The user is informed of the refund decision.</p>",
+            "ru": "<p>Пользователь может обратиться в службу поддержки за возвратом, если он отказался от услуги сразу после оплаты, если платёж был произведён ошибочно или повторно либо если у него возникли обоснованные претензии к услуге.</p><p>Обращения рассматриваются в индивидуальном порядке с учётом данных об операции, состояния оказания услуги, согласованных условий и применимого законодательства. О решении по возврату пользователю сообщается.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "6. Cihazın zəmanəti",
+            "en": "6. Device warranty",
+            "ru": "6. Гарантия на устройство"
+          },
+          "body": {
+            "az": "<p>Salam Sesame cihazları üçün nəzərdə tutulan zəmanət müddəti 12 aydır. Zəmanət şərtlərinə daxil olan texniki və istehsal nasazlıqları zamanı cihazın təmiri və ya dəyişdirilməsi təmin edilir. Qanunla nəzərdə tutulan digər istehlakçı hüquqları qüvvədə qalır.</p>",
+            "en": "<p>The warranty period for Salam Sesame devices is 12 months. In the event of technical and manufacturing defects covered by the warranty terms, repair or replacement of the device is provided. Other consumer rights provided by law remain in force.</p>",
+            "ru": "<p>Гарантийный срок на устройства Salam Sesame составляет 12 месяцев. При технических и производственных неисправностях, подпадающих под условия гарантии, обеспечивается ремонт или замена устройства. Иные права потребителя, предусмотренные законодательством, сохраняют силу.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "7. Müraciətin təqdim edilməsi",
+            "en": "7. Submitting a request",
+            "ru": "7. Подача обращения"
+          },
+          "body": {
+            "az": "<p>Geri qaytarma müraciəti mobil tətbiqdəki yardım bölməsi və ya saytın <a href=\"/contact\">Əlaqə</a> bölməsi vasitəsilə verilə bilər. Müraciət zamanı hesabın e-poçt ünvanı, ödəniş tarixi, əməliyyatla bağlı məlumat və müraciətin səbəbi istənilə bilər. Kartın tam rekvizitlərini göndərmək lazım deyil.</p>",
+            "en": "<p>A refund request may be submitted through the help section of the mobile app or the <a href=\"/contact\">Contact</a> section of the website. When submitting a request, you may be asked for the e-mail address of the account, the payment date, transaction details and the reason for the request. You do not need to send full card details.</p>",
+            "ru": "<p>Обращение о возврате можно подать через раздел помощи в мобильном приложении или через раздел <a href=\"/contact\">Контакты</a> на сайте. При обращении могут быть запрошены адрес электронной почты аккаунта, дата платежа, сведения об операции и причина обращения. Отправлять полные реквизиты карты не нужно.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "8. Yekun müddəalar",
+            "en": "8. Final provisions",
+            "ru": "8. Заключительные положения"
+          },
+          "body": {
+            "az": "<p>Bu siyasət Azərbaycan Respublikasının qüvvədə olan qanunvericiliyində nəzərdə tutulmuş istehlakçı hüquqlarını məhdudlaşdırmır.</p>",
+            "en": "<p>This policy does not limit the consumer rights provided for by the applicable legislation of the Republic of Azerbaijan.</p>",
+            "ru": "<p>Настоящая политика не ограничивает права потребителей, предусмотренные действующим законодательством Азербайджанской Республики.</p>"
+          }
+        }
+      ],
+      "button": {
+        "label": {
+          "az": "Əlaqə və müraciət",
+          "en": "Contact and requests",
+          "ru": "Контакты и обращения"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

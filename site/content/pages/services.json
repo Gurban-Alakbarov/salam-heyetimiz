@@ -1,0 +1,250 @@
+{
+  "key": "services",
+  "title": {
+    "az": "Xidmətlər",
+    "en": "Services",
+    "ru": "Услуги"
+  },
+  "description": {
+    "az": "Uyğun avtomatik giriş sistemlərinizi mobil tətbiqlə idarə etməyin sadə yolu.",
+    "en": "A simple way to control your compatible automatic access systems with a mobile app.",
+    "ru": "Простой способ управлять совместимыми автоматическими системами доступа через мобильное приложение."
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "XİDMƏTLƏR",
+        "en": "SERVICES",
+        "ru": "УСЛУГИ"
+      },
+      "title": {
+        "az": "Hər giriş üçün <em>ağıllı idarəetmə.</em>",
+        "en": "Smart control <em>for every entrance.</em>",
+        "ru": "Умное управление <em>каждым въездом.</em>"
+      },
+      "text": {
+        "az": "Uyğun avtomatik giriş sistemlərinizi mobil tətbiqlə idarə etməyin sadə yolu.",
+        "en": "A simple way to control your compatible automatic access systems with a mobile app.",
+        "ru": "Простой способ управлять совместимыми автоматическими системами доступа через мобильное приложение."
+      },
+      "image": "/landing/img-03.webp",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "service-grid",
+      "kicker": {
+        "az": "XİDMƏTLƏRİMİZ",
+        "en": "OUR SERVICES",
+        "ru": "НАШИ УСЛУГИ"
+      },
+      "title": {
+        "az": "Mövcud sistemlərinizlə işləyən həll.",
+        "en": "A solution that works with your existing systems.",
+        "ru": "Решение, которое работает с вашими существующими системами."
+      },
+      "text": {
+        "az": "Quraşdırma üçün texniki uyğunluq müraciət əsasında qiymətləndirilir.",
+        "en": "Technical compatibility for installation is assessed upon request.",
+        "ru": "Техническая совместимость для установки оценивается на основании заявки."
+      },
+      "items": [
+        {
+          "image": "/landing/img-03.webp",
+          "image_alt": {
+            "az": "Şlaqbaumlar",
+            "en": "Barriers",
+            "ru": "Шлагбаумы"
+          },
+          "title": {
+            "az": "Şlaqbaumlar",
+            "en": "Barriers",
+            "ru": "Шлагбаумы"
+          },
+          "text": {
+            "az": "Yaşayış kompleksləri və parkinq girişləri. Mobil tətbiq vasitəsilə uyğun giriş qurğusuna komanda göndərmə imkanı.",
+            "en": "Residential complexes and parking entrances. Send commands to a compatible access device through the mobile app.",
+            "ru": "Въезды в жилые комплексы и на парковки. Возможность отправлять команды совместимому устройству доступа через мобильное приложение."
+          }
+        },
+        {
+          "image": "/landing/img-04.webp",
+          "image_alt": {
+            "az": "Qaraj qapıları",
+            "en": "Garage doors",
+            "ru": "Гаражные ворота"
+          },
+          "title": {
+            "az": "Qaraj qapıları",
+            "en": "Garage doors",
+            "ru": "Гаражные ворота"
+          },
+          "text": {
+            "az": "Şəxsi və ortaq qarajların idarə olunması. Mobil tətbiq vasitəsilə uyğun giriş qurğusuna komanda göndərmə imkanı.",
+            "en": "Management of private and shared garages. Send commands to a compatible access device through the mobile app.",
+            "ru": "Управление личными и общими гаражами. Возможность отправлять команды совместимому устройству доступа через мобильное приложение."
+          }
+        },
+        {
+          "image": "/landing/img-05.webp",
+          "image_alt": {
+            "az": "Giriş qapıları",
+            "en": "Entrance gates",
+            "ru": "Въездные ворота"
+          },
+          "title": {
+            "az": "Giriş qapıları",
+            "en": "Entrance gates",
+            "ru": "Въездные ворота"
+          },
+          "text": {
+            "az": "Avtomatik darvaza və giriş sistemləri. Mobil tətbiq vasitəsilə uyğun giriş qurğusuna komanda göndərmə imkanı.",
+            "en": "Automatic gates and access systems. Send commands to a compatible access device through the mobile app.",
+            "ru": "Автоматические ворота и системы доступа. Возможность отправлять команды совместимому устройству доступа через мобильное приложение."
+          }
+        },
+        {
+          "image": "/landing/img-06.webp",
+          "image_alt": {
+            "az": "Kompleks və obyektlər",
+            "en": "Complexes and facilities",
+            "ru": "Комплексы и объекты"
+          },
+          "title": {
+            "az": "Kompleks və obyektlər",
+            "en": "Complexes and facilities",
+            "ru": "Комплексы и объекты"
+          },
+          "text": {
+            "az": "Fərqli istifadəçi qrupları üçün giriş. Mobil tətbiq vasitəsilə uyğun giriş qurğusuna komanda göndərmə imkanı.",
+            "en": "Access for different user groups. Send commands to a compatible access device through the mobile app.",
+            "ru": "Доступ для разных групп пользователей. Возможность отправлять команды совместимому устройству доступа через мобильное приложение."
+          }
+        }
+      ]
+    },
+    {
+      "type": "feature-grid",
+      "kicker": {
+        "az": "TƏTBİQİN İMKANLARI",
+        "en": "APP FEATURES",
+        "ru": "ВОЗМОЖНОСТИ ПРИЛОЖЕНИЯ"
+      },
+      "title": {
+        "az": "Gündəlik idarəetmə bir yerdə.",
+        "en": "Everyday control in one place.",
+        "ru": "Повседневное управление в одном месте."
+      },
+      "text": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      },
+      "items": [
+        {
+          "icon": "phone",
+          "title": {
+            "az": "Mobil pult",
+            "en": "Mobile remote",
+            "ru": "Мобильный пульт"
+          },
+          "text": {
+            "az": "İcazəniz olan giriş qurğularını telefondan idarə edin.",
+            "en": "Control the access devices you have permission for from your phone.",
+            "ru": "Управляйте с телефона устройствами доступа, к которым у вас есть разрешение."
+          }
+        },
+        {
+          "icon": "users",
+          "title": {
+            "az": "Ailə üzvləri",
+            "en": "Family members",
+            "ru": "Члены семьи"
+          },
+          "text": {
+            "az": "Ailə üzvlərinizi dəvət edin və onların giriş hüquqlarını idarə edin.",
+            "en": "Invite your family members and manage their access rights.",
+            "ru": "Приглашайте членов семьи и управляйте их правами доступа."
+          }
+        },
+        {
+          "icon": "link",
+          "title": {
+            "az": "Qonaq linkləri",
+            "en": "Guest links",
+            "ru": "Гостевые ссылки"
+          },
+          "text": {
+            "az": "Uyğun hallarda birdəfəlik və müddətli giriş linki yaradın.",
+            "en": "Create one-time and time-limited access links where applicable.",
+            "ru": "Создавайте одноразовые и временные ссылки доступа, когда это предусмотрено."
+          }
+        },
+        {
+          "icon": "clock",
+          "title": {
+            "az": "Əməliyyat tarixçəsi",
+            "en": "Activity history",
+            "ru": "История операций"
+          },
+          "text": {
+            "az": "Giriş əmrləri və istifadə tarixçəsinə baxın.",
+            "en": "View access commands and usage history.",
+            "ru": "Просматривайте команды доступа и историю использования."
+          }
+        },
+        {
+          "icon": "building",
+          "title": {
+            "az": "Komendant imkanları",
+            "en": "Building manager tools",
+            "ru": "Возможности коменданта"
+          },
+          "text": {
+            "az": "Sakinləri dəvət edin və kompleks girişlərini idarə edin.",
+            "en": "Invite residents and manage entrances to the complex.",
+            "ru": "Приглашайте жителей и управляйте въездами комплекса."
+          }
+        },
+        {
+          "icon": "bell",
+          "title": {
+            "az": "Bildirişlər",
+            "en": "Notifications",
+            "ru": "Уведомления"
+          },
+          "text": {
+            "az": "Xidmətlə bağlı bildirişləri tətbiqdən izləyin.",
+            "en": "Follow service notifications in the app.",
+            "ru": "Следите за уведомлениями о сервисе в приложении."
+          }
+        }
+      ]
+    },
+    {
+      "type": "cta-center",
+      "title": {
+        "az": "Məkanınız üçün uyğun həll axtarırsınız?",
+        "en": "Looking for the right solution for your location?",
+        "ru": "Ищете подходящее решение для своего объекта?"
+      },
+      "text": {
+        "az": "Texniki uyğunluğu yoxlayaq və fərdi təklif hazırlayaq.",
+        "en": "We will check technical compatibility and prepare a personalized quote.",
+        "ru": "Проверим техническую совместимость и подготовим индивидуальное предложение."
+      },
+      "button": {
+        "label": {
+          "az": "Təklif al",
+          "en": "Get a quote",
+          "ru": "Получить предложение"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

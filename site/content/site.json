@@ -1,0 +1,161 @@
+{
+  "base_url": "https://sezam.salam.az",
+  "menu": [
+    "index",
+    "services",
+    "how-it-works",
+    "solutions",
+    "campaigns",
+    "faq"
+  ],
+  "footer_pages": [
+    "services",
+    "how-it-works",
+    "solutions",
+    "campaigns",
+    "faq"
+  ],
+  "legal_pages": [
+    "privacy",
+    "terms",
+    "refund",
+    "account"
+  ],
+  "texts": {
+    "logo_aria": {
+      "az": "Salam Sesame — ana səhifə",
+      "en": "Salam Sesame — home page",
+      "ru": "Salam Sesame — главная страница"
+    },
+    "nav_aria": {
+      "az": "Əsas menyu",
+      "en": "Main menu",
+      "ru": "Главное меню"
+    },
+    "mobile_nav_aria": {
+      "az": "Mobil menyu",
+      "en": "Mobile menu",
+      "ru": "Мобильное меню"
+    },
+    "lang_aria": {
+      "az": "Dil",
+      "en": "Language",
+      "ru": "Язык"
+    },
+    "menu_open": {
+      "az": "Menyunu aç",
+      "en": "Open menu",
+      "ru": "Открыть меню"
+    },
+    "menu_close": {
+      "az": "Menyunu bağla",
+      "en": "Close menu",
+      "ru": "Закрыть меню"
+    },
+    "contact_label": {
+      "az": "Əlaqə",
+      "en": "Contact",
+      "ru": "Контакты"
+    },
+    "cta_label": {
+      "az": "Təklif al",
+      "en": "Get a quote",
+      "ru": "Получить предложение"
+    },
+    "footer_about": {
+      "az": "Bir tətbiq. Bütün girişləriniz.<br/>Şlaqbaum, qaraj və qapılar üçün ağıllı mobil idarəetmə.",
+      "en": "One app. All your entrances.<br/>Smart mobile control for barriers, garages and gates.",
+      "ru": "Одно приложение. Все ваши доступы.<br/>Умное мобильное управление шлагбаумами, гаражами и воротами."
+    },
+    "footer_company": {
+      "az": "Salam Sesame · Alkin Group MMC",
+      "en": "Salam Sesame · Alkin Group MMC",
+      "ru": "Salam Sesame · Alkin Group MMC"
+    },
+    "footer_site_title": {
+      "az": "Sayt",
+      "en": "Site",
+      "ru": "Сайт"
+    },
+    "footer_contact_item": {
+      "az": "Əlaqə / Təklif al",
+      "en": "Contact / Get a quote",
+      "ru": "Контакты / Получить предложение"
+    },
+    "footer_legal_title": {
+      "az": "Hüquqi məlumatlar",
+      "en": "Legal information",
+      "ru": "Правовая информация"
+    },
+    "footer_contact_title": {
+      "az": "Əlaqə",
+      "en": "Contact",
+      "ru": "Контакты"
+    },
+    "footer_contact_text": {
+      "az": "Müraciət etmək üçün əlaqə bölməsindən istifadə edin.",
+      "en": "Use the Contact section to submit a request.",
+      "ru": "Чтобы оставить обращение, воспользуйтесь разделом «Контакты»."
+    },
+    "footer_action": {
+      "az": "Müraciət et",
+      "en": "Submit a request",
+      "ru": "Оставить заявку"
+    },
+    "copyright": {
+      "az": "© 2026 Salam Sesame. Bütün hüquqlar qorunur.",
+      "en": "© 2026 Salam Sesame. All rights reserved.",
+      "ru": "© 2026 Salam Sesame. Все права защищены."
+    },
+    "region": {
+      "az": "Azərbaycan · AZ",
+      "en": "Azerbaijan · AZ",
+      "ru": "Азербайджан · AZ"
+    },
+    "legal_sidebar_title": {
+      "az": "Hüquqi məlumatlar",
+      "en": "Legal information",
+      "ru": "Правовая информация"
+    },
+    "legal_support_title": {
+      "az": "Sualınız var?",
+      "en": "Have a question?",
+      "ru": "Есть вопросы?"
+    },
+    "legal_support_text": {
+      "az": "Əlaqə bölməsindən müraciət edə bilərsiniz.",
+      "en": "You can reach us through the Contact section.",
+      "ru": "Вы можете обратиться через раздел «Контакты»."
+    },
+    "legal_support_link": {
+      "az": "Əlaqə",
+      "en": "Contact",
+      "ru": "Контакты"
+    },
+    "share_image_alt": {
+      "az": "Salam Sesame — yaşayış kompleksinin şlaqbaumu",
+      "en": "Salam Sesame — residential complex barrier",
+      "ru": "Salam Sesame — шлагбаум жилого комплекса"
+    },
+    "msg_demo": {
+      "az": "Demo: cihazla əlaqə yaradılmır, yalnız nümunədir.",
+      "en": "Demo: no connection is made to a device; this is only an example.",
+      "ru": "Демо: соединение с устройством не устанавливается, это только пример."
+    },
+    "msg_busy": {
+      "az": "Çox müraciət göndərildi. Bir az sonra yenidən cəhd edin.",
+      "en": "Too many requests. Please try again a little later.",
+      "ru": "Слишком много заявок. Попробуйте немного позже."
+    },
+    "msg_failed": {
+      "az": "Müraciət göndərilmədi. Məlumatları yoxlayıb yenidən cəhd edin.",
+      "en": "The request was not sent. Check the details and try again.",
+      "ru": "Заявка не отправлена. Проверьте данные и попробуйте ещё раз."
+    },
+    "msg_offline": {
+      "az": "Bağlantı xətası. Yenidən cəhd edin.",
+      "en": "Connection error. Please try again.",
+      "ru": "Ошибка соединения. Попробуйте ещё раз."
+    }
+  }
+}

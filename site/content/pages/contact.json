@@ -1,0 +1,213 @@
+{
+  "key": "contact",
+  "title": {
+    "az": "Əlaqə",
+    "en": "Contact",
+    "ru": "Контакты"
+  },
+  "description": {
+    "az": "Qiymətlər müraciət və qarşılıqlı danışıqlardan sonra müəyyənləşir.",
+    "en": "Prices are determined after your request and mutual discussion.",
+    "ru": "Цены определяются после заявки и взаимных переговоров."
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "ƏLAQƏ / TƏKLİF AL",
+        "en": "CONTACT / GET A QUOTE",
+        "ru": "КОНТАКТЫ / ПОЛУЧИТЬ ПРЕДЛОЖЕНИЕ"
+      },
+      "title": {
+        "az": "Giriş sisteminiz üçün <em>fərdi təklif.</em>",
+        "en": "A personalized quote <em>for your access system.</em>",
+        "ru": "Индивидуальное предложение <em>для вашей системы доступа.</em>"
+      },
+      "text": {
+        "az": "Qiymətlər müraciət və qarşılıqlı danışıqlardan sonra müəyyənləşir.",
+        "en": "Prices are determined after your request and mutual discussion.",
+        "ru": "Цены определяются после заявки и взаимных переговоров."
+      },
+      "image": "/landing/img-03.webp",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "contact-form",
+      "image": "/landing/img-02.webp",
+      "image_alt": {
+        "az": "Yaşayış kompleksinin giriş şlaqbaumu",
+        "en": "Entrance barrier of a residential complex",
+        "ru": "Въездной шлагбаум жилого комплекса"
+      },
+      "photo_kicker": {
+        "az": "SALAM SESAME",
+        "en": "SALAM SESAME",
+        "ru": "SALAM SESAME"
+      },
+      "photo_title": {
+        "az": "Birlikdə daha rahat giriş həlli quraq.",
+        "en": "Let us build a more convenient access solution together.",
+        "ru": "Давайте вместе создадим более удобное решение для доступа."
+      },
+      "photo_text": {
+        "az": "Yaşayış kompleksi, fərdi ev və biznes ehtiyaclarınıza uyğun.",
+        "en": "Tailored to residential complexes, private homes and business needs.",
+        "ru": "С учётом потребностей жилого комплекса, частного дома и бизнеса."
+      },
+      "kicker": {
+        "az": "MÜRACİƏT",
+        "en": "REQUEST",
+        "ru": "ЗАЯВКА"
+      },
+      "title": {
+        "az": "Təklif almaq üçün yazın.",
+        "en": "Write to us for a quote.",
+        "ru": "Напишите нам, чтобы получить предложение."
+      },
+      "text": {
+        "az": "Məlumatlarınızı yazın, qısa zamanda sizinlə əlaqə saxlayaq.",
+        "en": "Leave your details and we will get back to you shortly.",
+        "ru": "Оставьте свои данные, и мы скоро свяжемся с вами."
+      },
+      "name_label": {
+        "az": "Ad və soyad",
+        "en": "Full name",
+        "ru": "Имя и фамилия"
+      },
+      "name_hint": {
+        "az": "Adınız və soyadınız",
+        "en": "Your full name",
+        "ru": "Ваши имя и фамилия"
+      },
+      "email_label": {
+        "az": "E-poçt",
+        "en": "E-mail",
+        "ru": "Электронная почта"
+      },
+      "email_hint": {
+        "az": "example@mail.com",
+        "en": "example@mail.com",
+        "ru": "example@mail.com"
+      },
+      "phone_label": {
+        "az": "Telefon",
+        "en": "Phone",
+        "ru": "Телефон"
+      },
+      "phone_hint": {
+        "az": "+994 ...",
+        "en": "+994 ...",
+        "ru": "+994 ..."
+      },
+      "place_label": {
+        "az": "Məkan növü",
+        "en": "Location type",
+        "ru": "Тип объекта"
+      },
+      "place_hint": {
+        "az": "Seçin",
+        "en": "Select",
+        "ru": "Выберите"
+      },
+      "places": [
+        {
+          "text": {
+            "az": "Yaşayış kompleksi",
+            "en": "Residential complex",
+            "ru": "Жилой комплекс"
+          }
+        },
+        {
+          "text": {
+            "az": "Fərdi ev",
+            "en": "Private home",
+            "ru": "Частный дом"
+          }
+        },
+        {
+          "text": {
+            "az": "Ofis və ya biznes",
+            "en": "Office or business",
+            "ru": "Офис или бизнес"
+          }
+        },
+        {
+          "text": {
+            "az": "Digər obyekt",
+            "en": "Other facility",
+            "ru": "Другой объект"
+          }
+        }
+      ],
+      "topic_label": {
+        "az": "Müraciətin növü",
+        "en": "Request type",
+        "ru": "Тип обращения"
+      },
+      "topics": [
+        {
+          "text": {
+            "az": "Təklif almaq",
+            "en": "Get a quote",
+            "ru": "Получить предложение"
+          }
+        },
+        {
+          "text": {
+            "az": "Texniki dəstək",
+            "en": "Technical support",
+            "ru": "Техническая поддержка"
+          }
+        },
+        {
+          "text": {
+            "az": "Ödəniş və geri qaytarma",
+            "en": "Payment and refunds",
+            "ru": "Оплата и возврат"
+          }
+        },
+        {
+          "text": {
+            "az": "Hesab və məxfilik",
+            "en": "Account and privacy",
+            "ru": "Аккаунт и конфиденциальность"
+          }
+        }
+      ],
+      "message_label": {
+        "az": "Mesajınız",
+        "en": "Your message",
+        "ru": "Ваше сообщение"
+      },
+      "message_hint": {
+        "az": "Obyekt və giriş qurğusu barədə qısa məlumat",
+        "en": "Brief information about the facility and the access device",
+        "ru": "Кратко об объекте и устройстве доступа"
+      },
+      "consent": {
+        "az": "Müraciət məqsədilə məlumatlarımın işlənməsi haqqında <a href=\"/privacy\">Məxfilik siyasəti</a> ilə tanış oldum.",
+        "en": "I have read the <a href=\"/privacy\">Privacy Policy</a> regarding the processing of my data for this request.",
+        "ru": "Я ознакомлен(а) с документом <a href=\"/privacy\">Политика конфиденциальности</a> в части обработки моих данных для целей обращения."
+      },
+      "submit": {
+        "az": "Müraciəti göndər",
+        "en": "Send request",
+        "ru": "Отправить заявку"
+      },
+      "done_title": {
+        "az": "Müraciətiniz qəbul edildi",
+        "en": "We have received your request",
+        "ru": "Ваша заявка принята"
+      },
+      "done_text": {
+        "az": "Tezliklə sizinlə əlaqə saxlayacağıq.",
+        "en": "We will get back to you soon.",
+        "ru": "Мы скоро свяжемся с вами."
+      }
+    }
+  ]
+}

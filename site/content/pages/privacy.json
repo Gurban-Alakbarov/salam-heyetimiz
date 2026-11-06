@@ -1,0 +1,201 @@
+{
+  "key": "privacy",
+  "title": {
+    "az": "Məxfilik siyasəti",
+    "en": "Privacy Policy",
+    "ru": "Политика конфиденциальности"
+  },
+  "description": {
+    "az": "Bu Məxfilik siyasəti Alkin Group MMC tərəfindən Salam Sesame brendi altında təqdim olunan mobil tətbiq və əlaqəli veb-sayt xidmətlərindən istifadə zamanı…",
+    "en": "This Privacy Policy explains how data is processed when you use the mobile app and related website services provided by Alkin Group MMC under the Salam…",
+    "ru": "Настоящая Политика конфиденциальности разъясняет порядок обработки данных при использовании мобильного приложения и связанных с ним услуг веб-сайта…"
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "MƏXFİLİK",
+        "en": "PRIVACY",
+        "ru": "КОНФИДЕНЦИАЛЬНОСТЬ"
+      },
+      "title": {
+        "az": "Məxfilik siyasəti",
+        "en": "Privacy Policy",
+        "ru": "Политика конфиденциальности"
+      },
+      "text": {
+        "az": "Salam Sesame istifadəçiləri üçün məlumat və qaydalar.",
+        "en": "Information and rules for Salam Sesame users.",
+        "ru": "Информация и правила для пользователей Salam Sesame."
+      },
+      "image": "",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "legal",
+      "company": {
+        "az": "Alkin Group MMC",
+        "en": "Alkin Group MMC",
+        "ru": "Alkin Group MMC"
+      },
+      "items": [
+        {
+          "title": {
+            "az": "1. Ümumi məlumat",
+            "en": "1. General information",
+            "ru": "1. Общие сведения"
+          },
+          "body": {
+            "az": "<p>Bu Məxfilik siyasəti Alkin Group MMC tərəfindən Salam Sesame brendi altında təqdim olunan mobil tətbiq və əlaqəli veb-sayt xidmətlərindən istifadə zamanı məlumatların emalını izah edir. Şirkət fərdi məlumatları xidmətin göstərilməsi, təhlükəsizlik və qanuni öhdəliklərin icrası məqsədilə işləyir.</p>",
+            "en": "<p>This Privacy Policy explains how data is processed when you use the mobile app and related website services provided by Alkin Group MMC under the Salam Sesame brand. The Company processes personal data for the purposes of providing the service, ensuring security and fulfilling its legal obligations.</p>",
+            "ru": "<p>Настоящая Политика конфиденциальности разъясняет порядок обработки данных при использовании мобильного приложения и связанных с ним услуг веб-сайта, предоставляемых Alkin Group MMC под брендом Salam Sesame. Компания обрабатывает персональные данные в целях оказания услуг, обеспечения безопасности и исполнения обязательств, предусмотренных законодательством.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "2. Toplanan məlumatlar",
+            "en": "2. Data collected",
+            "ru": "2. Собираемые данные"
+          },
+          "body": {
+            "az": "<p>Xidmətin xarakterindən asılı olaraq aşağıdakı məlumatlar işlənə bilər:</p><ul><li>Ad, soyad, e-poçt ünvanı və telefon nömrəsi;</li><li>Qeydiyyat, hesabın təsdiqi və istifadəçi rolu haqqında məlumat;</li><li>Yaşayış kompleksi, qoşulduğu cihazlar, giriş icazələri və dəvətlər;</li><li>Cihaz əmrlərinin, giriş cəhdlərinin və müvafiq təhlükəsizlik hadisələrinin tarixçəsi;</li><li>Abunəlik, ödəniş statusu və müraciətlərlə bağlı qeydlər;</li><li>Bildirişlərin çatdırılması üçün zəruri texniki identifikatorlar;</li><li>Hüquqi şəxs müraciətində təqdim edilən təşkilat məlumatları və obyektin yerləşməsi.</li></ul>",
+            "en": "<p>Depending on the nature of the service, the following data may be processed:</p><ul><li>First name, last name, e-mail address and phone number;</li><li>Information about registration, account verification and user role;</li><li>Residential complex, connected devices, access permissions and invitations;</li><li>History of device commands, access attempts and related security events;</li><li>Records related to subscriptions, payment status and requests;</li><li>Technical identifiers required to deliver notifications;</li><li>Organization details and facility location provided in requests from legal entities.</li></ul>",
+            "ru": "<p>В зависимости от характера услуги могут обрабатываться следующие данные:</p><ul><li>Имя, фамилия, адрес электронной почты и номер телефона;</li><li>Сведения о регистрации, подтверждении аккаунта и роли пользователя;</li><li>Жилой комплекс, подключённые устройства, разрешения на доступ и приглашения;</li><li>История команд устройствам, попыток доступа и связанных с ними событий безопасности;</li><li>Записи о подписке, статусе оплаты и обращениях;</li><li>Технические идентификаторы, необходимые для доставки уведомлений;</li><li>Сведения об организации и местоположении объекта, предоставленные в обращении юридического лица.</li></ul>"
+          }
+        },
+        {
+          "title": {
+            "az": "3. Lokasiya məlumatları",
+            "en": "3. Location data",
+            "ru": "3. Данные о местоположении"
+          },
+          "body": {
+            "az": "<p>Salam Sesame istifadəçilərin fasiləsiz canlı yerini izləmir. Lakin müəyyən giriş qurğularında məsafəyə əsaslanan təhlükəsizlik məhdudiyyəti aktivləşdirildikdə, giriş əmri zamanı istifadəçinin həmin andakı lokasiyası tələb oluna bilər. Bu məlumat yalnız icazə və müvafiq funksiya çərçivəsində istifadə olunur.</p>",
+            "en": "<p>Salam Sesame does not continuously track the live location of users. However, when a distance-based security restriction is enabled on certain access devices, the current location of the user may be required at the moment an access command is sent. This data is used only with permission and within the scope of the relevant feature.</p>",
+            "ru": "<p>Salam Sesame не отслеживает местоположение пользователей непрерывно в режиме реального времени. Однако если для отдельных устройств доступа включено ограничение безопасности, основанное на расстоянии, при отправке команды доступа может запрашиваться местоположение пользователя на этот момент. Эти данные используются только при наличии разрешения и в рамках соответствующей функции.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "4. Məlumatlardan istifadə məqsədləri",
+            "en": "4. Purposes of data use",
+            "ru": "4. Цели использования данных"
+          },
+          "body": {
+            "az": "<ul><li>Hesabın yaradılması və e-poçt vasitəsilə təsdiqi;</li><li>Giriş hüquqlarının, cihazların, dəvətlərin və abunəliklərin idarəsi;</li><li>Əmrlərin qəbul edilməsi, emalı və təhlükəsizlik yoxlamaları;</li><li>Ödəniş əməliyyatlarının uçotu, müraciətlərin və şikayətlərin araşdırılması;</li><li>Tətbiqdaxili və push bildirişlərin çatdırılması;</li><li>Texniki nasazlıqların aşkarlanması və xidmətin təkmilləşdirilməsi.</li></ul>",
+            "en": "<ul><li>Creating the account and verifying it by e-mail;</li><li>Managing access rights, devices, invitations and subscriptions;</li><li>Receiving and processing commands and performing security checks;</li><li>Recording payment transactions and investigating requests and complaints;</li><li>Delivering in-app and push notifications;</li><li>Detecting technical faults and improving the service.</li></ul>",
+            "ru": "<ul><li>Создание аккаунта и его подтверждение по электронной почте;</li><li>Управление правами доступа, устройствами, приглашениями и подписками;</li><li>Приём и обработка команд, проверки безопасности;</li><li>Учёт платёжных операций, рассмотрение обращений и жалоб;</li><li>Доставка уведомлений в приложении и push-уведомлений;</li><li>Выявление технических неисправностей и совершенствование сервиса.</li></ul>"
+          }
+        },
+        {
+          "title": {
+            "az": "5. Ödəniş məlumatları",
+            "en": "5. Payment data",
+            "ru": "5. Платёжные данные"
+          },
+          "body": {
+            "az": "<p>Salam Sesame üzrə ödənişlər mobil tətbiq vasitəsilə həyata keçirilir. Ödənişin emalı bank və ya ödəniş təminatçısının infrastrukturu ilə aparıla bilər. Kartın yadda saxlanılması və avtomatik yenilənmə yalnız müvafiq inteqrasiya aktiv olduqda və istifadəçinin razılığı əsasında tətbiq edilir. Tam kart rekvizitlərinin Salam Sesame serverlərində saxlanılması nəzərdə tutulmur.</p>",
+            "en": "<p>Payments for Salam Sesame are made through the mobile app. Payments may be processed using the infrastructure of a bank or payment provider. Card saving and auto-renewal apply only when the relevant integration is active and with the consent of the user. Full card details are not intended to be stored on Salam Sesame servers.</p>",
+            "ru": "<p>Оплата услуг Salam Sesame осуществляется через мобильное приложение. Обработка платежа может проводиться с использованием инфраструктуры банка или платёжного провайдера. Сохранение карты и автоматическое продление применяются только при активной соответствующей интеграции и на основании согласия пользователя. Хранение полных реквизитов карты на серверах Salam Sesame не предусмотрено.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "6. Saxlanma və məlumatların təhlükəsizliyi",
+            "en": "6. Retention and data security",
+            "ru": "6. Хранение и безопасность данных"
+          },
+          "body": {
+            "az": "<p>Əsas serverlər Azərbaycan Respublikasında yerləşdirilir. Məlumatlar xidmətin göstərilməsi, istifadəçi icazələrinin yoxlanması, təhlükəsizlik və qanuni öhdəliklərin icrası üçün zəruri olduğu müddət ərzində saxlanılır. Əməliyyat tarixçəsinin saxlanma müddəti və silinmə qaydaları ayrıca daxili siyasətlə tənzimlənməlidir.</p><p>Məlumatlara çıxış səlahiyyətlərlə məhdudlaşdırılır və müvafiq texniki təhlükəsizlik tədbirləri tətbiq edilir.</p>",
+            "en": "<p>The main servers are located in the Republic of Azerbaijan. Data is retained for as long as necessary to provide the service, verify user permissions, ensure security and fulfil legal obligations. The retention period and deletion rules for activity history are to be governed by a separate internal policy.</p><p>Access to data is restricted according to authorization, and appropriate technical security measures are applied.</p>",
+            "ru": "<p>Основные серверы размещены в Азербайджанской Республике. Данные хранятся в течение срока, необходимого для оказания услуг, проверки разрешений пользователей, обеспечения безопасности и исполнения обязательств, предусмотренных законодательством. Срок хранения истории операций и порядок её удаления должны регулироваться отдельной внутренней политикой.</p><p>Доступ к данным ограничивается в соответствии с полномочиями, и применяются надлежащие технические меры безопасности.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "7. Üçüncü tərəf xidmətləri",
+            "en": "7. Third-party services",
+            "ru": "7. Сторонние сервисы"
+          },
+          "body": {
+            "az": "<p>Push bildirişlərin çatdırılmasında Google Firebase xidmətindən istifadə nəzərdə tutulur. Bununla əlaqədar bildiriş tokenləri və texniki məlumatların Google infrastrukturu vasitəsilə emalı mümkün ola bilər. Ödənişlərin icrası üçün zəruri məlumatlar inteqrasiya edilmiş bank və ödəniş təminatçısı ilə paylaşılır.</p><p>Tətbiqin sabit işləməsi üçün Google Firebase Crashlytics xəta hesabatlarını toplayır: tətbiqin qəfil bağlanması, cihaz modeli, əməliyyat sisteminin versiyası və daxili istifadəçi nömrəsi. Firebase Analytics tətbiqdən necə istifadə edildiyini (açılan ekranlar və əsas əməliyyatlar) statistika şəklində ölçür. Bu məlumatlar reklam üçün istifadə edilmir və satılmır; istifadə statistikasını tətbiqdə Ayarlar → Məxfilik bölməsindən söndürmək olar. Ünvan axtarışı və xəritə üçün GoMap.az xidmətindən serverlərimiz vasitəsilə istifadə olunur: axtarılan ünvan və xəritədə seçilən nöqtə GoMap-a göndərilir, istifadəçinin adı və ya əlaqə məlumatları göndərilmir.</p>",
+            "en": "<p>Google Firebase is intended to be used for delivering push notifications. In this connection, notification tokens and technical data may be processed through Google infrastructure. Data necessary for executing payments is shared with the integrated bank and payment provider.</p><p>To keep the app stable, Google Firebase Crashlytics collects crash reports: app crashes, the device model, the operating system version and an internal user number. Firebase Analytics measures how the app is used (screens opened and key actions) as statistics. This data is not used for advertising and is not sold; usage statistics can be turned off in the app under Settings → Privacy. Address search and the map use the GoMap.az service through our servers: the searched address and the point picked on the map are sent to GoMap, never the user's name or contact details.</p>",
+            "ru": "<p>Для доставки push-уведомлений предусмотрено использование сервиса Google Firebase. В связи с этим токены уведомлений и технические данные могут обрабатываться с использованием инфраструктуры Google. Данные, необходимые для проведения платежей, передаются интегрированному банку и платёжному провайдеру.</p><p>Для стабильной работы приложения Google Firebase Crashlytics собирает отчёты о сбоях: падения приложения, модель устройства, версию операционной системы и внутренний номер пользователя. Firebase Analytics измеряет, как используется приложение (открытые экраны и основные действия), в виде статистики. Эти данные не используются для рекламы и не продаются; статистику использования можно отключить в приложении в разделе Настройки → Конфиденциальность. Поиск адреса и карта работают через сервис GoMap.az посредством наших серверов: в GoMap передаются искомый адрес и выбранная на карте точка, но не имя пользователя и не его контактные данные.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "8. Digər istifadəçilərə göstərilən məlumatlar",
+            "en": "8. Information shown to other users",
+            "ru": "8. Данные, отображаемые другим пользователям"
+          },
+          "body": {
+            "az": "<p>Müvafiq cihaz və kompleks üzrə səlahiyyət verilmiş administratorlar istifadəçilərin adını, soyadını və e-poçt ünvanını giriş icazələrinin idarəsi məqsədilə görə bilərlər. İstifadəçi məlumatlarının görünmə həcmi onun rol və səlahiyyətlərindən asılıdır.</p>",
+            "en": "<p>Administrators authorized for the relevant device and complex may see the first name, last name and e-mail address of users for the purpose of managing access permissions. The extent of user data that is visible depends on the relevant role and permissions.</p>",
+            "ru": "<p>Администраторы, наделённые полномочиями в отношении соответствующего устройства и комплекса, могут видеть имя, фамилию и адрес электронной почты пользователей в целях управления разрешениями на доступ. Объём отображаемых данных пользователя зависит от его роли и полномочий.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "9. Bildirişlər və istifadə tarixçəsi",
+            "en": "9. Notifications and usage history",
+            "ru": "9. Уведомления и история использования"
+          },
+          "body": {
+            "az": "<p>Tətbiq abunəlik, dəvət, cihaz və digər xidmət hadisələri barədə push və tətbiqdaxili bildirişlər göndərə bilər. Bildirişlərin göstərilməsi cihazın əməliyyat sistemi parametrlərindən də asılıdır. Giriş və əməliyyat hadisələri xidmət təhlükəsizliyi və mübahisələrin araşdırılması üçün qeydə alına bilər.</p>",
+            "en": "<p>The app may send push and in-app notifications about subscription, invitation, device and other service events. Whether notifications are displayed also depends on the operating system settings of the device. Access and activity events may be recorded for service security and for the investigation of disputes.</p>",
+            "ru": "<p>Приложение может отправлять push-уведомления и уведомления в приложении о подписке, приглашениях, устройствах и других событиях сервиса. Отображение уведомлений также зависит от настроек операционной системы устройства. События доступа и операций могут регистрироваться в целях обеспечения безопасности сервиса и рассмотрения споров.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "10. Hesabın deaktiv edilməsi və məlumatların silinməsi",
+            "en": "10. Account deactivation and data deletion",
+            "ru": "10. Деактивация аккаунта и удаление данных"
+          },
+          "body": {
+            "az": "<p>Hesabın deaktiv edilməsi ilə fərdi məlumatların tam silinməsi fərqli əməliyyatlardır. Hesab deaktiv edildikdə hesabın məlumatları və qüvvədə olan abunəlik saxlanıla, bildirişlər dayandırıla bilər; istifadəçi yenidən daxil olduqda hesabdan istifadəni bərpa edə bilər.</p><p>Fərdi məlumatların silinməsi barədə ayrıca müraciət edilə bilər. Belə müraciətlər qanunvericiliyin tələblərinə və saxlanılması məcburi olan məlumatlara uyğun icra edilir. Hesabın texniki statusunun dəyişdirilməsi avtomatik olaraq bütün məlumatların silinməsi kimi təqdim edilmir.</p>",
+            "en": "<p>Deactivating an account and fully deleting personal data are separate operations. When an account is deactivated, the account data and any active subscription may be retained and notifications may be stopped; the user can restore use of the account by signing in again.</p><p>A separate request may be submitted for the deletion of personal data. Such requests are carried out in accordance with legal requirements and with regard to data that must be retained by law. A change in the technical status of an account is not presented as the automatic deletion of all data.</p>",
+            "ru": "<p>Деактивация аккаунта и полное удаление персональных данных — это разные операции. При деактивации аккаунта его данные и действующая подписка могут сохраняться, а уведомления — приостанавливаться; при повторном входе пользователь может возобновить использование аккаунта.</p><p>Удаление персональных данных может быть запрошено отдельным обращением. Такие обращения исполняются в соответствии с требованиями законодательства и с учётом данных, хранение которых является обязательным. Изменение технического статуса аккаунта не считается автоматическим удалением всех данных.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "11. İstifadəçinin hüquqları",
+            "en": "11. User rights",
+            "ru": "11. Права пользователя"
+          },
+          "body": {
+            "az": "<p>İstifadəçi qanunvericiliyə uyğun olaraq öz məlumatlarına dair məlumat almaq, qeyri-dəqiq məlumatları düzəltdirmək, müvafiq hallarda onların silinməsini tələb etmək və müraciət etmək hüququna malikdir.</p>",
+            "en": "<p>In accordance with the law, the user has the right to obtain information about their data, to have inaccurate data corrected, to request its deletion where applicable, and to submit requests.</p>",
+            "ru": "<p>В соответствии с законодательством пользователь имеет право получать информацию о своих данных, требовать исправления неточных данных, в соответствующих случаях требовать их удаления, а также подавать обращения.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "12. Dəyişikliklər və əlaqə",
+            "en": "12. Changes and contact",
+            "ru": "12. Изменения и контакты"
+          },
+          "body": {
+            "az": "<p>Məxfilik siyasəti xidmət və ya qanunvericilik dəyişdikdə yenilənə bilər. Müraciətlər üçün rəsmi veb-saytın <a href=\"/contact\">Əlaqə</a> bölməsindən istifadə edilə bilər.</p>",
+            "en": "<p>This Privacy Policy may be updated when the service or the law changes. For requests, you may use the <a href=\"/contact\">Contact</a> section of the official website.</p>",
+            "ru": "<p>Политика конфиденциальности может обновляться при изменении сервиса или законодательства. Для обращений можно воспользоваться разделом <a href=\"/contact\">Контакты</a> официального веб-сайта.</p>"
+          }
+        }
+      ],
+      "button": {
+        "label": {
+          "az": "Əlaqə və müraciət",
+          "en": "Contact and requests",
+          "ru": "Контакты и обращения"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

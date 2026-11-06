@@ -1,0 +1,189 @@
+{
+  "key": "terms",
+  "title": {
+    "az": "İstifadə şərtləri",
+    "en": "Terms of Use",
+    "ru": "Условия использования"
+  },
+  "description": {
+    "az": "Salam Sesame — Alkin Group MMC tərəfindən təqdim olunan, uyğun avtomatik giriş qurğularına mobil tətbiqdən komanda göndərməyə və giriş hüquqlarını idarə…",
+    "en": "Salam Sesame is a service and device solution provided by Alkin Group MMC that allows users to send commands from a mobile app to compatible automatic…",
+    "ru": "Salam Sesame — это сервис и аппаратное решение, предоставляемое Alkin Group MMC, которое позволяет отправлять команды совместимым автоматическим…"
+  },
+  "sections": [
+    {
+      "type": "page-hero",
+      "kicker": {
+        "az": "HÜQUQİ ŞƏRTLƏR",
+        "en": "LEGAL TERMS",
+        "ru": "ПРАВОВЫЕ УСЛОВИЯ"
+      },
+      "title": {
+        "az": "İstifadə şərtləri",
+        "en": "Terms of Use",
+        "ru": "Условия использования"
+      },
+      "text": {
+        "az": "Salam Sesame istifadəçiləri üçün məlumat və qaydalar.",
+        "en": "Information and rules for Salam Sesame users.",
+        "ru": "Информация и правила для пользователей Salam Sesame."
+      },
+      "image": "",
+      "image_alt": {
+        "az": "",
+        "en": "",
+        "ru": ""
+      }
+    },
+    {
+      "type": "legal",
+      "company": {
+        "az": "Alkin Group MMC",
+        "en": "Alkin Group MMC",
+        "ru": "Alkin Group MMC"
+      },
+      "items": [
+        {
+          "title": {
+            "az": "1. Xidmət haqqında",
+            "en": "1. About the service",
+            "ru": "1. О сервисе"
+          },
+          "body": {
+            "az": "<p>Salam Sesame — Alkin Group MMC tərəfindən təqdim olunan, uyğun avtomatik giriş qurğularına mobil tətbiqdən komanda göndərməyə və giriş hüquqlarını idarə etməyə imkan verən xidmət və cihaz həllidir.</p>",
+            "en": "<p>Salam Sesame is a service and device solution provided by Alkin Group MMC that allows users to send commands from a mobile app to compatible automatic access devices and to manage access rights.</p>",
+            "ru": "<p>Salam Sesame — это сервис и аппаратное решение, предоставляемое Alkin Group MMC, которое позволяет отправлять команды совместимым автоматическим устройствам доступа из мобильного приложения и управлять правами доступа.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "2. Qeydiyyat və hesab",
+            "en": "2. Registration and account",
+            "ru": "2. Регистрация и аккаунт"
+          },
+          "body": {
+            "az": "<p>İstifadəçi ad, soyad, telefon nömrəsi və e-poçt ünvanı ilə hesab yaradır. E-poçta göndərilən birdəfəlik kodla təsdiq tələb oluna bilər. Qeydiyyatın tamamlanması öz-özlüyündə cihaz və ya giriş səlahiyyəti yaratmır.</p>",
+            "en": "<p>The user creates an account with their first name, last name, phone number and e-mail address. Verification with a one-time code sent by e-mail may be required. Completing registration does not in itself create any device or access authorization.</p>",
+            "ru": "<p>Пользователь создаёт аккаунт, указывая имя, фамилию, номер телефона и адрес электронной почты. Может потребоваться подтверждение одноразовым кодом, отправленным на электронную почту. Завершение регистрации само по себе не предоставляет устройства или полномочий на доступ.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "3. Cihaz və giriş hüquqları",
+            "en": "3. Devices and access rights",
+            "ru": "3. Устройства и права доступа"
+          },
+          "body": {
+            "az": "<p>Salam Sesame şəxsi cihazlar və yaşayış komplekslərinə aid cihazlar üçün istifadə edilə bilər. Giriş hüququ müvafiq cihaz üzrə səlahiyyət və qüvvədə olan abunəlik şərtlərinə əsasən verilir. Bir istifadəçinin fərqli cihazlarda fərqli rolu ola bilər.</p>",
+            "en": "<p>Salam Sesame may be used for private devices and for devices belonging to residential complexes. Access rights are granted on the basis of authorization for the relevant device and the terms of an active subscription. A single user may have different roles on different devices.</p>",
+            "ru": "<p>Salam Sesame может использоваться для личных устройств и устройств, относящихся к жилым комплексам. Право доступа предоставляется на основании полномочий в отношении соответствующего устройства и условий действующей подписки. У одного пользователя могут быть разные роли на разных устройствах.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "4. Komendant və digər istifadəçilər",
+            "en": "4. Building manager and other users",
+            "ru": "4. Комендант и другие пользователи"
+          },
+          "body": {
+            "az": "<p>Yaşayış kompleksi üzrə səlahiyyətli komendant sakinləri dəvət edə, uyğun giriş hüquqlarını idarə edə bilər. Səlahiyyətli abunəçi ailə üzvlərini əlavə edə bilər. Ailə üzvlərinin və digər istifadəçilərin giriş hüquqları onların ayrıca səlahiyyət və abunəlik şərtlərinə uyğun müəyyən edilir.</p>",
+            "en": "<p>An authorized building manager of a residential complex may invite residents and manage the relevant access rights. An authorized subscriber may add family members. The access rights of family members and other users are determined in accordance with their separate authorization and subscription terms.</p>",
+            "ru": "<p>Уполномоченный комендант жилого комплекса может приглашать жителей и управлять соответствующими правами доступа. Уполномоченный подписчик может добавлять членов семьи. Права доступа членов семьи и других пользователей определяются в соответствии с их отдельными полномочиями и условиями подписки.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "5. Qonaq girişləri",
+            "en": "5. Guest access",
+            "ru": "5. Гостевой доступ"
+          },
+          "body": {
+            "az": "<p>Funksiya aktiv olduğu hallarda səlahiyyətli istifadəçi birdəfəlik və ya müddətli qonaq giriş linki yarada bilər. Linkin aidiyyəti olmayan şəxslərlə paylaşılmasına yol verməmək istifadəçinin məsuliyyətidir.</p>",
+            "en": "<p>Where the feature is active, an authorized user may create a one-time or time-limited guest access link. The user is responsible for ensuring that the link is not shared with unauthorized persons.</p>",
+            "ru": "<p>Если функция активна, уполномоченный пользователь может создать одноразовую или временную гостевую ссылку доступа. Пользователь несёт ответственность за то, чтобы ссылка не передавалась посторонним лицам.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "6. Abunəlik və ödəniş",
+            "en": "6. Subscription and payment",
+            "ru": "6. Подписка и оплата"
+          },
+          "body": {
+            "az": "<p>Salam Sesame üçün illik abunəlik modeli nəzərdə tutulur. Tariflər müraciətə, müştəri kateqoriyasına və razılaşdırılmış kommersiya şərtlərinə uyğun müəyyən edilir. Abunəliklə bağlı ödənişlər mobil tətbiq vasitəsilə həyata keçirilir. Avtomatik yenilənmə yalnız istifadəçinin ayrıca razılığı ilə və müvafiq funksiya aktiv olduqda tətbiq edilir.</p>",
+            "en": "<p>Salam Sesame is provided under an annual subscription model. Rates are determined according to the request, the customer category and the agreed commercial terms. Subscription payments are made through the mobile app. Auto-renewal applies only with the separate consent of the user and when the relevant feature is active.</p>",
+            "ru": "<p>Для Salam Sesame предусмотрена модель годовой подписки. Тарифы определяются в зависимости от заявки, категории клиента и согласованных коммерческих условий. Оплата подписки осуществляется через мобильное приложение. Автоматическое продление применяется только с отдельного согласия пользователя и при активной соответствующей функции.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "7. Komandanın göndərilməsi",
+            "en": "7. Sending commands",
+            "ru": "7. Отправка команд"
+          },
+          "body": {
+            "az": "<p>Mobil tətbiq uyğun cihaz vasitəsilə giriş avtomatikasına komanda ötürür. İstifadəçi cihazın internet əlaqəsinin, elektrik təchizatının və giriş mexanizminin işinin nəticəyə təsir edə biləcəyini qəbul edir. Əmrin qəbul edilməsi hər zaman fiziki qapının faktiki açıldığını və ya bağlandığını təsdiq etmir.</p>",
+            "en": "<p>The mobile app transmits commands to the access automation through a compatible device. The user acknowledges that the internet connection and power supply of the device, as well as the operation of the access mechanism, may affect the result. Acceptance of a command does not always confirm that the physical gate has actually opened or closed.</p>",
+            "ru": "<p>Мобильное приложение передаёт команду автоматике доступа через совместимое устройство. Пользователь признаёт, что на результат могут влиять интернет-соединение устройства, электропитание и работа механизма доступа. Получение команды не всегда подтверждает фактическое открытие или закрытие физических ворот.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "8. İstifadə qaydaları və məhdudiyyətlər",
+            "en": "8. Rules of use and restrictions",
+            "ru": "8. Правила использования и ограничения"
+          },
+          "body": {
+            "az": "<p>İstifadəçi başqasının hesabından icazəsiz istifadəyə, təhlükəsizlik sistemini pozmağa, linkləri qanunsuz məqsədlərlə paylaşmağa və giriş qurğularından təhlükəli qaydada istifadə etməyə yol verməməlidir.</p>",
+            "en": "<p>The user must not make unauthorized use of the account of another person, compromise the security system, share links for unlawful purposes or use access devices in a dangerous manner.</p>",
+            "ru": "<p>Пользователь не должен допускать несанкционированного использования чужого аккаунта, нарушения работы системы безопасности, распространения ссылок в незаконных целях и небезопасного использования устройств доступа.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "9. Hesabın idarə edilməsi",
+            "en": "9. Account management",
+            "ru": "9. Управление аккаунтом"
+          },
+          "body": {
+            "az": "<p>İstifadəçi hesabın deaktiv edilməsi və ya məlumatların silinməsi üçün müvafiq kanallardan müraciət edə bilər. Deaktivasiya zamanı qüvvədə olan abunəliyin saxlanılması və hesabın yenidən aktivləşdirilməsi mümkündür. Fərdi məlumatların tam silinməsi ayrıca qaydada həyata keçirilir.</p>",
+            "en": "<p>The user may submit a request through the appropriate channels to deactivate the account or delete data. Upon deactivation, an active subscription may be retained and the account may be reactivated. Full deletion of personal data is carried out under a separate procedure.</p>",
+            "ru": "<p>Пользователь может обратиться по соответствующим каналам для деактивации аккаунта или удаления данных. При деактивации возможны сохранение действующей подписки и повторная активация аккаунта. Полное удаление персональных данных осуществляется в отдельном порядке.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "10. Dəstək və müraciətlər",
+            "en": "10. Support and requests",
+            "ru": "10. Поддержка и обращения"
+          },
+          "body": {
+            "az": "<p>Xidmət, quraşdırma və ya ödənişlə bağlı müraciətlər mobil tətbiqin yardım hissəsi və saytın <a href=\"/contact\">Əlaqə</a> bölməsi üzərindən təqdim edilə bilər.</p>",
+            "en": "<p>Requests concerning the service, installation or payment may be submitted through the help section of the mobile app and the <a href=\"/contact\">Contact</a> section of the website.</p>",
+            "ru": "<p>Обращения, связанные с сервисом, установкой или оплатой, можно направить через раздел помощи в мобильном приложении и раздел <a href=\"/contact\">Контакты</a> на сайте.</p>"
+          }
+        },
+        {
+          "title": {
+            "az": "11. Şərtlərdə dəyişikliklər",
+            "en": "11. Changes to the terms",
+            "ru": "11. Изменения условий"
+          },
+          "body": {
+            "az": "<p>Bu şərtlərin aktual versiyası Salam Sesame-in rəsmi veb-saytında yerləşdirilir. Qanunla tələb olunduqda dəyişikliklər haqqında istifadəçilərə müvafiq bildiriş verilə bilər.</p>",
+            "en": "<p>The current version of these terms is published on the official Salam Sesame website. Where required by law, users may be given appropriate notice of changes.</p>",
+            "ru": "<p>Актуальная версия настоящих условий размещается на официальном веб-сайте Salam Sesame. Если это требуется по закону, пользователи могут быть надлежащим образом уведомлены об изменениях.</p>"
+          }
+        }
+      ],
+      "button": {
+        "label": {
+          "az": "Əlaqə və müraciət",
+          "en": "Contact and requests",
+          "ru": "Контакты и обращения"
+        },
+        "href": "/contact"
+      }
+    }
+  ]
+}

@@ -24,6 +24,7 @@ import 'package:salam_mobile/core/storage/app_storage.dart';
 import 'package:salam_mobile/core/storage/storage_keys.dart';
 import 'package:salam_mobile/features/door_widget/door_widget_open.dart';
 import 'package:salam_mobile/features/door_widget/door_widget_service.dart';
+import 'package:salam_mobile/features/door_widget/ios_widget_bridge.dart';
 import 'package:salam_mobile/features/notifications/data/push_messaging_service.dart';
 
 /// Crash reports + usage analytics leave the device only from a prod release build (1.0.1), so dev / QA /
@@ -103,6 +104,9 @@ Future<void> bootstrap(AppConfig config) async {
         crash.recordError(error, stack, fatal: false);
       }
     }
+
+    // The iOS widget reads the API address and language from the shared Keychain group.
+    await const IosWidgetBridge().setConfig(baseUrl: config.apiBaseUrl, locale: widgetLocaleCode);
 
     // Hydrate the session before the first frame so the splash gate can decide
     // immediately whether to restore the session or show Welcome.

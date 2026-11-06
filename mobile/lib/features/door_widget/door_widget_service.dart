@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
+
+import 'ios_widget_bridge.dart';
 
 /// The barrier a single home-screen widget instance is bound to (W5). Only the
 /// non-sensitive id + display label — never a token.
@@ -9,7 +12,7 @@ class DoorWidgetConfig {
   final String deviceLabel;
 }
 
-/// Bridges the app and the Android home-screen widgets. W5: configuration is
+/// Bridges the app and the Android home-screen widgets (iOS: [IosWidgetBridge]). W5: configuration is
 /// PER-INSTANCE, keyed by the real Android `AppWidgetId`, so two widgets can point
 /// at two different doors. Legacy (pre-W5) global keys are kept as a read fallback
 /// so existing widgets keep working until reconfigured.
@@ -100,6 +103,9 @@ class DoorWidgetService {
   /// Logout cleanup: wipe EVERY installed instance's config + the legacy global keys
   /// + the base URL. Keeps the app locale (not user-specific). Never touched a token.
   Future<void> clearAll() async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return const IosWidgetBridge().clear();
+    }
     for (final widget in await _installedDoorWidgets()) {
       final id = widget.androidWidgetId;
       if (id != null) {
@@ -146,6 +152,9 @@ class DoorWidgetService {
   /// Persist the app locale code (az/ru/en) for the native widget to localize with,
   /// then refresh all widgets so they re-render in the new language (W5 D2).
   Future<void> setLocale(String localeCode) async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return const IosWidgetBridge().setLocale(localeCode);
+    }
     await HomeWidget.saveWidgetData<String>(keyLocale, localeCode);
     await refresh();
   }

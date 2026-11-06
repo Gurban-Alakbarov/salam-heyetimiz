@@ -3,7 +3,9 @@
 <!--
   Runner entitlements (wired via CODE_SIGN_ENTITLEMENTS). Push (APNs, production) for FCM, and universal
   links for https://sezam.salam.az/invite/* (served by /.well-known/apple-app-site-association with the
-  Apple Team ID — APP_LINKS_IOS_APP_ID).
+  Apple Team ID — APP_LINKS_IOS_APP_ID). The Keychain groups let the home-screen widget read what
+  ios_widget_bridge.dart writes: the app's own group must stay first, because the first group is where
+  everything else (the session tokens) is written.
 -->
 <plist version="1.0">
 <dict>
@@ -12,6 +14,11 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:sezam.salam.az</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)az.salam.sezam</string>
+		<string>$(AppIdentifierPrefix)az.salam.sezam.shared</string>
 	</array>
 </dict>
 </plist>

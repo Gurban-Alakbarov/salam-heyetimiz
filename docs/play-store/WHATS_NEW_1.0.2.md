@@ -14,7 +14,9 @@ Redesigned home screen widget: the door's name and status are now easier to see.
 ## App Store (iOS)
 
 **en-US**
-Directions now open AzNav with the route to your gate.
+- New home screen widget: open your gate without opening the app (iOS 17 or later)
+- Directions now open AzNav with the route to your gate
 
 **ru**
-Кнопка «Маршрут» теперь открывает AzNav с маршрутом до ворот.
+- Новый виджет на главном экране: открывайте ворота, не заходя в приложение (iOS 17 и новее)
+- Кнопка «Маршрут» теперь открывает AzNav с маршрутом до ворот

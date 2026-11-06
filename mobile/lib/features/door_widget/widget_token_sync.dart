@@ -1,6 +1,7 @@
 import '../../core/network/api_client.dart';
 import '../../core/storage/app_storage.dart';
 import '../../core/storage/storage_keys.dart';
+import 'ios_widget_bridge.dart';
 
 /// The home-screen widget's own credential (backend `POST /v1/me/widget-token`): open-only, bound to this
 /// install, long-lived. The widget's background isolate uses it instead of the app's 15-minute access token,
@@ -27,7 +28,10 @@ class WidgetTokenSync {
       final fresh = token != null &&
           issuedAtMs != null &&
           _now().difference(DateTime.fromMillisecondsSinceEpoch(issuedAtMs)) < reissueAfter;
-      if (fresh && !force) return;
+      if (fresh && !force) {
+        await const IosWidgetBridge().setToken(token); // also covers a phone updated from a version without the widget
+        return;
+      }
 
       final res = await _api.post('/v1/me/widget-token');
       final body = res.data;
@@ -37,6 +41,7 @@ class WidgetTokenSync {
 
       await _store.write(StorageKeys.widgetToken, newToken);
       await _store.write(StorageKeys.widgetTokenIssuedAt, _now().millisecondsSinceEpoch.toString());
+      await const IosWidgetBridge().setToken(newToken);
     } catch (_) {
       // offline / not signed in — the widget keeps the token it has
     }

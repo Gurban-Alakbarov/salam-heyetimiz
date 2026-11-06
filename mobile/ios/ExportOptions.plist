@@ -18,6 +18,8 @@
 	<dict>
 		<key>az.salam.sezam</key>
 		<string>Salam Sesame App Store</string>
+		<key>az.salam.sezam.DoorWidget</key>
+		<string>Salam Sesame Door Widget App Store</string>
 	</dict>
 	<key>uploadSymbols</key>
 	<true/>

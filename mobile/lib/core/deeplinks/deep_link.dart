@@ -44,6 +44,20 @@ class PaymentReturnLink extends DeepLink {
   String toString() => 'PaymentReturnLink($status, test=$isTest)';
 }
 
+/// `salam://widget/open?deviceId=` — the iOS widget hands over to the app when it cannot open by itself (the door
+/// needs GPS, or the session ended). The device id is navigation only: the open screen checks it again.
+class WidgetOpenLink extends DeepLink {
+  const WidgetOpenLink(this.deviceId);
+  final int deviceId;
+
+  @override
+  bool operator ==(Object other) => other is WidgetOpenLink && other.deviceId == deviceId;
+  @override
+  int get hashCode => deviceId.hashCode;
+  @override
+  String toString() => 'WidgetOpenLink($deviceId)';
+}
+
 class UnknownLink extends DeepLink {
   const UnknownLink();
 }
@@ -76,6 +90,11 @@ class DeepLinkParser {
       );
     }
 
+    if (scheme == customScheme && uri.host == 'widget' && uri.path == '/open') {
+      final deviceId = int.tryParse(uri.queryParameters['deviceId'] ?? '');
+      if (deviceId != null) return WidgetOpenLink(deviceId);
+    }
+
     return const UnknownLink();
   }
 
@@ -91,6 +110,7 @@ class DeepLinkParser {
   /// flow (B16) — the token never travels in a route or the navigation history.
   static String? routeFor(DeepLink link) => switch (link) {
         InviteLink() => null,
+        WidgetOpenLink(:final deviceId) => '/widget/open?deviceId=$deviceId',
         PaymentReturnLink(:final status, :final orderReference, :final isTest) => Uri(
             path: '/payment/return',
             queryParameters: {

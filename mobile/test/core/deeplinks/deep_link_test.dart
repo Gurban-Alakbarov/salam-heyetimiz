@@ -19,6 +19,17 @@ class _MemStore implements SecureStore {
 }
 
 void main() {
+  test('parses the iOS widget hand-over link', () {
+    final link = DeepLinkParser.parse(Uri.parse('salam://widget/open?deviceId=25'));
+
+    expect(link, const WidgetOpenLink(25));
+    expect(DeepLinkParser.routeFor(link), '/widget/open?deviceId=25');
+  });
+
+  test('ignores a widget link without a device', () {
+    expect(DeepLinkParser.parse(Uri.parse('salam://widget/open')), isA<UnknownLink>());
+  });
+
   group('DeepLinkParser — invitation app links (B6)', () {
     test('accepts https://sezam.salam.az/invite/{token} and the old salamheyetimiz.com links', () {
       expect(DeepLinkParser.parse(Uri.parse('https://sezam.salam.az/invite/$_token')), const InviteLink(_token));

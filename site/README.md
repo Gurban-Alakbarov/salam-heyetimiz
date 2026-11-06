@@ -19,6 +19,12 @@ php artisan site:build
 
 Writes 30 pages to `storage/app/site-build` (`index.html`, `services.html`, `en/index.html`, `en/services.html`, ...). With `--out=<empty folder>` it writes there instead.
 
+## Database
+
+`php artisan site:import` fills `site_documents` from these files, once, and only while the table is empty. From then on the database holds the working drafts and each saved change is a row in `site_revisions`. `php artisan site:build --from-db` builds from the drafts. Icons stay in `content/icons.json`, they are part of the design.
+
+The admin API is under `/admin/v1/site/` and needs the `site.manage` permission. `ContentNormalizer` shapes what is saved, and `SiteHtml` removes any markup that is not allowed, because pages render those fields unescaped.
+
 ## Content rules
 
 - A translated value is `{"az": "...", "en": "...", "ru": "..."}`. An empty translation falls back to Azerbaijani.

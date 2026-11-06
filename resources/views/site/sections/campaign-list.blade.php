@@ -6,7 +6,7 @@
 @if (! empty($item['ends_at']))
 <p><strong>{{ $t($s['until_label']) }}</strong> {{ \Illuminate\Support\Carbon::parse($item['ends_at'])->format('d.m.Y') }}</p>
 @endif
-@if (! empty($item['link']))
+@if (! empty($item['link']['href']))
 <a class="text-link" href="{{ $url($item['link']['href']) }}">{{ $t($item['link']['label']) }} {!! $icon('arrow', 16) !!}</a>
 @endif
 </div>

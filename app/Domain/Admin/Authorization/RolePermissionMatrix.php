@@ -60,6 +60,7 @@ final class RolePermissionMatrix
                 Permission::NOTIFICATIONS_SEND,
                 Permission::APPLICATIONS_VIEW,
                 Permission::APPLICATIONS_MANAGE,
+                Permission::SITE_MANAGE,
                 Permission::NOTIFICATION_TEMPLATES_VIEW,
             ],
 

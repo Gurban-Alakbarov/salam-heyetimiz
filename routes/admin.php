@@ -22,6 +22,7 @@ use App\Http\Admin\V1\Controllers\Refunds\AdminRefundController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentArchiveController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentController;
 use App\Http\Admin\V1\Controllers\Site\AdminInboxCountController;
+use App\Http\Admin\V1\Controllers\Site\AdminSiteContentController;
 use App\Http\Admin\V1\Controllers\Site\AdminSiteLeadController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsTestController;
@@ -83,6 +84,15 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
 
     // Residential complexes — the root entity (complexes.view / complexes.manage)
     // Requests from the website's contact form
+    // The public website's content (site.manage)
+    Route::get('site/catalog', [AdminSiteContentController::class, 'catalog'])->name('adminSiteCatalog');
+    Route::get('site/documents', [AdminSiteContentController::class, 'index'])->name('adminListSiteDocuments');
+    Route::get('site/documents/{key}', [AdminSiteContentController::class, 'show'])->where('key', '[a-z-]+')->name('adminGetSiteDocument');
+    Route::put('site/documents/{key}', [AdminSiteContentController::class, 'update'])->where('key', '[a-z-]+')->name('adminUpdateSiteDocument');
+    Route::get('site/documents/{key}/revisions', [AdminSiteContentController::class, 'revisions'])->where('key', '[a-z-]+')->name('adminListSiteRevisions');
+    Route::get('site/documents/{key}/revisions/{version}', [AdminSiteContentController::class, 'revision'])->where('key', '[a-z-]+')->whereNumber('version')->name('adminGetSiteRevision');
+    Route::post('site/documents/{key}/revisions/{version}/restore', [AdminSiteContentController::class, 'restore'])->where('key', '[a-z-]+')->whereNumber('version')->name('adminRestoreSiteRevision');
+
     Route::get('inbox-counts', AdminInboxCountController::class)->name('adminInboxCounts');
     Route::get('site-leads', [AdminSiteLeadController::class, 'index'])->name('adminListSiteLeads');
     Route::patch('site-leads/{id}', [AdminSiteLeadController::class, 'update'])->whereNumber('id')->name('adminUpdateSiteLead');

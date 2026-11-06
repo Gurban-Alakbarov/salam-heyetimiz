@@ -12,6 +12,7 @@ return [
     'confirmation_required' => 'Требуется подтверждение отправки (confirmed=true).',
     'rate_limited' => 'Слишком много запросов. Повторите через :retry_after_seconds сек.',
     'cooldown' => 'Подождите :retry_after_seconds сек. перед повторной попыткой.',
+    'site_content_conflict' => 'Эта страница изменилась, пока вы её редактировали. Обновите её и повторите попытку.',
     'subscription_required' => 'Срок вашей подписки истёк.',
     'device_disabled' => 'Устройство отключено администратором.',
     // GEOFENCE-1 — ограничение по расстоянию.

@@ -15,6 +15,7 @@ return [
     'confirmation_required' => 'Göndərişi təsdiqləmək tələb olunur (confirmed=true).',
     'rate_limited' => 'Çox sayda sorğu. :retry_after_seconds saniyə sonra yenidən cəhd edin.',
     'cooldown' => 'Yenidən cəhd üçün :retry_after_seconds saniyə gözləyin.',
+    'site_content_conflict' => 'Bu səhifə siz redaktə edərkən dəyişilib. Səhifəni yeniləyib yenidən cəhd edin.',
     'subscription_required' => 'Aboneliyiniz başa çatıb.',
     'device_disabled' => 'Cihaz admin tərəfindən bağlanıb.',
     // GEOFENCE-1 — məsafə məhdudiyyəti.

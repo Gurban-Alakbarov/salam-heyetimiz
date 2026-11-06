@@ -7749,6 +7749,253 @@
         }
       }
     },
+    "/admin/v1/site/catalog": {
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Section types, their fields, shared text fields and icons, for drawing the editor (site.manage)",
+        "operationId": "adminSiteCatalog",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/admin/v1/site/documents": {
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Website pages and shared texts, with version and translation state (site.manage)",
+        "operationId": "adminListSiteDocuments",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/admin/v1/site/documents/{key}": {
+      "parameters": [
+        {
+          "name": "key",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "A page key, or \"site\" for the shared texts"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "One website document with its draft content and translation issues (site.manage)",
+        "operationId": "adminGetSiteDocument",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "404": {
+            "description": "not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Save a draft as a new version (site.manage)",
+        "description": "Text is cleaned, unknown keys are dropped and missing keys come back empty. `version` must be the one that was read, otherwise 409.",
+        "operationId": "adminUpdateSiteDocument",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content",
+                  "version"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "object"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "409": {
+            "description": "changed by another admin"
+          },
+          "422": {
+            "description": "a field cannot be right",
+            "keyed by its path": null
+          }
+        }
+      }
+    },
+    "/admin/v1/site/documents/{key}/revisions": {
+      "parameters": [
+        {
+          "name": "key",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Saved versions of a website document (site.manage)",
+        "operationId": "adminListSiteRevisions",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/admin/v1/site/documents/{key}/revisions/{version}": {
+      "parameters": [
+        {
+          "name": "key",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "version",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "One saved version with its content (site.manage)",
+        "operationId": "adminGetSiteRevision",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "404": {
+            "description": "not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/site/documents/{key}/revisions/{version}/restore": {
+      "parameters": [
+        {
+          "name": "key",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "version",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Bring an earlier version back as a new draft (site.manage)",
+        "operationId": "adminRestoreSiteRevision",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "version"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "description": "The current version",
+                    "as read": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "409": {
+            "description": "changed by another admin"
+          }
+        }
+      }
+    },
     "/admin/v1/inbox-counts": {
       "get": {
         "tags": [

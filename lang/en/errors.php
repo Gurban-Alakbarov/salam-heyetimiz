@@ -12,6 +12,7 @@ return [
     'confirmation_required' => 'Send confirmation is required (confirmed=true).',
     'rate_limited' => 'Too many requests. Try again in :retry_after_seconds seconds.',
     'cooldown' => 'Wait :retry_after_seconds seconds before trying again.',
+    'site_content_conflict' => 'This page was changed while you were editing. Reload it and try again.',
     'subscription_required' => 'Your subscription has expired.',
     'device_disabled' => 'The device has been disabled by an administrator.',
     // GEOFENCE-1 — distance restriction.

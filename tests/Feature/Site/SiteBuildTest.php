@@ -22,7 +22,7 @@ function editPage(string $dir, string $key, callable $edit): void
 
 function buildSite(string $dir, ?Carbon $today = null): array
 {
-    $files = (new SiteBuilder(base_path('site')))->build(new SiteContent($dir.'/content', $today), $dir.'/out');
+    $files = (new SiteBuilder(base_path('site')))->build(SiteContent::fromFiles($dir.'/content', $today), $dir.'/out');
 
     return $files;
 }
@@ -175,7 +175,7 @@ it('refuses a folder that already has files', function () {
 })->throws(RuntimeException::class, 'Build folder is not empty');
 
 it('has a template for every section type', function () {
-    foreach (array_keys(SectionCatalog::TYPES) as $type) {
+    foreach (array_keys(SectionCatalog::types()) as $type) {
         expect(view()->exists('site.sections.'.$type))->toBeTrue();
     }
 });

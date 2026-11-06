@@ -60,6 +60,9 @@ final class Permission
 
     public const APPLICATIONS_MANAGE = 'applications.manage';
 
+    // the public website's content
+    public const SITE_MANAGE = 'site.manage';
+
     // devices / barriers
     public const DEVICES_VIEW = 'devices.view';
 
@@ -181,6 +184,7 @@ final class Permission
             self::COMPLEXES_DEVICES_BIND => ['group' => 'complexes', 'label' => 'Cihazı kompleksə qoş / ayır'],
             self::CATALOG_MANAGE => ['group' => 'system', 'label' => 'Cihaz modelləri, regionlar, SIM operatorları'],
             self::APPLICATIONS_VIEW => ['group' => 'applications', 'label' => 'Müraciətləri gör'],
+            self::SITE_MANAGE => ['group' => 'site', 'label' => 'Saytı idarə et'],
             self::APPLICATIONS_MANAGE => ['group' => 'applications', 'label' => 'Müraciətləri idarə et (status, təsdiq/rədd)'],
 
             self::DEVICES_VIEW => ['group' => 'devices', 'label' => 'Cihazları gör'],

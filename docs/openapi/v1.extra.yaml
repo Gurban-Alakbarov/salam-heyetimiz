@@ -1100,6 +1100,14 @@ paths:
         '202': { description: accepted }
         '422': { description: invalid fields }
         '429': { description: too many requests }
+  /admin/inbox-counts:
+    get:
+      tags: [Site]
+      summary: New applications and website requests, for the sidebar numbers (applications.view)
+      operationId: adminInboxCounts
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200': { description: ok }
   /admin/site-leads:
     get:
       tags: [Site]

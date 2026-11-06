@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
+import { useInboxCounts } from '@/api/inboxCounts'
 import { useAuth } from '@/auth/useAuth'
+import { PERM } from '@/auth/permissions'
 import { cn } from '@/lib/utils'
 import { navGroups } from './navItems'
 
@@ -20,6 +22,7 @@ export function SidebarBrand() {
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { hasPermission } = useAuth()
+  const counts = useInboxCounts(hasPermission(PERM.applicationsView)).data
   const groups = navGroups
     .map((g) => ({ ...g, items: g.items.filter((item) => hasPermission(item.permission)) }))
     .filter((g) => g.items.length > 0)
@@ -35,6 +38,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           )}
           {group.items.map((item) => {
             const Icon = item.icon
+            const count = item.count ? (counts?.[item.count] ?? 0) : 0
             return (
               <NavLink
                 key={item.to}
@@ -52,6 +56,14 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
+                {count > 0 && (
+                  <span
+                    aria-label={`${count} yeni`}
+                    className="ml-auto min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white"
+                  >
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
               </NavLink>
             )
           })}

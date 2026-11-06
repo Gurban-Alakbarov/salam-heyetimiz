@@ -7749,6 +7749,25 @@
         }
       }
     },
+    "/admin/v1/inbox-counts": {
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "New applications and website requests, for the sidebar numbers (applications.view)",
+        "operationId": "adminInboxCounts",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
     "/admin/v1/site-leads": {
       "get": {
         "tags": [

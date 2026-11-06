@@ -39,6 +39,9 @@ export function useUpdateSiteLead() {
   return useMutation({
     mutationFn: async ({ id, ...body }: { id: number; status: SiteLeadStatus; admin_note?: string | null }) =>
       (await api.patch(`/admin/v1/site-leads/${id}`, body)).data,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['site-leads'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['site-leads'] })
+      qc.invalidateQueries({ queryKey: ['inbox-counts'] })
+    },
   })
 }

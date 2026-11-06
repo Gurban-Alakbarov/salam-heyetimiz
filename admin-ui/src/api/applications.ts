@@ -96,7 +96,10 @@ export function useUpdateIndividualApplication(id: number) {
   return useMutation({
     mutationFn: async (input: IndividualStatusInput) =>
       (await api.patch<{ data: IndividualApplication }>(`/admin/v1/applications/individual/${id}`, input)).data.data,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['applications', 'individual'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['applications', 'individual'] })
+      qc.invalidateQueries({ queryKey: ['inbox-counts'] })
+    },
   })
 }
 
@@ -107,6 +110,7 @@ export function useApproveLegalApplication(id: number) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['applications', 'legal'] })
       qc.invalidateQueries({ queryKey: ['complexes'] })
+      qc.invalidateQueries({ queryKey: ['inbox-counts'] })
     },
   })
 }
@@ -115,6 +119,9 @@ export function useRejectLegalApplication(id: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (reason: string) => (await api.post<{ data: LegalApplication }>(`/admin/v1/applications/legal/${id}/reject`, { reason })).data.data,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['applications', 'legal'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['applications', 'legal'] })
+      qc.invalidateQueries({ queryKey: ['inbox-counts'] })
+    },
   })
 }

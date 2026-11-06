@@ -21,6 +21,7 @@ use App\Http\Admin\V1\Controllers\Payments\AdminPaymentLogController;
 use App\Http\Admin\V1\Controllers\Refunds\AdminRefundController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentArchiveController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentController;
+use App\Http\Admin\V1\Controllers\Site\AdminInboxCountController;
 use App\Http\Admin\V1\Controllers\Site\AdminSiteLeadController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsTestController;
@@ -82,6 +83,7 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
 
     // Residential complexes — the root entity (complexes.view / complexes.manage)
     // Requests from the website's contact form
+    Route::get('inbox-counts', AdminInboxCountController::class)->name('adminInboxCounts');
     Route::get('site-leads', [AdminSiteLeadController::class, 'index'])->name('adminListSiteLeads');
     Route::patch('site-leads/{id}', [AdminSiteLeadController::class, 'update'])->whereNumber('id')->name('adminUpdateSiteLead');
 

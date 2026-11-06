@@ -116,6 +116,21 @@ it('lets an admin list, search and update requests, audited', function () {
     $this->actingAs($admin, 'admin')->getJson('/admin/v1/site-leads?status=new')->assertJsonCount(1, 'data');
 });
 
+it('counts what waits for someone, for the sidebar', function () {
+    Bus::fake([SendSiteLeadEmailJob::class]);
+    $this->postJson('/v1/site/contact', siteLeadBody());
+    $this->postJson('/v1/site/contact', siteLeadBody(['email' => 'second@example.test']));
+    $admin = makeSuperAdmin();
+
+    $this->actingAs($admin, 'admin')->getJson('/admin/v1/inbox-counts')
+        ->assertOk()->assertJsonPath('data.site_leads', 2)->assertJsonPath('data.applications', 0);
+
+    SiteLead::query()->first()->update(['status' => 'contacted']);
+
+    $this->actingAs($admin, 'admin')->getJson('/admin/v1/inbox-counts')->assertJsonPath('data.site_leads', 1);
+    $this->actingAs(makeAdminRole('finance'), 'admin')->getJson('/admin/v1/inbox-counts')->assertForbidden();
+});
+
 it('hides requests from admins without the permission', function () {
     $complex = makeComplex('CX-L', 'L');
 

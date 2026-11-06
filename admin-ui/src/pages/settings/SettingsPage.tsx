@@ -41,7 +41,6 @@ const GROUP_LABELS: Record<string, string> = {
   otp: 'OTP',
   payments: 'Ödənişlər',
   traccar: 'Traccar',
-  sms: 'SMS',
   subscriptions: 'Abunəliklər',
 }
 const TESTABLE = new Set(['traccar', 'email', 'payments'])
@@ -191,7 +190,6 @@ function GroupForm({ group, readonly }: { group: SettingGroup; readonly: Record<
 /** Group-specific operational actions (real backend calls — no mock). */
 function GroupActions({ group }: { group: string }) {
   if (group === 'email') return <EmailActions />
-  if (group === 'sms') return <SmsActions />
   if (group === 'security') return <SecurityActions />
   if (group === 'traccar') return <TraccarStatusPanel />
   if (group === 'payments') return <PaymentsStatus />
@@ -276,7 +274,6 @@ function EmailActions() {
         <Select value={template} onChange={(e) => setTemplate(e.target.value)} className="w-44">
           <option value="registration">Qeydiyyat OTP</option>
           <option value="login">Giriş OTP</option>
-          <option value="password_reset">Parol bərpa OTP</option>
         </Select>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -291,14 +288,13 @@ function EmailActions() {
   )
 }
 
-function SmsActions() {
+function SmsTest({ configured }: { configured: boolean }) {
   const { toast } = useToast()
   const [to, setTo] = useState('')
   const testSms = useTestSms()
+  if (!configured) return <p className="pt-1 text-xs text-muted-foreground">SMS provayderi qoşulmayıb. Serverin .env faylında təyin olunur.</p>
   return (
-    <div className="space-y-3 border-t pt-4">
-      <p className="text-sm font-medium">Test SMS</p>
-      <p className="text-xs text-muted-foreground">SMS yalnız ehtiyat (fallback) kanaldır.</p>
+    <div className="space-y-2 pt-2">
       <div className="flex flex-wrap items-end gap-2">
         <div className="grow space-y-1.5"><Label className="text-xs">Nömrə</Label>
           <Input placeholder="+994..." value={to} onChange={(e) => setTo(e.target.value)} />
@@ -343,6 +339,7 @@ function TraccarStatusPanel() {
         <p className="text-sm font-medium">Traccar statusu</p>
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Badge variant={online ? 'success' : 'destructive'}>{online ? 'Qoşulub' : 'Qoşulmayıb'}</Badge>}
       </div>
+      <p className="text-xs text-muted-foreground">Bağlantı məlumatları serverin .env faylındadır.</p>
       {data && (
         <div className="grid gap-1 text-sm sm:grid-cols-2">
           <Row k="Versiya" v={data.version ?? '—'} />
@@ -485,6 +482,10 @@ function HealthCards({ h }: { h: SystemHealth }) {
         <Row k="Son webhook" v={h.traccar.last_webhook ? new Date(h.traccar.last_webhook).toLocaleString('az') : '—'} />
       </HCard>
       <HCard title="SMTP" badge={ok(h.smtp.configured)}><Row k="Konfiqurasiya" v={h.smtp.configured ? 'Var' : 'Yox'} /></HCard>
+      <HCard title="SMS" badge={<Badge variant={h.sms.configured ? 'success' : 'muted'}>{h.sms.configured ? 'Qoşulub' : 'Qoşulmayıb'}</Badge>}>
+        <Row k="Provayder" v={h.sms.provider} />
+        <SmsTest configured={h.sms.configured} />
+      </HCard>
       <HCard title="Ödəniş" badge={<Badge variant={h.payment.enabled ? 'success' : 'muted'}>{h.payment.enabled ? 'Aktiv' : 'Söndürülüb'}</Badge>}><Row k="Konfiqurasiya" v={h.payment.configured ? 'Var' : 'Yox'} /></HCard>
       <HCard title="Cloudflare" badge={<Badge variant={h.cloudflare.proxied ? 'success' : 'muted'}>{h.cloudflare.proxied ? 'Proxy' : 'Birbaşa'}</Badge>}><Row k="CF-RAY" v={h.cloudflare.ray ?? '—'} /></HCard>
     </div>

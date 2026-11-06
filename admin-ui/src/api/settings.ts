@@ -39,6 +39,7 @@ export interface SystemHealth {
   memory: { php_used_mb: number; php_limit: string }
   cpu: { load_1m: number | null }
   smtp: { configured: boolean }
+  sms: { provider: string; configured: boolean }
   payment: { enabled: boolean; configured: boolean }
   cloudflare: { proxied: boolean; ray: string | null }
   traccar: { status: string; version: string | null; device_count: number; queue_size: number; last_webhook: string | null }

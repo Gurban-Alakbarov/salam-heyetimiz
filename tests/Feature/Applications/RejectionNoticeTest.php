@@ -100,7 +100,7 @@ it('writes the legal rejection email — subject included — in the applicant\'
         ->and($mail['body'])->toContain($reasonLabel.' VÖEN')->toContain('Gənclik Park')
         ->and($mail['html'])->toContain('lang="'.$lang.'"');
 })->with([
-    'az' => ['az', 'Salam Həyətimiz — müraciətiniz təsdiqlənmədi', 'Səbəb:'],
-    'ru' => ['ru', 'Salam Həyətimiz — ваша заявка не одобрена', 'Причина:'],
-    'en' => ['en', 'Salam Həyətimiz — your application was not approved', 'Reason:'],
+    'az' => ['az', 'Salam Sesame — müraciətiniz təsdiqlənmədi', 'Səbəb:'],
+    'ru' => ['ru', 'Salam Sesame — ваша заявка не одобрена', 'Причина:'],
+    'en' => ['en', 'Salam Sesame — your application was not approved', 'Reason:'],
 ]);

@@ -4,6 +4,7 @@ namespace App\Http\Admin\V1\Requests\Admins;
 
 use App\Domain\Admin\Authorization\Permission;
 use App\Domain\Admin\Models\AdminUser;
+use App\Domain\Admin\Settings\AdminPasswordPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 
 /** Validates adminCreateAdmin. The admins.create permission is checked here (403 precedes body validation). */
@@ -24,7 +25,7 @@ class CreateAdminRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'max:160', 'unique:admin_users,email'],
             'name' => ['required', 'string', 'min:2', 'max:120'],
-            'password' => ['required', 'string', 'min:12', 'max:255'],
+            'password' => ['required', ...app(AdminPasswordPolicy::class)->rules()],
             'role' => ['required', 'string', 'in:super_admin,technical,operator,finance,support,complex_manager'],
             'complex_id' => ['nullable', 'integer', 'exists:complexes,id', 'required_if:role,complex_manager'],
         ];

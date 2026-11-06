@@ -6,9 +6,11 @@ use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Auth\Actions\AdminLogin;
 use App\Domain\Auth\Actions\AdminLogout;
 use App\Domain\Auth\Actions\AdminVerifyTwoFactor;
+use App\Domain\Auth\Actions\ChangeAdminPassword;
 use App\Domain\Auth\Actions\RegenerateRecoveryCodes;
 use App\Http\Admin\V1\Requests\Auth\AdminLoginRequest;
 use App\Http\Admin\V1\Requests\Auth\AdminVerify2faRequest;
+use App\Http\Admin\V1\Requests\Auth\ChangeAdminPasswordRequest;
 use App\Http\Admin\V1\Requests\Auth\RegenerateRecoveryCodesRequest;
 use App\Http\Resources\AdminUserResource;
 use Illuminate\Http\JsonResponse;
@@ -83,6 +85,18 @@ class AdminAuthController
         $admin = $request->user();
 
         return new AdminUserResource($admin);
+    }
+
+    /** POST /admin/v1/auth/password — adminChangePassword (204). The panel signs in again afterwards. */
+    public function changePassword(ChangeAdminPasswordRequest $request, ChangeAdminPassword $action): JsonResponse
+    {
+        abort_if($request->attributes->get('jwt_impersonator_id') !== null, 403, __('errors.admin_password_impersonated'));
+
+        /** @var AdminUser $admin */
+        $admin = $request->user();
+        $action->handle($admin, (string) $request->input('current_password'), (string) $request->input('password'));
+
+        return response()->json(null, 204);
     }
 
     /** POST /admin/v1/auth/recovery-codes — regenerateRecoveryCodes (200, codes shown once). */

@@ -96,8 +96,4 @@ final class PaymentSettings
         return max(1, (int) $this->settings->value('payments', 'kapital_refund_window_days'));
     }
 
-    public function loggingEnabled(): bool
-    {
-        return (bool) $this->settings->value('payments', 'enable_logging');
-    }
 }

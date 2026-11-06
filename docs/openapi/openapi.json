@@ -2656,6 +2656,62 @@
         }
       }
     },
+    "/admin/v1/auth/password": {
+      "post": {
+        "tags": [
+          "Admin / Auth"
+        ],
+        "summary": "Change your own password",
+        "operationId": "adminChangePassword",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "description": "Requires the current password. The new one follows Settings › Security. Every token issued\nearlier stops working, this one included, so the client signs in again. Refused with 403\nduring impersonation.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "current_password",
+                  "password",
+                  "password_confirmation"
+                ],
+                "properties": {
+                  "current_password": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 12
+                  },
+                  "password_confirmation": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
     "/admin/v1/auth/recovery-codes": {
       "post": {
         "tags": [
@@ -7490,57 +7546,6 @@
         ],
         "summary": "Send a test SMS (fallback channel)",
         "operationId": "adminSendTestSms",
-        "security": [
-          {
-            "adminBearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "to"
-                ],
-                "properties": {
-                  "to": {
-                    "type": "string",
-                    "example": "+994501234567"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Result",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TestActionResult"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthenticated"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          }
-        }
-      }
-    },
-    "/admin/v1/settings/sms/send-test-otp": {
-      "post": {
-        "tags": [
-          "Admin / Settings"
-        ],
-        "summary": "Send a test OTP via SMS",
-        "operationId": "adminSendTestSmsOtp",
         "security": [
           {
             "adminBearerAuth": []

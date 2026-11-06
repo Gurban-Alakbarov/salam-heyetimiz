@@ -1014,25 +1014,6 @@ paths:
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
-  /admin/settings/sms/send-test-otp:
-    post:
-      tags: [Admin / Settings]
-      summary: Send a test OTP via SMS
-      operationId: adminSendTestSmsOtp
-      security: [{ adminBearerAuth: [] }]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [to]
-              properties: { to: { type: string, example: '+994501234567' } }
-      responses:
-        '200': { description: Result, content: { application/json: { schema: { $ref: '#/components/schemas/TestActionResult' } } } }
-        '401': { $ref: '#/components/responses/Unauthenticated' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-
   /admin/settings/traccar/status:
     get:
       tags: [Admin / Settings]

@@ -12,11 +12,6 @@ enum EmailType: string
 {
     case RegistrationOtp = 'registration_otp';
     case LoginOtp = 'login_otp';
-    case Welcome = 'welcome';
-    case PasswordSet = 'password_set';
-    case PasswordChanged = 'password_changed';
-    case EmailChanged = 'email_changed';
-    case SecurityAlert = 'security_alert';
     case ResidentInvitation = 'resident_invitation';
     case FamilyInvitation = 'family_invitation';
     case ApplicationRejected = 'application_rejected';
@@ -45,14 +40,9 @@ enum EmailType: string
         return match ($this) {
             self::RegistrationOtp => 'Salam Həyətimiz — qeydiyyat təsdiq kodu',
             self::LoginOtp => 'Salam Həyətimiz — giriş təsdiq kodu',
-            self::Welcome => 'Salam Həyətimiz-ə xoş gəldiniz',
-            self::PasswordSet => 'Salam Həyətimiz — parol təyin edildi',
-            self::PasswordChanged => 'Salam Həyətimiz — parol dəyişdirildi',
-            self::EmailChanged => 'Salam Həyətimiz — email dəyişdirildi',
-            self::SecurityAlert => 'Salam Həyətimiz — təhlükəsizlik bildirişi',
-            self::ResidentInvitation => 'Salam Həyətimiz — yaşayış kompleksinə dəvət',
-            self::FamilyInvitation => 'Salam Həyətimiz — ailə üzvü dəvəti',
-            self::ApplicationRejected => 'Salam Həyətimiz — müraciətiniz təsdiqlənmədi',
+            self::ResidentInvitation => 'Salam Sesame — yaşayış kompleksinə dəvət',
+            self::FamilyInvitation => 'Salam Sesame — ailə üzvü dəvəti',
+            self::ApplicationRejected => 'Salam Sesame — müraciətiniz təsdiqlənmədi',
             self::PaymentReceipt => 'Salam Sesame — ödəniş qəbzi',
             self::RefundReceipt => 'Salam Sesame — geri qaytarma qəbzi',
             self::SiteLead => 'Salam Sesame — saytdan yeni müraciət',

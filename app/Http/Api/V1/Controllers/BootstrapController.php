@@ -49,8 +49,8 @@ class BootstrapController
             ],
             'public_settings' => [
                 'brand' => $this->str('general', 'app_name') ?: 'Salam Həyətimiz',
-                'default_locale' => $this->str('general', 'default_language') ?: 'az',
-                'default_timezone' => $this->str('general', 'timezone') ?: 'Asia/Baku',
+                'default_locale' => 'az',
+                'default_timezone' => 'Asia/Baku',
                 'currency' => 'AZN',
             ],
             'feature_flags' => $this->featureFlags(),
@@ -125,7 +125,7 @@ class BootstrapController
     private function featureFlags(): array
     {
         return [
-            'email_otp' => (bool) $this->settings->value('otp', 'enable_email_otp'),
+            'email_otp' => true,
             'sms_login' => false,                   // SMS login retired (infra preserved, not used)
             'registration' => true,
         ];

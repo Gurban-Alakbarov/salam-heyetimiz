@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'admin_password_wrong' => 'The current password is incorrect.',
+    'admin_password_impersonated' => 'A password cannot be changed while acting as another admin.',
     'unauthenticated' => 'Authentication is required.',
     'forbidden' => 'You are not allowed to perform this action.',
     'family_member_cannot_share' => 'Family members cannot create visitor links.',

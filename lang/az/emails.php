@@ -6,7 +6,7 @@ return [
     'automatic' => 'Bu avtomatik mesajdır, cavab verməyin.',
 
     'subjects' => [
-        'application_rejected' => 'Salam Həyətimiz — müraciətiniz təsdiqlənmədi',
+        'application_rejected' => 'Salam Sesame — müraciətiniz təsdiqlənmədi',
         'payment_receipt' => 'Salam Sesame — ödəniş qəbzi',
         'refund_receipt' => 'Salam Sesame — geri qaytarma qəbzi',
     ],

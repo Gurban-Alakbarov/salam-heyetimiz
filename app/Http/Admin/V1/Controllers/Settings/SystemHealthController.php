@@ -45,6 +45,10 @@ class SystemHealthController
             ],
             'cloudflare' => ['proxied' => $request->hasHeader('CF-RAY'), 'ray' => $request->header('CF-RAY')],
             'traccar' => $this->traccar(),
+            'sms' => [
+                'provider' => (string) config('integrations.sms.provider'),
+                'configured' => config('integrations.sms.provider') !== 'fake' && (string) config('integrations.sms.base_url') !== '',
+            ],
         ]);
     }
 
@@ -53,8 +57,8 @@ class SystemHealthController
      */
     private function traccar(): array
     {
-        $base = (string) $this->settings->value('traccar', 'api_url');
-        $token = (string) $this->settings->value('traccar', 'api_token');
+        $base = (string) config('integrations.traccar.base_url');
+        $token = (string) config('integrations.traccar.api_token');
         $deviceCount = $this->safe(fn (): int => (int) DB::table('traccar_devices')->count(), 0);
         $queueSize = $this->safe(fn (): int => (int) DB::table('whitelist_changes')->where('status', 'pending')->count(), 0);
         $lastWebhook = $this->safe(fn (): ?string => DB::table('device_diagnostics')->max('reported_at'), null);

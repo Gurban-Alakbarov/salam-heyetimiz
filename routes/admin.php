@@ -56,6 +56,9 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('auth/recovery-codes', [AdminAuthController::class, 'regenerateRecoveryCodes'])
         ->middleware('admin.tfa')
         ->name('regenerateRecoveryCodes');
+    Route::post('auth/password', [AdminAuthController::class, 'changePassword'])
+        ->middleware(['admin.tfa', 'throttle:5,1'])
+        ->name('adminChangePassword');
     Route::post('auth/stop-impersonation', [ImpersonationController::class, 'stop'])->name('adminStopImpersonation');
 
     // Admins & RBAC (super-admin tier; permission-gated in the controllers)
@@ -142,7 +145,6 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('settings/email/send-test', [SettingsTestController::class, 'sendTestEmail'])->name('adminSendTestEmail');
     Route::post('settings/email/send-test-otp', [SettingsTestController::class, 'sendTestOtp'])->name('adminSendTestOtp');
     Route::post('settings/sms/send-test', [SettingsTestController::class, 'sendTestSms'])->name('adminSendTestSms');
-    Route::post('settings/sms/send-test-otp', [SettingsTestController::class, 'sendTestSmsOtp'])->name('adminSendTestSmsOtp');
     Route::get('settings/traccar/status', [SettingsTestController::class, 'traccarStatus'])->name('adminTraccarStatus');
     Route::post('settings/security/force-logout', [SettingsTestController::class, 'forceLogout'])->name('adminForceLogout');
     Route::post('settings/payments/test-create', [SettingsTestController::class, 'testCreatePayment'])->name('adminTestCreatePayment');

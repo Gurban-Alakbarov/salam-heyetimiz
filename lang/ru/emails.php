@@ -6,7 +6,7 @@ return [
     'automatic' => 'Это автоматическое сообщение, не отвечайте на него.',
 
     'subjects' => [
-        'application_rejected' => 'Salam Həyətimiz — ваша заявка не одобрена',
+        'application_rejected' => 'Salam Sesame — ваша заявка не одобрена',
         'payment_receipt' => 'Salam Sesame — квитанция об оплате',
         'refund_receipt' => 'Salam Sesame — квитанция о возврате',
     ],

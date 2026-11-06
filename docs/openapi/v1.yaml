@@ -1575,6 +1575,34 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminUser' }
 
+  /admin/auth/password:
+    post:
+      tags: [Admin / Auth]
+      summary: Change your own password
+      operationId: adminChangePassword
+      security:
+        - adminBearerAuth: []
+      description: |
+        Requires the current password. The new one follows Settings › Security. Every token issued
+        earlier stops working, this one included, so the client signs in again. Refused with 403
+        during impersonation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, password, password_confirmation]
+              properties:
+                current_password: { type: string }
+                password: { type: string, minLength: 12 }
+                password_confirmation: { type: string }
+      responses:
+        '204': { description: Password changed }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
   /admin/auth/recovery-codes:
     post:
       tags: [Admin / Auth]

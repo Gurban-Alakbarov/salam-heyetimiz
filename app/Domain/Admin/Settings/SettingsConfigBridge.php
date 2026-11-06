@@ -24,6 +24,7 @@ final class SettingsConfigBridge
         'domain.auth.otp.length' => ['otp', 'otp_length'],
         'domain.auth.otp.max_attempts' => ['otp', 'otp_max_attempts'],
         'domain.auth.otp.resend_seconds' => ['otp', 'otp_resend_seconds'],
+        'domain.devices.offline_threshold_minutes' => ['traccar', 'offline_threshold_minutes'],
     ];
 
     public function apply(SettingsService $settings): void

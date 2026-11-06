@@ -14,6 +14,9 @@ return [
     'in' => 'The selected :attribute is invalid.',
     'exists' => 'The selected :attribute does not exist.',
     'phone' => 'The :attribute must be a valid number.',
+    'password_uppercase' => 'The password must contain at least one uppercase letter.',
+    'password_number' => 'The password must contain at least one number.',
+    'password_symbol' => 'The password must contain at least one symbol.',
     'min' => [
         'numeric' => 'The :attribute must be at least :min.',
         'string' => 'The :attribute must be at least :min characters.',

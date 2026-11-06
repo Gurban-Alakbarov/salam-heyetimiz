@@ -16,6 +16,9 @@ return [
     'in' => 'Seçilmiş :attribute yanlışdır.',
     'exists' => 'Seçilmiş :attribute mövcud deyil.',
     'phone' => ':attribute düzgün nömrə olmalıdır.',
+    'password_uppercase' => 'Parolda ən azı bir böyük hərf olmalıdır.',
+    'password_number' => 'Parolda ən azı bir rəqəm olmalıdır.',
+    'password_symbol' => 'Parolda ən azı bir simvol olmalıdır.',
     'min' => [
         'numeric' => ':attribute ən azı :min olmalıdır.',
         'string' => ':attribute ən azı :min simvol olmalıdır.',

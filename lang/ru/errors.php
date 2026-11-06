@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'admin_password_wrong' => 'Текущий пароль неверен.',
+    'admin_password_impersonated' => 'Нельзя менять пароль, действуя от имени другого администратора.',
     'unauthenticated' => 'Требуется вход.',
     'forbidden' => 'У вас нет доступа к этому действию.',
     'family_member_cannot_share' => 'Член семьи не может создавать гостевые ссылки.',

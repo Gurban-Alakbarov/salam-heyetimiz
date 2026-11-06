@@ -109,7 +109,7 @@ it('returns the resolved permissions on /me', function () {
 
 it('lets a super admin create an admin and forbids non-super', function () {
     $this->actingAs(makeSuperAdmin(), 'admin')->postJson('/admin/v1/admins', [
-        'email' => 'new-tech@salamhayetimiz.az', 'name' => 'New Tech', 'password' => 'create-12chars!', 'role' => 'technical',
+        'email' => 'new-tech@salamhayetimiz.az', 'name' => 'New Tech', 'password' => 'Create-12chars!', 'role' => 'technical',
     ])->assertStatus(201)->assertJsonPath('admin.role', 'technical')->assertJsonStructure(['totp_secret', 'recovery_codes']);
 
     expect(AdminUser::query()->where('email', 'new-tech@salamhayetimiz.az')->exists())->toBeTrue();

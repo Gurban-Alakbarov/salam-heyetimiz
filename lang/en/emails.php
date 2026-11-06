@@ -6,7 +6,7 @@ return [
     'automatic' => 'This is an automatic message, please do not reply.',
 
     'subjects' => [
-        'application_rejected' => 'Salam Həyətimiz — your application was not approved',
+        'application_rejected' => 'Salam Sesame — your application was not approved',
         'payment_receipt' => 'Salam Sesame — payment receipt',
         'refund_receipt' => 'Salam Sesame — refund receipt',
     ],

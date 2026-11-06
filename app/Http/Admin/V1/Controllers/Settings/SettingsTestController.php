@@ -7,6 +7,7 @@ use App\Domain\Admin\Services\SettingsService;
 use App\Domain\Admin\Settings\RuntimeMailer;
 use App\Domain\Auth\Models\RefreshToken;
 use App\Domain\Audit\Services\AuditLogger;
+use App\Domain\DeviceComm\Contracts\DeviceSmsGateway;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomClient;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomGateway;
 use App\Domain\Payments\Exceptions\KapitalEcomApiException;
@@ -33,6 +34,7 @@ class SettingsTestController
         private readonly PaymentSettingsValidator $paymentValidator,
         private readonly PaymentSettings $paymentSettings,
         private readonly KapitalEcomClient $kapital,
+        private readonly DeviceSmsGateway $sms,
     ) {}
 
     /** POST /admin/v1/settings/{group}/test — connection test (traccar/email/payments). */
@@ -73,7 +75,7 @@ class SettingsTestController
         $this->requirePermission($request, Permission::SYSTEM_SETTINGS_MANAGE);
         $data = $request->validate([
             'to' => ['required', 'email'],
-            'template' => ['nullable', 'in:registration,login,password_reset'],
+            'template' => ['nullable', 'in:registration,login'],
         ]);
         $to = (string) $data['to'];
         $template = $data['template'] ?? 'login';
@@ -96,29 +98,23 @@ class SettingsTestController
         }
     }
 
-    /** POST /admin/v1/settings/sms/send-test — honest: no SMS provider is integrated yet. */
+    /** POST /admin/v1/settings/sms/send-test — a real SMS through the provider in .env, when one is connected. */
     public function sendTestSms(Request $request): JsonResponse
     {
         $this->requirePermission($request, Permission::SYSTEM_SETTINGS_MANAGE);
-        $request->validate(['to' => ['required', 'string']]);
-        $provider = (string) $this->settings->value('sms', 'provider');
+        $to = (string) $request->validate(['to' => ['required', 'string']])['to'];
 
-        return response()->json([
-            'ok' => false,
-            'message' => "SMS provayder ('{$provider}') hələ inteqrasiya olunmayıb — yalnız parametrlər hazırdır. SMS əsas nəqliyyat deyil (fallback).",
-        ]);
-    }
+        if (config('integrations.sms.provider') === 'fake') {
+            return response()->json(['ok' => false, 'message' => 'SMS provayderi qoşulmayıb: serverin .env faylında SMS_PROVIDER=fake.']);
+        }
+        try {
+            $sent = $this->sms->sendCommand($to, 'Salam Sesame: test SMS');
+            $this->audit->record('settings.sms_test_sent', ['to' => $to, 'sent' => $sent]);
 
-    /** POST /admin/v1/settings/sms/send-test-otp — honest: no SMS provider integrated yet. */
-    public function sendTestSmsOtp(Request $request): JsonResponse
-    {
-        $this->requirePermission($request, Permission::SYSTEM_SETTINGS_MANAGE);
-        $request->validate(['to' => ['required', 'string']]);
-
-        return response()->json([
-            'ok' => false,
-            'message' => 'SMS OTP provayderi hələ inteqrasiya olunmayıb (parametrlər hazırdır).',
-        ]);
+            return response()->json(['ok' => $sent, 'message' => $sent ? "Test SMS göndərildi: {$to}" : 'Provayder SMS-i qəbul etmədi.']);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'message' => 'Göndərmə uğursuz: '.substr($e->getMessage(), 0, 160)]);
+        }
     }
 
     /** GET /admin/v1/settings/traccar/status — live Traccar operational status (real reads, no fake data). */
@@ -163,10 +159,10 @@ class SettingsTestController
      */
     private function testTraccar(): array
     {
-        $base = (string) $this->settings->value('traccar', 'api_url');
-        $token = (string) $this->settings->value('traccar', 'api_token');
+        $base = (string) config('integrations.traccar.base_url');
+        $token = (string) config('integrations.traccar.api_token');
         if ($base === '') {
-            return ['ok' => false, 'message' => 'Traccar API URL təyin edilməyib.'];
+            return ['ok' => false, 'message' => 'TRACCAR_BASE_URL serverin .env faylında təyin edilməyib.'];
         }
         try {
             $req = Http::timeout(8);

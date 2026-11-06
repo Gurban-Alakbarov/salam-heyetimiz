@@ -4,6 +4,8 @@
 // Server renders `message` via __(); placeholders use Laravel ":name" syntax.
 // `az` is the source of truth (R-LOC-01).
 return [
+    'admin_password_wrong' => 'Cari parol yanlışdır.',
+    'admin_password_impersonated' => 'Başqa admin adından parol dəyişmək olmaz.',
     'unauthenticated' => 'Giriş tələb olunur.',
     'forbidden' => 'Bu əməliyyata icazəniz yoxdur.',
     'family_member_cannot_share' => 'Ailə üzvü qonaq linki yarada bilməz.',

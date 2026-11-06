@@ -239,7 +239,7 @@ function CreateAdminDialog({ open, onOpenChange }: { open: boolean; onOpenChange
       { email: email.trim(), name: name.trim(), password, role, complex_id: role === 'complex_manager' && complexId ? Number(complexId) : null },
       {
         onSuccess: (res) => { setCreated(res); toast({ variant: 'success', title: 'Admin yaradıldı' }) },
-        onError: (err) => toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? err.message : undefined }),
+        onError: (err) => toast({ variant: 'destructive', title: 'Xəta', description: err instanceof ApiError ? (err.fieldError('password') ?? err.fieldError('email') ?? err.message) : undefined }),
       },
     )
   }
@@ -280,7 +280,7 @@ function CreateAdminDialog({ open, onOpenChange }: { open: boolean; onOpenChange
                 <Input id="a-name" value={name} onChange={(e) => setName(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="a-pass">Parol (≥12 simvol)</Label>
+                <Label htmlFor="a-pass">Parol (ən azı 12 simvol, böyük hərf və rəqəm)</Label>
                 <Input id="a-pass" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} required />
               </div>
               <div className="space-y-2">

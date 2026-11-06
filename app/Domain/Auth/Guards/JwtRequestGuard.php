@@ -99,6 +99,11 @@ final class JwtRequestGuard
             return null;
         }
 
+        // Changing a password ends every session opened with the old one.
+        if ($admin->password_changed_at !== null && ($claims['issued_at'] ?? 0) < $admin->password_changed_at->getTimestamp()) {
+            return null;
+        }
+
         $request->attributes->set('jwt_admin_tfa', $claims['tfa_verified']);
         if ($claims['impersonator'] !== null) {
             $request->attributes->set('jwt_impersonator_id', $claims['impersonator']);

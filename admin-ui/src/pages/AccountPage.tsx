@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { KeyRound, Loader2, LogOut } from 'lucide-react'
+import { KeyRound, Loader2, LockKeyhole, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
 import { api, ApiError } from '@/lib/api'
@@ -45,6 +45,7 @@ export function AccountPage() {
   const { admin, logout } = useAuth()
   const navigate = useNavigate()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [passwordOpen, setPasswordOpen] = useState(false)
 
   if (!admin) return null
 
@@ -75,12 +76,21 @@ export function AccountPage() {
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Təhlükəsizlik</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">Bərpa kodlarını yenidən yarat (köhnələri etibarsız olur).</p>
-          <Button variant="outline" onClick={() => setDialogOpen(true)}>
-            <KeyRound className="h-4 w-4" />
-            Bərpa kodları
-          </Button>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-muted-foreground">Parolu dəyiş (bütün sessiyalar bağlanır, yenidən daxil olursunuz).</p>
+            <Button variant="outline" onClick={() => setPasswordOpen(true)}>
+              <LockKeyhole className="h-4 w-4" />
+              Parolu dəyiş
+            </Button>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-muted-foreground">Bərpa kodlarını yenidən yarat (köhnələri etibarsız olur).</p>
+            <Button variant="outline" onClick={() => setDialogOpen(true)}>
+              <KeyRound className="h-4 w-4" />
+              Bərpa kodları
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -95,7 +105,84 @@ export function AccountPage() {
       </Card>
 
       <RecoveryCodesDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ChangePasswordDialog open={passwordOpen} onOpenChange={setPasswordOpen} onChanged={handleLogout} />
     </div>
+  )
+}
+
+function ChangePasswordDialog({ open, onOpenChange, onChanged }: { open: boolean; onOpenChange: (open: boolean) => void; onChanged: () => void }) {
+  const { toast } = useToast()
+  const [current, setCurrent] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+
+  const mutation = useMutation({
+    mutationFn: async () =>
+      api.post('/admin/v1/auth/password', { current_password: current, password, password_confirmation: confirmation }),
+    onSuccess: () => {
+      toast({ variant: 'success', title: 'Parol dəyişdirildi', description: 'Yeni parolla daxil olun.' })
+      onChanged()
+    },
+    onError: (err) =>
+      toast({
+        variant: 'destructive',
+        title: 'Parol dəyişmədi',
+        description: err instanceof ApiError ? (err.fieldError('current_password') ?? err.fieldError('password') ?? err.message) : undefined,
+      }),
+  })
+
+  const close = (next: boolean) => {
+    if (mutation.isPending) return
+    onOpenChange(next)
+    if (!next) {
+      setCurrent('')
+      setPassword('')
+      setConfirmation('')
+      mutation.reset()
+    }
+  }
+
+  const mismatch = confirmation !== '' && confirmation !== password
+
+  return (
+    <Dialog open={open} onOpenChange={close}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Parolu dəyiş</DialogTitle>
+          <DialogDescription>Ən azı 12 simvol. Dəyişəndən sonra yenidən daxil olacaqsınız.</DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e: FormEvent) => {
+            e.preventDefault()
+            mutation.mutate()
+          }}
+          className="space-y-4"
+        >
+          <div className="space-y-2">
+            <Label htmlFor="current-password">Cari parol</Label>
+            <Input id="current-password" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} autoFocus required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-password">Yeni parol</Label>
+            <Input id="new-password" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-password-confirmation">Yeni parol (təkrar)</Label>
+            <Input id="new-password-confirmation" type="password" autoComplete="new-password" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} required />
+            {mismatch && <p className="text-xs text-destructive">Parollar uyğun gəlmir.</p>}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => close(false)} disabled={mutation.isPending}>
+              İmtina
+            </Button>
+            <Button type="submit" disabled={mutation.isPending || !current || password.length < 12 || password !== confirmation}>
+              {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Dəyiş
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -32,6 +32,7 @@ final class SettingsCatalog
                 'force_update' => ['type' => 'bool', 'default' => false, 'label' => 'Məcburi yeniləmə'],
                 'support_email' => ['type' => 'string', 'default' => '', 'label' => 'Dəstək e-poçtu'],
                 'support_phone' => ['type' => 'string', 'default' => '', 'label' => 'Dəstək telefonu'],
+                'site_lead_email' => ['type' => 'string', 'default' => '', 'label' => 'Sayt müraciətləri üçün e-poçt'],
             ],
             'security' => [
                 'require_2fa' => ['type' => 'bool', 'default' => false, 'label' => 'İki-faktorlu doğrulama tələb et'],

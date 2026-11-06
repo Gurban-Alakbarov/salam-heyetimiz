@@ -80,3 +80,7 @@ Thumbs.db
 
 # graphify knowledge graph (local, rebuilt with `graphify update .`)
 graphify-out/
+
+# Website: old working copies, not the source
+/site/index.html
+/site/index.extracted.html

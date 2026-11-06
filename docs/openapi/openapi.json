@@ -7676,6 +7676,127 @@
         }
       }
     },
+    "/v1/site/contact": {
+      "post": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Contact form on the public website (3 per 10 minutes per e-mail address)",
+        "operationId": "siteContact",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "phone",
+                  "place"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "place": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "topic": {
+                    "type": "string",
+                    "maxLength": 80,
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 2000,
+                    "nullable": true
+                  },
+                  "locale": {
+                    "type": "string",
+                    "enum": [
+                      "az",
+                      "en",
+                      "ru"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "accepted"
+          },
+          "422": {
+            "description": "invalid fields"
+          },
+          "429": {
+            "description": "too many requests"
+          }
+        }
+      }
+    },
+    "/admin/v1/site-leads": {
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Requests from the website contact form (applications.view)",
+        "operationId": "adminListSiteLeads",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/admin/v1/site-leads/{id}": {
+      "patch": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Update a website request (applications.manage)",
+        "operationId": "adminUpdateSiteLead",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
     "/v1/payments/return": {
       "get": {
         "tags": [

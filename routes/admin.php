@@ -21,6 +21,7 @@ use App\Http\Admin\V1\Controllers\Payments\AdminPaymentLogController;
 use App\Http\Admin\V1\Controllers\Refunds\AdminRefundController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentArchiveController;
 use App\Http\Admin\V1\Controllers\Residents\AdminResidentController;
+use App\Http\Admin\V1\Controllers\Site\AdminSiteLeadController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsTestController;
 use App\Http\Admin\V1\Controllers\Settings\SystemHealthController;
@@ -80,6 +81,10 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::post('admins/{adminId}/permissions/reset', [AccessControlController::class, 'reset'])->whereNumber('adminId')->name('adminResetPermissions');
 
     // Residential complexes — the root entity (complexes.view / complexes.manage)
+    // Requests from the website's contact form
+    Route::get('site-leads', [AdminSiteLeadController::class, 'index'])->name('adminListSiteLeads');
+    Route::patch('site-leads/{id}', [AdminSiteLeadController::class, 'update'])->whereNumber('id')->name('adminUpdateSiteLead');
+
     // Registration applications (B9) — physical and legal are separate tabs / endpoints.
     Route::get('applications/individual', [AdminApplicationController::class, 'individualIndex'])->name('adminListIndividualApplications');
     Route::get('applications/individual/{id}', [AdminApplicationController::class, 'individualShow'])->whereNumber('id')->name('adminGetIndividualApplication');

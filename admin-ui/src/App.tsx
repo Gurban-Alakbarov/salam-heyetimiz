@@ -31,6 +31,7 @@ import { OrderDetailPage } from '@/pages/orders/OrderDetailPage'
 import { OrdersPage } from '@/pages/orders/OrdersPage'
 import { PaymentLogsPage } from '@/pages/payments/PaymentLogsPage'
 import { RefundsPage } from '@/pages/refunds/RefundsPage'
+import { SiteLeadsPage } from '@/pages/site/SiteLeadsPage'
 import { SubscriptionDetailPage } from '@/pages/subscriptions/SubscriptionDetailPage'
 import { SubscriptionPricesPage } from '@/pages/subscriptions/SubscriptionPricesPage'
 import { SubscriptionsPage } from '@/pages/subscriptions/SubscriptionsPage'
@@ -58,6 +59,7 @@ export function App() {
           <Route path="/devices/new" element={<RequirePermission anyOf={[PERM.devicesCreate]}><DeviceFormPage /></RequirePermission>} />
           <Route path="/devices/:id" element={<RequirePermission anyOf={[PERM.devicesView]}><DeviceDetailPage /></RequirePermission>} />
           <Route path="/devices/:id/edit" element={<RequirePermission anyOf={[PERM.devicesUpdate]}><DeviceFormPage /></RequirePermission>} />
+          <Route path="/site-leads" element={<RequirePermission anyOf={[PERM.applicationsView]}><SiteLeadsPage /></RequirePermission>} />
           <Route path="/subscriptions" element={<RequirePermission anyOf={[PERM.subscriptionsView]}><SubscriptionsPage /></RequirePermission>} />
           <Route path="/subscriptions/prices" element={<RequirePermission anyOf={[PERM.subscriptionsManage]}><SubscriptionPricesPage /></RequirePermission>} />
           <Route path="/subscriptions/:id" element={<RequirePermission anyOf={[PERM.subscriptionsView]}><SubscriptionDetailPage /></RequirePermission>} />

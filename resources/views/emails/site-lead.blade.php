@@ -1,0 +1,1 @@
+@include('emails.payment-receipt')

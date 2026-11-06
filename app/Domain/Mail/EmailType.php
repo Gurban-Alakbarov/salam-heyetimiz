@@ -22,6 +22,7 @@ enum EmailType: string
     case ApplicationRejected = 'application_rejected';
     case PaymentReceipt = 'payment_receipt';
     case RefundReceipt = 'refund_receipt';
+    case SiteLead = 'site_lead';
 
     /** Blade view that renders this email (both OTP types share the one OTP template). */
     public function view(): string
@@ -54,6 +55,7 @@ enum EmailType: string
             self::ApplicationRejected => 'Salam Həyətimiz — müraciətiniz təsdiqlənmədi',
             self::PaymentReceipt => 'Salam Sesame — ödəniş qəbzi',
             self::RefundReceipt => 'Salam Sesame — geri qaytarma qəbzi',
+            self::SiteLead => 'Salam Sesame — saytdan yeni müraciət',
         };
     }
 }

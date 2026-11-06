@@ -22,6 +22,7 @@ use App\Http\Api\V1\Controllers\Notifications\PushTokenController;
 use App\Http\Api\V1\Controllers\Orders\OrderController;
 use App\Http\Api\V1\Controllers\Payments\FakeCheckoutController;
 use App\Http\Api\V1\Controllers\Payments\PaymentReturnController;
+use App\Http\Api\V1\Controllers\Site\SiteContactController;
 use App\Http\Api\V1\Controllers\Subscriptions\SubscriptionController;
 use App\Http\Api\V1\Controllers\Visitor\VisitorAccessController;
 use App\Http\Api\V1\Controllers\Visitor\VisitorLinkController;
@@ -43,6 +44,8 @@ Route::get('health/ready', [HealthController::class, 'ready'])->name('getHealthR
 Route::get('bootstrap', [BootstrapController::class, 'guest'])->middleware('throttle:public')->name('guestBootstrap');
 
 // Payment return (browser redirect-back from the hosted page) — public; verifies via getOrderStatus.
+Route::post('site/contact', SiteContactController::class)->middleware('throttle:site-contact')->name('siteContact');
+
 Route::get('payments/return', PaymentReturnController::class)->name('paymentReturn');
 
 // Simulated hosted payment page ("TEST ÖDƏNİŞ") — only while the fake gateway is active (404 otherwise);

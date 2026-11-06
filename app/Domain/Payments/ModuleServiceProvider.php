@@ -2,7 +2,11 @@
 
 namespace App\Domain\Payments;
 
+use App\Domain\Payments\Events\OrderPaid;
+use App\Domain\Payments\Events\OrderPartiallyRefunded;
+use App\Domain\Payments\Events\OrderRefunded;
 use App\Domain\Payments\Events\PaymentCallbackReceived;
+use App\Domain\Payments\Jobs\SendReceiptEmailJob;
 use App\Domain\Payments\Listeners\FlagOrderForRefund;
 use App\Domain\Payments\Listeners\HandlePaymentCallbackReceived;
 use App\Domain\Payments\Models\Order;
@@ -32,5 +36,9 @@ class ModuleServiceProvider extends ServiceProvider
 
         Event::listen(PaymentCallbackReceived::class, HandlePaymentCallbackReceived::class);
         Event::listen(PaidSubscriptionUndeliverable::class, FlagOrderForRefund::class); // K3
+
+        Event::listen(OrderPaid::class, static fn (OrderPaid $e) => SendReceiptEmailJob::dispatch((int) $e->order->id));
+        Event::listen(OrderRefunded::class, static fn (OrderRefunded $e) => SendReceiptEmailJob::dispatch((int) $e->order->id, (int) $e->refund->id));
+        Event::listen(OrderPartiallyRefunded::class, static fn (OrderPartiallyRefunded $e) => SendReceiptEmailJob::dispatch((int) $e->order->id, (int) $e->refund->id));
     }
 }

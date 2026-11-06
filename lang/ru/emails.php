@@ -7,6 +7,8 @@ return [
 
     'subjects' => [
         'application_rejected' => 'Salam Həyətimiz — ваша заявка не одобрена',
+        'payment_receipt' => 'Salam Sesame — квитанция об оплате',
+        'refund_receipt' => 'Salam Sesame — квитанция о возврате',
     ],
 
     'application_rejected' => [
@@ -15,5 +17,19 @@ return [
         'individual_body' => 'К сожалению, ваша заявка на установку системы доступа по вашему адресу (:address) не одобрена.',
         'reason' => 'Причина: :reason',
         'retry' => 'Вы можете исправить данные и подать заявку снова в приложении.',
+    ],
+
+    'receipt' => [
+        'paid_title' => 'Оплата получена',
+        'refund_title' => 'Средства возвращены',
+        'seller' => 'Продавец',
+        'order' => 'Заказ',
+        'date' => 'Дата',
+        'service' => 'Подписка',
+        'service_value' => ':door, до :date',
+        'amount' => 'Сумма',
+        'refund_amount' => 'Сумма возврата',
+        'card' => 'Карта',
+        'test_notice' => 'Это тестовый платёж: реальные деньги не списаны.',
     ],
 ];

@@ -20,6 +20,8 @@ enum EmailType: string
     case ResidentInvitation = 'resident_invitation';
     case FamilyInvitation = 'family_invitation';
     case ApplicationRejected = 'application_rejected';
+    case PaymentReceipt = 'payment_receipt';
+    case RefundReceipt = 'refund_receipt';
 
     /** Blade view that renders this email (both OTP types share the one OTP template). */
     public function view(): string
@@ -50,6 +52,8 @@ enum EmailType: string
             self::ResidentInvitation => 'Salam Həyətimiz — yaşayış kompleksinə dəvət',
             self::FamilyInvitation => 'Salam Həyətimiz — ailə üzvü dəvəti',
             self::ApplicationRejected => 'Salam Həyətimiz — müraciətiniz təsdiqlənmədi',
+            self::PaymentReceipt => 'Salam Sesame — ödəniş qəbzi',
+            self::RefundReceipt => 'Salam Sesame — geri qaytarma qəbzi',
         };
     }
 }

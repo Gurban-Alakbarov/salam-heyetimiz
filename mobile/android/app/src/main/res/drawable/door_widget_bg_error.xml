@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The open failed or needs the app: dark amber, white text stays readable. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#B45309" />
+    <corners android:radius="18dp" />
+</shape>

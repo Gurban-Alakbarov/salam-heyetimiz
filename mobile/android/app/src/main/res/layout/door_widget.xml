@@ -1,66 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Home-screen door widget layout. All user-facing text is set at runtime by
-     DoorWidgetProvider from a locale-specific context (W5), so the widget follows the app
+<!-- Home-screen door widget layout (design B: a full coloured button). All user-facing text is set at
+     runtime by DoorWidgetProvider from a locale-specific context (W5), so the widget follows the app
      language rather than the device locale — the android:text values here are only fallbacks.
      The whole widget is the tap target (per-instance background-open, wired in the provider).
-     The CTA row (icon | spinner | state label) reflects the state: normal "[door] Aç",
-     pending "[spinner] Açılır…", success "[check] Açıldı". Only ONE of the icon / spinner is
-     ever visible at a time (the provider toggles them). -->
+     The white circle holds the state icon or the pending spinner; only ONE of them is ever visible
+     (the provider toggles them). The provider picks the background and the icon colour per state. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/door_widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/door_widget_bg"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="10dp">
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="6dp">
 
-    <!-- CTA row: door/check/error icon OR the pending spinner, then the state label. -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/door_widget_circle">
 
         <ImageView
             android:id="@+id/door_widget_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginEnd="6dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_dw_open"
+            android:src="@drawable/ic_dw_power"
             android:contentDescription="@string/dw_open" />
 
-        <!-- Indeterminate spinner shown only while an open is in progress (pending). White. -->
+        <!-- Indeterminate spinner shown only while an open is in progress (pending). -->
         <ProgressBar
             android:id="@+id/door_widget_progress"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginEnd="6dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
             android:indeterminate="true"
-            android:indeterminateTint="#FFFFFF"
+            android:indeterminateTint="#D32F2F"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Selected barrier's label (server data, not localized); gone until configured. -->
+        <TextView
+            android:id="@+id/door_widget_device_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
             android:visibility="gone" />
 
+        <!-- The state: "Aç", "Açılır…", "Açıldı" or an error, which can take two lines. -->
         <TextView
             android:id="@+id/door_widget_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="@string/dw_open"
             android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="12sp" />
     </LinearLayout>
-
-    <!-- Selected barrier's label (server data, not localized); gone until configured. -->
-    <TextView
-        android:id="@+id/door_widget_device_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textColor="#E6FFFFFF"
-        android:textSize="11sp"
-        android:visibility="gone" />
 </LinearLayout>

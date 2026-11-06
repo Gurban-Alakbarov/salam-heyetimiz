@@ -55,10 +55,12 @@ class DoorWidgetProvider : HomeWidgetProvider() {
                 (lastOpenMs <= 0L || System.currentTimeMillis() - lastOpenMs <= STALE_OPENING_MS)
 
             if (label.isNullOrEmpty()) {
-                // No configured device → the "no door" hint, no icon/spinner, normal bg, tap = confirm.
+                // No configured device → the "no door" hint, the resting icon, normal bg, tap = confirm.
                 views.setViewVisibility(R.id.door_widget_device_label, View.GONE)
-                views.setViewVisibility(R.id.door_widget_icon, View.GONE)
                 views.setViewVisibility(R.id.door_widget_progress, View.GONE)
+                views.setViewVisibility(R.id.door_widget_icon, View.VISIBLE)
+                views.setImageViewResource(R.id.door_widget_icon, R.drawable.ic_dw_power)
+                views.setInt(R.id.door_widget_icon, "setColorFilter", COLOR_GREEN)
                 views.setTextViewText(R.id.door_widget_title, loc.getString(R.string.dw_no_device))
                 views.setInt(R.id.door_widget_root, "setBackgroundResource", R.drawable.door_widget_bg)
                 views.setOnClickPendingIntent(R.id.door_widget_root, confirmIntent(context, widgetId))
@@ -67,7 +69,7 @@ class DoorWidgetProvider : HomeWidgetProvider() {
                 views.setViewVisibility(R.id.door_widget_device_label, View.VISIBLE)
 
                 if (pending) {
-                    // In progress: spinner + "Açılır…" + amber bg. Tap HARD-DISABLED (no re-tap /
+                    // In progress: spinner + "Açılır…" + red bg. Tap HARD-DISABLED (no re-tap /
                     // double-submit; the Dart debounce is the backstop). Only THIS instance changes.
                     views.setViewVisibility(R.id.door_widget_icon, View.GONE)
                     views.setViewVisibility(R.id.door_widget_progress, View.VISIBLE)
@@ -75,7 +77,7 @@ class DoorWidgetProvider : HomeWidgetProvider() {
                     views.setInt(R.id.door_widget_root, "setBackgroundResource", R.drawable.door_widget_bg_pending)
                     views.setOnClickPendingIntent(R.id.door_widget_root, null)
                 } else {
-                    // Normal / result: state icon + label + green bg + tap enabled. A stale `opening`
+                    // Normal / result: state icon + label + state bg + tap enabled. A stale `opening`
                     // is treated as normal.
                     val effectiveCode = if (statusCode == CODE_OPENING) null else statusCode
                     val titleRes = if (effectiveCode == null || effectiveCode == CODE_NO_DEVICE) {
@@ -86,8 +88,9 @@ class DoorWidgetProvider : HomeWidgetProvider() {
                     views.setViewVisibility(R.id.door_widget_progress, View.GONE)
                     views.setViewVisibility(R.id.door_widget_icon, View.VISIBLE)
                     views.setImageViewResource(R.id.door_widget_icon, statusIconRes(effectiveCode))
+                    views.setInt(R.id.door_widget_icon, "setColorFilter", statusIconColor(effectiveCode))
                     views.setTextViewText(R.id.door_widget_title, loc.getString(titleRes))
-                    views.setInt(R.id.door_widget_root, "setBackgroundResource", R.drawable.door_widget_bg)
+                    views.setInt(R.id.door_widget_root, "setBackgroundResource", statusBackgroundRes(effectiveCode))
 
                     // Confirm-first on every tap (D5); the exception is `location_required`, where the
                     // tap opens the app on this barrier for the in-app GPS open (GEOFENCE-4 D3).
@@ -178,12 +181,24 @@ class DoorWidgetProvider : HomeWidgetProvider() {
         else -> 0
     }
 
-    /** White CTA icon for the state: check on success, error on failure/geofence, door otherwise. */
-    private fun statusIconRes(code: String?): Int = when (code) {
-        "opened", "sent" -> R.drawable.ic_dw_opened
-        "failed", "no_response", "not_confirmed", "session_expired",
-        "unauthorized", "network_error", "error", "location_required" -> R.drawable.ic_dw_error
-        else -> R.drawable.ic_dw_open
+    private fun isSuccess(code: String?): Boolean = code == "opened" || code == "sent"
+
+    private fun isError(code: String?): Boolean = code in ERROR_CODES
+
+    /** Icon for the state: check on success, error on failure/geofence, the open button's power otherwise. */
+    private fun statusIconRes(code: String?): Int = when {
+        isSuccess(code) -> R.drawable.ic_dw_opened
+        isError(code) -> R.drawable.ic_dw_error
+        else -> R.drawable.ic_dw_power
+    }
+
+    /** The icon sits on the white circle in the colour of the state's background. */
+    private fun statusIconColor(code: String?): Int = if (isError(code)) COLOR_AMBER else COLOR_GREEN
+
+    private fun statusBackgroundRes(code: String?): Int = when {
+        isSuccess(code) -> R.drawable.door_widget_bg_success
+        isError(code) -> R.drawable.door_widget_bg_error
+        else -> R.drawable.door_widget_bg
     }
 
     /** Read a Long pref (home_widget stores epoch-ms via putLong); 0 if absent/unreadable. */
@@ -209,6 +224,12 @@ class DoorWidgetProvider : HomeWidgetProvider() {
         private const val CODE_OPENING = "opening"
         private const val STALE_OPENING_MS = 30_000L // a stuck `opening` reverts to normal after this
         private const val INVALID_ID = -1
+        private const val COLOR_GREEN = 0xFF4A9216.toInt()
+        private const val COLOR_AMBER = 0xFFB45309.toInt()
+        private val ERROR_CODES = setOf(
+            "failed", "no_response", "not_confirmed", "session_expired",
+            "unauthorized", "network_error", "error", "location_required",
+        )
         private const val LEGACY_DEVICE_ID = "door_widget_device_id"
         private const val LEGACY_DEVICE_LABEL = "door_widget_device_label"
         private const val LEGACY_STATUS_CODE = "door_widget_status_code"

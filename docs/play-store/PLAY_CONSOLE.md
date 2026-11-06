@@ -28,7 +28,7 @@ Salam Sesame şlaqbaum, qaraj qapısı və avtomatik giriş qapılarını telefo
 • Yol göstər — qonaqlarınız ünvana AzNav ilə gəlsin
 • Bildirişlər — abunəlik və giriş haqqında vaxtında xəbər
 
-Cihaz quraşdırılması və hesabın cihaza bağlanması Salam Sesame komandası tərəfindən edilir. Əlaqə: support@sezam.salam.az
+Cihaz quraşdırılması və hesabın cihaza bağlanması Salam Sesame komandası tərəfindən edilir. Əlaqə: sezam@salam.az
 
 **en** — Short: Open barriers, garage doors and gates from your phone.
 **en** — Full:
@@ -41,7 +41,7 @@ Salam Sesame lets you control barriers, garage doors and automatic gates from yo
 • Directions — guests reach the address with AzNav
 • Notifications — timely updates about your subscription and access
 
-Devices are installed and linked to your account by the Salam Sesame team. Contact: support@sezam.salam.az
+Devices are installed and linked to your account by the Salam Sesame team. Contact: sezam@salam.az
 
 **ru** — Short: Открывайте шлагбаумы, ворота и гаражи с телефона.
 **ru** — Full:
@@ -54,11 +54,11 @@ Salam Sesame позволяет управлять шлагбаумами, га�
 • Маршрут — гости доберутся до адреса через AzNav
 • Уведомления — своевременные сообщения о подписке и доступе
 
-Установку устройства и привязку аккаунта выполняет команда Salam Sesame. Контакты: support@sezam.salam.az
+Установку устройства и привязку аккаунта выполняет команда Salam Sesame. Контакты: sezam@salam.az
 
 - App icon: `play-icon-512.png` · Feature graphic: `play-feature-graphic-1024x500.png`
 - Phone screenshots: 2–8, from the phone (login, device list, open button, family/guest link).
-- Category: **House & Home** · Email: support@sezam.salam.az · Website: https://sezam.salam.az
+- Category: **House & Home** · Email: sezam@salam.az · Website: https://sezam.salam.az
 
 ## 4. App content
 - **Privacy policy:** https://sezam.salam.az/privacy

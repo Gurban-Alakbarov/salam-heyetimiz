@@ -13,6 +13,8 @@ export interface NavItem {
   permission: Permission
   /** Shows a red number: how many items wait for someone. */
   count?: keyof InboxCounts
+  /** Left out of the sidebar. The page itself keeps working at its address. */
+  hidden?: boolean
 }
 
 export interface NavGroup {
@@ -55,7 +57,8 @@ export const navGroups: NavGroup[] = [
   },
   {
     label: 'Sayt',
-    items: [{ to: '/site', label: 'Sayt məzmunu', icon: Globe, permission: PERM.siteManage }],
+    // Hidden until the owner opens it to the team: remove `hidden` to show it.
+    items: [{ to: '/site', label: 'Sayt məzmunu', icon: Globe, permission: PERM.siteManage, hidden: true }],
   },
   {
     label: 'Sistem',

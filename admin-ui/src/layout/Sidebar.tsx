@@ -24,7 +24,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { hasPermission } = useAuth()
   const counts = useInboxCounts(hasPermission(PERM.applicationsView)).data
   const groups = navGroups
-    .map((g) => ({ ...g, items: g.items.filter((item) => hasPermission(item.permission)) }))
+    .map((g) => ({ ...g, items: g.items.filter((item) => !item.hidden && hasPermission(item.permission)) }))
     .filter((g) => g.items.length > 0)
 
   return (

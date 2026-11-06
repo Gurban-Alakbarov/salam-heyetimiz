@@ -28,7 +28,7 @@ export function SupportPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Dəstək: qapı açılmır" description="Sakini tapın — hər cihaz üçün qapının niyə açılmadığı bir baxışda görünür" />
+      <PageHeader title="Dəstək: qapı açılmır" description="Sakini tapın — hər cihaz üçün qapının niyə açılmadığı görünür" />
       <div className="relative max-w-md">
         <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input

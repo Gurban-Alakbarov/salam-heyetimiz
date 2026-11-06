@@ -175,6 +175,7 @@ class FamilyController
     private function deviceArray(DeviceUser $row): array
     {
         $sub = Subscription::query()->where('device_user_id', $row->getKey())->first();
+        $renewal = $sub !== null ? app(SubscriptionPriceResolver::class)->forSubscription($sub) : null;
 
         return [
             'device_id' => (int) $row->device_id,
@@ -185,8 +186,8 @@ class FamilyController
                 'tier' => $sub->tier->value,
                 'price_minor' => (int) $sub->price_minor,
                 'term_days' => (int) $sub->term_days,
-                'renewal_price_minor' => app(SubscriptionPriceResolver::class)->commercial($sub->tier)['price_minor'],
-                'renewal_term_days' => app(SubscriptionPriceResolver::class)->commercial($sub->tier)['term_days'],
+                'renewal_price_minor' => $renewal['price_minor'],
+                'renewal_term_days' => $renewal['term_days'],
                 'currency' => $sub->currency,
                 'ends_at' => optional($sub->ends_at)->toIso8601String(),
             ],

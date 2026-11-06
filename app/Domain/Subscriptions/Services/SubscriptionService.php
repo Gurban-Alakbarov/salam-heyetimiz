@@ -48,7 +48,7 @@ final class SubscriptionService
         }
 
         $now = $this->clock->now();
-        $terms = $this->prices->commercial($tier);
+        $terms = $this->prices->forDeviceUser($tier, $deviceUser);
 
         return Subscription::query()->create([
             'device_user_id' => $deviceUser->getKey(),
@@ -74,7 +74,7 @@ final class SubscriptionService
         }
 
         $now = $this->clock->now();
-        $terms = $this->prices->commercial($tier);
+        $terms = $this->prices->forDeviceUser($tier, $subscription->deviceUser);
 
         $subscription->forceFill([
             'tier' => $tier->value,
@@ -182,6 +182,7 @@ final class SubscriptionService
         return DB::transaction(function () use ($subscription, $order, $amountMinor, $period): Subscription {
             $subscription->forceFill([
                 'status' => SubscriptionStatus::Active->value,
+                'price_minor' => $amountMinor > 0 ? $amountMinor : $subscription->price_minor, // a special price may differ from the snapshot
                 'starts_at' => $period['start'],
                 'ends_at' => $period['end'],
                 'cancelled_at' => null,
@@ -212,7 +213,7 @@ final class SubscriptionService
      */
     public function renew(Subscription $subscription, Order $order, int $amountMinor): Subscription
     {
-        $terms = $this->prices->commercial($subscription->tier);
+        $terms = $this->prices->forSubscription($subscription);
         // A14 — an ended subscription restarts from the payment, never back-dated over days without access.
         $period = $this->term->renew($subscription->ends_at->toImmutable(), $terms['term_days'], $this->clock->now());
 

@@ -21,7 +21,7 @@ class SubscriptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $renewal = app(SubscriptionPriceResolver::class)->commercial($this->tier);
+        $renewal = app(SubscriptionPriceResolver::class)->forSubscription($this->resource);
 
         return [
             'id' => (int) $this->id,
@@ -41,7 +41,7 @@ class SubscriptionResource extends JsonResource
             'price_minor' => (int) $this->price_minor,
             'currency' => $this->currency,
             'term_days' => (int) $this->term_days,
-            // What a renewal costs today (the commercial price, not this row's snapshot) — the app shows it on
+            // What a renewal costs this person today (not this row's snapshot) — the app shows it on
             // the renew button, so a price change never needs an app update.
             'renewal_price_minor' => $renewal['price_minor'],
             'renewal_term_days' => $renewal['term_days'],

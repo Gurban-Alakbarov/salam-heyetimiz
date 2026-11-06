@@ -25,6 +25,7 @@ use App\Http\Admin\V1\Controllers\Settings\SettingsController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsTestController;
 use App\Http\Admin\V1\Controllers\Settings\SystemHealthController;
 use App\Http\Admin\V1\Controllers\Subscriptions\AdminSubscriptionController;
+use App\Http\Admin\V1\Controllers\Subscriptions\AdminSubscriptionPriceController;
 use App\Http\Admin\V1\Controllers\Visitor\AdminVisitorLinkController;
 use Illuminate\Support\Facades\Route;
 
@@ -135,6 +136,9 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     Route::get('refunds', [AdminRefundController::class, 'index'])->name('adminListRefunds');
 
     // Subscriptions (batch 06)
+    Route::get('subscription-prices', [AdminSubscriptionPriceController::class, 'index'])->name('adminListSubscriptionPrices');
+    Route::put('subscription-prices', [AdminSubscriptionPriceController::class, 'upsert'])->name('adminSetSubscriptionPrice');
+    Route::delete('subscription-prices/{id}', [AdminSubscriptionPriceController::class, 'destroy'])->whereNumber('id')->name('adminRemoveSubscriptionPrice');
     Route::get('subscriptions', [AdminSubscriptionController::class, 'index'])->name('adminListSubscriptions');
     Route::get('subscriptions/{id}', [AdminSubscriptionController::class, 'show'])->whereNumber('id')->name('adminGetSubscription');
 

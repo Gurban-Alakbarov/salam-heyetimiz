@@ -47,19 +47,23 @@ class ComplexController
     public function devices(Request $request, int $complexId): JsonResponse
     {
         $complex = $this->visible($request, $complexId);
-        $price = $this->prices->commercial(SubscriptionTier::Main);
+        $userId = (int) $request->user()->getKey();
 
-        $data = $this->devices->forComplex((int) $complex->getKey(), (int) $request->user()->getKey())
-            ->map(fn (Device $d): array => [
-                'id' => (int) $d->id,
-                'label' => $d->location_label ?? $d->serial,
-                'address' => $d->address,
-                'image_url' => $d->image_url,
-                'subscription_price_minor' => $price['price_minor'],
-                'subscription_term_days' => $price['term_days'],
-                'currency' => $price['currency'],
-                'my_subscription_status' => $d->caller_subscription_status ?? 'none',
-            ])->values()->all();
+        $data = $this->devices->forComplex((int) $complex->getKey(), $userId)
+            ->map(function (Device $d) use ($complex, $userId): array {
+                $price = $this->prices->commercial(SubscriptionTier::Main, $userId, (int) $d->id, (int) $complex->getKey());
+
+                return [
+                    'id' => (int) $d->id,
+                    'label' => $d->location_label ?? $d->serial,
+                    'address' => $d->address,
+                    'image_url' => $d->image_url,
+                    'subscription_price_minor' => $price['price_minor'],
+                    'subscription_term_days' => $price['term_days'],
+                    'currency' => $price['currency'],
+                    'my_subscription_status' => $d->caller_subscription_status ?? 'none',
+                ];
+            })->values()->all();
 
         return response()->json(['data' => $data]);
     }

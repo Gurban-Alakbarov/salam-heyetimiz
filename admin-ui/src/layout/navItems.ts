@@ -1,4 +1,4 @@
-import { Bell, Boxes, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, UsersRound, Users } from 'lucide-react'
+import { Bell, Boxes, Building2, ClipboardList, CreditCard, FileText, HardDrive, KeyRound, LayoutDashboard, LifeBuoy, ReceiptText, RotateCcw, ScrollText, Settings, Tag, UsersRound, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PERM } from '@/auth/permissions'
 import type { Permission } from '@/types/api'
@@ -38,7 +38,8 @@ export const navGroups: NavGroup[] = [
   {
     label: 'Maliyyə',
     items: [
-      { to: '/subscriptions', label: 'Abunəliklər', icon: CreditCard, permission: PERM.subscriptionsView },
+      { to: '/subscriptions', label: 'Abunəliklər', icon: CreditCard, end: true, permission: PERM.subscriptionsView },
+      { to: '/subscriptions/prices', label: 'Xüsusi qiymətlər', icon: Tag, permission: PERM.subscriptionsManage },
       { to: '/orders', label: 'Sifarişlər', icon: ReceiptText, permission: PERM.ordersView },
       { to: '/refunds', label: 'Geri qaytarmalar', icon: RotateCcw, permission: PERM.refundsView },
       { to: '/payment-logs', label: 'Bank sorğuları (texniki)', icon: FileText, permission: PERM.ordersView },

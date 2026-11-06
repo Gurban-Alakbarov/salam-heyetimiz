@@ -68,20 +68,23 @@ class KomendantController
     {
         $manager = $this->manager($request, Permission::DEVICES_VIEW);
         $threshold = now()->subMinutes((int) config('domain.devices.offline_threshold_minutes', 15));
-        $price = $prices->commercial(SubscriptionTier::Main);
 
         $data = $this->complexDevices((int) $manager->complex_id)->orderBy('location_label')->get()
-            ->map(fn (Device $d): array => [
-                'id' => (int) $d->id,
-                'label' => $d->location_label ?? $d->serial,
-                'address' => $d->address,
-                'status' => $d->status->value,
-                'online' => $d->last_online_at !== null && $d->last_online_at->greaterThan($threshold),
-                'image_url' => $d->image_url,
-                'subscription_price_minor' => $price['price_minor'],
-                'subscription_term_days' => $price['term_days'],
-                'currency' => $price['currency'],
-            ])->all();
+            ->map(function (Device $d) use ($manager, $prices, $threshold): array {
+                $price = $prices->commercial(SubscriptionTier::Main, null, (int) $d->id, (int) $manager->complex_id);
+
+                return [
+                    'id' => (int) $d->id,
+                    'label' => $d->location_label ?? $d->serial,
+                    'address' => $d->address,
+                    'status' => $d->status->value,
+                    'online' => $d->last_online_at !== null && $d->last_online_at->greaterThan($threshold),
+                    'image_url' => $d->image_url,
+                    'subscription_price_minor' => $price['price_minor'],
+                    'subscription_term_days' => $price['term_days'],
+                    'currency' => $price['currency'],
+                ];
+            })->all();
 
         return response()->json(['data' => $data]);
     }

@@ -2330,6 +2330,66 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SubscriptionListResponse' }
 
+  /admin/subscription-prices:
+    get:
+      tags: [Admin / Subscriptions]
+      summary: List special subscription prices (subscriptions.manage)
+      operationId: adminListSubscriptionPrices
+      security: [{ adminBearerAuth: [] }]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        scope: { type: string, enum: [user, device, complex] }
+                        subject_id: { type: integer }
+                        subject_label: { type: string, nullable: true }
+                        price_minor: { type: integer }
+                        updated_at: { type: string, format: date-time, nullable: true }
+    put:
+      tags: [Admin / Subscriptions]
+      summary: Set the special price of a person, device or complex (subscriptions.manage)
+      description: Precedence is person, device, complex, then the standard price. Applies from the next payment.
+      operationId: adminSetSubscriptionPrice
+      security: [{ adminBearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope, subject_id, price_minor]
+              properties:
+                scope: { type: string, enum: [user, device, complex] }
+                subject_id: { type: integer }
+                price_minor: { type: integer, minimum: 100, maximum: 100000 }
+      responses:
+        '200': { description: saved }
+        '422': { description: invalid price or unknown subject }
+  /admin/subscription-prices/{id}:
+    delete:
+      tags: [Admin / Subscriptions]
+      summary: Remove a special price; the standard price applies from the next payment
+      operationId: adminRemoveSubscriptionPrice
+      security: [{ adminBearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: removed }
+        '404': { description: not found }
+
   # ----- Admin Reports ------------------------------------------------------
   /admin/reports/revenue:
     get:

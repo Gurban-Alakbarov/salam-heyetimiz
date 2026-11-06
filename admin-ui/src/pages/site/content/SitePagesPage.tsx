@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDateTime } from '@/lib/format'
+import { PublishButton, ReleaseList } from './SitePublish'
 
 /** In the order of the website's menu, shared texts last. */
 const ORDER = ['index', 'services', 'how-it-works', 'solutions', 'campaigns', 'faq', 'contact', 'privacy', 'terms', 'refund', 'account', 'site']
@@ -28,10 +29,10 @@ export function SitePagesPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Sayt məzmunu" description="Saytın səhifələri, mətnləri və şəkilləri" />
+      <PageHeader title="Sayt məzmunu" description="Saytın səhifələri, mətnləri və şəkilləri" actions={<PublishButton />} />
 
       <Alert>
-        <AlertDescription>Saxlanan dəyişikliklər yayımlanana qədər saytda görünmür.</AlertDescription>
+        <AlertDescription>Saxlanan dəyişikliklər "Yayımla" basılana qədər saytda görünmür.</AlertDescription>
       </Alert>
 
       <Card className="overflow-hidden">
@@ -68,6 +69,8 @@ export function SitePagesPage() {
           </Table>
         )}
       </Card>
+
+      <ReleaseList />
     </div>
   )
 }

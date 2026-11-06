@@ -22,7 +22,7 @@ final class SiteBuilder
 
     public function __construct(private readonly string $source) {}
 
-    /** @return list<string> Files written, relative to $out. */
+    /** @return list<string> Pages written, relative to $out. */
     public function build(SiteContent $content, string $out): array
     {
         if (is_dir($out) && ! File::isEmptyDirectory($out)) {
@@ -44,6 +44,9 @@ final class SiteBuilder
                 $written[] = $file;
             }
         }
+
+        File::put($out.'/sitemap.xml', $this->sitemap($content));
+        File::put($out.'/robots.txt', $this->robots($content));
 
         return $written;
     }
@@ -73,6 +76,33 @@ final class SiteBuilder
 
         // Template line breaks are not content: the original page had no space between its tags.
         return (string) preg_replace('/>\s+</', '><', trim($html))."\n";
+    }
+
+    /** Each page once per language, with its other languages listed, as search engines expect. */
+    private function sitemap(SiteContent $content): string
+    {
+        $base = rtrim($content->site['base_url'], '/');
+        $urls = '';
+        foreach (array_keys($content->pages) as $key) {
+            $path = $key === 'index' ? '/' : '/'.$key;
+            $links = '';
+            foreach (self::LANGS as $lang) {
+                $links .= '<xhtml:link rel="alternate" hreflang="'.$lang.'" href="'.e($base.$this->localUrl($path, $lang)).'"/>';
+            }
+            foreach (self::LANGS as $lang) {
+                $urls .= '<url><loc>'.e($base.$this->localUrl($path, $lang)).'</loc>'.$links.'</url>'."\n";
+            }
+        }
+
+        return '<?xml version="1.0" encoding="UTF-8"?>'."\n"
+            .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n"
+            .$urls.'</urlset>'."\n";
+    }
+
+    /** Personal links (guest passes, invitations) stay out of search results. */
+    private function robots(SiteContent $content): string
+    {
+        return "User-agent: *\nDisallow: /v/\nDisallow: /invite/\nAllow: /\n\nSitemap: ".rtrim($content->site['base_url'], '/')."/sitemap.xml\n";
     }
 
     private function localUrl(string $path, string $lang): string

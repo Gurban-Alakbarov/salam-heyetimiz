@@ -16,6 +16,10 @@ return [
     'rate_limited' => 'Çox sayda sorğu. :retry_after_seconds saniyə sonra yenidən cəhd edin.',
     'cooldown' => 'Yenidən cəhd üçün :retry_after_seconds saniyə gözləyin.',
     'site_content_conflict' => 'Bu səhifə siz redaktə edərkən dəyişilib. Səhifəni yeniləyib yenidən cəhd edin.',
+    'site_publish_busy' => 'Sayt hazırda yayımlanır. Bir az sonra yenidən cəhd edin.',
+    'site_nothing_to_publish' => 'Yayımlanacaq dəyişiklik yoxdur.',
+    'site_publish_unfinished' => 'Bəzi səhifələrin adı boşdur. Əvvəlcə onları doldurun.',
+    'site_release_gone' => 'Bu yayım artıq serverdə saxlanılmır.',
     'subscription_required' => 'Aboneliyiniz başa çatıb.',
     'device_disabled' => 'Cihaz admin tərəfindən bağlanıb.',
     // GEOFENCE-1 — məsafə məhdudiyyəti.

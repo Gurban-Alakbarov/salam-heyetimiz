@@ -24,6 +24,7 @@ use App\Http\Admin\V1\Controllers\Residents\AdminResidentController;
 use App\Http\Admin\V1\Controllers\Site\AdminInboxCountController;
 use App\Http\Admin\V1\Controllers\Site\AdminSiteContentController;
 use App\Http\Admin\V1\Controllers\Site\AdminSiteLeadController;
+use App\Http\Admin\V1\Controllers\Site\AdminSitePublishController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsController;
 use App\Http\Admin\V1\Controllers\Settings\SettingsTestController;
 use App\Http\Admin\V1\Controllers\Settings\SystemHealthController;
@@ -86,6 +87,10 @@ Route::middleware(['auth:admin', 'throttle:admin'])->group(function (): void {
     // Requests from the website's contact form
     // The public website's content (site.manage)
     Route::get('site/catalog', [AdminSiteContentController::class, 'catalog'])->name('adminSiteCatalog');
+    Route::get('site/publish', [AdminSitePublishController::class, 'status'])->name('adminSitePublishStatus');
+    Route::post('site/publish', [AdminSitePublishController::class, 'publish'])->name('adminSitePublish');
+    Route::post('site/releases/{id}/rollback', [AdminSitePublishController::class, 'rollback'])->whereNumber('id')->name('adminSiteRollback');
+    Route::get('site/preview/{key}', [AdminSitePublishController::class, 'preview'])->where('key', '[a-z-]+')->name('adminSitePreview');
     Route::get('site/media', [AdminSiteContentController::class, 'media'])->name('adminListSiteMedia');
     Route::post('site/media', [AdminSiteContentController::class, 'upload'])->name('adminUploadSiteMedia');
     Route::get('site/documents', [AdminSiteContentController::class, 'index'])->name('adminListSiteDocuments');

@@ -24,6 +24,7 @@ import { ApiError } from '@/lib/api'
 import { formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { EditorContext, Fields } from './FieldEditors'
+import { SitePreview } from './SitePreview'
 import { blankFields, hasErrorUnder, type Item, move, prepare, preview } from './model'
 
 /** One of each per page: they carry the page's own layout or the contact form. */
@@ -209,7 +210,12 @@ function Editor({ document, catalog }: { document: SiteDocument; catalog: SiteCa
         <PageHeader
           title={document.title}
           description={`Versiya ${version}`}
-          actions={<VersionHistory documentKey={key} current={version} dirty={dirty} onRestored={load} />}
+          actions={(
+            <>
+              <SitePreview documentKey={key} dirty={dirty} />
+              <VersionHistory documentKey={key} current={version} dirty={dirty} onRestored={load} />
+            </>
+          )}
         />
 
         {key === 'campaigns' && (

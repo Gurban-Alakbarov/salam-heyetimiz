@@ -25,24 +25,33 @@ Writes 30 pages to `storage/app/site-build` (`index.html`, `services.html`, `en/
 
 The admin API is under `/admin/v1/site/` and needs the `site.manage` permission. `ContentNormalizer` shapes what is saved, and `SiteHtml` removes any markup that is not allowed, because pages render those fields unescaped.
 
+## Publishing
+
+The database is the source of the live site; the files here only seed it. `SitePublisher` builds a complete copy in `SITE_RELEASES_PATH/<release>` and moves the `current` link to it in one step. The web server serves `current`, so a failed build changes nothing and going back is the same step. The last 10 copies stay on disk.
+
+`php artisan site:rebuild` builds what is already published again. Run it after a deploy that changes templates, `site.css` or `site.js`. The scheduler runs it daily, so a campaign ends on its last day without anyone editing it.
+
 ## Content rules
 
 - A translated value is `{"az": "...", "en": "...", "ru": "..."}`. An empty translation falls back to Azerbaijani.
 - Links are written without a language (`/contact`). The build adds `/en` or `/ru`.
 - A section's `type` must be listed in `SectionCatalog`, and each type has a view in `resources/views/site/sections/`.
-- The campaigns page is built only while a campaign runs. A campaign's `ends_at` is its last day, checked at build time, so a daily build is needed to take it down on time.
+- The campaigns page is built only while a campaign runs. A campaign's `ends_at` is its last day.
 
 ## Web server
 
-Each address serves its own file:
+Each address serves its own file from the live copy:
 
 ```nginx
-location = / { root /var/www/salam-site; try_files /index.html =404; }
+location = / { root /var/www/salam-site-releases/current; try_files /index.html =404; }
+location = /sitemap.xml { root /var/www/salam-site-releases/current; try_files /sitemap.xml =404; }
+location = /robots.txt { root /var/www/salam-site-releases/current; try_files /robots.txt =404; }
 location ~ ^/(services|how-it-works|solutions|campaigns|faq|contact|privacy|terms|refund|account)/?$ {
-    root /var/www/salam-site; try_files /$1.html =404;
+    root /var/www/salam-site-releases/current; try_files /$1.html =404;
 }
-location ~ ^/(en|ru)/?$ { root /var/www/salam-site; try_files /$1/index.html =404; }
+location ~ ^/(en|ru)/?$ { root /var/www/salam-site-releases/current; try_files /$1/index.html =404; }
 location ~ ^/(en|ru)/(services|how-it-works|solutions|campaigns|faq|contact|privacy|terms|refund|account)/?$ {
-    root /var/www/salam-site; try_files /$1/$2.html =404;
+    root /var/www/salam-site-releases/current; try_files /$1/$2.html =404;
 }
+location ^~ /landing/ { root /var/www/salam-site-releases/current; try_files $uri =404; expires 7d; }
 ```

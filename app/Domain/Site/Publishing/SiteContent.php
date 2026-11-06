@@ -4,6 +4,7 @@ namespace App\Domain\Site\Publishing;
 
 use App\Domain\Site\Models\SiteDocument;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use RuntimeException;
 
 /**
@@ -48,10 +49,33 @@ final class SiteContent
     /** The current drafts in the database. */
     public static function fromDatabase(string $iconsFile, ?Carbon $today = null): self
     {
-        $documents = SiteDocument::query()->get()->keyBy('key');
+        return self::fromDocuments(SiteDocument::query()->get(), $iconsFile, $today);
+    }
+
+    /** @param Collection<int, SiteDocument> $documents */
+    public static function fromDocuments(Collection $documents, string $iconsFile, ?Carbon $today = null): self
+    {
+        $documents = $documents->keyBy('key');
         $shared = $documents->pull(SiteDocument::SHARED) ?? throw new RuntimeException('Website content is not imported yet.');
 
         return new self($shared->content, self::read($iconsFile), $documents->pluck('content')->all(), $today);
+    }
+
+    /**
+     * What is live now, drafts aside.
+     *
+     * @param  Collection<int, SiteDocument>  $documents
+     */
+    public static function fromPublished(Collection $documents, string $iconsFile, ?Carbon $today = null): self
+    {
+        $published = $documents->map(function (SiteDocument $document): SiteDocument {
+            $copy = clone $document;
+            $copy->content = $document->revisions()->where('version', $document->published_version)->firstOrFail()->content;
+
+            return $copy;
+        });
+
+        return self::fromDocuments($published, $iconsFile, $today);
     }
 
     /** Campaigns past their last day leave the list. */

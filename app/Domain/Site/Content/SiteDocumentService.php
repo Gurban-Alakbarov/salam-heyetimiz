@@ -5,6 +5,7 @@ namespace App\Domain\Site\Content;
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Site\Exceptions\SiteContentException;
 use App\Domain\Site\Models\SiteDocument;
+use App\Domain\Site\Models\SiteRelease;
 use App\Domain\Site\Publishing\SiteContent;
 use Illuminate\Support\Facades\DB;
 
@@ -99,9 +100,13 @@ final class SiteDocumentService
             'restored_from' => $restoredFrom,
         ]);
 
+        // What is live, or could be gone back to, has to stay readable for a rebuild.
+        $needed = SiteRelease::query()->pluck('versions')->map(fn (array $versions) => $versions[$document->key] ?? null)
+            ->push($document->published_version)->filter()->unique()->values()->all();
+
         $document->revisions()
             ->where('version', '<=', $document->version - self::KEEP)
-            ->when($document->published_version !== null, fn ($q) => $q->where('version', '!=', $document->published_version))
+            ->whereNotIn('version', $needed)
             ->delete();
 
         return $document;

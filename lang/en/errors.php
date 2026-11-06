@@ -13,6 +13,10 @@ return [
     'rate_limited' => 'Too many requests. Try again in :retry_after_seconds seconds.',
     'cooldown' => 'Wait :retry_after_seconds seconds before trying again.',
     'site_content_conflict' => 'This page was changed while you were editing. Reload it and try again.',
+    'site_publish_busy' => 'The website is being published. Try again shortly.',
+    'site_nothing_to_publish' => 'There are no changes to publish.',
+    'site_publish_unfinished' => 'Some pages have no name. Fill them in first.',
+    'site_release_gone' => 'This release is no longer kept on the server.',
     'subscription_required' => 'Your subscription has expired.',
     'device_disabled' => 'The device has been disabled by an administrator.',
     // GEOFENCE-1 — distance restriction.

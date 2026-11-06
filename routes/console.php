@@ -66,6 +66,12 @@ Schedule::job(new SweepAbandonedSubscriptionIntentsJob())
     ->onOneServer();
 
 // Auth (batch 07)
+// A campaign's last day passing changes the website with no one editing it.
+Schedule::command('site:rebuild')
+    ->dailyAt('00:10')
+    ->timezone($scheduleTimezone)
+    ->withoutOverlapping();
+
 Schedule::command('auth:prune')
     ->dailyAt('03:00')
     ->timezone($scheduleTimezone)

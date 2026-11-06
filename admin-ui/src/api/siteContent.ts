@@ -141,3 +141,64 @@ export function useUploadSiteMedia() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['site-media'] }),
   })
 }
+
+export interface SiteRelease {
+  id: number
+  kind: 'publish' | 'rebuild'
+  admin: string | null
+  pages: number
+  live: boolean
+  created_at: string | null
+}
+
+export interface SitePublishStatus {
+  changed: { key: string; title: string; version: number; published_version: number | null }[]
+  translations_missing: number
+  translations_stale: number
+  /** Pages that cannot go out as they are. */
+  unfinished: string[]
+  releases: SiteRelease[]
+}
+
+export function useSitePublishStatus() {
+  return useQuery({
+    queryKey: ['site-publish'],
+    queryFn: async () => (await api.get<{ data: SitePublishStatus }>('/admin/v1/site/publish')).data.data,
+  })
+}
+
+function useStorePublishStatus() {
+  const qc = useQueryClient()
+  return (status: SitePublishStatus) => {
+    qc.setQueryData(['site-publish'], status)
+    qc.invalidateQueries({ queryKey: ['site-documents'] })
+    qc.invalidateQueries({ queryKey: ['site-document'] })
+    qc.invalidateQueries({ queryKey: ['site-revisions'] })
+  }
+}
+
+export function usePublishSite() {
+  const store = useStorePublishStatus()
+  return useMutation({
+    mutationFn: async () => (await api.post<{ data: SitePublishStatus }>('/admin/v1/site/publish', undefined, { timeout: 120000 })).data.data,
+    onSuccess: store,
+  })
+}
+
+export function useRollbackSite() {
+  const store = useStorePublishStatus()
+  return useMutation({
+    mutationFn: async (id: number) => (await api.post<{ data: SitePublishStatus }>(`/admin/v1/site/releases/${id}/rollback`)).data.data,
+    onSuccess: store,
+  })
+}
+
+export function useSitePreview(key: string, lang: SiteLang, enabled: boolean) {
+  return useQuery({
+    queryKey: ['site-preview', key, lang],
+    queryFn: async () => (await api.get<{ data: { html: string | null } }>(`/admin/v1/site/preview/${key}`, { params: { lang } })).data.data.html,
+    enabled,
+    gcTime: 0,
+    staleTime: 0,
+  })
+}

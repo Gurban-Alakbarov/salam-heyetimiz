@@ -7768,6 +7768,127 @@
         }
       }
     },
+    "/admin/v1/site/publish": {
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Changes waiting for publishing, translation warnings and the kept copies of the website (site.manage)",
+        "operationId": "adminSitePublishStatus",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Build all saved drafts into a new copy of the website and make it live (site.manage)",
+        "operationId": "adminSitePublish",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "published"
+          },
+          "409": {
+            "description": "nothing to publish",
+            "or a publish is already running": null
+          },
+          "422": {
+            "description": "a page has no name"
+          }
+        }
+      }
+    },
+    "/admin/v1/site/releases/{id}/rollback": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "Make an earlier copy of the website live again; drafts stay (site.manage)",
+        "operationId": "adminSiteRollback",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "409": {
+            "description": "the copy is no longer on the server"
+          }
+        }
+      }
+    },
+    "/admin/v1/site/preview/{key}": {
+      "parameters": [
+        {
+          "name": "key",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "lang",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "az",
+              "en",
+              "ru"
+            ]
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Site"
+        ],
+        "summary": "The saved draft of a page as HTML, for showing inside the panel (site.manage)",
+        "description": "`html` is null when the page would not exist, such as campaigns with none running.",
+        "operationId": "adminSitePreview",
+        "security": [
+          {
+            "adminBearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
     "/admin/v1/site/media": {
       "get": {
         "tags": [

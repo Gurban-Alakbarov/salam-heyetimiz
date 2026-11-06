@@ -8,19 +8,34 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		2224F2938915786209248782 /* DoorIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D7E07F53BBE1A1CA751C48 /* DoorIntents.swift */; };
+		24260D63C4211FD166E70630 /* DoorAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7074936D931759A3CB081185 /* DoorAPI.swift */; };
+		288E19BC70AE05ED51E07941 /* SalamDoorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7957B30BAD0A7B57984AFE93 /* SalamDoorWidget.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		5B10A130DED64FEA671E564C /* DoorStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E36E9601787E6BD289F7D00 /* DoorStrings.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		7C1F29F81F959E0B487A2944 /* DoorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFCD5CF88DDEB696AFA63F /* DoorStore.swift */; };
 		7E0A7ED5B1B80DCCEDEF0F4B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28F9A37F64DFF6C21E5410D9 /* InfoPlist.strings */; };
+		7E0FF7EF30EF4F817DDFBC68 /* SalamDoorWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 9DF950942FD35D81C640BC81 /* SalamDoorWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B1C2D3E4F5A6B7C8D9E0F1A2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist */; };
+		CEFA2792C731C476746FCDD0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 12DDD5AA67B00C957D1CF140 /* PrivacyInfo.xcprivacy */; };
+		D20990941709DECE7FBCCC7E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E176AE189DD1B1317C793D06 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1D77BFA50641B8D61F18D91E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E60F27A29E0B5B9FEBB0CFE5;
+			remoteInfo = SalamDoorWidget;
+		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -41,20 +56,39 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DC9730AB5D3E59A27BF79C8A /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7E0FF7EF30EF4F817DDFBC68 /* SalamDoorWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		12DDD5AA67B00C957D1CF140 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		25D2D5D9A94B669063A30F3F /* SalamDoorWidget.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SalamDoorWidget.xcconfig; sourceTree = "<group>"; };
+		25D7E07F53BBE1A1CA751C48 /* DoorIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DoorIntents.swift; sourceTree = "<group>"; };
+		27970ADD9D33F901EB2361AC /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		65A2CF412D0E85D887F3FAF8 /* SalamDoorWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = SalamDoorWidget.entitlements; sourceTree = "<group>"; };
 		65EEEE514D18EA4374499532 /* az */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7074936D931759A3CB081185 /* DoorAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DoorAPI.swift; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
+		7957B30BAD0A7B57984AFE93 /* SalamDoorWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SalamDoorWidget.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		8E36E9601787E6BD289F7D00 /* DoorStrings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DoorStrings.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,9 +96,12 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9DF950942FD35D81C640BC81 /* SalamDoorWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SalamDoorWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A14B69A127E1AE2A679E3F3B /* ru */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ADF28A9D6D9FC3407611D3B7 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C7CFCD5CF88DDEB696AFA63F /* DoorStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DoorStore.swift; sourceTree = "<group>"; };
+		E176AE189DD1B1317C793D06 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +110,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B05FA9824CD98157045648AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D20990941709DECE7FBCCC7E /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +130,31 @@
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
 			);
 			path = RunnerTests;
+			sourceTree = "<group>";
+		};
+		6D5BEA085DE764073C57B5CC /* SalamDoorWidget */ = {
+			isa = PBXGroup;
+			children = (
+				7074936D931759A3CB081185 /* DoorAPI.swift */,
+				25D7E07F53BBE1A1CA751C48 /* DoorIntents.swift */,
+				C7CFCD5CF88DDEB696AFA63F /* DoorStore.swift */,
+				8E36E9601787E6BD289F7D00 /* DoorStrings.swift */,
+				7957B30BAD0A7B57984AFE93 /* SalamDoorWidget.swift */,
+				12DDD5AA67B00C957D1CF140 /* PrivacyInfo.xcprivacy */,
+				27970ADD9D33F901EB2361AC /* Info.plist */,
+				65A2CF412D0E85D887F3FAF8 /* SalamDoorWidget.entitlements */,
+				25D2D5D9A94B669063A30F3F /* SalamDoorWidget.xcconfig */,
+			);
+			name = SalamDoorWidget;
+			path = SalamDoorWidget;
+			sourceTree = "<group>";
+		};
+		8F244FE1EFAF3DD710E2B4B5 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				E176AE189DD1B1317C793D06 /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
@@ -106,6 +176,8 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				C4249D1F81DB3D12EC215482 /* Frameworks */,
+				6D5BEA085DE764073C57B5CC /* SalamDoorWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,6 +186,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				9DF950942FD35D81C640BC81 /* SalamDoorWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,6 +207,14 @@
 				28F9A37F64DFF6C21E5410D9 /* InfoPlist.strings */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		C4249D1F81DB3D12EC215482 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8F244FE1EFAF3DD710E2B4B5 /* iOS */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -165,12 +246,14 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				DC9730AB5D3E59A27BF79C8A /* Embed App Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				5C1A5E5A2F80000000000001 /* Upload Crashlytics dSYMs */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B7F45DEBD2B92F2F39A572B2 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -179,6 +262,23 @@
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E60F27A29E0B5B9FEBB0CFE5 /* SalamDoorWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E56A7B98132BE8C3A85304CB /* Build configuration list for PBXNativeTarget "SalamDoorWidget" */;
+			buildPhases = (
+				02812A3C7617BC7663847675 /* Sources */,
+				B05FA9824CD98157045648AD /* Frameworks */,
+				67536E532BAEBD2D880506D6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SalamDoorWidget;
+			productName = SalamDoorWidget;
+			productReference = 9DF950942FD35D81C640BC81 /* SalamDoorWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -220,6 +320,7 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				E60F27A29E0B5B9FEBB0CFE5 /* SalamDoorWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -229,6 +330,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		67536E532BAEBD2D880506D6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEFA2792C731C476746FCDD0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +410,18 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		02812A3C7617BC7663847675 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24260D63C4211FD166E70630 /* DoorAPI.swift in Sources */,
+				2224F2938915786209248782 /* DoorIntents.swift in Sources */,
+				7C1F29F81F959E0B487A2944 /* DoorStore.swift in Sources */,
+				5B10A130DED64FEA671E564C /* DoorStrings.swift in Sources */,
+				288E19BC70AE05ED51E07941 /* SalamDoorWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807D294A63A400263BE5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -326,6 +447,12 @@
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		B7F45DEBD2B92F2F39A572B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SalamDoorWidget;
+			target = E60F27A29E0B5B9FEBB0CFE5 /* SalamDoorWidget */;
+			targetProxy = 1D77BFA50641B8D61F18D91E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -479,6 +606,30 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
 			name = Profile;
+		};
+		70E5EC85FA2A7D270037336A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 25D2D5D9A94B669063A30F3F /* SalamDoorWidget.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = SalamDoorWidget/SalamDoorWidget.entitlements;
+				DEVELOPMENT_TEAM = 2654395QYQ;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SalamDoorWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = az.salam.sezam.DoorWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 		97C147031CF9000F007C117D /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -640,6 +791,59 @@
 			};
 			name = Release;
 		};
+		9AF535FF3AD8681126904073 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 25D2D5D9A94B669063A30F3F /* SalamDoorWidget.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = SalamDoorWidget/SalamDoorWidget.entitlements;
+				DEVELOPMENT_TEAM = 2654395QYQ;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SalamDoorWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = az.salam.sezam.DoorWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+		C715001E39B16E5D4E7EB4EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 25D2D5D9A94B669063A30F3F /* SalamDoorWidget.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = SalamDoorWidget/SalamDoorWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 2654395QYQ;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SalamDoorWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = az.salam.sezam.DoorWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Salam Sesame Door Widget App Store";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -669,6 +873,16 @@
 				97C147061CF9000F007C117D /* Debug */,
 				97C147071CF9000F007C117D /* Release */,
 				249021D4217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E56A7B98132BE8C3A85304CB /* Build configuration list for PBXNativeTarget "SalamDoorWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C715001E39B16E5D4E7EB4EC /* Release */,
+				70E5EC85FA2A7D270037336A /* Debug */,
+				9AF535FF3AD8681126904073 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -43,7 +43,7 @@ export function LoginPage() {
             <ShieldCheck className="h-6 w-6" />
           </div>
           <CardTitle>Admin Panel</CardTitle>
-          <CardDescription>Salam Həyətimiz — idarəetmə</CardDescription>
+          <CardDescription>Salam Sesame — idarəetmə</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4" noValidate>

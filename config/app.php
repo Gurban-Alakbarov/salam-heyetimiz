@@ -2,7 +2,7 @@
 
 return [
 
-    'name' => env('APP_NAME', 'Salam Həyətimiz'),
+    'name' => env('APP_NAME', 'Salam Sesame'),
 
     'env' => env('APP_ENV', 'production'),
 

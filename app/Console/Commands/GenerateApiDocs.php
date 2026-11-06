@@ -151,7 +151,7 @@ class GenerateApiDocs extends Command
 
         File::put($root.'/bruno.json', json_encode([
             'version' => '1',
-            'name' => 'Salam Həyətimiz API',
+            'name' => 'Salam Sesame API',
             'type' => 'collection',
             'ignore' => ['node_modules', '.git'],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");

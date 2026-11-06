@@ -184,7 +184,7 @@ export function TemplateDetailPage() {
               {shown ? (
                 <>
                   <div className="rounded-xl border bg-muted/40 p-3 shadow-sm">
-                    <p className="text-xs text-muted-foreground">Salam Həyətimiz · indi</p>
+                    <p className="text-xs text-muted-foreground">Salam Sesame · indi</p>
                     <p className="text-sm font-semibold">{shown.title || '—'}</p>
                     <p className="text-sm">{shown.body || '—'}</p>
                   </div>

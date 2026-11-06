@@ -22,7 +22,7 @@ it('offers no setting that nothing reads', function () {
 it('gives every mail the system sends a subject field', function (EmailType $type) {
     expect(SettingsCatalog::definition('email', $type->subjectKey()))->not->toBeNull()
         ->and($type->defaultSubject())->not->toContain('Həyətimiz');
-})->with(array_filter(EmailType::cases(), fn (EmailType $type) => ! in_array($type, [EmailType::RegistrationOtp, EmailType::LoginOtp], true)));
+})->with(EmailType::cases());
 
 it('moves the offline window with the panel setting', function () {
     $settings = app(SettingsService::class);

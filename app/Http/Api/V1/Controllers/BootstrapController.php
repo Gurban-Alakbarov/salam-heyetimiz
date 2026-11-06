@@ -48,7 +48,7 @@ class BootstrapController
                 'resend_seconds' => (int) $this->settings->value('otp', 'otp_resend_seconds'),
             ],
             'public_settings' => [
-                'brand' => $this->str('general', 'app_name') ?: 'Salam Həyətimiz',
+                'brand' => $this->str('general', 'app_name') ?: 'Salam Sesame',
                 'default_locale' => 'az',
                 'default_timezone' => 'Asia/Baku',
                 'currency' => 'AZN',

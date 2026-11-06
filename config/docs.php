@@ -13,7 +13,7 @@ return [
     'username' => env('API_DOCS_USER', 'admin'),
     'password' => env('API_DOCS_PASSWORD'),
 
-    'title' => 'Salam Həyətimiz API',
+    'title' => 'Salam Sesame API',
 
     // Versioned spec files (relative to the project root). The default version is served at
     // /api/openapi.json; explicit versions at /api/{version}/openapi.json.

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Salam Həyətimiz — dəvət</title>
+    <title>Salam Sesame — dəvət</title>
     <style>
         body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #f4f7f2; color: #1f2a1a; }
         main { max-width: 420px; margin: 0 auto; padding: 32px 16px; }
@@ -22,7 +22,7 @@
     <div class="card">
         @if ($invite)
             <h1>Salam, {{ $invite['first_name'] }}!</h1>
-            <p><strong>{{ $invite['inviter_name'] }}</strong> sizi Salam Həyətimiz tətbiqinə dəvət edir.</p>
+            <p><strong>{{ $invite['inviter_name'] }}</strong> sizi Salam Sesame tətbiqinə dəvət edir.</p>
             <p class="muted">Dəvət {{ $invite['email_masked'] }} ünvanı üçündür. Qeydiyyatda bu email-i istifadə edin.</p>
             <a class="btn primary" id="open" href="{{ $openUrl }}">Tətbiqdə aç</a>
             @if ($storeAndroid)<a class="btn secondary" href="{{ $storeAndroid }}">Google Play</a>@endif

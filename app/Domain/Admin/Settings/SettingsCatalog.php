@@ -21,7 +21,7 @@ final class SettingsCatalog
     {
         return [
             'general' => [
-                'app_name' => ['type' => 'string', 'default' => 'Salam Həyətimiz', 'label' => 'Tətbiq adı'],
+                'app_name' => ['type' => 'string', 'default' => 'Salam Sesame', 'label' => 'Tətbiq adı'],
                 'maintenance_mode' => ['type' => 'bool', 'default' => false, 'label' => 'Texniki rejim'],
                 'min_version' => ['type' => 'string', 'default' => '1.0.0', 'label' => 'Minimum tətbiq versiyası'],
                 'support_email' => ['type' => 'string', 'default' => '', 'label' => 'Dəstək e-poçtu'],
@@ -47,12 +47,12 @@ final class SettingsCatalog
                 'smtp_username' => ['type' => 'string', 'default' => '', 'label' => 'SMTP İstifadəçi'],
                 'smtp_password' => ['type' => 'secret', 'default' => '', 'label' => 'SMTP Parol'],
                 'smtp_encryption' => ['type' => 'select', 'default' => 'tls', 'label' => 'Şifrələmə', 'options' => ['none', 'tls', 'ssl']],
-                'from_name' => ['type' => 'string', 'default' => 'Salam Həyətimiz', 'label' => 'From Name (göndərən ad)'],
+                'from_name' => ['type' => 'string', 'default' => 'Salam Sesame', 'label' => 'From Name (göndərən ad)'],
                 'from_email' => ['type' => 'string', 'default' => '', 'label' => 'From Email (göndərən e-poçt)'],
                 'reply_to_email' => ['type' => 'string', 'default' => '', 'label' => 'Reply-To e-poçt'],
                 'html_enabled' => ['type' => 'bool', 'default' => true, 'label' => 'HTML email şablonları aktiv'],
-                'subject_registration_otp' => ['type' => 'string', 'default' => 'Salam Həyətimiz — qeydiyyat təsdiq kodu', 'label' => 'Mövzu — Qeydiyyat OTP'],
-                'subject_login_otp' => ['type' => 'string', 'default' => 'Salam Həyətimiz — giriş təsdiq kodu', 'label' => 'Mövzu — Giriş OTP'],
+                'subject_registration_otp' => ['type' => 'string', 'default' => 'Salam Sesame — qeydiyyat təsdiq kodu', 'label' => 'Mövzu — Qeydiyyat OTP'],
+                'subject_login_otp' => ['type' => 'string', 'default' => 'Salam Sesame — giriş təsdiq kodu', 'label' => 'Mövzu — Giriş OTP'],
                 'subject_resident_invitation' => ['type' => 'string', 'default' => 'Salam Sesame — yaşayış kompleksinə dəvət', 'label' => 'Mövzu — Sakin dəvəti'],
                 'subject_family_invitation' => ['type' => 'string', 'default' => 'Salam Sesame — ailə üzvü dəvəti', 'label' => 'Mövzu — Ailə üzvü dəvəti'],
                 'subject_application_rejected' => ['type' => 'string', 'default' => 'Salam Sesame — müraciətiniz təsdiqlənmədi', 'label' => 'Mövzu — Müraciətin rəddi'],

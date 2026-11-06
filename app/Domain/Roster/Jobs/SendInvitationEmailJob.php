@@ -79,8 +79,8 @@ class SendInvitationEmailJob implements ShouldBeEncrypted, ShouldQueue
             'lines' => [
                 'Salam, '.$invitation->invitee_first_name.'!',
                 $invitation->kind === InvitationKind::ComplexResident
-                    ? $inviter.' sizi Salam Həyətimiz tətbiqinə sakin kimi dəvət edir.'
-                    : $inviter.' sizi Salam Həyətimiz tətbiqində ailə üzvü kimi dəvət edir.',
+                    ? $inviter.' sizi Salam Sesame tətbiqinə sakin kimi dəvət edir.'
+                    : $inviter.' sizi Salam Sesame tətbiqində ailə üzvü kimi dəvət edir.',
                 'Dəvəti qəbul etmək üçün: '.$link,
                 'Link '.$expires.' tarixinədək etibarlıdır.',
                 'Bu dəvəti gözləmirdinizsə, məktubu nəzərə almayın.',

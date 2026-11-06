@@ -38,11 +38,11 @@ function emailCode(string $email): string
 it('renders the HTML OTP template with code, TTL and security warning', function () {
     $html = view('emails.otp', [
         'code' => '987654', 'ttlMinutes' => 3, 'intro' => 'Giriş kodunuz:',
-        'brand' => 'Salam Həyətimiz', 'supportEmail' => 'support@salamheyetimiz.com',
+        'brand' => 'Salam Sesame', 'supportEmail' => 'support@salamheyetimiz.com',
     ])->render();
 
     expect($html)->toContain('987654')->toContain('3 dəqiqə')
-        ->toContain('paylaşmayın')->toContain('Salam Həyətimiz')->toContain('support@salamheyetimiz.com');
+        ->toContain('paylaşmayın')->toContain('Salam Sesame')->toContain('support@salamheyetimiz.com');
 });
 
 it('composes an email via TemplatedMailer: subject from EmailType + HTML + text fallback', function () {
@@ -50,13 +50,13 @@ it('composes an email via TemplatedMailer: subject from EmailType + HTML + text 
     app()->instance(RuntimeMailer::class, $cap);
 
     app(TemplatedMailer::class)->send(EmailType::RegistrationOtp, 'compose@test.az', [
-        'code' => '123456', 'ttlMinutes' => 2, 'intro' => 'Qeydiyyat kodunuz:', 'brand' => 'Salam Həyətimiz',
+        'code' => '123456', 'ttlMinutes' => 2, 'intro' => 'Qeydiyyat kodunuz:', 'brand' => 'Salam Sesame',
     ]);
 
     expect($cap->sent)->toHaveCount(1);
     $msg = $cap->sent[0];
     expect($msg['to'])->toBe('compose@test.az')
-        ->and($msg['subject'])->toBe('Salam Həyətimiz — qeydiyyat təsdiq kodu')
+        ->and($msg['subject'])->toBe('Salam Sesame — qeydiyyat təsdiq kodu')
         ->and($msg['html'])->toContain('123456')->toContain('2 dəqiqə')
         ->and($msg['body'])->toContain('123456'); // plain-text fallback present
 });

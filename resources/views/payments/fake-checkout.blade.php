@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>TEST ÖDƏNİŞ — Salam Həyətimiz</title>
+<title>TEST ÖDƏNİŞ — Salam Sesame</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;margin:0;color:#0f172a}
 .banner{background:#b91c1c;color:#fff;text-align:center;font-weight:800;letter-spacing:.08em;padding:14px 16px;font-size:18px}

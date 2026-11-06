@@ -60,7 +60,7 @@ class SettingsTestController
             return response()->json(['ok' => false, 'message' => 'SMTP host və From Email təyin edilməlidir.']);
         }
         try {
-            $this->mailer->send($to, 'Salam Həyətimiz — test e-poçtu', "Bu, Settings bölməsindən göndərilən test mesajıdır.\nƏgər bunu alırsınızsa, SMTP konfiqurasiyası işləyir.");
+            $this->mailer->send($to, 'Salam Sesame — test e-poçtu', "Bu, Settings bölməsindən göndərilən test mesajıdır.\nƏgər bunu alırsınızsa, SMTP konfiqurasiyası işləyir.");
             $this->audit->record('settings.email_test_sent', ['to' => $to]);
 
             return response()->json(['ok' => true, 'message' => "Test e-poçtu göndərildi: {$to}"]);
@@ -89,7 +89,7 @@ class SettingsTestController
         $body = str_replace('{code}', $code, (string) $this->settings->value('otp', "tpl_{$template}"));
 
         try {
-            $this->mailer->send($to, 'Salam Həyətimiz — test OTP', $body);
+            $this->mailer->send($to, 'Salam Sesame — test OTP', $body);
             $this->audit->record('settings.otp_test_sent', ['to' => $to, 'template' => $template]);
 
             return response()->json(['ok' => true, 'message' => "Test OTP göndərildi: {$to} (şablon: {$template})"]);

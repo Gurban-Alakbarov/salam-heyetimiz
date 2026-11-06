@@ -3,7 +3,7 @@
 @section('content')
   <p style="margin:0 0 8px;font-size:16px;font-weight:600;">Salam, {{ $firstName }}!</p>
   <p style="margin:0 0 20px;font-size:14px;color:#374151;">
-    <strong>{{ $inviter }}</strong> sizi Salam Həyətimiz tətbiqinə sakin kimi dəvət edir.
+    <strong>{{ $inviter }}</strong> sizi Salam Sesame tətbiqinə sakin kimi dəvət edir.
     Dəvəti qəbul etdikdən sonra kompleksinizin cihazlarını görəcək və abunəlik seçə biləcəksiniz.
   </p>
   <div style="text-align:center;margin:8px 0 20px;">

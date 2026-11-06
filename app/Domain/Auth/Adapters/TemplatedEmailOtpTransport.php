@@ -36,7 +36,7 @@ final class TemplatedEmailOtpTransport implements EmailOtpTransport
             'code' => $code,
             'ttlMinutes' => max(1, (int) ceil($ttlSeconds / 60)),
             'intro' => $intro,
-            'brand' => 'Salam Həyətimiz',
+            'brand' => 'Salam Sesame',
             'supportEmail' => $support,
         ], $locale);
     }

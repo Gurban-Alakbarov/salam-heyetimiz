@@ -13,7 +13,7 @@
   </p>
   <table role="presentation" width="100%" style="background:#fef2f2;border-radius:8px;">
     <tr><td style="padding:12px 14px;font-size:12px;color:#991b1b;">
-      &#9888; Bu kodu heç kimlə paylaşmayın. {{ $brand ?? 'Salam Həyətimiz' }} əməkdaşları sizdən kodu soruşmaz.
+      &#9888; Bu kodu heç kimlə paylaşmayın. {{ $brand ?? 'Salam Sesame' }} əməkdaşları sizdən kodu soruşmaz.
       Bu sorğunu siz etməmisinizsə, məktubu nəzərə almayın.
     </td></tr>
   </table>

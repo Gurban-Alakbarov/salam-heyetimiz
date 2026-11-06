@@ -38,8 +38,8 @@ enum EmailType: string
     public function defaultSubject(): string
     {
         return match ($this) {
-            self::RegistrationOtp => 'Salam Həyətimiz — qeydiyyat təsdiq kodu',
-            self::LoginOtp => 'Salam Həyətimiz — giriş təsdiq kodu',
+            self::RegistrationOtp => 'Salam Sesame — qeydiyyat təsdiq kodu',
+            self::LoginOtp => 'Salam Sesame — giriş təsdiq kodu',
             self::ResidentInvitation => 'Salam Sesame — yaşayış kompleksinə dəvət',
             self::FamilyInvitation => 'Salam Sesame — ailə üzvü dəvəti',
             self::ApplicationRejected => 'Salam Sesame — müraciətiniz təsdiqlənmədi',

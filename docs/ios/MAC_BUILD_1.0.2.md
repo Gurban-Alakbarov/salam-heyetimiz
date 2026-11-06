@@ -51,7 +51,7 @@ cd ~/salam/mobile
 flutter pub get
 flutter build ios --release --no-codesign -t lib/main_prod.dart --build-number 5
 cd ios
-xcodebuild -workspace Runner.xcworkspace -scheme SalamDoorWidget -configuration Release \
+xcodebuild -workspace Runner.xcworkspace -target SalamDoorWidget -configuration Release \
   -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
 ```
 

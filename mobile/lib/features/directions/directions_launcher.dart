@@ -11,16 +11,21 @@ import '../../l10n/app_localizations.dart';
 /// AzNav — Azerbaijan's national navigation app (Sinam).
 const _azNavPackage = 'net.sinam.aznav';
 
-/// AzNav on the App Store (Sinam MMC). Its iOS URL scheme is not public, so on iPhone the button opens
-/// AzNav's App Store page (which offers "Open" when it is installed) instead of a coordinate hand-off.
+/// AzNav on the App Store (Sinam MMC), for an iPhone without AzNav or with a version too old for the route link.
 const _azNavAppStoreUrl = 'https://apps.apple.com/app/id6758716660';
+
+/// AzNav's route link on iPhone, as given by Sinam. Note it is `lon`, not `lng`. The `aznav` scheme is listed under
+/// LSApplicationQueriesSchemes in Info.plist so iOS lets the app check for it.
+@visibleForTesting
+Uri azNavRouteUri(double lat, double lng) =>
+    Uri.parse('aznav://route?lat=$lat&lon=$lng');
 
 /// Resident "Directions" — navigate to a barrier using **AzNav only**.
 ///
 /// Independent of Visitor Links. AzNav is the single supported navigation
 /// provider (no picker, no Google Maps/Waze/HERE/2GIS/Yandex, and no generic-map
-/// fallback). On Android the destination coordinates are handed off via
-/// [_launchAzNav]; on iPhone the button opens AzNav's App Store page.
+/// fallback). The destination coordinates are handed off via [_launchAzNav] on
+/// Android and via [azNavRouteUri] on iPhone.
 class DirectionsLauncher {
   DirectionsLauncher._();
 
@@ -34,7 +39,7 @@ class DirectionsLauncher {
     String? label,
   }) async {
     if (Platform.isIOS) {
-      await _openAzNavAppStore(context);
+      await _launchAzNavOnIos(context, lat, lng);
       return;
     }
     final available = Platform.isAndroid && await _isAzNavInstalled();
@@ -78,6 +83,22 @@ class DirectionsLauncher {
     );
     if (install == true && context.mounted) {
       await _openAzNavStore(context);
+    }
+  }
+
+  /// iPhone: the route link when AzNav can take it, otherwise AzNav's App Store page.
+  static Future<void> _launchAzNavOnIos(
+    BuildContext context,
+    double lat,
+    double lng,
+  ) async {
+    final uri = azNavRouteUri(lat, lng);
+    final canOpen = await canLaunchUrl(uri).catchError((_) => false);
+    final opened = canOpen &&
+        await launchUrl(uri, mode: LaunchMode.externalApplication)
+            .catchError((_) => false);
+    if (!opened && context.mounted) {
+      await _openAzNavAppStore(context);
     }
   }
 

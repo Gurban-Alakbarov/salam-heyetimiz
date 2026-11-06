@@ -25,6 +25,7 @@
             'opened' => __('visitor.opened'),
             'failed' => __('visitor.open_failed'),
             'expiresIn' => __('visitor.expires_in'),
+            'installAzNav' => __('visitor.install_aznav'),
             'open' => __('visitor.open_barrier'),
         ],
     ];
@@ -263,14 +264,16 @@
 
             // Directions app picker. Android: AzNav is the only provider — an intent:// opens it,
             // and if AzNav is not installed Chrome follows browser_fallback_url to its Play Store
-            // page. iOS / any non-Android: AzNav is Android-only, so open Apple Maps with the
-            // coordinates instead — the Play Store (Android) link is NEVER used off Android.
+            // page. iPhone: AzNav's route link. Safari cannot tell whether AzNav is installed, so the
+            // picker also offers its App Store page. Anything else: Apple Maps with the coordinates.
+            // The Play Store (Android) link is NEVER used off Android.
             var dirBtn = document.getElementById('dirBtn');
             var dirSheet = document.getElementById('dirSheet');
             var dirList = document.getElementById('dirList');
             var NAV_SVG = '<svg viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 0 0-1.42 0l-9 9a1 1 0 0 0 0 1.42l9 9a1 1 0 0 0 1.42 0l9-9a1 1 0 0 0 0-1.42zM14 14.5V12h-4v3H8v-4a1 1 0 0 1 1-1h5V7.5l3.5 3.5z"/></svg>';
 
             var AZNAV_PLAY = 'https://play.google.com/store/apps/details?id=net.sinam.aznav';
+            var AZNAV_APP_STORE = 'https://apps.apple.com/app/id6758716660';
 
             function navApps() {
                 var c = VISIT.coordinates;
@@ -287,9 +290,18 @@
                     ];
                 }
 
-                // iOS / any non-Android → Apple Maps directions to the destination coordinates
-                // (opens the native Maps app on iOS, web Apple Maps elsewhere). The Android-only
-                // Play Store link is never used here.
+                // iPhone / iPad (iPadOS reports itself as a Mac with a touch screen).
+                var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
+                    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                if (isIos) {
+                    return [
+                        { name: 'AzNav', color: '#0b7285', url: 'aznav://route?lat=' + c.lat + '&lon=' + c.lng, samePage: true },
+                        { name: VISIT.i18n.installAzNav, color: '#6b7280', url: AZNAV_APP_STORE },
+                    ];
+                }
+
+                // Any other device → web Apple Maps directions to the destination coordinates.
+                // The Android-only Play Store link is never used here.
                 var appleMapsUrl = 'https://maps.apple.com/?daddr=' + ll + '&dirflg=d';
                 return [
                     { name: 'Apple Maps', color: '#0b7285', url: appleMapsUrl },
@@ -305,6 +317,10 @@
                     row.innerHTML = '<span class="app-icon" style="background:' + app.color + '">' + NAV_SVG + '</span><span class="app-name">' + app.name + '</span>';
                     row.addEventListener('click', function () {
                         dirSheet.hidden = true;
+                        if (app.samePage) {
+                            window.location.href = app.url; // an app link: a new tab would stay behind empty
+                            return;
+                        }
                         window.open(app.url, '_blank', 'noopener');
                     });
                     dirList.appendChild(row);

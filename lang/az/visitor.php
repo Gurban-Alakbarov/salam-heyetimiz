@@ -7,6 +7,7 @@ return [
     'open_barrier' => 'Şlaqbaumu Aç',
     'directions' => 'Yol göstər',
     'choose_app' => 'Tətbiq seçin',
+    'install_aznav' => 'AzNav-ı yüklə',
     'opening' => 'Açılır…',
     'opened' => 'Şlaqbaum açıldı',
     'open_failed' => 'Açılış alınmadı. Yenidən cəhd edin.',

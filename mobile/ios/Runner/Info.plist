@@ -49,9 +49,13 @@
 	<false/>
 	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
 	<false/>
-	<!-- map_launcher: navigation apps the "Directions" action can detect/hand off to. -->
+	<!-- 1.0.2: no ads, so no advertising identifier from Firebase Analytics. -->
+	<key>GOOGLE_ANALYTICS_ADID_COLLECTION_ENABLED</key>
+	<false/>
+	<!-- Navigation apps the "Directions" action can detect/hand off to: AzNav and those of map_launcher. -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>aznav</string>
 		<string>comgooglemaps</string>
 		<string>waze</string>
 		<string>yandexmaps</string>

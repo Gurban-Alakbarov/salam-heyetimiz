@@ -8,6 +8,13 @@ import 'package:salam_mobile/l10n/app_localizations.dart';
 /// test host `Platform.isAndroid` is false, so [DirectionsLauncher.open] takes the
 /// not-available branch deterministically, without touching platform channels.
 void main() {
+  test('builds the AzNav route link with lat and lon', () {
+    final uri = azNavRouteUri(40.4093, 49.8671);
+
+    expect(uri.toString(), 'aznav://route?lat=40.4093&lon=49.8671');
+    expect(uri.queryParameters['lng'], isNull);
+  });
+
   Widget harness(Locale locale) => MaterialApp(
     locale: locale,
     localizationsDelegates: AppLocalizations.localizationsDelegates,

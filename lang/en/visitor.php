@@ -7,6 +7,7 @@ return [
     'open_barrier' => 'Open Barrier',
     'directions' => 'Directions',
     'choose_app' => 'Choose an app',
+    'install_aznav' => 'Install AzNav',
     'opening' => 'Opening…',
     'opened' => 'Barrier opened',
     'open_failed' => 'Could not open. Please try again.',

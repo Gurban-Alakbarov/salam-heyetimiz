@@ -26,15 +26,20 @@ it('renders the open page for a live link', function () {
         ->assertSee('net.sinam.aznav')
         ->assertSee('intent://')
         ->assertSee('browser_fallback_url')
-        // iOS / non-Android branch: Apple Maps directions to the coordinates (never the Play Store).
+        // iPhone branch: AzNav's route link (lat + lon), with its App Store page next to it.
+        ->assertSee("aznav://route?lat=", false)
+        ->assertSee("'&lon='", false)
+        ->assertSee('apps.apple.com/app/id6758716660')
+        ->assertSee(trim((string) json_encode(__('visitor.install_aznav')), '"'), false)
+        // Any other device: Apple Maps directions to the coordinates (never the Play Store).
         ->assertSee('maps.apple.com/?daddr=')
         ->assertSee('dirflg=d')
         ->assertSee('Apple Maps')
-        // Google Maps/Waze/etc. stay removed — AzNav (Android) + Apple Maps (iOS) are the only targets.
+        // Google Maps/Waze/etc. stay removed.
         ->assertDontSee('google.com/maps/dir');
 
-    // Regression guard for the iOS bug: the non-Android branch opens Apple Maps, never the Play
-    // Store — the old `: AZNAV_PLAY` ternary that pointed iOS at play.google.com must be gone.
+    // Regression guard for the iOS bug: the non-Android branches never open the Play Store — the
+    // old `: AZNAV_PLAY` ternary that pointed iOS at play.google.com must be gone.
     expect($res->getContent())->not->toContain(': AZNAV_PLAY');
 });
 

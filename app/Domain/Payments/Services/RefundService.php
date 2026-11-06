@@ -4,6 +4,7 @@ namespace App\Domain\Payments\Services;
 
 use App\Domain\Admin\Models\AdminUser;
 use App\Domain\Audit\Services\AuditLogger;
+use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Adapters\PaymentGateway;
 use App\Domain\Payments\DTOs\RefundRequestData;
 use App\Domain\Payments\Enums\OrderStatus;
@@ -15,6 +16,7 @@ use App\Domain\Payments\Events\OrderRefundRequested;
 use App\Domain\Payments\Events\OrderRefunded;
 use App\Domain\Payments\Exceptions\OrderNotRefundableException;
 use App\Domain\Payments\Exceptions\RefundIdempotencyMismatchException;
+use App\Domain\Payments\Exceptions\TestOrderNotRefundableException;
 use App\Domain\Payments\Models\Order;
 use App\Domain\Payments\Models\Refund;
 use App\Domain\Payments\Support\PaymentSettings;
@@ -183,6 +185,10 @@ final class RefundService
     /** @param  bool  $countInFlight  at request time, refunds not yet settled (requested / processing) are already spoken for */
     private function assertRefundable(Order $order, int $amountMinor, bool $countInFlight = false): void
     {
+        if (FakeKapitalGateway::isFakeBankOrderId($order->bank_order_id) && ! $this->gateway instanceof FakeKapitalGateway) {
+            throw new TestOrderNotRefundableException('Test payment: nothing to refund.');
+        }
+
         if (! $order->status->isPaidLike()) {
             throw new OrderNotRefundableException(
                 'Order is not in a refundable state.',

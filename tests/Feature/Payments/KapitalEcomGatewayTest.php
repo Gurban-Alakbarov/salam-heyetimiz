@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Admin\Services\SettingsService;
+use App\Domain\Payments\Adapters\FakeKapitalGateway;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomClient;
 use App\Domain\Payments\Adapters\KapitalEcom\KapitalEcomGateway;
 use App\Domain\Payments\Adapters\PaymentGateway;
@@ -278,6 +279,24 @@ it('leaves a refund with an unknown outcome to the job retry', function () {
     ]);
 
     expect(fn () => kapitalGateway()->refund('294074', 500, 'refund-1'))->toThrow(KapitalEcomApiException::class);
+});
+
+it('refuses to refund a test-checkout order on the real gateway, in plain words', function () {
+    seedRbac();
+    setKapitalEcom();
+    app()->instance(PaymentGateway::class, kapitalGateway());
+    Http::fake();
+    $order = makePaidOrder(makeUser(), 1500, FakeKapitalGateway::BANK_ORDER_PREFIX.'old-1');
+
+    $this->actingAs(makeSuperAdmin(), 'admin')
+        ->withHeaders(['Idempotency-Key' => 'test-order-1'])
+        ->postJson("/admin/v1/orders/{$order->id}/refund", ['amount_minor' => 1500, 'reason' => 'customer request'])
+        ->assertStatus(409)
+        ->assertJsonPath('error.code', 'test_order_not_refundable')
+        ->assertJsonPath('error.message', __('errors.test_order_not_refundable'));
+
+    Http::assertNothingSent();
+    expect($order->refresh()->refunds()->count())->toBe(0);
 });
 
 it('finds the order from the ID the bank sends to the return page', function () {

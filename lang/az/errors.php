@@ -37,6 +37,7 @@ return [
     'roster_member_not_found' => 'İstifadəçi bu cihazın istifadəçiləri arasında deyil.',
     'resident_owns_device' => 'Bu sakin cihaz sahibidir — silmədən əvvəl cihazı başqasına köçürün və ya deaktiv edin.',
     'order_not_refundable' => 'Sifariş geri qaytarıla bilməz.',
+    'test_order_not_refundable' => 'Test ödənişidir, geri qaytarma yoxdur.',
     'subscription_not_renewable' => 'Abonelik hazırkı vəziyyətində yenilənə bilməz.',
     'auto_renew_unavailable' => 'Avtomatik yenilənmə hələ əlçatan deyil.',
     'signature_invalid' => 'İmza yanlışdır və ya yoxdur.',

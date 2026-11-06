@@ -34,6 +34,7 @@ return [
     'roster_member_not_found' => 'This user is not on the device roster.',
     'resident_owns_device' => 'This resident still owns a device — transfer or decommission it before deleting the account.',
     'order_not_refundable' => 'The order is not refundable.',
+    'test_order_not_refundable' => 'This is a test payment, there is nothing to refund.',
     'subscription_not_renewable' => 'The subscription cannot be renewed in its current state.',
     'auto_renew_unavailable' => 'Auto-renew is not available yet.',
     'signature_invalid' => 'The signature is invalid or missing.',
